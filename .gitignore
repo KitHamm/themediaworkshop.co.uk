@@ -41,3 +41,7 @@ docker-compose.yaml
 
 # prisma
 seed.ts
+
+# media
+public/images
+public/video
