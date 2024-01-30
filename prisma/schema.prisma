@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @default(cuid())
+    email String @unique
+    password String?
+    firstname String
+    lastname String
+    position String?
+    image String?
+}
+
+model Page {
+    id Int @unique @default(autoincrement())
+    title String @unique
+    short String?
+    description String?
+    video String?
+    segment Segment[]
+}
+
+model Segment {
+    id Int @unique @default(autoincrement())
+    title String @unique
+    copy String?
+    image String[]
+    video String[]
+    headerimage String?
+    order Int?
+    page Page @relation(fields: [pageId], references: [id])
+    pageId Int
+    casestudy CaseStudy[]
+}
+
+model CaseStudy {
+    id Int @unique @default(autoincrement())
+    title String
+    copy String
+    image String[]
+    video String[]
+    segment Segment @relation(fields: [segmentId], references: [id])
+    segmentId Int
+}
