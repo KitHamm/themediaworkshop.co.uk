@@ -18,6 +18,7 @@ export default async function Dashboard() {
     async function revalidateDashboard() {
         "use server";
         revalidatePath("/dashboard", "page");
+        revalidatePath("/", "page");
     }
 
     return (
