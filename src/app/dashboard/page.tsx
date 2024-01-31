@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { Page } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/auth";
+import { authOptions } from "@/authOptions";
 import SidePanel from "@/components/dashboard/SidePanel";
 import DashboardTop from "@/components/dashboard/DashboardTop";
 import DashboardMain from "@/components/dashboard/DashboardMain";
