@@ -48,15 +48,36 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     name: user.firstname + " " + user.lastname,
                     position: user.position,
+                    image: user.image,
                 };
             },
         }),
     ],
     callbacks: {
         session: ({ session, token }) => {
-            return session;
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    id: token.id,
+                    name: token.name,
+                    email: token.email,
+                    position: token.position,
+                },
+            };
         },
         jwt: ({ token, user }) => {
+            if (user) {
+                const u = user as unknown as any;
+                return {
+                    ...token,
+                    id: u.id,
+                    email: u.email,
+                    name: u.name,
+                    position: u.position,
+                    image: u.image,
+                };
+            }
             return token;
         },
     },

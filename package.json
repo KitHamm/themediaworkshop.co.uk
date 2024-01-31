@@ -16,7 +16,8 @@
         "next-auth": "^4.24.5",
         "next-video": "^0.12.0",
         "react": "^18",
-        "react-dom": "^18"
+        "react-dom": "^18",
+        "react-hook-form": "^7.49.3"
     },
     "prisma": {
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
