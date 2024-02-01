@@ -17,7 +17,7 @@ export default function PageEdit(props: {
         props.data.header ? props.data.header : ""
     );
     const [video, setVideo] = useState(
-        props.data.video ? props.data.video : ""
+        props.data.video ? props.data.video : "Select Video"
     );
     const [showreel, setShowreel] = useState(
         props.data.showreel ? props.data.showreel : "Select Video"
