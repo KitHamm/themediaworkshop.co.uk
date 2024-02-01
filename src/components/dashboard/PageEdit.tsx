@@ -148,7 +148,7 @@ export default function PageEdit(props: {
                                     }}
                                     disabled={
                                         video === props.data.video ||
-                                        showreel === "Select Video"
+                                        video === "Select Video"
                                             ? true
                                             : false
                                     }
