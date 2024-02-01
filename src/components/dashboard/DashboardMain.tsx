@@ -9,6 +9,7 @@ import PageEdit from "./PageEdit";
 export default function DashboardMain(props: {
     data: Page;
     revalidateDashboard: any;
+    bgVideos: string[];
 }) {
     const searchParams = useSearchParams();
     const pageEdit: string = searchParams.get("pageEdit")
@@ -26,6 +27,7 @@ export default function DashboardMain(props: {
                 return (
                     <div key={index}>
                         <PageEdit
+                            bgVideos={props.bgVideos}
                             revalidateDashboard={props.revalidateDashboard}
                             data={page}
                             hidden={pageEdit === page.title ? false : true}

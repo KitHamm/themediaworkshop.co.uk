@@ -4,6 +4,8 @@
         "firstname",
         "lastname",
         "nextauth",
-        "tailwindcss"
+        "tailwindcss",
+        "updatepage",
+        "uploadvideo"
     ]
 }

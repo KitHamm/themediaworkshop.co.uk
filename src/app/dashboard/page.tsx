@@ -6,6 +6,7 @@ import SidePanel from "@/components/dashboard/SidePanel";
 import DashboardTop from "@/components/dashboard/DashboardTop";
 import DashboardMain from "@/components/dashboard/DashboardMain";
 import { revalidatePath } from "next/cache";
+import fs from "fs";
 
 export default async function Dashboard() {
     const session = await getServerSession(authOptions);
@@ -14,11 +15,21 @@ export default async function Dashboard() {
             segment: { include: { casestudy: true } },
         },
     });
+    var bgVideos: string[] = [];
+    fs.readdir("./public/video", function (error, videos) {
+        if (error) {
+            return console.log(error);
+        }
+        var videoList = [];
+        videos.forEach(function (video) {
+            bgVideos.push(video);
+        });
+    });
 
-    async function revalidateDashboard() {
+    async function revalidateDashboard(route: string) {
         "use server";
         revalidatePath("/dashboard", "page");
-        revalidatePath("/", "page");
+        revalidatePath(route, "page");
     }
 
     return (
@@ -30,6 +41,7 @@ export default async function Dashboard() {
                 <div className="xl:basis-5/6">
                     <DashboardTop />
                     <DashboardMain
+                        bgVideos={bgVideos}
                         revalidateDashboard={revalidateDashboard}
                         data={data}
                     />

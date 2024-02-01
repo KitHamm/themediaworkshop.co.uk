@@ -20,5 +20,5 @@ select {
     padding: 12px 20px;
     resize: none;
     width: 100%;
-    height: -webkit-fill-available;
+    /* height: -webkit-fill-available; */
 }

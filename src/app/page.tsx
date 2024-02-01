@@ -22,7 +22,7 @@ export default async function Home() {
                         autoPlay={true}
                         muted
                         loop
-                        src={"/video/Header_HOMEPAGE-3.mp4"}
+                        src={"/video/" + data?.video}
                     />
                     <Header description={data?.description} />
                 </section>
