@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Messages from "./Message";
 import Settings from "./Settings";
 import PageEdit from "./PageEdit";
+import { NextUIProvider } from "@nextui-org/react";
 
 export default function DashboardMain(props: {
     data: Page;
@@ -20,7 +21,7 @@ export default function DashboardMain(props: {
         : "none";
 
     return (
-        <>
+        <NextUIProvider>
             <Messages hidden={view === "messages" ? false : true} />
             <Settings hidden={view === "settings" ? false : true} />
             {props.data.map((page: Page, index: number) => {
@@ -35,6 +36,6 @@ export default function DashboardMain(props: {
                     </div>
                 );
             })}
-        </>
+        </NextUIProvider>
     );
 }

@@ -2,6 +2,7 @@
 
 import { Page } from "@prisma/client";
 import { useState } from "react";
+import { Select, SelectItem } from "@nextui-org/react";
 
 export default function PageEdit(props: {
     data: Page;
@@ -9,9 +10,18 @@ export default function PageEdit(props: {
     revalidateDashboard: any;
     bgVideos: string[];
 }) {
-    const [description, setDescription] = useState(props.data.description);
-    const [video, setVideo] = useState(props.data.video);
-    const [showreel, setShowreel] = useState(props.data.showreel);
+    const [description, setDescription] = useState(
+        props.data.description ? props.data.description : ""
+    );
+    const [header, setHeader] = useState(
+        props.data.header ? props.data.header : ""
+    );
+    const [video, setVideo] = useState(
+        props.data.video ? props.data.video : ""
+    );
+    const [showreel, setShowreel] = useState(
+        props.data.showreel ? props.data.showreel : "Select Video"
+    );
     const [newVideo, setNewVideo] = useState<File>();
     const [uploading, setUploading] = useState(false);
 
@@ -46,6 +56,13 @@ export default function PageEdit(props: {
         updatePage(json);
     }
 
+    function handleHeader() {
+        const json = {
+            header: header,
+        };
+        updatePage(json);
+    }
+
     function handleBackgroundVideo() {
         const json = {
             video: video,
@@ -62,7 +79,7 @@ export default function PageEdit(props: {
 
     function clearFileInput() {
         const inputElm = document.getElementById(
-            "new-video"
+            "new-video-" + props.data.title
         ) as HTMLInputElement;
         if (inputElm) {
             inputElm.value = "";
@@ -103,28 +120,26 @@ export default function PageEdit(props: {
                 <div id="left-column">
                     <div className="xl:grid xl:grid-cols-2 xl:gap-10">
                         <div>
-                            <label htmlFor="bg-video">Background Video</label>
-                            <select
-                                defaultValue={video ? video : ""}
-                                className="text-black"
-                                name="bg-video"
-                                id="bg-video"
+                            <label htmlFor={"bg-video-" + props.data.title}>
+                                Background Video
+                            </label>
+                            <Select
+                                disabledKeys={["Select Video"]}
+                                label="Background Video"
+                                placeholder="Select a video"
+                                className="max-w-xs text-black my-4"
+                                defaultSelectedKeys={[video]}
                                 onChange={(e) => setVideo(e.target.value)}>
-                                <option value="" disabled>
-                                    Select an option
-                                </option>
-                                {props.bgVideos.map(
-                                    (videoUrl: string, index: number) => {
-                                        return (
-                                            <option
-                                                key={"video-" + index}
-                                                value={videoUrl}>
-                                                {videoUrl}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
+                                {props.bgVideos.map((videoName: string) => {
+                                    return (
+                                        <SelectItem
+                                            className="text-black"
+                                            key={videoName}>
+                                            {videoName}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </Select>
                             <div>
                                 <button
                                     onClick={(e) => {
@@ -132,7 +147,8 @@ export default function PageEdit(props: {
                                         handleBackgroundVideo();
                                     }}
                                     disabled={
-                                        video === props.data.video
+                                        video === props.data.video ||
+                                        showreel === "Select Video"
                                             ? true
                                             : false
                                     }
@@ -141,7 +157,8 @@ export default function PageEdit(props: {
                                 </button>
                             </div>
                             <div className="mt-6">
-                                <label htmlFor="new-video">
+                                <label
+                                    htmlFor={"new-video-" + props.data.title}>
                                     Upload New Video
                                 </label>
                                 <input
@@ -151,8 +168,8 @@ export default function PageEdit(props: {
                                     }}
                                     className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2"
                                     type="file"
-                                    name="new-video"
-                                    id="new-video"
+                                    name={"new-video-" + props.data.title}
+                                    id={"new-video-" + props.data.title}
                                 />
                                 <div className="flex">
                                     <button
@@ -179,28 +196,26 @@ export default function PageEdit(props: {
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="showreel">Showreel</label>
-                            <select
-                                defaultValue={showreel ? showreel : ""}
-                                className="text-black"
-                                name="showreel"
-                                id="showreel"
+                            <label htmlFor={"showreel-" + props.data.title}>
+                                Showreel
+                            </label>
+                            <Select
+                                disabledKeys={["Select Video"]}
+                                label="Background Video"
+                                placeholder="Select a video"
+                                className="max-w-xs text-black my-4"
+                                defaultSelectedKeys={[showreel]}
                                 onChange={(e) => setShowreel(e.target.value)}>
-                                <option value="" disabled>
-                                    Select an option
-                                </option>
-                                {props.bgVideos.map(
-                                    (videoUrl: string, index: number) => {
-                                        return (
-                                            <option
-                                                key={"video-" + index}
-                                                value={videoUrl}>
-                                                {videoUrl}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
+                                {props.bgVideos.map((videoName: string) => {
+                                    return (
+                                        <SelectItem
+                                            className="text-black"
+                                            key={videoName}>
+                                            {videoName}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </Select>
 
                             <button
                                 onClick={(e) => {
@@ -208,7 +223,8 @@ export default function PageEdit(props: {
                                     handleShowreel();
                                 }}
                                 disabled={
-                                    showreel === props.data.showreel
+                                    showreel === props.data.showreel ||
+                                    showreel === "Select Video"
                                         ? true
                                         : false
                                 }
@@ -225,15 +241,55 @@ export default function PageEdit(props: {
                         <em>required</em>) and the showreel.
                     </div>
                 </div>
+                {/* Left Column */}
                 <div>
-                    <label htmlFor="description">Description</label>
+                    <label htmlFor={"header-" + props.data.title}>Title</label>
+                    {/* <textarea
+                        value={description ? description : ""}
+                        onChange={(e) => {
+                            setDescription(e.target.value);
+                        }}
+                        name={"description-" + props.data.title}
+                        id={"description-" + props.data.title}
+                        className="text-black h-52"
+                    /> */}
+                    <input
+                        placeholder="Title"
+                        value={header}
+                        onChange={(e) => setHeader(e.target.value)}
+                        id={"header-" + props.data.title}
+                        name={"header-" + props.data.title}
+                        type="text"
+                        className="text-black"
+                    />
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleHeader();
+                        }}
+                        disabled={
+                            header === props.data.header || header === ""
+                                ? true
+                                : false
+                        }
+                        className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
+                        Update
+                    </button>
+                </div>
+                <div className="xl:flex">
+                    <div className="my-auto">The Page Title</div>
+                </div>
+                <div>
+                    <label htmlFor={"description-" + props.data.title}>
+                        Description
+                    </label>
                     <textarea
                         value={description ? description : ""}
                         onChange={(e) => {
                             setDescription(e.target.value);
                         }}
-                        name="description"
-                        id="description"
+                        name={"description-" + props.data.title}
+                        id={"description-" + props.data.title}
                         className="text-black h-52"
                     />
                     <button

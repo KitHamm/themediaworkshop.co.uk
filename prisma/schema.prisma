@@ -23,6 +23,7 @@ model User {
 model Page {
     id Int @unique @default(autoincrement())
     title String @unique
+    header String?
     description String?
     video String?
     showreel String?

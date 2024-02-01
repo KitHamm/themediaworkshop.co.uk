@@ -18,13 +18,17 @@ export default async function Home() {
                     className="relative top-0 left-0 w-full h-screen overflow-hidden">
                     <video
                         id="bg-video"
-                        className="w-full h-auto"
+                        className="w-full h-auto fade-in"
                         autoPlay={true}
                         muted
                         loop
                         src={process.env.BASE_VIDEO_URL + data?.video}
                     />
-                    <Header description={data?.description} />
+                    <Header
+                        home={true}
+                        header={data?.header}
+                        description={data?.description}
+                    />
                 </section>
             </header>
         </>

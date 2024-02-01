@@ -5,6 +5,7 @@
         "firstname",
         "lastname",
         "nextauth",
+        "nextui",
         "tailwindcss",
         "updatepage",
         "uploadvideo"

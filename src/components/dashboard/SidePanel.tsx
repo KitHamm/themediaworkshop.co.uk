@@ -12,13 +12,15 @@ export default function SidePanel(props: { session: any }) {
         ? searchParams.get("pageEdit")!
         : "none";
     return (
-        <div className="min-h-screen bg-neutral-800 border-r border-orange-400">
+        <div className="min-h-screen h-full bg-neutral-800 border-r border-orange-400">
             <div className="xl:flex xl:p-10">
                 <Image
+                    onClick={() => (window.location.href = "/")}
                     src={"/images/tmw-logo.png"}
                     alt="TMW Logo"
                     height={75}
                     width={720}
+                    className="cursor-pointer"
                 />
             </div>
             <div className="xl:flex justify-center">

@@ -11,16 +11,21 @@ import fs from "fs";
 export default async function Dashboard() {
     const session = await getServerSession(authOptions);
     const data: Page = await prisma.page.findMany({
+        orderBy: [
+            {
+                id: "asc",
+            },
+        ],
         include: {
             segment: { include: { casestudy: true } },
         },
     });
-    var bgVideos: string[] = [];
+    var bgVideos: string[] = ["Select Video"];
+
     fs.readdir(process.env.STATIC_VIDEOS as string, function (error, videos) {
         if (error) {
             return console.log(error);
         }
-        var videoList = [];
         videos.forEach(function (video) {
             bgVideos.push(video);
         });
