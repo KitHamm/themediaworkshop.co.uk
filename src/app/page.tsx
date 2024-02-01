@@ -22,7 +22,7 @@ export default async function Home() {
                         autoPlay={true}
                         muted
                         loop
-                        src={"/video/" + data?.video}
+                        src={process.env.BASE_URL + data?.video}
                     />
                     <Header description={data?.description} />
                 </section>

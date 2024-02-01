@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     try {
         await writeFile(
-            path.join(process.cwd(), "public/video/" + file.name),
+            path.join(process.cwd(), "videos/" + file.name),
             buffer
         );
         return new NextResponse(JSON.stringify(file.name), { status: 201 });
