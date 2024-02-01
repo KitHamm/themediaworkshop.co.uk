@@ -1,7 +1,7 @@
 "use client";
 
 import { Page } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function PageEdit(props: {
     data: Page;
@@ -13,29 +13,30 @@ export default function PageEdit(props: {
     const [video, setVideo] = useState(props.data.video);
     const [showreel, setShowreel] = useState(props.data.showreel);
     const [newVideo, setNewVideo] = useState<File>();
+    const [uploading, setUploading] = useState(false);
 
     async function handleUploadVideo() {
         const formData = new FormData();
         if (newVideo) {
             formData.append("file", newVideo);
         }
-        try {
-            const response = await fetch("/api/uploadvideo", {
-                method: "POST",
-                body: formData,
-            });
-            if (response.ok) {
-                var result = await response.json();
-                console.log(result);
-                if (props.data.title === "home") {
-                    props.revalidateDashboard("/");
-                } else {
-                    props.revalidateDashboard("/" + props.data.title);
+        const response = await fetch("/api/uploadvideo", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Done");
+                    setUploading(false);
+                    clearFileInput();
+                    if (props.data.title === "home") {
+                        props.revalidateDashboard("/");
+                    } else {
+                        props.revalidateDashboard("/" + props.data.title);
+                    }
                 }
-            }
-        } catch (error) {
-            console.log(error);
-        }
+            })
+            .catch((error) => console.log(error));
     }
 
     function handleDescription() {
@@ -79,7 +80,8 @@ export default function PageEdit(props: {
                 }),
             });
             if (response.ok) {
-                await response.json();
+                console.log("Done");
+
                 if (props.data.title === "home") {
                     props.revalidateDashboard("/");
                 } else {
@@ -157,6 +159,7 @@ export default function PageEdit(props: {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             console.log("Video");
+                                            setUploading(true);
                                             handleUploadVideo();
                                         }}
                                         disabled={newVideo ? false : true}
@@ -172,6 +175,7 @@ export default function PageEdit(props: {
                                         Clear
                                     </button>
                                 </div>
+                                <div>{uploading ? "Uploading..." : ""}</div>
                             </div>
                         </div>
                         <div>
