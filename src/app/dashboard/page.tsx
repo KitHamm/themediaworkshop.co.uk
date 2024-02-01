@@ -16,7 +16,7 @@ export default async function Dashboard() {
         },
     });
     var bgVideos: string[] = [];
-    fs.readdir("./public/video", function (error, videos) {
+    fs.readdir(process.env.STATIC_VIDEOS as string, function (error, videos) {
         if (error) {
             return console.log(error);
         }
