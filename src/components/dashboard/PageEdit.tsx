@@ -27,33 +27,7 @@ export default function PageEdit(props: {
     const [showreel, setShowreel] = useState(
         props.data.showreel ? props.data.showreel : "None"
     );
-    const [newVideo, setNewVideo] = useState<File>();
     const [newSegmentModal, setNewSegmentModal] = useState(false);
-    const [uploading, setUploading] = useState(false);
-
-    async function handleUploadVideo() {
-        const formData = new FormData();
-        if (newVideo) {
-            formData.append("file", newVideo);
-        }
-        const response = await fetch("/api/uploadvideo", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setUploading(false);
-                    clearFileInput();
-                    if (props.data.title === "home") {
-                        props.revalidateDashboard("/");
-                    } else {
-                        props.revalidateDashboard("/" + props.data.title);
-                    }
-                }
-            })
-            .catch((error) => console.log(error));
-    }
-
     function handleDescription() {
         const json = {
             description: description,
@@ -80,16 +54,6 @@ export default function PageEdit(props: {
             showreel: showreel,
         };
         updatePage(json);
-    }
-
-    function clearFileInput() {
-        const inputElm = document.getElementById(
-            "new-video-" + props.data.title
-        ) as HTMLInputElement;
-        if (inputElm) {
-            inputElm.value = "";
-        }
-        setNewVideo(undefined);
     }
 
     async function updatePage(json: any) {
@@ -164,44 +128,6 @@ export default function PageEdit(props: {
                                         Update
                                     </button>
                                 </div>
-                                {/* <div className="mt-6">
-                                <label
-                                    htmlFor={"new-video-" + props.data.title}>
-                                    Upload New Video
-                                </label>
-                                <input
-                                    onChange={(e) => {
-                                        if (e.target.files)
-                                            setNewVideo(e.target.files[0]);
-                                    }}
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2"
-                                    type="file"
-                                    name={"new-video-" + props.data.title}
-                                    id={"new-video-" + props.data.title}
-                                />
-                                <div className="flex">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            console.log("Video");
-                                            setUploading(true);
-                                            handleUploadVideo();
-                                        }}
-                                        disabled={newVideo ? false : true}
-                                        className="mt-2 disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                                        Upload
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            clearFileInput();
-                                        }}
-                                        className="mt-2 ms-4 bg-red-400 text-black rounded-md px-4 py-2">
-                                        Clear
-                                    </button>
-                                </div>
-                                <div>{uploading ? "Uploading..." : ""}</div>
-                            </div> */}
                             </div>
                             <div>
                                 {props.bgVideos.length > 1 ? (

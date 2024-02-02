@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Navbar(props: { active: string }) {
     return (
-        <nav className="fixed z-40 bg-neutral-900 top-0 w-full">
-            <ul className="flex justify-evenly px-80 uppercase font-normal py-3 text-2xl">
+        <nav className="fixed z-40 bg-black top-0 w-full">
+            <ul className="flex justify-evenly w-4/6 mx-auto uppercase font-normal py-3 text-2xl">
                 <li
                     className={`${
                         props.active === "home" ? "text-orange-600" : ""

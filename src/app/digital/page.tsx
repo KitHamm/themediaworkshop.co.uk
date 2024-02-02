@@ -14,10 +14,10 @@ export default async function Home() {
     return (
         <>
             <Navbar active="digital" />
-            <header id="header" className="w-full h-full">
+            <header id="header" className="overflow-x-hidden">
                 <section
                     id="bg-video-container"
-                    className="relative top-0 left-0 w-full h-screen overflow-hidden">
+                    className="relative top-0 left-0 w-screen h-screen overflow-hidden">
                     <video
                         id="bg-video"
                         className="w-full h-auto fade-in"

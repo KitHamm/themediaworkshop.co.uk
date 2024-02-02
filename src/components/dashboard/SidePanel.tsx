@@ -49,6 +49,11 @@ export default function SidePanel(props: { session: any }) {
                 Pages
             </Link>
             <Link
+                href={"?view=media"}
+                className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
+                Media
+            </Link>
+            <Link
                 href={"?view=messages"}
                 className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
                 Message

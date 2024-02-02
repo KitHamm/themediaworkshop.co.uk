@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={lato.className + " bg-neutral-900 text-white"}>
+            <body className={lato.className + " bg-neutral-900 text-white m-0"}>
                 {children}
             </body>
         </html>
