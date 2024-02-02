@@ -1,13 +1,15 @@
 import Navbar from "@/components/Navbar";
 import prisma from "@/lib/prisma";
-import { Page } from "@prisma/client";
+import { Page, Segment } from "@prisma/client";
 import Header from "@/components/header";
+import PageSegment from "@/components/PageSegment";
 
 export default async function Home() {
     const data: Page = await prisma.page.findUnique({
         where: {
             title: "events",
         },
+        include: { segment: { include: { casestudy: true } } },
     });
     return (
         <>
@@ -31,6 +33,13 @@ export default async function Home() {
                     />
                 </section>
             </header>
+            {data?.segment.map((segment: Segment, index: number) => {
+                return (
+                    <div key={segment.title}>
+                        <PageSegment segment={segment} index={index} />
+                    </div>
+                );
+            })}
         </>
     );
 }

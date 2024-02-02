@@ -1,8 +1,10 @@
 "use client";
 
-import { Page } from "@prisma/client";
+import { Page, Segment } from "@prisma/client";
 import { useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
+import EditSegment from "./Segment";
+import NewSegment from "./NewSegment";
 
 export default function PageEdit(props: {
     data: Page;
@@ -13,16 +15,20 @@ export default function PageEdit(props: {
     const [description, setDescription] = useState(
         props.data.description ? props.data.description : ""
     );
+    const [checkDescription, setCheckDescription] = useState(
+        props.data.description ? props.data.description : ""
+    );
     const [header, setHeader] = useState(
         props.data.header ? props.data.header : ""
     );
     const [video, setVideo] = useState(
-        props.data.video ? props.data.video : "Select Video"
+        props.data.video ? props.data.video : "None"
     );
     const [showreel, setShowreel] = useState(
-        props.data.showreel ? props.data.showreel : "Select Video"
+        props.data.showreel ? props.data.showreel : "None"
     );
     const [newVideo, setNewVideo] = useState<File>();
+    const [newSegmentModal, setNewSegmentModal] = useState(false);
     const [uploading, setUploading] = useState(false);
 
     async function handleUploadVideo() {
@@ -36,7 +42,6 @@ export default function PageEdit(props: {
         })
             .then((response) => {
                 if (response.ok) {
-                    console.log("Done");
                     setUploading(false);
                     clearFileInput();
                     if (props.data.title === "home") {
@@ -88,75 +93,78 @@ export default function PageEdit(props: {
     }
 
     async function updatePage(json: any) {
-        try {
-            const response = await fetch("/api/updatepage", {
-                method: "POST",
-                body: JSON.stringify({
-                    id: props.data.id as number,
-                    data: json,
-                }),
-            });
-            if (response.ok) {
-                console.log("Done");
-
-                if (props.data.title === "home") {
-                    props.revalidateDashboard("/");
-                } else {
-                    props.revalidateDashboard("/" + props.data.title);
+        const response = await fetch("/api/updatepage", {
+            method: "POST",
+            body: JSON.stringify({
+                id: props.data.id as number,
+                data: json,
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    if (props.data.title === "home") {
+                        props.revalidateDashboard("/");
+                    } else {
+                        props.revalidateDashboard("/" + props.data.title);
+                    }
                 }
-            }
-        } catch (error) {
-            console.log(error);
-        }
+            })
+            .catch((error) => console.log(error));
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20`}>
+        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in mb-10`}>
             <div className="my-10 border-b py-4 text-3xl font-bold capitalize">
-                Editing {props.data.title}
+                {props.data.title}
             </div>
-            <div className="xl:grid xl:grid-cols-2 xl:gap-10">
-                {/* Left Column */}
-                <div id="left-column">
-                    <div className="xl:grid xl:grid-cols-2 xl:gap-10">
-                        <div>
-                            <label htmlFor={"bg-video-" + props.data.title}>
-                                Background Video
-                            </label>
-                            <Select
-                                disabledKeys={["Select Video"]}
-                                label="Background Video"
-                                placeholder="Select a video"
-                                className="max-w-xs text-black my-4"
-                                defaultSelectedKeys={[video]}
-                                onChange={(e) => setVideo(e.target.value)}>
-                                {props.bgVideos.map((videoName: string) => {
-                                    return (
-                                        <SelectItem
-                                            className="text-black"
-                                            key={videoName}>
-                                            {videoName}
-                                        </SelectItem>
-                                    );
-                                })}
-                            </Select>
+            <div className="">
+                <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
+                    <div id="left-column">
+                        <div className="border-b pb-2">Page Videos</div>
+                        <div className="xl:grid xl:grid-cols-2 xl:gap-10">
                             <div>
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleBackgroundVideo();
-                                    }}
-                                    disabled={
-                                        video === props.data.video ||
-                                        video === "Select Video"
-                                            ? true
-                                            : false
-                                    }
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                                    Update
-                                </button>
-                            </div>
-                            <div className="mt-6">
+                                {props.bgVideos.length > 1 ? (
+                                    <Select
+                                        disabledKeys={["None"]}
+                                        label="Background Video"
+                                        placeholder="Select a video"
+                                        className="max-w-xs text-black my-4"
+                                        defaultSelectedKeys={[video]}
+                                        onChange={(e) =>
+                                            setVideo(e.target.value)
+                                        }>
+                                        {props.bgVideos.map(
+                                            (videoName: string) => {
+                                                return (
+                                                    <SelectItem
+                                                        className="text-black"
+                                                        key={videoName}>
+                                                        {videoName}
+                                                    </SelectItem>
+                                                );
+                                            }
+                                        )}
+                                    </Select>
+                                ) : (
+                                    ""
+                                )}
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleBackgroundVideo();
+                                        }}
+                                        disabled={
+                                            video === props.data.video ||
+                                            video === "None"
+                                                ? true
+                                                : false
+                                        }
+                                        className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
+                                        Update
+                                    </button>
+                                </div>
+                                {/* <div className="mt-6">
                                 <label
                                     htmlFor={"new-video-" + props.data.title}>
                                     Upload New Video
@@ -193,126 +201,154 @@ export default function PageEdit(props: {
                                     </button>
                                 </div>
                                 <div>{uploading ? "Uploading..." : ""}</div>
+                            </div> */}
+                            </div>
+                            <div>
+                                {props.bgVideos.length > 1 ? (
+                                    <Select
+                                        label="Showreel"
+                                        placeholder="Select a video"
+                                        className="max-w-xs text-black my-4"
+                                        defaultSelectedKeys={[showreel]}
+                                        onChange={(e) =>
+                                            setShowreel(e.target.value)
+                                        }>
+                                        {props.bgVideos.map(
+                                            (videoName: string) => {
+                                                return (
+                                                    <SelectItem
+                                                        className="text-black"
+                                                        key={videoName}>
+                                                        {videoName}
+                                                    </SelectItem>
+                                                );
+                                            }
+                                        )}
+                                    </Select>
+                                ) : (
+                                    ""
+                                )}
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleShowreel();
+                                        }}
+                                        disabled={
+                                            showreel === props.data.showreel
+                                                ? true
+                                                : false
+                                        }
+                                        className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="my-10">
+                            <div className="border-b pb-2 mb-2">Header</div>
+                            <input
+                                placeholder="Title"
+                                value={header}
+                                onChange={(e) => setHeader(e.target.value)}
+                                id={"header-" + props.data.title}
+                                name={"header-" + props.data.title}
+                                type="text"
+                                className="text-black"
+                            />
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleHeader();
+                                    }}
+                                    disabled={
+                                        header === props.data.header ||
+                                        header === ""
+                                            ? true
+                                            : false
+                                    }
+                                    className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
+                                    Update
+                                </button>
                             </div>
                         </div>
                         <div>
-                            <label htmlFor={"showreel-" + props.data.title}>
-                                Showreel
-                            </label>
-                            <Select
-                                disabledKeys={["Select Video"]}
-                                label="Background Video"
-                                placeholder="Select a video"
-                                className="max-w-xs text-black my-4"
-                                defaultSelectedKeys={[showreel]}
-                                onChange={(e) => setShowreel(e.target.value)}>
-                                {props.bgVideos.map((videoName: string) => {
-                                    return (
-                                        <SelectItem
-                                            className="text-black"
-                                            key={videoName}>
-                                            {videoName}
-                                        </SelectItem>
-                                    );
-                                })}
-                            </Select>
-
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleShowreel();
+                            <div className="border-b pb-2 mb-2">
+                                Description
+                            </div>
+                            <textarea
+                                value={description ? description : ""}
+                                onChange={(e) => {
+                                    setDescription(e.target.value);
                                 }}
-                                disabled={
-                                    showreel === props.data.showreel ||
-                                    showreel === "Select Video"
-                                        ? true
-                                        : false
-                                }
-                                className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                                Update
-                            </button>
+                                name={"description-" + props.data.title}
+                                id={"description-" + props.data.title}
+                                className="text-black h-52"
+                            />
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleDescription();
+                                    }}
+                                    disabled={
+                                        description === props.data.description
+                                            ? true
+                                            : false
+                                    }
+                                    className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 disabled:text-black rounded-md px-4 py-2">
+                                    Update
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    <div id="right-colum"></div>
                 </div>
-                {/* Right column */}
-                <div className="xl:flex">
-                    <div className="my-auto">
-                        Set the URL for the background video of the page (
-                        <em>required</em>) and the showreel.
+                <div id="segments">
+                    <div className="border-b pb-2 mb-2 font-bold text-2xl">
+                        Segments
                     </div>
-                </div>
-                {/* Left Column */}
-                <div>
-                    <label htmlFor={"header-" + props.data.title}>Title</label>
-                    {/* <textarea
-                        value={description ? description : ""}
-                        onChange={(e) => {
-                            setDescription(e.target.value);
-                        }}
-                        name={"description-" + props.data.title}
-                        id={"description-" + props.data.title}
-                        className="text-black h-52"
-                    /> */}
-                    <input
-                        placeholder="Title"
-                        value={header}
-                        onChange={(e) => setHeader(e.target.value)}
-                        id={"header-" + props.data.title}
-                        name={"header-" + props.data.title}
-                        type="text"
-                        className="text-black"
-                    />
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handleHeader();
-                        }}
-                        disabled={
-                            header === props.data.header || header === ""
-                                ? true
-                                : false
+                    {props.data.segment.map(
+                        (segment: Segment, index: number) => {
+                            return (
+                                <div key={segment.title + "-" + index}>
+                                    <EditSegment
+                                        revalidateDashboard={
+                                            props.revalidateDashboard
+                                        }
+                                        title={props.data.title}
+                                        segment={segment}
+                                        index={index}
+                                    />
+                                </div>
+                            );
                         }
-                        className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                        Update
-                    </button>
-                </div>
-                <div className="xl:flex">
-                    <div className="my-auto">The Page Title</div>
-                </div>
-                <div>
-                    <label htmlFor={"description-" + props.data.title}>
-                        Description
-                    </label>
-                    <textarea
-                        value={description ? description : ""}
-                        onChange={(e) => {
-                            setDescription(e.target.value);
-                        }}
-                        name={"description-" + props.data.title}
-                        id={"description-" + props.data.title}
-                        className="text-black h-52"
-                    />
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handleDescription();
-                        }}
-                        disabled={
-                            description === props.data.description
-                                ? true
-                                : false
-                        }
-                        className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                        Update
-                    </button>
-                </div>
-                <div className="xl:flex">
-                    <div className="my-auto">
-                        The description that is situated on top of the
-                        background video.
-                    </div>
+                    )}
+                    {!newSegmentModal ? (
+                        <div className="flex justify-end mt-10 mb-10">
+                            <button
+                                onClick={() => setNewSegmentModal(true)}
+                                className="bg-orange-400 px-4 py-2 rounded">
+                                Add Segment
+                            </button>
+                        </div>
+                    ) : (
+                        ""
+                    )}
                 </div>
             </div>
+            {newSegmentModal ? (
+                <NewSegment
+                    pageID={props.data.id}
+                    title={props.data.title}
+                    revalidateDashboard={props.revalidateDashboard}
+                    setNewSegmentModal={setNewSegmentModal}
+                />
+            ) : (
+                ""
+            )}
         </div>
     );
 }

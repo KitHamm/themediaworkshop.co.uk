@@ -1,13 +1,16 @@
 {
     "cSpell.words": [
         "addpage",
+        "addsegment",
         "casestudy",
+        "deletesegment",
         "firstname",
         "lastname",
         "nextauth",
         "nextui",
         "tailwindcss",
         "updatepage",
+        "updatesegment",
         "uploadvideo"
     ]
 }

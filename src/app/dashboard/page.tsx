@@ -20,23 +20,13 @@ export default async function Dashboard() {
             segment: { include: { casestudy: true } },
         },
     });
-    var bgVideos: string[] = ["Select Video"];
-
-    fs.readdir(process.env.STATIC_VIDEOS as string, function (error, videos) {
-        if (error) {
-            return console.log(error);
-        }
-        videos.forEach(function (video) {
-            bgVideos.push(video);
-        });
-    });
 
     async function revalidateDashboard(route: string) {
         "use server";
         revalidatePath("/dashboard", "page");
         revalidatePath(route, "page");
     }
-
+    // var initialVideos = await getVideos();
     return (
         <>
             <main className="xl:flex xl:min-h-screen">
@@ -44,9 +34,9 @@ export default async function Dashboard() {
                     <SidePanel session={session} />
                 </div>
                 <div className="xl:basis-5/6">
-                    <DashboardTop />
+                    {/* <DashboardTop /> */}
                     <DashboardMain
-                        bgVideos={bgVideos}
+                        // bgVideos={initialVideos}
                         revalidateDashboard={revalidateDashboard}
                         data={data}
                     />
@@ -55,3 +45,16 @@ export default async function Dashboard() {
         </>
     );
 }
+
+// export async function getVideos() {
+//     var bgVideos: string[] = ["Select Video"];
+//     fs.readdir(process.env.STATIC_VIDEOS as string, function (error, videos) {
+//         if (error) {
+//             return console.log(error);
+//         }
+//         videos.forEach(function (video) {
+//             bgVideos.push(video);
+//         });
+//     });
+//     return bgVideos;
+// }
