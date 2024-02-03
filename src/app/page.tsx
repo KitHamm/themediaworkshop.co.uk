@@ -14,17 +14,19 @@ export default async function Home() {
     return (
         <>
             <Navbar active="home" />
-            <header id="header" className="overflow-x-hidden">
+            <header id="header" className="w-full h-full">
                 <section
                     id="bg-video-container"
-                    className="relative top-0 left-0 w-screen overflow-hidden">
+                    className="relative top-0 left-0 w-full h-screen overflow-hidden">
                     <video
                         id="bg-video"
                         className="w-full h-auto fade-in"
                         autoPlay={true}
                         muted
                         loop
-                        src={process.env.BASE_VIDEO_URL + data?.video}
+                        src={
+                            process.env.NEXT_PUBLIC_BASE_VIDEO_URL + data?.video
+                        }
                     />
                     <Header
                         home={true}

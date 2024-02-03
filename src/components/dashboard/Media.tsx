@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import VideoViewer from "./VideoViewer";
+import ImageViewer from "./ImageViewer";
 
 export default function Media(props: {
     hidden: boolean;
@@ -10,6 +12,10 @@ export default function Media(props: {
     const [images, setImages] = useState([]);
     const [newUpload, setNewUpload] = useState<File>();
     const [uploading, setUploading] = useState(false);
+    const [videoModalOpen, setVideoModalOpen] = useState(false);
+    const [imageModalOpen, setImageModalOpen] = useState(false);
+    const [selectedVideo, setSelectedVideo] = useState("");
+    const [selectedImage, setSelectedImage] = useState("");
 
     useEffect(() => {
         getVideos();
@@ -145,6 +151,10 @@ export default function Media(props: {
                                     return (
                                         <div
                                             key={video}
+                                            onClick={() => {
+                                                setSelectedVideo(video);
+                                                setVideoModalOpen(true);
+                                            }}
                                             className="flex flex-col">
                                             <div className="cursor-pointer border rounded p-4 h-full flex w-full">
                                                 <img
@@ -180,7 +190,12 @@ export default function Media(props: {
                                         <div
                                             key={image}
                                             className="flex flex-col">
-                                            <div className="cursor-pointer border rounded p-4 h-full flex w-full">
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedImage(image);
+                                                    setImageModalOpen(true);
+                                                }}
+                                                className="cursor-pointer border rounded p-4 h-full flex w-full">
                                                 <img
                                                     src={
                                                         process.env
@@ -209,6 +224,16 @@ export default function Media(props: {
                     </div>
                 </div>
             </div>
+            <VideoViewer
+                open={videoModalOpen}
+                video={selectedVideo}
+                setVideoModalOpen={setVideoModalOpen}
+            />
+            <ImageViewer
+                open={imageModalOpen}
+                image={selectedImage}
+                setImageModalOpen={setImageModalOpen}
+            />
         </div>
     );
 }

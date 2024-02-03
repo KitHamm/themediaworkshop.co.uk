@@ -4,6 +4,7 @@
         "addsegment",
         "casestudy",
         "deletesegment",
+        "deleteuser",
         "firstname",
         "lastname",
         "nextauth",
@@ -11,6 +12,7 @@
         "tailwindcss",
         "updatepage",
         "updatesegment",
+        "uploadavatar",
         "uploadimage",
         "uploadvideo"
     ]

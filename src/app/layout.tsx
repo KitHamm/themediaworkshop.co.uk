@@ -19,6 +19,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <script
+                    src="https://kit.fontawesome.com/9923e52d96.js"
+                    crossOrigin="anonymous"
+                    async
+                />
+            </head>
             <body className={lato.className + " bg-neutral-900 text-white m-0"}>
                 {children}
             </body>
