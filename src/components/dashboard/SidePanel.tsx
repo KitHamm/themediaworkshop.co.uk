@@ -63,7 +63,7 @@ export default function SidePanel(props: { session: any }) {
             .then((res) => {
                 if (res.ok) {
                     getAvatar();
-
+                    setChangeSuccess(true);
                     setNewAvatar("");
                 }
             })
