@@ -20,9 +20,19 @@ export default function PageSegment(props: {
                 ""
             )}
             <div className="text-center">
-                <img
+                {/* <img
                     alt="Placeholder"
                     src={process.env.BASE_IMAGE_URL + "placeholder.jpg"}
+                    className="m-auto w-full h-auto"
+                /> */}
+                <Image
+                    width={500}
+                    height={300}
+                    src={
+                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                        "placeholder.jpg"
+                    }
+                    alt="Placeholder"
                     className="m-auto w-full h-auto"
                 />
             </div>
