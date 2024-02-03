@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Avatar } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
+import { User } from "@nextui-org/react";
 import {
     Dropdown,
     DropdownTrigger,
@@ -105,59 +105,58 @@ export default function SidePanel(props: { session: any }) {
                     />
                 </div>
                 <div className="xl:flex pb-5 border-b border-neutral-400">
-                    <div className="px-5">
-                        <Avatar
-                            showFallback
-                            src={
-                                avatar
+                    <div className="px-5 w-full flex justify-between">
+                        <User
+                            name={
+                                <div className="font-bold text-xl">
+                                    {props.session.user.name}
+                                </div>
+                            }
+                            description={
+                                <div className="text-md">
+                                    {props.session.user.position}
+                                </div>
+                            }
+                            avatarProps={{
+                                src: avatar
                                     ? process.env.NEXT_PUBLIC_BASE_AVATAR_URL +
                                       avatar
-                                    : undefined
-                            }
-                            name={props.session.user.name}
-                            size="lg"
-                            className="text-large ms-auto"
+                                    : undefined,
+                                name: props.session.user.name,
+                                size: "lg",
+                                className: "text-large ms-auto",
+                            }}
                         />
-                    </div>
-                    <div className="w-full flex">
-                        <div className="my-auto">
-                            <div className=" font-bold xl:text-xl">
-                                {props.session.user.name}
-                            </div>
-                            <div className="text-neutral-400 xl:text-md">
-                                {props.session.user.position}
-                            </div>
-                        </div>
-                    </div>
-                    <Dropdown className="dark z-0">
-                        <DropdownTrigger>
-                            <div className="xl:basis-1/5 xl:flex xl:cursor-pointer">
-                                <i
-                                    aria-hidden
-                                    className="xl:m-auto fa-solid fa-ellipsis-vertical"></i>
-                            </div>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions">
-                            <DropdownSection showDivider>
-                                <DropdownItem
-                                    onClick={() => onOpen()}
-                                    key="new-avatar">
-                                    Change Avatar
-                                </DropdownItem>
-                            </DropdownSection>
+                        <Dropdown className="dark z-0">
+                            <DropdownTrigger>
+                                <div className="xl:basis-1/5 xl:flex xl:cursor-pointer">
+                                    <i
+                                        aria-hidden
+                                        className="xl:m-auto fa-solid fa-ellipsis-vertical"></i>
+                                </div>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Static Actions">
+                                <DropdownSection showDivider>
+                                    <DropdownItem
+                                        onClick={() => onOpen()}
+                                        key="new-avatar">
+                                        Change Avatar
+                                    </DropdownItem>
+                                </DropdownSection>
 
-                            <DropdownSection>
-                                <DropdownItem
-                                    onClick={() =>
-                                        signOut({ callbackUrl: "/" })
-                                    }
-                                    key="logout"
-                                    className="text-red-400">
-                                    Log Out
-                                </DropdownItem>
-                            </DropdownSection>
-                        </DropdownMenu>
-                    </Dropdown>
+                                <DropdownSection>
+                                    <DropdownItem
+                                        onClick={() =>
+                                            signOut({ callbackUrl: "/" })
+                                        }
+                                        key="logout"
+                                        className="text-red-400">
+                                        Log Out
+                                    </DropdownItem>
+                                </DropdownSection>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
                 </div>
                 <Link
                     href={"?view=pages"}
@@ -212,19 +211,31 @@ export default function SidePanel(props: { session: any }) {
                                     <>
                                         <div className="flex">
                                             {newAvatar === "" ? (
-                                                <input
-                                                    id="new-avatar"
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            setUploading(true);
-                                                            handleUpload(
-                                                                e.target
-                                                                    .files[0]
-                                                            );
-                                                        }
-                                                    }}
-                                                    type="file"
-                                                />
+                                                <div className="file-input flex w-full justify-center">
+                                                    <input
+                                                        id="new-avatar"
+                                                        className="inputFile mx-auto"
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.files
+                                                            ) {
+                                                                setUploading(
+                                                                    true
+                                                                );
+                                                                handleUpload(
+                                                                    e.target
+                                                                        .files[0]
+                                                                );
+                                                            }
+                                                        }}
+                                                        type="file"
+                                                    />
+                                                    <label htmlFor="new-avatar">
+                                                        {newAvatar !== ""
+                                                            ? newAvatar
+                                                            : "Select file"}
+                                                    </label>
+                                                </div>
                                             ) : (
                                                 <div>{newAvatar}</div>
                                             )}

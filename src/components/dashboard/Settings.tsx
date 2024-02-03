@@ -267,22 +267,32 @@ export default function Settings(props: { hidden: boolean }) {
                                                     Avatar
                                                 </div>
                                                 {avatar === "" ? (
-                                                    <input
-                                                        onChange={(e) => {
-                                                            if (
-                                                                e.target.files
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                handleUpload(
+                                                    <div className="file-input">
+                                                        <input
+                                                            onChange={(e) => {
+                                                                if (
                                                                     e.target
-                                                                        .files[0]
-                                                                );
-                                                            }
-                                                        }}
-                                                        type="file"
-                                                    />
+                                                                        .files
+                                                                ) {
+                                                                    setUploading(
+                                                                        true
+                                                                    );
+                                                                    handleUpload(
+                                                                        e.target
+                                                                            .files[0]
+                                                                    );
+                                                                }
+                                                            }}
+                                                            type="file"
+                                                            className="inputFile"
+                                                            id="new-avatar"
+                                                        />
+                                                        <label htmlFor="new-avatar">
+                                                            {avatar !== ""
+                                                                ? avatar
+                                                                : "Select file"}
+                                                        </label>
+                                                    </div>
                                                 ) : (
                                                     <div>{avatar}</div>
                                                 )}

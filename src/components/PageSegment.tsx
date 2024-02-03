@@ -21,8 +21,8 @@ export default function PageSegment(props: {
             )}
             <div className="text-center">
                 <Image
-                    width={500}
-                    height={300}
+                    width={900}
+                    height={500}
                     src={
                         process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
                         "placeholder.jpg"

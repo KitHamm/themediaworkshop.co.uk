@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import VideoViewer from "./VideoViewer";
 import ImageViewer from "./ImageViewer";
 import Image from "next/image";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+} from "@nextui-org/react";
 
 export default function Media(props: {
     hidden: boolean;
@@ -13,10 +22,18 @@ export default function Media(props: {
     const [images, setImages] = useState([]);
     const [newUpload, setNewUpload] = useState<File>();
     const [uploading, setUploading] = useState(false);
-    const [videoModalOpen, setVideoModalOpen] = useState(false);
-    const [imageModalOpen, setImageModalOpen] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
+    const {
+        isOpen: isOpenImage,
+        onOpen: onOpenImage,
+        onOpenChange: onOpenChangeImage,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenVideo,
+        onOpen: onOpenVideo,
+        onOpenChange: onOpenChangeVideo,
+    } = useDisclosure();
 
     useEffect(() => {
         getVideos();
@@ -105,39 +122,47 @@ export default function Media(props: {
                     Media
                 </div>
                 <div className="my-6">
-                    <div className="w-full">
-                        <div className="font-bold mb-2">Upload New</div>
-                        <input
-                            onChange={(e) => {
-                                if (e.target.files)
-                                    setNewUpload(e.target.files[0]);
-                            }}
-                            className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2"
-                            type="file"
-                            name={"new-video"}
-                            id={"new-video"}
-                        />
+                    <div className="font-bold mb-2">Upload New</div>
+                    <div className=" flex">
+                        <div className="file-input">
+                            <input
+                                onChange={(e) => {
+                                    if (e.target.files)
+                                        setNewUpload(e.target.files[0]);
+                                }}
+                                className="inputFile"
+                                type="file"
+                                name={"new-video"}
+                                id={"new-video"}
+                            />
+                            <label htmlFor="new-video">
+                                {newUpload !== undefined
+                                    ? newUpload.name
+                                    : "Select file"}
+                            </label>
+                        </div>
+                        <div className="flex my-auto">
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setUploading(true);
+                                    handleUpload();
+                                }}
+                                disabled={newUpload ? false : true}
+                                className="ms-4 my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
+                                Upload
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    clearFileInput();
+                                }}
+                                className="my-auto ms-4 bg-red-400 text-black rounded-md px-4 py-2">
+                                Clear
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex">
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setUploading(true);
-                                handleUpload();
-                            }}
-                            disabled={newUpload ? false : true}
-                            className="mt-2 disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                            Upload
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                clearFileInput();
-                            }}
-                            className="mt-2 ms-4 bg-red-400 text-black rounded-md px-4 py-2">
-                            Clear
-                        </button>
-                    </div>
+
                     <div>{uploading ? "Uploading..." : ""}</div>
                 </div>
                 <div className="xl:flex xl:grid-cols-2 xl:gap-10">
@@ -154,7 +179,8 @@ export default function Media(props: {
                                             key={video}
                                             onClick={() => {
                                                 setSelectedVideo(video);
-                                                setVideoModalOpen(true);
+                                                onOpenVideo();
+                                                // setVideoModalOpen(true);
                                             }}
                                             className="flex flex-col">
                                             <div className="cursor-pointer border rounded p-4 h-full flex w-full">
@@ -200,7 +226,7 @@ export default function Media(props: {
                                             <div
                                                 onClick={() => {
                                                     setSelectedImage(image);
-                                                    setImageModalOpen(true);
+                                                    onOpenImage();
                                                 }}
                                                 className="cursor-pointer border rounded p-4 h-full flex w-full">
                                                 <Image
@@ -233,16 +259,86 @@ export default function Media(props: {
                     </div>
                 </div>
             </div>
-            <VideoViewer
+            {/* <VideoViewer
                 open={videoModalOpen}
                 video={selectedVideo}
                 setVideoModalOpen={setVideoModalOpen}
-            />
-            <ImageViewer
-                open={imageModalOpen}
-                image={selectedImage}
-                setImageModalOpen={setImageModalOpen}
-            />
+            /> */}
+
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenImage}
+                className="dark"
+                onOpenChange={onOpenChangeImage}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>{selectedImage}</ModalHeader>
+                            <ModalBody>
+                                <div>
+                                    <Image
+                                        height={1000}
+                                        width={1000}
+                                        src={
+                                            process.env
+                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                            selectedImage
+                                        }
+                                        alt={selectedImage}
+                                        className="m-auto h-auto w-auto"
+                                    />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenVideo}
+                className="dark"
+                onOpenChange={onOpenChangeVideo}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>{selectedVideo}</ModalHeader>
+                            <ModalBody>
+                                <div>
+                                    <video
+                                        id="bg-video"
+                                        controls={true}
+                                        src={
+                                            process.env
+                                                .NEXT_PUBLIC_BASE_VIDEO_URL +
+                                            selectedVideo
+                                        }
+                                    />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }
