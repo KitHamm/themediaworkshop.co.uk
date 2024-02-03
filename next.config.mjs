@@ -20,6 +20,13 @@ const nextConfig = {
             },
         ];
     },
+    remotePatterns: [
+        {
+            protocol: "https",
+            hostname: "staging.themediaworkshop.co.uk",
+            pathname: "**",
+        },
+    ],
     experimental: {
         serverComponentsExternalPackages: ["@prisma/client", "bcrypt"],
     },
