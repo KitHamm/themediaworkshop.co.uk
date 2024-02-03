@@ -45,5 +45,6 @@ seed.ts
 # media
 public/images
 public/video
+public/avatars
 /images
 /videos

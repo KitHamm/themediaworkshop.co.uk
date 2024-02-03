@@ -21,6 +21,7 @@ export default function ImageViewer(props: {
                                 props.image
                             }
                             alt={props.image}
+                            className="m-auto h-auto w-auto"
                         />
                     </div>
                 ) : (

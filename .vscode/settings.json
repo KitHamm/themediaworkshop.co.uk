@@ -12,6 +12,7 @@
         "tailwindcss",
         "updatepage",
         "updatesegment",
+        "updateuser",
         "uploadavatar",
         "uploadimage",
         "uploadvideo"
