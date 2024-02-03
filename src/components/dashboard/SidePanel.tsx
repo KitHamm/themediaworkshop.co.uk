@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar } from "@nextui-org/react";
-import prisma from "@/lib/prisma";
 import { useEffect, useState } from "react";
 
 export default function SidePanel(props: { session: any }) {
@@ -40,7 +39,12 @@ export default function SidePanel(props: { session: any }) {
                 <div className="px-5">
                     <Avatar
                         showFallback
-                        src={avatar ? "./avatars/" + avatar : undefined}
+                        src={
+                            avatar
+                                ? process.env.NEXT_PUBLIC_BASE_AVATAR_URL +
+                                  avatar
+                                : undefined
+                        }
                         name={props.session.user.name}
                         size="lg"
                         className="text-large ms-auto"

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function ImageViewer(props: {
     open: boolean;
     image: string;
@@ -11,13 +13,14 @@ export default function ImageViewer(props: {
             <div className="w-1/2 h-1/2 m-auto">
                 {props.image !== "" ? (
                     <div className="h-full flex">
-                        <img
-                            id="image"
-                            className="m-auto h-auto w-auto"
+                        <Image
+                            height={500}
+                            width={700}
                             src={
                                 process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
                                 props.image
                             }
+                            alt={props.image}
                         />
                     </div>
                 ) : (

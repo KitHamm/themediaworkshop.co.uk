@@ -24,7 +24,9 @@ export default async function Home() {
                         autoPlay={true}
                         muted
                         loop
-                        src={process.env.BASE_VIDEO_URL + data?.video}
+                        src={
+                            process.env.NEXT_PUBLIC_BASE_VIDEO_URL + data?.video
+                        }
                     />
                     <Header
                         home={false}

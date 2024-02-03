@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import VideoViewer from "./VideoViewer";
 import ImageViewer from "./ImageViewer";
+import Image from "next/image";
 
 export default function Media(props: {
     hidden: boolean;
@@ -157,9 +158,15 @@ export default function Media(props: {
                                             }}
                                             className="flex flex-col">
                                             <div className="cursor-pointer border rounded p-4 h-full flex w-full">
-                                                <img
-                                                    src={"images/play.png"}
-                                                    alt={video}
+                                                <Image
+                                                    height={100}
+                                                    width={100}
+                                                    src={
+                                                        process.env
+                                                            .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                        "play.png"
+                                                    }
+                                                    alt="play"
                                                     className="w-full h-auto m-auto"
                                                 />
                                             </div>
@@ -196,7 +203,9 @@ export default function Media(props: {
                                                     setImageModalOpen(true);
                                                 }}
                                                 className="cursor-pointer border rounded p-4 h-full flex w-full">
-                                                <img
+                                                <Image
+                                                    height={100}
+                                                    width={100}
                                                     src={
                                                         process.env
                                                             .NEXT_PUBLIC_BASE_IMAGE_URL +
