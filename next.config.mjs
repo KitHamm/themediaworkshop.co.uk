@@ -23,6 +23,10 @@ const nextConfig = {
     experimental: {
         serverComponentsExternalPackages: ["@prisma/client", "bcrypt"],
     },
+    publicRuntimeConfig: {
+        NEXT_PUBLIC_BASE_VIDEO_URL: process.env.NEXT_PUBLIC_BASE_VIDEO_URL,
+        NEXT_PUBLIC_BASE_IMAGE_URL: process.env.NEXT_PUBLIC_BASE_IMAGE_URL,
+    },
 };
 
 export default nextConfig;
