@@ -19,7 +19,6 @@ export default async function Dashboard() {
         include: {
             segment: {
                 orderBy: { order: "asc" },
-
                 include: { casestudy: true },
             },
         },
@@ -48,16 +47,3 @@ export default async function Dashboard() {
         </>
     );
 }
-
-// export async function getVideos() {
-//     var bgVideos: string[] = ["Select Video"];
-//     fs.readdir(process.env.STATIC_VIDEOS as string, function (error, videos) {
-//         if (error) {
-//             return console.log(error);
-//         }
-//         videos.forEach(function (video) {
-//             bgVideos.push(video);
-//         });
-//     });
-//     return bgVideos;
-// }

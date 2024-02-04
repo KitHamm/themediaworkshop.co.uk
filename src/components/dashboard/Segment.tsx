@@ -24,6 +24,7 @@ export default function EditSegment(props: {
     const [images, setImages] = useState(props.segment.image);
     const [availableImages, setAvailableImages] = useState([]);
     const [headerImage, setHeaderImage] = useState(props.segment.headerimage);
+    const [order, setOrder] = useState<number>(props.segment.order);
     const [changes, setChanges] = useState(false);
     const {
         isOpen: isOpenTopImage,
@@ -46,17 +47,20 @@ export default function EditSegment(props: {
             title !== props.segment.title ||
             copy !== props.segment.copy ||
             JSON.stringify(images) !== JSON.stringify(props.segment.image) ||
-            headerImage !== props.segment.headerimage
+            headerImage !== props.segment.headerimage ||
+            order !== parseInt(props.segment.order)
         ) {
             setChanges(true);
         } else {
             setChanges(false);
         }
     }, [
+        order,
         title,
         copy,
         JSON.stringify(images),
         headerImage,
+        props.segment.order,
         props.segment.title,
         props.segment.copy,
         JSON.stringify(props.segment.image),
@@ -69,6 +73,7 @@ export default function EditSegment(props: {
             copy: copy,
             headerimage: headerImage,
             image: images,
+            order: order,
         };
         updateSegment(json);
     }
@@ -157,7 +162,7 @@ export default function EditSegment(props: {
 
     return (
         <>
-            <div className="light bg-neutral-600 rounded-md px-5 mb-4 py-4">
+            <div className="light  rounded-md px-5 mb-4 py-4">
                 <div className="flex justify-between border-b pb-2">
                     <div className="">Top Image</div>
                     {changes ? (
@@ -272,6 +277,17 @@ export default function EditSegment(props: {
                                 className="text-black h-52"
                                 name=""
                                 id=""
+                            />
+                        </div>
+                        <div className="w-1/6">
+                            <div className="border-b pb-2 mb-2">Order</div>
+                            <input
+                                className="text-black"
+                                value={order}
+                                onChange={(e) =>
+                                    setOrder(parseInt(e.target.value))
+                                }
+                                type="number"
                             />
                         </div>
                     </div>
