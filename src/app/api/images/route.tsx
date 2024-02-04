@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
+import fsp from "fs/promises";
 
 export async function GET(request: Request) {
     var preImages: string[] = ["None"];
-    var images = fs.readdirSync(
+    var images = await fsp.readdir(
         (process.cwd() + process.env.STATIC_IMAGES) as string
     );
     var result = preImages.concat(images);
