@@ -53,7 +53,7 @@ export default function Media(props: {
     }
 
     async function getImages() {
-        fetch("/api/images", { method: "GET" })
+        fetch("/api/images", { method: "GET", cache: "no-store" })
             .then((res) => res.json())
             .then((json) => setImages(json))
             .catch((err) => console.log(err));
