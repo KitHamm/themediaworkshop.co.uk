@@ -39,7 +39,7 @@ select {
     height: 50px;
     border-radius: 3px;
     background-color: rgb(251 146 60);
-    box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4);
+    /* box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4); */
     display: flex;
     align-items: center;
     justify-content: center;

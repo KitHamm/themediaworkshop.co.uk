@@ -1,13 +1,81 @@
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    CircularProgress,
+} from "@nextui-org/react";
 
 export default function NewSegment(props: {
-    setNewSegmentModal: any;
     revalidateDashboard: any;
     title: string;
     pageID: number;
 }) {
     const [title, setTitle] = useState("");
     const [copy, setCopy] = useState("");
+    const [changes, setChanges] = useState(false);
+    const [images, setImages] = useState<string[]>([]);
+    const [availableImages, setAvailableImages] = useState<string[]>([]);
+    const [headerImage, setHeaderImage] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const {
+        isOpen: isOpenTopImage,
+        onOpen: onOpenTopImage,
+        onOpenChange: onOpenChangeTopImage,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenAddImage,
+        onOpen: onOpenAddImage,
+        onOpenChange: onOpenChangeAddImage,
+    } = useDisclosure();
+
+    async function getImages() {
+        fetch("/api/images", { method: "GET" })
+            .then((res) => res.json())
+            .then((json) => setAvailableImages(json))
+            .catch((err) => console.log(err));
+    }
+
+    function removeImage(index: number) {
+        setImages(
+            images.filter((_image: string, _index: number) => _index !== index)
+        );
+    }
+    function clearFileInput(target: string) {
+        var id = target === "header" ? "top-image-input" : "image-input";
+        const inputElm = document.getElementById(id) as HTMLInputElement;
+        if (inputElm) {
+            inputElm.value = "";
+        }
+    }
+    async function handleUpload(file: File, target: string) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/uploadimage" as string, {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    setUploading(false);
+                    if (target === "header") {
+                        setHeaderImage(file.name);
+                        clearFileInput(target);
+                    } else {
+                        getImages();
+                        clearFileInput(target);
+                    }
+                }
+            })
+            .catch((error) => console.log(error));
+    }
 
     async function addSegment() {
         const response = await fetch("/api/addsegment", {
@@ -15,6 +83,8 @@ export default function NewSegment(props: {
             body: JSON.stringify({
                 title: title,
                 copy: copy,
+                headerimage: headerImage,
+                image: images,
                 page: {
                     connect: {
                         id: props.pageID,
@@ -24,9 +94,11 @@ export default function NewSegment(props: {
         })
             .then((response) => {
                 if (response.ok) {
+                    setSuccess(true);
                     setTitle("");
                     setCopy("");
-                    props.setNewSegmentModal(false);
+                    setHeaderImage("");
+                    setImages([]);
                     if (props.title === "home") {
                         props.revalidateDashboard("/");
                     } else {
@@ -39,50 +111,358 @@ export default function NewSegment(props: {
 
     return (
         <>
-            <div className="font-bold text-2xl my-5">New Segment</div>
-            <div className="xl:grid xl:grid-cols-2 xl:gap-10 px-10">
-                <div id={"left-segment-new-column"}>
-                    <div>
-                        <div className="border-b pb-2 mb-2">Title</div>
-                        <input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            type="text"
-                            className="text-black"
-                        />
-                    </div>
-                    <div>
-                        <div className="border-b pb-2 mb-2">Copy</div>
-                        <textarea
-                            value={copy}
-                            onChange={(e) => setCopy(e.target.value)}
-                            className="text-black h-52"
-                            name=""
-                            id=""
-                        />
-                    </div>
+            {success ? (
+                <div className="w-full text-center">
+                    <div className="font-bold text-3xl">Success!</div>
                 </div>
-                <div className={"right-segment-new-column"}></div>
-            </div>
-            <div className="flex justify-between px-10">
-                <button
-                    onClick={() => {
-                        setTitle("");
-                        setCopy("");
-                        props.setNewSegmentModal(false);
-                    }}
-                    className="px-4 py-2 bg-orange-400 rounded">
-                    Cancel
-                </button>
-                <button
-                    disabled={title === "" || copy === "" ? true : false}
-                    onClick={() => {
-                        addSegment();
-                    }}
-                    className="disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-black px-4 py-2 bg-orange-400 rounded">
-                    Submit Segment
-                </button>
-            </div>
+            ) : (
+                <div className="light rounded-md px-5 mb-4 py-4">
+                    <div className="flex justify-between border-b pb-2">
+                        <div className="">Top Image</div>
+                        {changes ? (
+                            <div className="fade-in font-bold text-red-400">
+                                There are unsaved changes on this segment
+                            </div>
+                        ) : (
+                            ""
+                        )}
+                    </div>
+                    <div className="relative my-2">
+                        {headerImage !== "" ? (
+                            <div>
+                                <Image
+                                    height={2000}
+                                    width={1000}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                        headerImage
+                                    }
+                                    alt={headerImage}
+                                    className="w-full h-auto m-auto"
+                                />
+                                <div className="hover:opacity-100 flex justify-center transition-opacity opacity-0 absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                    <div className="m-auto flex w-1/2 justify-evenly">
+                                        <div className="w-1/2 text-center">
+                                            <i
+                                                onClick={() => {
+                                                    onOpenChangeTopImage();
+                                                    getImages();
+                                                }}
+                                                aria-hidden
+                                                className="fa-solid cursor-pointer fa-pen-to-square fa-2xl"
+                                            />
+                                        </div>
+                                        <div className="w-1/2 text-center">
+                                            <i
+                                                onClick={() =>
+                                                    setHeaderImage("")
+                                                }
+                                                aria-hidden
+                                                className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full flex justify-evenly my-10">
+                                {uploading ? (
+                                    <CircularProgress
+                                        color="warning"
+                                        aria-label="Loading..."
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="file-input shadow-xl">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        setUploading(true);
+                                                        handleUpload(
+                                                            e.target.files[0],
+                                                            "header"
+                                                        );
+                                                    }
+                                                }}
+                                                id={"top-image-input"}
+                                                type="file"
+                                                className="inputFile"
+                                            />
+                                            <label htmlFor={"top-image-input"}>
+                                                Upload New
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <button
+                                                onClick={() => {
+                                                    onOpenChangeTopImage();
+                                                    getImages();
+                                                }}
+                                                className="bg-orange-400 py-3 px-20 rounded shadow-xl">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <div className="xl:grid xl:grid-cols-2 xl:gap-10 ">
+                        <div id={"left-segment-column"}>
+                            <div>
+                                <div className="border-b pb-2 mb-2">Title</div>
+                                <input
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    type="text"
+                                    className="text-black"
+                                />
+                            </div>
+                            <div>
+                                <div className="border-b pb-2 mb-2">Copy</div>
+                                <textarea
+                                    value={copy}
+                                    onChange={(e) => setCopy(e.target.value)}
+                                    className="text-black h-52"
+                                    name=""
+                                    id=""
+                                />
+                            </div>
+                        </div>
+                        <div className={"right-segment-column"}>
+                            <div className="">
+                                <div className="border-b pb-2">Images</div>
+                                <div className="grid grid-cols-4 gap-4 p-2">
+                                    {images.map(
+                                        (image: string, index: number) => {
+                                            return (
+                                                <div
+                                                    key={image + "-" + index}
+                                                    className="relative">
+                                                    <Image
+                                                        height={100}
+                                                        width={100}
+                                                        src={
+                                                            process.env
+                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                            image
+                                                        }
+                                                        alt={image}
+                                                        className="w-full h-auto"
+                                                    />
+                                                    <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                                        <div className="text-red-400 h-full flex justify-center">
+                                                            <i
+                                                                onClick={() =>
+                                                                    removeImage(
+                                                                        index
+                                                                    )
+                                                                }
+                                                                aria-hidden
+                                                                className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+
+                                    <div
+                                        onClick={() => {
+                                            onOpenChangeAddImage();
+                                            getImages();
+                                        }}
+                                        className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
+                                        <div className="flex h-full justify-center">
+                                            <i
+                                                aria-hidden
+                                                className="m-auto fa-solid fa-plus fa-2xl"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <button
+                            onClick={addSegment}
+                            className="px-4 py-2 bg-orange-400 rounded">
+                            Submit
+                        </button>
+                    </div>
+                    <Modal
+                        size="5xl"
+                        backdrop="blur"
+                        isOpen={isOpenTopImage}
+                        className="dark"
+                        scrollBehavior="inside"
+                        onOpenChange={onOpenChangeTopImage}>
+                        <ModalContent>
+                            {(onClose) => (
+                                <>
+                                    <ModalHeader>{"Top Image"}</ModalHeader>
+                                    <ModalBody>
+                                        <div className="grid grid-cols-4 gap-5">
+                                            {availableImages.map(
+                                                (
+                                                    image: string,
+                                                    index: number
+                                                ) => {
+                                                    if (image !== "None")
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    image +
+                                                                    "-" +
+                                                                    index
+                                                                }
+                                                                className="flex cursor-pointer"
+                                                                onClick={() =>
+                                                                    setHeaderImage(
+                                                                        image
+                                                                    )
+                                                                }>
+                                                                <Image
+                                                                    height={300}
+                                                                    width={300}
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                        image
+                                                                    }
+                                                                    alt={image}
+                                                                    className="w-full h-auto m-auto"
+                                                                />
+                                                            </div>
+                                                        );
+                                                }
+                                            )}
+                                        </div>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button
+                                            color="danger"
+                                            onPress={() => {
+                                                onClose();
+                                            }}>
+                                            Close
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
+                    <Modal
+                        size="2xl"
+                        backdrop="blur"
+                        isOpen={isOpenAddImage}
+                        className="dark"
+                        scrollBehavior="inside"
+                        onOpenChange={onOpenChangeAddImage}>
+                        <ModalContent>
+                            {(onClose) => (
+                                <>
+                                    <ModalHeader>
+                                        <div className="w-full text-center font-bold">
+                                            Select or Upload Image
+                                        </div>
+                                    </ModalHeader>
+                                    <ModalBody>
+                                        <div className="w-full flex justify-center mb-10">
+                                            {uploading ? (
+                                                <CircularProgress
+                                                    color="warning"
+                                                    aria-label="Loading..."
+                                                />
+                                            ) : (
+                                                <div className="file-input shadow-xl">
+                                                    <input
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.files
+                                                            ) {
+                                                                setUploading(
+                                                                    true
+                                                                );
+                                                                handleUpload(
+                                                                    e.target
+                                                                        .files[0],
+                                                                    "image"
+                                                                );
+                                                            }
+                                                        }}
+                                                        id={"image-input"}
+                                                        type="file"
+                                                        className="inputFile"
+                                                    />
+                                                    <label
+                                                        htmlFor={"image-input"}>
+                                                        Upload New
+                                                    </label>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-5">
+                                            {availableImages.map(
+                                                (
+                                                    image: string,
+                                                    index: number
+                                                ) => {
+                                                    if (
+                                                        image !== "None" &&
+                                                        !images.includes(image)
+                                                    )
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    image +
+                                                                    "-" +
+                                                                    index
+                                                                }
+                                                                className="flex cursor-pointer"
+                                                                onClick={() => {
+                                                                    setImages([
+                                                                        ...images,
+                                                                        image,
+                                                                    ]);
+                                                                    onClose();
+                                                                }}>
+                                                                <Image
+                                                                    height={300}
+                                                                    width={300}
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                        image
+                                                                    }
+                                                                    alt={image}
+                                                                    className="w-full h-auto m-auto"
+                                                                />
+                                                            </div>
+                                                        );
+                                                }
+                                            )}
+                                        </div>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button
+                                            color="danger"
+                                            onPress={() => {
+                                                onClose();
+                                            }}>
+                                            Close
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
+                </div>
+            )}
         </>
     );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import VideoViewer from "./VideoViewer";
-import ImageViewer from "./ImageViewer";
 import Image from "next/image";
 import {
     Modal,
@@ -12,6 +10,7 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
+    CircularProgress,
 } from "@nextui-org/react";
 
 export default function Media(props: {
@@ -24,6 +23,7 @@ export default function Media(props: {
     const [uploading, setUploading] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
+    const [toDelete, setToDelete] = useState({ file: "", type: "" });
     const {
         isOpen: isOpenImage,
         onOpen: onOpenImage,
@@ -33,6 +33,11 @@ export default function Media(props: {
         isOpen: isOpenVideo,
         onOpen: onOpenVideo,
         onOpenChange: onOpenChangeVideo,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenDelete,
+        onOpen: onOpenDelete,
+        onOpenChange: onOpenChangeDelete,
     } = useDisclosure();
 
     useEffect(() => {
@@ -141,6 +146,15 @@ export default function Media(props: {
                                     : "Select file"}
                             </label>
                         </div>
+                        {uploading ? (
+                            <CircularProgress
+                                color="warning"
+                                aria-label="Loading..."
+                                className="ms-4"
+                            />
+                        ) : (
+                            ""
+                        )}
                         <div className="flex my-auto">
                             <button
                                 onClick={(e) => {
@@ -162,13 +176,16 @@ export default function Media(props: {
                             </button>
                         </div>
                     </div>
-
-                    <div>{uploading ? "Uploading..." : ""}</div>
                 </div>
                 <div className="xl:flex xl:grid-cols-2 xl:gap-10">
                     <div className="w-full">
-                        <div className="font-bold text-xl border-b mb-5">
-                            Videos
+                        <div className="flex justify-between border-b mb-5">
+                            <div className="font-bold text-xl">Videos</div>
+                            <i
+                                onClick={() => getVideos()}
+                                aria-hidden
+                                className="cursor-pointer fa-solid fa-arrows-rotate"
+                            />
                         </div>
 
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
@@ -200,11 +217,19 @@ export default function Media(props: {
                                                 {video}
                                             </div>
                                             <div
-                                                onClick={() =>
-                                                    deleteFile("video", video)
-                                                }
+                                                onClick={() => {
+                                                    // deleteFile("video", video)
+                                                    onOpenChangeDelete();
+                                                    setToDelete({
+                                                        file: video,
+                                                        type: "video",
+                                                    });
+                                                }}
                                                 className="cursor-pointer text-center">
-                                                X
+                                                <i
+                                                    aria-hidden
+                                                    className="text-red-500 fa-solid fa-trash"
+                                                />
                                             </div>
                                         </div>
                                     );
@@ -213,8 +238,13 @@ export default function Media(props: {
                         </div>
                     </div>
                     <div className="w-full">
-                        <div className="font-bold text-xl border-b mb-5">
-                            Images
+                        <div className="flex justify-between border-b mb-5">
+                            <div className="font-bold text-xl">Images</div>
+                            <i
+                                onClick={() => getImages()}
+                                aria-hidden
+                                className="cursor-pointer fa-solid fa-arrows-rotate"
+                            />
                         </div>
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
                             {images.map((image: string, index: number) => {
@@ -245,11 +275,18 @@ export default function Media(props: {
                                                 {image}
                                             </div>
                                             <div
-                                                onClick={() =>
-                                                    deleteFile("image", image)
-                                                }
+                                                onClick={() => {
+                                                    onOpenChangeDelete();
+                                                    setToDelete({
+                                                        file: image,
+                                                        type: "image",
+                                                    });
+                                                }}
                                                 className="cursor-pointer text-center">
-                                                X
+                                                <i
+                                                    aria-hidden
+                                                    className="text-red-500 fa-solid fa-trash"
+                                                />
                                             </div>
                                         </div>
                                     );
@@ -259,12 +296,55 @@ export default function Media(props: {
                     </div>
                 </div>
             </div>
-            {/* <VideoViewer
-                open={videoModalOpen}
-                video={selectedVideo}
-                setVideoModalOpen={setVideoModalOpen}
-            /> */}
-
+            <Modal
+                size="xl"
+                backdrop="blur"
+                isOpen={isOpenDelete}
+                className="dark"
+                onOpenChange={onOpenChangeDelete}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full flex justify-center">
+                                    <div className="font-bold text-2xl text-red-400">
+                                        WARNING
+                                    </div>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <div className="w-full">
+                                    <div className="text-center">
+                                        Please make sure this media is not used
+                                        on any pages before deleting.
+                                    </div>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        deleteFile(
+                                            toDelete.type,
+                                            toDelete.file
+                                        );
+                                        onClose();
+                                    }}>
+                                    Delete
+                                </Button>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
             <Modal
                 size="5xl"
                 backdrop="blur"

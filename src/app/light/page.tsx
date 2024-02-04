@@ -1,8 +1,10 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import prisma from "@/lib/prisma";
 import { Page, Segment } from "@prisma/client";
 import Header from "@/components/header";
 import PageSegment from "@/components/PageSegment";
+import Image from "next/image";
 
 export default async function Home() {
     const data: Page = await prisma.page.findUnique({
@@ -32,16 +34,34 @@ export default async function Home() {
                         home={false}
                         header={data?.header}
                         description={data?.description}
+                        showreel={data?.showreel}
                     />
                 </section>
             </header>
             {data?.segment.map((segment: Segment, index: number) => {
                 return (
                     <div key={segment.title}>
+                        {segment.headerimage ? (
+                            <div className="relative flex w-full bg-black h-96 overflow-hidden">
+                                <Image
+                                    width={2560}
+                                    height={500}
+                                    className="absolute w-full h-auto"
+                                    alt={segment.headerimage}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                        segment.headerimage
+                                    }
+                                />
+                            </div>
+                        ) : (
+                            ""
+                        )}
                         <PageSegment segment={segment} index={index} />
                     </div>
                 );
             })}
+            <Footer />
         </>
     );
 }

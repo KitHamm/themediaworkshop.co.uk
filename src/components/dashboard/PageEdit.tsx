@@ -1,9 +1,20 @@
 "use client";
 
 import { Page, Segment } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
 import EditSegment from "./Segment";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    CircularProgress,
+} from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@nextui-org/react";
 import NewSegment from "./NewSegment";
 
 export default function PageEdit(props: {
@@ -15,9 +26,6 @@ export default function PageEdit(props: {
     const [description, setDescription] = useState(
         props.data.description ? props.data.description : ""
     );
-    const [checkDescription, setCheckDescription] = useState(
-        props.data.description ? props.data.description : ""
-    );
     const [header, setHeader] = useState(
         props.data.header ? props.data.header : ""
     );
@@ -27,30 +35,40 @@ export default function PageEdit(props: {
     const [showreel, setShowreel] = useState(
         props.data.showreel ? props.data.showreel : "None"
     );
-    const [newSegmentModal, setNewSegmentModal] = useState(false);
-    function handleDescription() {
+    const [changes, setChanges] = useState(false);
+    const {
+        isOpen: isOpenAddSegment,
+        onOpen: onOpenAddSegment,
+        onOpenChange: onOpenChangeAddSegment,
+    } = useDisclosure();
+
+    useEffect(() => {
+        if (
+            description !== props.data.description ||
+            header !== props.data.header ||
+            video !== props.data.video ||
+            showreel !== props.data.showreel
+        ) {
+            setChanges(true);
+        } else {
+            setChanges(false);
+        }
+    }, [
+        description,
+        header,
+        video,
+        showreel,
+        props.data.description,
+        props.data.header,
+        props.data.video,
+        props.data.showreel,
+    ]);
+
+    function handleUpdate() {
         const json = {
             description: description,
-        };
-        updatePage(json);
-    }
-
-    function handleHeader() {
-        const json = {
             header: header,
-        };
-        updatePage(json);
-    }
-
-    function handleBackgroundVideo() {
-        const json = {
             video: video,
-        };
-        updatePage(json);
-    }
-
-    function handleShowreel() {
-        const json = {
             showreel: showreel,
         };
         updatePage(json);
@@ -78,8 +96,17 @@ export default function PageEdit(props: {
 
     return (
         <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in mb-10`}>
-            <div className="my-10 border-b py-4 text-3xl font-bold capitalize">
-                {props.data.title}
+            <div className="my-10 border-b py-4 flex justify-between">
+                <div className="text-3xl font-bold capitalize">
+                    {props.data.title}
+                </div>
+                {changes ? (
+                    <div className="fade-in my-auto font-bold text-red-400">
+                        There are unsaved Changes
+                    </div>
+                ) : (
+                    ""
+                )}
             </div>
             <div className="">
                 <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
@@ -112,22 +139,6 @@ export default function PageEdit(props: {
                                 ) : (
                                     ""
                                 )}
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleBackgroundVideo();
-                                        }}
-                                        disabled={
-                                            video === props.data.video ||
-                                            video === "None"
-                                                ? true
-                                                : false
-                                        }
-                                        className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
-                                        Update
-                                    </button>
-                                </div>
                             </div>
                             <div>
                                 {props.bgVideos.length > 1 ? (
@@ -154,24 +165,8 @@ export default function PageEdit(props: {
                                 ) : (
                                     ""
                                 )}
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleShowreel();
-                                        }}
-                                        disabled={
-                                            showreel === props.data.showreel
-                                                ? true
-                                                : false
-                                        }
-                                        className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
-                                        Update
-                                    </button>
-                                </div>
                             </div>
                         </div>
-
                         <div className="my-10">
                             <div className="border-b pb-2 mb-2">Header</div>
                             <input
@@ -183,23 +178,9 @@ export default function PageEdit(props: {
                                 type="text"
                                 className="text-black"
                             />
-                            <div className="flex justify-end">
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleHeader();
-                                    }}
-                                    disabled={
-                                        header === props.data.header ||
-                                        header === ""
-                                            ? true
-                                            : false
-                                    }
-                                    className="disabled:text-black disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 rounded-md px-4 py-2">
-                                    Update
-                                </button>
-                            </div>
                         </div>
+                    </div>
+                    <div id="right-colum">
                         <div>
                             <div className="border-b pb-2 mb-2">
                                 Description
@@ -217,64 +198,89 @@ export default function PageEdit(props: {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        handleDescription();
+                                        handleUpdate();
                                     }}
-                                    disabled={
-                                        description === props.data.description
-                                            ? true
-                                            : false
-                                    }
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 disabled:text-black rounded-md px-4 py-2">
+                                    disabled={!changes}
+                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-400 disabled:text-black rounded-md px-4 py-2">
                                     Update
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div id="right-colum"></div>
                 </div>
                 <div id="segments">
-                    <div className="border-b pb-2 mb-2 font-bold text-2xl">
-                        Segments
+                    <div className="flex justify-between border-b pb-2 mt-10 mb-2">
+                        <div className="font-bold text-2xl">Segments</div>
+                        <button
+                            onClick={onOpenAddSegment}
+                            className="px-4 py-2 bg-orange-400 rounded">
+                            Add Segment
+                        </button>
                     </div>
-                    {props.data.segment.map(
-                        (segment: Segment, index: number) => {
-                            return (
-                                <div key={segment.title + "-" + index}>
-                                    <EditSegment
-                                        revalidateDashboard={
-                                            props.revalidateDashboard
-                                        }
-                                        title={props.data.title}
-                                        segment={segment}
-                                        index={index}
-                                    />
-                                </div>
-                            );
-                        }
-                    )}
-                    {!newSegmentModal ? (
-                        <div className="flex justify-end mt-10 mb-10">
-                            <button
-                                onClick={() => setNewSegmentModal(true)}
-                                className="bg-orange-400 px-4 py-2 rounded">
-                                Add Segment
-                            </button>
-                        </div>
-                    ) : (
-                        ""
-                    )}
+                    <Accordion variant="splitted">
+                        {props.data.segment.map(
+                            (segment: Segment, index: number) => {
+                                return (
+                                    <AccordionItem
+                                        className="dark"
+                                        key={index}
+                                        aria-label={segment.title}
+                                        title={segment.title}>
+                                        <div key={segment.title + "-" + index}>
+                                            <EditSegment
+                                                revalidateDashboard={
+                                                    props.revalidateDashboard
+                                                }
+                                                title={props.data.title}
+                                                segment={segment}
+                                                index={index}
+                                            />
+                                        </div>
+                                    </AccordionItem>
+                                );
+                            }
+                        )}
+                    </Accordion>
                 </div>
             </div>
-            {newSegmentModal ? (
-                <NewSegment
-                    pageID={props.data.id}
-                    title={props.data.title}
-                    revalidateDashboard={props.revalidateDashboard}
-                    setNewSegmentModal={setNewSegmentModal}
-                />
-            ) : (
-                ""
-            )}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenAddSegment}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangeAddSegment}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Add Segment
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <NewSegment
+                                    revalidateDashboard={
+                                        props.revalidateDashboard
+                                    }
+                                    title={props.data.title}
+                                    pageID={props.data.id}
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

@@ -25,7 +25,7 @@ export default function PageSegment(props: {
                     height={500}
                     src={
                         process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                        "placeholder.jpg"
+                        props.segment.image[0]
                     }
                     alt="Placeholder"
                     className="m-auto w-full h-auto"

@@ -52,3 +52,13 @@ model CaseStudy {
     segment Segment @relation(fields: [segmentId], references: [id])
     segmentId Int
 }
+
+model Message {
+    id String @unique @default(cuid())
+    name String
+    email String
+    message String
+    read Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

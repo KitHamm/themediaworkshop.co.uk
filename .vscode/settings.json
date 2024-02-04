@@ -6,6 +6,7 @@
         "deletesegment",
         "deleteuser",
         "firstname",
+        "headerimage",
         "lastname",
         "nextauth",
         "nextui",

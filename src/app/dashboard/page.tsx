@@ -17,7 +17,11 @@ export default async function Dashboard() {
             },
         ],
         include: {
-            segment: { include: { casestudy: true } },
+            segment: {
+                orderBy: { order: "asc" },
+
+                include: { casestudy: true },
+            },
         },
     });
 
@@ -34,9 +38,8 @@ export default async function Dashboard() {
                     <SidePanel session={session} />
                 </div>
                 <div className="xl:basis-5/6">
-                    {/* <DashboardTop /> */}
                     <DashboardMain
-                        // bgVideos={initialVideos}
+                        session={session}
                         revalidateDashboard={revalidateDashboard}
                         data={data}
                     />

@@ -11,6 +11,7 @@ import { NextUIProvider } from "@nextui-org/react";
 export default function DashboardMain(props: {
     data: Page;
     revalidateDashboard: any;
+    session: any;
 }) {
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
@@ -24,7 +25,10 @@ export default function DashboardMain(props: {
                 revalidateDashboard={props.revalidateDashboard}
                 hidden={view === "media" ? false : true}
             />
-            <Settings hidden={view === "settings" ? false : true} />
+            <Settings
+                session={props.session}
+                hidden={view === "settings" ? false : true}
+            />
             <Pages
                 hidden={view === "pages" ? false : true}
                 data={props.data}

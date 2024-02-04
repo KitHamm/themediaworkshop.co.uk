@@ -21,7 +21,7 @@ type FormValues = {
     password: string;
 };
 
-export default function Settings(props: { hidden: boolean }) {
+export default function Settings(props: { hidden: boolean; session: any }) {
     const [users, setUsers] = useState([]);
     const [userCreated, setUserCreated] = useState(false);
     const [password, setPassword] = useState("");
@@ -357,15 +357,23 @@ export default function Settings(props: { hidden: boolean }) {
                                     <td scope="col" className="px-6 py-4">
                                         {user.position}
                                     </td>
-                                    <td
-                                        onClick={() => {
-                                            setUserId(user.id);
-                                            deleteOnOpen();
-                                        }}
-                                        scope="col"
-                                        className="px-6 py-4 text-red-400 cursor-pointer">
-                                        Delete
-                                    </td>
+                                    {user.id !== props.session.user.id ? (
+                                        <td
+                                            onClick={() => {
+                                                setUserId(user.id);
+                                                deleteOnOpen();
+                                            }}
+                                            scope="col"
+                                            className="px-6 py-4 text-red-400 cursor-pointer">
+                                            Delete
+                                        </td>
+                                    ) : (
+                                        <td
+                                            scope="col"
+                                            className="px-6 py-4 text-neutral-400 cursor-pointer">
+                                            Delete
+                                        </td>
+                                    )}
                                 </tr>
                             );
                         })}

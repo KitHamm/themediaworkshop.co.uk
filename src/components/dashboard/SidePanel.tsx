@@ -99,12 +99,13 @@ export default function SidePanel(props: { session: any }) {
                         onClick={() => (window.location.href = "/")}
                         src={"/images/tmw-logo.png"}
                         alt="TMW Logo"
+                        priority
                         height={75}
                         width={720}
                         className="cursor-pointer"
                     />
                 </div>
-                <div className="xl:flex pb-5 border-b border-neutral-400">
+                <div className="xl:flex pb-5 border-b border-neutral-400 mb-20">
                     <div className="px-5 w-full flex justify-between">
                         <User
                             name={
@@ -159,23 +160,28 @@ export default function SidePanel(props: { session: any }) {
                     </div>
                 </div>
                 <Link
+                    href={"?view=dashboard"}
+                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
+                    Dashboard
+                </Link>
+                <Link
                     href={"?view=pages"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
+                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
                     Pages
                 </Link>
                 <Link
                     href={"?view=media"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
+                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
                     Media
                 </Link>
                 <Link
                     href={"?view=messages"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
+                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
                     Message
                 </Link>
                 <Link
                     href={"?view=settings"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl p-5">
+                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
                     Settings
                 </Link>
             </div>
