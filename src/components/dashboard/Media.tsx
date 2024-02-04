@@ -46,7 +46,7 @@ export default function Media(props: {
     }, []);
 
     async function getVideos() {
-        fetch("/api/videos", { method: "GET" })
+        fetch("/api/videos", { method: "GET", cache: "no-store" })
             .then((res) => res.json())
             .then((json) => setVideos(json))
             .catch((err) => console.log(err));
