@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
     const fileToDelete = json.file;
 
-    fs.unlinkSync(process.cwd() + fileToDelete);
+    fs.unlinkSync(process.cwd() + "/" + fileToDelete);
     return new NextResponse(JSON.stringify({ message: "No Idea" }), {
         status: 201,
     });
