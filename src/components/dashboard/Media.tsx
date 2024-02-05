@@ -208,7 +208,7 @@ export default function Media(props: {
                                             <Image
                                                 height={100}
                                                 width={100}
-                                                src={"/public/play.png"}
+                                                src={"/images/play.png"}
                                                 alt="play"
                                                 className="w-full h-auto m-auto"
                                             />

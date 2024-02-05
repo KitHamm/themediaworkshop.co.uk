@@ -94,6 +94,7 @@ export default function PageEdit(props: {
     async function handleUpload(file: File) {
         if (file.type.split("/")[0] !== "video") {
             setNotVideoError(true);
+            setUploading(false);
             console.log("Not Video");
             return;
         } else {
@@ -184,11 +185,7 @@ export default function PageEdit(props: {
                                             <Image
                                                 height={100}
                                                 width={100}
-                                                src={
-                                                    process.env
-                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                    "play.png"
-                                                }
+                                                src={"/images/play.png"}
                                                 alt="play"
                                                 className="w-full h-auto m-auto"
                                             />
@@ -236,11 +233,7 @@ export default function PageEdit(props: {
                                             <Image
                                                 height={100}
                                                 width={100}
-                                                src={
-                                                    process.env
-                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                    "play.png"
-                                                }
+                                                src={"/images/play.png"}
                                                 alt="play"
                                                 className="w-full h-auto m-auto"
                                             />
@@ -388,6 +381,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -423,6 +417,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -462,6 +457,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -501,6 +497,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -535,24 +532,31 @@ export default function PageEdit(props: {
                                     ""
                                 )}
                                 <div className="flex justify-evenly w-full">
-                                    <div className="file-input shadow-xl">
-                                        <input
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setUploading(true);
-                                                    handleUpload(
-                                                        e.target.files[0]
-                                                    );
-                                                }
-                                            }}
-                                            id={"upload-showreel"}
-                                            type="file"
-                                            className="inputFile"
+                                    {uploading ? (
+                                        <CircularProgress
+                                            color="warning"
+                                            aria-label="Loading..."
                                         />
-                                        <label htmlFor={"upload-showreel"}>
-                                            Upload New
-                                        </label>
-                                    </div>
+                                    ) : (
+                                        <div className="file-input shadow-xl">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        setUploading(true);
+                                                        handleUpload(
+                                                            e.target.files[0]
+                                                        );
+                                                    }
+                                                }}
+                                                id={"upload-showreel"}
+                                                type="file"
+                                                className="inputFile"
+                                            />
+                                            <label htmlFor={"upload-showreel"}>
+                                                Upload New
+                                            </label>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-4 gap-4">
                                     {videos.map(
@@ -574,9 +578,7 @@ export default function PageEdit(props: {
                                                             height={100}
                                                             width={100}
                                                             src={
-                                                                process.env
-                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                "play.png"
+                                                                "/images/play.png"
                                                             }
                                                             alt="play"
                                                             className="w-full h-auto m-auto"
@@ -609,6 +611,7 @@ export default function PageEdit(props: {
                                         onClick={() => {
                                             setVideo("");
                                             onClose();
+                                            setNotVideoError(false);
                                         }}
                                         className="px-10 py-2 bg-red-400 rounded-xl">
                                         Remove
@@ -621,6 +624,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -654,24 +658,31 @@ export default function PageEdit(props: {
                                     ""
                                 )}
                                 <div className="flex justify-evenly w-full">
-                                    <div className="file-input shadow-xl">
-                                        <input
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setUploading(true);
-                                                    handleUpload(
-                                                        e.target.files[0]
-                                                    );
-                                                }
-                                            }}
-                                            id={"upload-showreel"}
-                                            type="file"
-                                            className="inputFile"
+                                    {uploading ? (
+                                        <CircularProgress
+                                            color="warning"
+                                            aria-label="Loading..."
                                         />
-                                        <label htmlFor={"upload-showreel"}>
-                                            Upload New
-                                        </label>
-                                    </div>
+                                    ) : (
+                                        <div className="file-input shadow-xl">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        setUploading(true);
+                                                        handleUpload(
+                                                            e.target.files[0]
+                                                        );
+                                                    }
+                                                }}
+                                                id={"upload-showreel"}
+                                                type="file"
+                                                className="inputFile"
+                                            />
+                                            <label htmlFor={"upload-showreel"}>
+                                                Upload New
+                                            </label>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-4 gap-4">
                                     {videos.map(
@@ -693,9 +704,7 @@ export default function PageEdit(props: {
                                                             height={100}
                                                             width={100}
                                                             src={
-                                                                process.env
-                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                "play.png"
+                                                                "/images/play.png"
                                                             }
                                                             alt="play"
                                                             className="w-full h-auto m-auto"
@@ -711,6 +720,9 @@ export default function PageEdit(props: {
                                                                     video.name
                                                                 );
                                                                 onClose();
+                                                                setNotVideoError(
+                                                                    false
+                                                                );
                                                             }}
                                                             className="px-10 py-2 bg-orange-400 rounded">
                                                             Select
@@ -728,6 +740,7 @@ export default function PageEdit(props: {
                                         onClick={() => {
                                             setShowreel("");
                                             onClose();
+                                            setNotVideoError(false);
                                         }}
                                         className="px-10 py-2 bg-red-400 rounded-xl">
                                         Remove
@@ -740,6 +753,7 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
+                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
