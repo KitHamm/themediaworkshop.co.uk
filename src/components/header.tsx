@@ -43,7 +43,11 @@ export default function Header(props: {
     } = useDisclosure();
 
     useEffect(() => {
-        console.log(props.showreel);
+        console.log("Showreel", props.showreel);
+        console.log("Type", typeof props.showreel);
+    }, []);
+
+    useEffect(() => {
         if (sending && success) {
             setTimeout(() => {
                 setSending(false);
@@ -82,8 +86,8 @@ export default function Header(props: {
                             {props.header}
                         </div>
                         <div className="flex justify-evenly px-10 my-4">
-                            {props.showreel !== null ||
-                            props.showreel !== undefined ||
+                            {props.showreel !== null &&
+                            props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <div>
                                     <button
@@ -271,8 +275,8 @@ export default function Header(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            {props.showreel !== null ||
-                            props.showreel !== undefined ||
+                            {props.showreel !== null &&
+                            props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <video
                                     id="bg-video"
