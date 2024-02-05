@@ -125,7 +125,6 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     setUserCreated(true);
                     getUsers();
                     setError(false);
-                    setPassword("");
                     setAvatar("");
                 } else {
                     setError(true);
