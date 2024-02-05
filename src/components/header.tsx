@@ -83,7 +83,8 @@ export default function Header(props: {
                         </div>
                         <div className="flex justify-evenly px-10 my-4">
                             {props.showreel !== null ||
-                            props.showreel != undefined ? (
+                            props.showreel !== undefined ||
+                            props.showreel !== "" ? (
                                 <div>
                                     <button
                                         onClick={onOpenChangeShowreel}
@@ -271,7 +272,8 @@ export default function Header(props: {
                     {(onClose) => (
                         <>
                             {props.showreel !== null ||
-                            props.showreel != undefined ? (
+                            props.showreel !== undefined ||
+                            props.showreel !== "" ? (
                                 <video
                                     id="bg-video"
                                     controls={true}
