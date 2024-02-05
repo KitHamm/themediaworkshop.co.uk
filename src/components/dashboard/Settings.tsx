@@ -11,7 +11,6 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-
 type FormValues = {
     email: string;
     firstName: string;
@@ -105,8 +104,6 @@ export default function Settings(props: { hidden: boolean; session: any }) {
     }
 
     async function onSubmit(data: FormValues) {
-        setPassword(randomPassword(10));
-
         await fetch("/api/users", {
             method: "POST",
             body: JSON.stringify({
@@ -115,13 +112,13 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                 lastName: data.lastName,
                 position: data.position,
                 image: avatar,
-                password: password,
+                password: randomPassword(10),
             }),
         })
             .then((res) => res.json())
             .then((json) => {
                 if (json.message) {
-                    console.log(json);
+                    setPassword(json.password);
                     setUserCreated(true);
                     getUsers();
                     setError(false);
@@ -149,6 +146,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     backdrop="blur"
                     isOpen={isOpen}
                     className="dark"
+                    isDismissable={false}
                     onOpenChange={onOpenChange}>
                     <ModalContent>
                         {(onClose) => (

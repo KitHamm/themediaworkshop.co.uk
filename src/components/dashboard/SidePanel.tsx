@@ -123,7 +123,9 @@ export default function SidePanel(props: { session: any }) {
                                     ? process.env.NEXT_PUBLIC_BASE_AVATAR_URL +
                                       avatar
                                     : undefined,
-                                name: props.session.user.name,
+                                name: Array.from(
+                                    props.session.user.name
+                                )[0] as string,
                                 size: "lg",
                                 className: "text-large ms-auto",
                             }}

@@ -36,9 +36,15 @@ export async function POST(request: Request) {
                 password: hashedPassword,
             },
         });
-        return new NextResponse(JSON.stringify({ message: "User Created" }), {
-            status: 201,
-        });
+        return new NextResponse(
+            JSON.stringify({
+                message: "User Created",
+                password: json.password,
+            }),
+            {
+                status: 201,
+            }
+        );
     } catch (e: any) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
             // The .code property can be accessed in a type-safe manner
