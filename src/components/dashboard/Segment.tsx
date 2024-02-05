@@ -1,4 +1,4 @@
-import { Segment } from "@prisma/client";
+import { Images, Segment } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
@@ -18,13 +18,21 @@ export default function EditSegment(props: {
     title: string;
     revalidateDashboard: any;
 }) {
-    const [title, setTitle] = useState(props.segment.title);
-    const [copy, setCopy] = useState(props.segment.copy);
+    const [title, setTitle] = useState(
+        props.segment.title ? props.segment.title : ""
+    );
+    const [copy, setCopy] = useState(
+        props.segment.copy ? props.segment.copy : ""
+    );
     const [uploading, setUploading] = useState(false);
     const [images, setImages] = useState(props.segment.image);
-    const [availableImages, setAvailableImages] = useState([]);
-    const [headerImage, setHeaderImage] = useState(props.segment.headerimage);
-    const [order, setOrder] = useState<number>(props.segment.order);
+    const [availableImages, setAvailableImages] = useState<Images[]>([]);
+    const [headerImage, setHeaderImage] = useState(
+        props.segment.headerimage ? props.segment.headerimage : ""
+    );
+    const [order, setOrder] = useState<number>(
+        props.segment.order ? props.segment.order : 0
+    );
     const [changes, setChanges] = useState(false);
     const {
         isOpen: isOpenTopImage,
@@ -374,34 +382,33 @@ export default function EditSegment(props: {
                                 <ModalBody>
                                     <div className="grid grid-cols-4 gap-5">
                                         {availableImages.map(
-                                            (image: string, index: number) => {
-                                                if (image !== "None")
-                                                    return (
-                                                        <div
-                                                            key={
-                                                                image +
-                                                                "-" +
-                                                                index
+                                            (image: Images, index: number) => {
+                                                return (
+                                                    <div
+                                                        key={
+                                                            image.name +
+                                                            "-" +
+                                                            index
+                                                        }
+                                                        className="flex cursor-pointer"
+                                                        onClick={() =>
+                                                            setHeaderImage(
+                                                                image.name
+                                                            )
+                                                        }>
+                                                        <Image
+                                                            height={300}
+                                                            width={300}
+                                                            src={
+                                                                process.env
+                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                image.name
                                                             }
-                                                            className="flex cursor-pointer"
-                                                            onClick={() =>
-                                                                setHeaderImage(
-                                                                    image
-                                                                )
-                                                            }>
-                                                            <Image
-                                                                height={300}
-                                                                width={300}
-                                                                src={
-                                                                    process.env
-                                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                    image
-                                                                }
-                                                                alt={image}
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                    );
+                                                            alt={image.name}
+                                                            className="w-full h-auto m-auto"
+                                                        />
+                                                    </div>
+                                                );
                                             }
                                         )}
                                     </div>

@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import PageEdit from "./PageEdit";
-import { Page } from "@prisma/client";
+import { Page, Videos } from "@prisma/client";
 
 export default function Pages(props: {
     hidden: boolean;
     data: Page;
     revalidateDashboard: any;
 }) {
-    const [bgVideos, setBgVideos] = useState([]);
+    const [bgVideos, setBgVideos] = useState<Videos>([]);
     const searchParams = useSearchParams();
     const pageEdit: string = searchParams.get("pageEdit")
         ? searchParams.get("pageEdit")!

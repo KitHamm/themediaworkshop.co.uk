@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import fsp from "fs/promises";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
-    var preImages: string[] = ["None"];
-    var images = await fsp.readdir(
-        (process.cwd() + process.env.STATIC_IMAGES) as string
-    );
-    var result = preImages.concat(images);
-    return new NextResponse(JSON.stringify(process.cwd()), { status: 201 });
+    revalidatePath("/api/images");
+    const result = await prisma.images.findMany();
+    return new NextResponse(JSON.stringify(result), { status: 201 });
 }

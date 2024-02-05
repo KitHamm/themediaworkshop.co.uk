@@ -21,6 +21,7 @@ const nextConfig = {
         ];
     },
     images: {
+        disableStaticImages: true,
         remotePatterns: [
             {
                 protocol: "https",
@@ -30,6 +31,11 @@ const nextConfig = {
             {
                 protocol: "https",
                 hostname: "themediaworkshop.co.uk",
+                pathname: "**",
+            },
+            {
+                protocol: "http",
+                hostname: "localhost",
                 pathname: "**",
             },
         ],

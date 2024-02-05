@@ -1,5 +1,233 @@
+"use client";
+
+import { Message } from "@prisma/client";
+import { useEffect, useState } from "react";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+} from "@nextui-org/react";
+
 export default function Messages(props: { hidden: boolean }) {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [selectedMessage, setSelectedMessage] = useState(-1);
+    const {
+        isOpen: isOpenMessageModal,
+        onOpen: onOpenMessageModal,
+        onOpenChange: onOpenChangeMessageModal,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenDeleteModal,
+        onOpen: onOpenDeleteModal,
+        onOpenChange: onOpenChangeDeleteModal,
+    } = useDisclosure();
+    useEffect(() => {
+        getMessages();
+    }, []);
+
+    async function deleteMessage(id: string) {
+        const deleted = await fetch("/api/deletemessage", {
+            method: "POST",
+            body: JSON.stringify({ id: id }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    getMessages();
+                    setSelectedMessage(-1);
+                }
+            })
+            .catch((err: any) => console.log(err));
+    }
+
+    async function updateMessage(id: string, value: boolean) {
+        const updated = await fetch("/api/updatemessage", {
+            method: "POST",
+            body: JSON.stringify({ id: id, value: value }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    getMessages();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
+    async function getMessages() {
+        const messages = await fetch("/api/message", { method: "GET" })
+            .then((res) => res.json())
+            .then((json) => setMessages(json))
+            .catch((err: any) => console.log(err));
+    }
+
     return (
-        <div className={`${props.hidden ? "hidden" : ""} p-20`}>Messages</div>
+        <div className={`${props.hidden ? "hidden" : ""} mx-20`}>
+            <div className="my-10">
+                <div className="border-b py-4 text-3xl font-bold capitalize">
+                    Messages
+                </div>
+            </div>
+            <div className="grid grid-cols-4 gap-10">
+                {messages.map((message: Message, index: number) => {
+                    return (
+                        <div
+                            onClick={() => {
+                                onOpenChangeMessageModal();
+                                setSelectedMessage(index);
+                                if (!message.read) {
+                                    updateMessage(message.id, true);
+                                }
+                            }}
+                            className="cursor-pointer"
+                            key={message.id}>
+                            <div
+                                className={`${
+                                    message.read
+                                        ? "bg-neutral-800"
+                                        : "bg-orange-400"
+                                } rounded-lg shadow-lg p-4`}>
+                                <div className="flex border-b mb-2 pb-2 justify-end">
+                                    <div className="">
+                                        {message.read ? "Read" : "Unread"}
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong>From: </strong>
+                                    {message.name}
+                                </div>
+                                <div>
+                                    <strong>Received: </strong>
+                                    {new Date(
+                                        message.createdAt
+                                    ).toLocaleDateString("en-US")}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+            <Modal
+                size="xl"
+                backdrop="blur"
+                isOpen={isOpenMessageModal}
+                className="dark"
+                isDismissable={false}
+                onOpenChange={onOpenChangeMessageModal}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Message
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <div>
+                                    <strong>From: </strong>
+                                    {messages[selectedMessage].name}
+                                </div>
+                                <div>
+                                    <strong>Email: </strong>
+                                    {messages[selectedMessage].email}
+                                </div>
+                                <div>
+                                    <strong>Message: </strong>
+                                </div>
+                                <div>{messages[selectedMessage].message}</div>
+                                <div className="mt-4">
+                                    <strong>Received: </strong>
+                                    {new Date(
+                                        messages[selectedMessage].createdAt
+                                    ).toLocaleDateString("en-US")}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    onClick={() => {
+                                        onOpenChangeDeleteModal();
+                                        onClose();
+                                    }}
+                                    color="danger"
+                                    variant="light">
+                                    Delete
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        updateMessage(
+                                            messages[selectedMessage].id,
+                                            false
+                                        );
+                                        onClose();
+                                        setSelectedMessage(-1);
+                                    }}
+                                    className="bg-orange-400">
+                                    Mark Unread
+                                </Button>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="sm"
+                backdrop="blur"
+                isOpen={isOpenDeleteModal}
+                className="dark"
+                isDismissable
+                onOpenChange={onOpenChangeDeleteModal}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl text-red-400">
+                                    WARNING
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <div className="w-full text-center">
+                                    Are you sure you want to delete this
+                                    message?
+                                </div>
+                                <div className="w-full text-center">
+                                    This action cannot be undone.
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    onClick={() => {
+                                        onClose();
+                                        deleteMessage(
+                                            messages[selectedMessage].id
+                                        );
+                                    }}
+                                    color="danger"
+                                    variant="light">
+                                    Delete
+                                </Button>
+
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                        setSelectedMessage(-1);
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </div>
     );
 }

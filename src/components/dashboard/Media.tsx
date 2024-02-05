@@ -12,13 +12,14 @@ import {
     useDisclosure,
     CircularProgress,
 } from "@nextui-org/react";
+import { Images, Videos } from "@prisma/client";
 
 export default function Media(props: {
     hidden: boolean;
     revalidateDashboard: any;
 }) {
-    const [videos, setVideos] = useState([]);
-    const [images, setImages] = useState([]);
+    const [videos, setVideos] = useState<Videos[]>([]);
+    const [images, setImages] = useState<Images[]>([]);
     const [newUpload, setNewUpload] = useState<File>();
     const [uploading, setUploading] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState("");
@@ -46,14 +47,16 @@ export default function Media(props: {
     }, []);
 
     async function getVideos() {
-        fetch("/api/videos", { method: "GET", cache: "no-store" })
+        props.revalidateDashboard("/");
+        fetch("/api/videos", { method: "GET" })
             .then((res) => res.json())
             .then((json) => setVideos(json))
             .catch((err) => console.log(err));
     }
 
     async function getImages() {
-        fetch("/api/images", { method: "GET", cache: "no-store" })
+        props.revalidateDashboard("/");
+        fetch("/api/images", { method: "GET" })
             .then((res) => res.json())
             .then((json) => setImages(json))
             .catch((err) => console.log(err));
@@ -98,7 +101,9 @@ export default function Media(props: {
         const response = await fetch("/api/deletefile", {
             method: "POST",
             body: JSON.stringify({
+                name: file,
                 file: dir + file,
+                type: type,
             }),
         })
             .then((res) => {
@@ -189,51 +194,48 @@ export default function Media(props: {
                         </div>
 
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
-                            {videos.map((video: string, index: number) => {
-                                if (video !== "None") {
-                                    return (
+                            {videos.map((video: Videos, index: number) => {
+                                return (
+                                    <div
+                                        key={video.name + "-" + index}
+                                        className="flex flex-col">
                                         <div
-                                            key={video}
                                             onClick={() => {
-                                                setSelectedVideo(video);
+                                                setSelectedVideo(video.name);
                                                 onOpenVideo();
-                                                // setVideoModalOpen(true);
                                             }}
-                                            className="flex flex-col">
-                                            <div className="cursor-pointer border rounded p-4 h-full flex w-full">
-                                                <Image
-                                                    height={100}
-                                                    width={100}
-                                                    src={
-                                                        process.env
-                                                            .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                                        "play.png"
-                                                    }
-                                                    alt="play"
-                                                    className="w-full h-auto m-auto"
-                                                />
-                                            </div>
-                                            <div className="text-center truncate mt-4 h-full">
-                                                {video}
-                                            </div>
-                                            <div
-                                                onClick={() => {
-                                                    // deleteFile("video", video)
-                                                    onOpenChangeDelete();
-                                                    setToDelete({
-                                                        file: video,
-                                                        type: "video",
-                                                    });
-                                                }}
-                                                className="cursor-pointer text-center">
-                                                <i
-                                                    aria-hidden
-                                                    className="text-red-500 fa-solid fa-trash"
-                                                />
-                                            </div>
+                                            className="cursor-pointer border rounded p-4 h-full flex w-full">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    "play.png"
+                                                }
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
                                         </div>
-                                    );
-                                }
+                                        <div className="text-center truncate mt-4 h-full">
+                                            {video.name}
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeDelete();
+                                                setToDelete({
+                                                    file: video.name,
+                                                    type: "video",
+                                                });
+                                            }}
+                                            className="cursor-pointer text-center">
+                                            <i
+                                                aria-hidden
+                                                className="text-red-500 fa-solid fa-trash"
+                                            />
+                                        </div>
+                                    </div>
+                                );
                             })}
                         </div>
                     </div>
@@ -247,50 +249,48 @@ export default function Media(props: {
                             />
                         </div>
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
-                            {images.map((image: string, index: number) => {
-                                if (image !== "None") {
-                                    return (
+                            {images.map((image: Images, index: number) => {
+                                return (
+                                    <div
+                                        key={image.name + "-" + index}
+                                        className="flex flex-col">
                                         <div
-                                            key={image}
-                                            className="flex flex-col">
-                                            <div
-                                                onClick={() => {
-                                                    setSelectedImage(image);
-                                                    onOpenImage();
-                                                }}
-                                                className="cursor-pointer border rounded p-4 h-full flex w-full">
-                                                <Image
-                                                    height={100}
-                                                    width={100}
-                                                    src={
-                                                        process.env
-                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                        image
-                                                    }
-                                                    alt={image}
-                                                    className="w-full h-auto m-auto"
-                                                />
-                                            </div>
-                                            <div className="text-center mt-4">
-                                                {image}
-                                            </div>
-                                            <div
-                                                onClick={() => {
-                                                    onOpenChangeDelete();
-                                                    setToDelete({
-                                                        file: image,
-                                                        type: "image",
-                                                    });
-                                                }}
-                                                className="cursor-pointer text-center">
-                                                <i
-                                                    aria-hidden
-                                                    className="text-red-500 fa-solid fa-trash"
-                                                />
-                                            </div>
+                                            onClick={() => {
+                                                setSelectedImage(image.name);
+                                                onOpenImage();
+                                            }}
+                                            className="cursor-pointer border rounded p-4 h-full flex w-full">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    image.name
+                                                }
+                                                alt={image.name}
+                                                className="w-full h-auto m-auto"
+                                            />
                                         </div>
-                                    );
-                                }
+                                        <div className="text-center mt-4">
+                                            {image.name}
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeDelete();
+                                                setToDelete({
+                                                    file: image.name,
+                                                    type: "image",
+                                                });
+                                            }}
+                                            className="cursor-pointer text-center">
+                                            <i
+                                                aria-hidden
+                                                className="text-red-500 fa-solid fa-trash"
+                                            />
+                                        </div>
+                                    </div>
+                                );
                             })}
                         </div>
                     </div>

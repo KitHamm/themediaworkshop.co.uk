@@ -177,7 +177,7 @@ export default function SidePanel(props: { session: any }) {
                 <Link
                     href={"?view=messages"}
                     className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Message
+                    Messages
                 </Link>
                 <Link
                     href={"?view=settings"}

@@ -10,6 +10,7 @@ import {
     useDisclosure,
     CircularProgress,
 } from "@nextui-org/react";
+import { Images } from "@prisma/client";
 
 export default function NewSegment(props: {
     revalidateDashboard: any;
@@ -20,10 +21,11 @@ export default function NewSegment(props: {
     const [copy, setCopy] = useState("");
     const [changes, setChanges] = useState(false);
     const [images, setImages] = useState<string[]>([]);
-    const [availableImages, setAvailableImages] = useState<string[]>([]);
+    const [availableImages, setAvailableImages] = useState<Images[]>([]);
     const [headerImage, setHeaderImage] = useState("");
     const [uploading, setUploading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [order, setOrder] = useState(0);
     const {
         isOpen: isOpenTopImage,
         onOpen: onOpenTopImage,
@@ -85,6 +87,7 @@ export default function NewSegment(props: {
                 copy: copy,
                 headerimage: headerImage,
                 image: images,
+                order: order,
                 page: {
                     connect: {
                         id: props.pageID,
@@ -228,6 +231,21 @@ export default function NewSegment(props: {
                                     id=""
                                 />
                             </div>
+                            <div>
+                                <div className="border-b pb-2 mb-2">Order</div>
+                                <div className="w-1/6">
+                                    <input
+                                        value={
+                                            !Number.isNaN(order) ? order : ""
+                                        }
+                                        onChange={(e) =>
+                                            setOrder(parseInt(e.target.value))
+                                        }
+                                        className="text-black"
+                                        type="number"
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className={"right-segment-column"}>
                             <div className="">
@@ -307,37 +325,35 @@ export default function NewSegment(props: {
                                         <div className="grid grid-cols-4 gap-5">
                                             {availableImages.map(
                                                 (
-                                                    image: string,
+                                                    image: Images,
                                                     index: number
                                                 ) => {
-                                                    if (image !== "None")
-                                                        return (
-                                                            <div
-                                                                key={
-                                                                    image +
-                                                                    "-" +
-                                                                    index
+                                                    return (
+                                                        <div
+                                                            key={
+                                                                image.name +
+                                                                "-" +
+                                                                index
+                                                            }
+                                                            className="flex cursor-pointer"
+                                                            onClick={() =>
+                                                                setHeaderImage(
+                                                                    image.name
+                                                                )
+                                                            }>
+                                                            <Image
+                                                                height={300}
+                                                                width={300}
+                                                                src={
+                                                                    process.env
+                                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                    image.name
                                                                 }
-                                                                className="flex cursor-pointer"
-                                                                onClick={() =>
-                                                                    setHeaderImage(
-                                                                        image
-                                                                    )
-                                                                }>
-                                                                <Image
-                                                                    height={300}
-                                                                    width={300}
-                                                                    src={
-                                                                        process
-                                                                            .env
-                                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                        image
-                                                                    }
-                                                                    alt={image}
-                                                                    className="w-full h-auto m-auto"
-                                                                />
-                                                            </div>
-                                                        );
+                                                                alt={image.name}
+                                                                className="w-full h-auto m-auto"
+                                                            />
+                                                        </div>
+                                                    );
                                                 }
                                             )}
                                         </div>
@@ -408,17 +424,18 @@ export default function NewSegment(props: {
                                         <div className="grid grid-cols-4 gap-5">
                                             {availableImages.map(
                                                 (
-                                                    image: string,
+                                                    image: Images,
                                                     index: number
                                                 ) => {
                                                     if (
-                                                        image !== "None" &&
-                                                        !images.includes(image)
+                                                        !images.includes(
+                                                            image.name
+                                                        )
                                                     )
                                                         return (
                                                             <div
                                                                 key={
-                                                                    image +
+                                                                    image.name +
                                                                     "-" +
                                                                     index
                                                                 }
@@ -426,7 +443,7 @@ export default function NewSegment(props: {
                                                                 onClick={() => {
                                                                     setImages([
                                                                         ...images,
-                                                                        image,
+                                                                        image.name,
                                                                     ]);
                                                                     onClose();
                                                                 }}>
@@ -437,9 +454,11 @@ export default function NewSegment(props: {
                                                                         process
                                                                             .env
                                                                             .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                        image
+                                                                        image.name
                                                                     }
-                                                                    alt={image}
+                                                                    alt={
+                                                                        image.name
+                                                                    }
                                                                     className="w-full h-auto m-auto"
                                                                 />
                                                             </div>

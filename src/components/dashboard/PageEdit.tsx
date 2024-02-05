@@ -1,8 +1,7 @@
 "use client";
 
-import { Page, Segment } from "@prisma/client";
+import { Page, Segment, Videos } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { Select, SelectItem } from "@nextui-org/react";
 import EditSegment from "./Segment";
 import {
     Modal,
@@ -16,12 +15,13 @@ import {
 } from "@nextui-org/react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import NewSegment from "./NewSegment";
+import Image from "next/image";
 
 export default function PageEdit(props: {
     data: Page;
     hidden: boolean;
     revalidateDashboard: any;
-    bgVideos: string[];
+    bgVideos: Videos[];
 }) {
     const [description, setDescription] = useState(
         props.data.description ? props.data.description : ""
@@ -29,17 +29,44 @@ export default function PageEdit(props: {
     const [header, setHeader] = useState(
         props.data.header ? props.data.header : ""
     );
-    const [video, setVideo] = useState(
-        props.data.video ? props.data.video : "None"
-    );
-    const [showreel, setShowreel] = useState(
-        props.data.showreel ? props.data.showreel : "None"
-    );
+    const [video, setVideo] = useState(props.data.video);
+    const [uploading, setUploading] = useState(false);
+    const [showreel, setShowreel] = useState(props.data.showreel);
     const [changes, setChanges] = useState(false);
+    const [notVideoError, setNotVideoError] = useState(false);
+    const [videos, setVideos] = useState<Videos[]>([]);
+    const [previewVideo, setPreviewVideo] = useState("");
     const {
         isOpen: isOpenAddSegment,
         onOpen: onOpenAddSegment,
         onOpenChange: onOpenChangeAddSegment,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenVideoModal,
+        onOpen: onOpenVideoModal,
+        onOpenChange: onOpenChangeVideoModal,
+    } = useDisclosure();
+
+    const {
+        isOpen: isOpenShowreelModal,
+        onOpen: onOpenShowreelModal,
+        onOpenChange: onOpenChangeShowreelModal,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenSelectVideo,
+        onOpen: onOpenSelectVideo,
+        onOpenChange: onOpenChangeSelectVideo,
+    } = useDisclosure();
+
+    const {
+        isOpen: isOpenSelectShowreel,
+        onOpen: onOpenSelectShowreel,
+        onOpenChange: onOpenChangeSelectShowreel,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenPreviewVideo,
+        onOpen: onOpenPreviewVideo,
+        onOpenChange: onOpenChangePreviewVideo,
     } = useDisclosure();
 
     useEffect(() => {
@@ -63,6 +90,39 @@ export default function PageEdit(props: {
         props.data.video,
         props.data.showreel,
     ]);
+
+    async function handleUpload(file: File) {
+        if (file.type.split("/")[0] !== "video") {
+            setNotVideoError(true);
+            console.log("Not Video");
+            return;
+        } else {
+            const formData = new FormData();
+
+            formData.append("file", file);
+
+            const response = await fetch("/api/uploadvideo" as string, {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        setUploading(false);
+                        // clearFileInput();
+                        getVideos();
+                    }
+                })
+                .catch((error) => console.log(error));
+        }
+    }
+
+    async function getVideos() {
+        props.revalidateDashboard("/");
+        fetch("/api/videos", { method: "GET" })
+            .then((res) => res.json())
+            .then((json) => setVideos(json))
+            .catch((err) => console.log(err));
+    }
 
     function handleUpdate() {
         const json = {
@@ -112,62 +172,113 @@ export default function PageEdit(props: {
                 <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
                     <div id="left-column">
                         <div className="border-b pb-2">Page Videos</div>
-                        <div className="xl:grid xl:grid-cols-2 xl:gap-10">
+                        <div className="xl:grid xl:grid-cols-2 xl:gap-10 min-h-20">
                             <div>
-                                {props.bgVideos.length > 1 ? (
-                                    <Select
-                                        disabledKeys={["None"]}
-                                        label="Background Video"
-                                        placeholder="Select a video"
-                                        className="max-w-xs text-black my-4"
-                                        defaultSelectedKeys={[video]}
-                                        onChange={(e) =>
-                                            setVideo(e.target.value)
-                                        }>
-                                        {props.bgVideos.map(
-                                            (videoName: string) => {
-                                                return (
-                                                    <SelectItem
-                                                        className="text-black"
-                                                        key={videoName}>
-                                                        {videoName}
-                                                    </SelectItem>
-                                                );
-                                            }
-                                        )}
-                                    </Select>
+                                {video ? (
+                                    <>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeVideoModal();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    "play.png"
+                                                }
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {video}
+                                        </div>
+                                        <div className="flex justify-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectVideo();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
                                 ) : (
-                                    ""
+                                    <>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="flex justify-center h-full">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectVideo();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                             <div>
-                                {props.bgVideos.length > 1 ? (
-                                    <Select
-                                        label="Showreel"
-                                        placeholder="Select a video"
-                                        className="max-w-xs text-black my-4"
-                                        defaultSelectedKeys={[showreel]}
-                                        onChange={(e) =>
-                                            setShowreel(e.target.value)
-                                        }>
-                                        {props.bgVideos.map(
-                                            (videoName: string) => {
-                                                return (
-                                                    <SelectItem
-                                                        className="text-black"
-                                                        key={videoName}>
-                                                        {videoName}
-                                                    </SelectItem>
-                                                );
-                                            }
-                                        )}
-                                    </Select>
+                                {showreel ? (
+                                    <>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeShowreelModal();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    "play.png"
+                                                }
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {showreel}
+                                        </div>
+                                        <div className="flex justify-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectShowreel();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
                                 ) : (
-                                    ""
+                                    <>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="flex justify-center h-full">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectShowreel();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
-                        <div className="my-10">
+                        <div className="mt-4 mb-10">
                             <div className="border-b pb-2 mb-2">Header</div>
                             <input
                                 placeholder="Title"
@@ -225,7 +336,11 @@ export default function PageEdit(props: {
                                         className="dark"
                                         key={index}
                                         aria-label={segment.title}
-                                        title={segment.title}>
+                                        title={
+                                            segment.title
+                                                ? segment.title
+                                                : "Untitled Segment"
+                                        }>
                                         <div key={segment.title + "-" + index}>
                                             <EditSegment
                                                 revalidateDashboard={
@@ -268,6 +383,358 @@ export default function PageEdit(props: {
                                 />
                             </ModalBody>
                             <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenPreviewVideo}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangePreviewVideo}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader></ModalHeader>
+                            <ModalBody>
+                                <video
+                                    id="bg-video"
+                                    controls={true}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        previewVideo
+                                    }
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenVideoModal}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangeVideoModal}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Background video
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <video
+                                    id="bg-video"
+                                    controls={true}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        video
+                                    }
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenShowreelModal}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangeShowreelModal}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Showreel
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <video
+                                    id="bg-video"
+                                    controls={true}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        video
+                                    }
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Change BG Video */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenSelectVideo}
+                className="dark"
+                scrollBehavior="inside"
+                isDismissable={false}
+                onOpenChange={onOpenChangeSelectVideo}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Background Video
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                {notVideoError ? (
+                                    <div className="w-full text-center text-red-400">
+                                        Please Upload file in video format.
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <div className="flex justify-evenly w-full">
+                                    <div className="file-input shadow-xl">
+                                        <input
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    setUploading(true);
+                                                    handleUpload(
+                                                        e.target.files[0]
+                                                    );
+                                                }
+                                            }}
+                                            id={"upload-showreel"}
+                                            type="file"
+                                            className="inputFile"
+                                        />
+                                        <label htmlFor={"upload-showreel"}>
+                                            Upload New
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-4">
+                                    {videos.map(
+                                        (video: Videos, index: number) => {
+                                            return (
+                                                <div
+                                                    key={
+                                                        video.name + "-" + index
+                                                    }>
+                                                    <div
+                                                        onClick={() => {
+                                                            setPreviewVideo(
+                                                                video.name
+                                                            );
+                                                            onOpenChangePreviewVideo();
+                                                        }}
+                                                        className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                        <Image
+                                                            height={100}
+                                                            width={100}
+                                                            src={
+                                                                process.env
+                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                "play.png"
+                                                            }
+                                                            alt="play"
+                                                            className="w-full h-auto m-auto"
+                                                        />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        {video.name}
+                                                    </div>
+                                                    <div className="flex justify-center mt-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setVideo(
+                                                                    video.name
+                                                                );
+                                                                onClose();
+                                                            }}
+                                                            className="px-10 py-2 bg-orange-400 rounded">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {video ? (
+                                    <button
+                                        onClick={() => {
+                                            setVideo("");
+                                            onClose();
+                                        }}
+                                        className="px-10 py-2 bg-red-400 rounded-xl">
+                                        Remove
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenSelectShowreel}
+                className="dark"
+                scrollBehavior="inside"
+                isDismissable={false}
+                onOpenChange={onOpenChangeSelectShowreel}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Showreel
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                {notVideoError ? (
+                                    <div className="w-full text-center text-red-400">
+                                        Please Upload file in video format.
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <div className="flex justify-evenly w-full">
+                                    <div className="file-input shadow-xl">
+                                        <input
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    setUploading(true);
+                                                    handleUpload(
+                                                        e.target.files[0]
+                                                    );
+                                                }
+                                            }}
+                                            id={"upload-showreel"}
+                                            type="file"
+                                            className="inputFile"
+                                        />
+                                        <label htmlFor={"upload-showreel"}>
+                                            Upload New
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-4">
+                                    {videos.map(
+                                        (video: Videos, index: number) => {
+                                            return (
+                                                <div
+                                                    key={
+                                                        video.name + "-" + index
+                                                    }>
+                                                    <div
+                                                        onClick={() => {
+                                                            setPreviewVideo(
+                                                                video.name
+                                                            );
+                                                            onOpenChangePreviewVideo();
+                                                        }}
+                                                        className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                        <Image
+                                                            height={100}
+                                                            width={100}
+                                                            src={
+                                                                process.env
+                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                "play.png"
+                                                            }
+                                                            alt="play"
+                                                            className="w-full h-auto m-auto"
+                                                        />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        {video.name}
+                                                    </div>
+                                                    <div className="flex justify-center mt-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setShowreel(
+                                                                    video.name
+                                                                );
+                                                                onClose();
+                                                            }}
+                                                            className="px-10 py-2 bg-orange-400 rounded">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {showreel ? (
+                                    <button
+                                        onClick={() => {
+                                            setShowreel("");
+                                            onClose();
+                                        }}
+                                        className="px-10 py-2 bg-red-400 rounded-xl">
+                                        Remove
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                                 <Button
                                     color="danger"
                                     variant="light"
