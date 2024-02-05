@@ -268,7 +268,7 @@ export default function Media(props: {
                                                 className="w-full h-auto m-auto"
                                             />
                                         </div>
-                                        <div className="text-center mt-4">
+                                        <div className="text-center truncate mt-4 pb-4">
                                             {image.name}
                                         </div>
                                         <div
