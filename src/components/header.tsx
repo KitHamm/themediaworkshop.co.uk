@@ -43,11 +43,6 @@ export default function Header(props: {
     } = useDisclosure();
 
     useEffect(() => {
-        console.log("Showreel", props.showreel);
-        console.log("Type", typeof props.showreel);
-    }, []);
-
-    useEffect(() => {
         if (sending && success) {
             setTimeout(() => {
                 setSending(false);
