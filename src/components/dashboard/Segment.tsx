@@ -182,7 +182,9 @@ export default function EditSegment(props: {
                     )}
                 </div>
                 <div className="relative my-2">
-                    {headerImage !== null ? (
+                    {headerImage !== null &&
+                    headerImage !== undefined &&
+                    headerImage !== "" ? (
                         <div>
                             <Image
                                 height={2000}
