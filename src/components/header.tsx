@@ -81,7 +81,7 @@ export default function Header(props: {
                             {props.header}
                         </div>
                         <div className="flex justify-evenly px-10 my-4">
-                            {props.showreel !== "None" ? (
+                            {props.showreel !== null ? (
                                 <div>
                                     <button
                                         onClick={onOpenChangeShowreel}
@@ -268,7 +268,7 @@ export default function Header(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            {props.showreel ? (
+                            {props.showreel !== null ? (
                                 <video
                                     id="bg-video"
                                     controls={true}
