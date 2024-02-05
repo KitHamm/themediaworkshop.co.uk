@@ -11,7 +11,12 @@ export default async function Home() {
         where: {
             title: "film",
         },
-        include: { segment: { include: { casestudy: true } } },
+        include: {
+            segment: {
+                orderBy: { order: "asc" },
+                include: { casestudy: true },
+            },
+        },
     });
     return (
         <>
