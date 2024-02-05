@@ -208,11 +208,7 @@ export default function Media(props: {
                                             <Image
                                                 height={100}
                                                 width={100}
-                                                src={
-                                                    process.env
-                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                    "play.png"
-                                                }
+                                                src={"/public/play.png"}
                                                 alt="play"
                                                 className="w-full h-auto m-auto"
                                             />

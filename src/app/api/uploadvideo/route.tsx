@@ -17,16 +17,19 @@ export async function POST(request: Request) {
         });
     }
     const buffer = Buffer.from(await file.arrayBuffer());
-
+    const formattedName = file.name.replace(" ", "_");
     try {
         await writeFile(
-            path.join(process.cwd(), process.env.PUT_STATIC_VIDEOS + file.name),
+            path.join(
+                process.cwd(),
+                process.env.PUT_STATIC_VIDEOS + formattedName
+            ),
             buffer
         );
         try {
             await prisma.videos.create({
                 data: {
-                    name: file.name,
+                    name: formattedName,
                 },
             });
             return new NextResponse(
