@@ -1,18 +1,12 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { signOut } from "next-auth/react";
-import { User } from "@nextui-org/react";
+// Library Components
 import {
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
     DropdownItem,
     DropdownSection,
-} from "@nextui-org/react";
-import {
     Modal,
     ModalContent,
     ModalHeader,
@@ -20,38 +14,69 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
+    CircularProgress,
 } from "@nextui-org/react";
-import { CircularProgress } from "@nextui-org/react";
+
+//  React Components
+import { useEffect, useState } from "react";
+
+// Next Auth
+import { signOut } from "next-auth/react";
+import { User } from "@nextui-org/react";
+
+// Next Components
+import Image from "next/image";
+import Link from "next/link";
+
+//  Functions
+import handleUpload from "./uploadHandler";
 
 export default function SidePanel(props: { session: any }) {
+    //? States
+
+    // Current avatar and possible new avatar for user
     const [avatar, setAvatar] = useState("");
     const [newAvatar, setNewAvatar] = useState("");
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [uploading, setUploading] = useState(false);
+    // Change avatar success state
     const [changeSuccess, setChangeSuccess] = useState(false);
+    // Uploading avatar state
+    const [uploading, setUploading] = useState(false);
+    // Modal states
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+    // First render get current avatar from DB
     useEffect(() => {
         getAvatar();
     }, []);
 
-    async function handleUpload(file: File) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/uploadavatar" as string, {
+    async function getAvatar() {
+        fetch("/api/avatar", {
             method: "POST",
-            body: formData,
+            body: JSON.stringify({
+                id: props.session.user.id,
+            }),
         })
-            .then((response) => {
-                if (response.ok) {
+            .then((res) => res.json())
+            .then((json) => setAvatar(json.avatar))
+            .catch((err) => console.log(err));
+    }
+
+    // Handler for uploading avatar
+    // Uses the upload handler returning a promise
+    async function uploadAvatar(file: File) {
+        await handleUpload(file, "avatar")
+            .then((res) => {
+                if (res === 1) {
                     setUploading(false);
                     setNewAvatar(file.name);
                     clearFileInput();
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
+    // After the avatar has been uploaded the success message is displayed
+    // The user can then save the avatar to their profile with this function
     async function updateAvatar() {
         fetch("/api/updateuser", {
             method: "POST",
@@ -79,20 +104,9 @@ export default function SidePanel(props: { session: any }) {
         }
     }
 
-    async function getAvatar() {
-        fetch("/api/avatar", {
-            method: "POST",
-            body: JSON.stringify({
-                id: props.session.user.id,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => setAvatar(json.avatar))
-            .catch((err) => console.log(err));
-    }
-
     return (
         <>
+            {/* Side panel set to 1/6 width of the screen in a fixed position on the left */}
             <div className="min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-400">
                 <div className="xl:flex xl:p-10">
                     <Image
@@ -100,11 +114,13 @@ export default function SidePanel(props: { session: any }) {
                         src={"/images/tmw-logo.png"}
                         alt="TMW Logo"
                         priority
+                        id="title-logo"
                         height={75}
                         width={720}
                         className="cursor-pointer"
                     />
                 </div>
+                {/* User information and avatar */}
                 <div className="xl:flex pb-5 border-b border-neutral-400 mb-20">
                     <div className="px-5 w-full flex justify-between">
                         <User
@@ -130,6 +146,7 @@ export default function SidePanel(props: { session: any }) {
                                 className: "text-large ms-auto",
                             }}
                         />
+                        {/* User dropdown containing upload new avatar and logout */}
                         <Dropdown className="dark z-0">
                             <DropdownTrigger>
                                 <div className="xl:basis-1/5 xl:flex xl:cursor-pointer">
@@ -161,6 +178,7 @@ export default function SidePanel(props: { session: any }) {
                         </Dropdown>
                     </div>
                 </div>
+                {/* Navigation Links using state props */}
                 <Link
                     href={"?view=dashboard"}
                     className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
@@ -187,7 +205,7 @@ export default function SidePanel(props: { session: any }) {
                     Settings
                 </Link>
             </div>
-
+            {/* Modal for uploading new avatar */}
             <Modal
                 backdrop="blur"
                 isOpen={isOpen}
@@ -198,6 +216,7 @@ export default function SidePanel(props: { session: any }) {
                         <>
                             <ModalHeader>Update Avatar</ModalHeader>
                             <ModalBody>
+                                {/* Show success message on successful upload of avatar */}
                                 {changeSuccess ? (
                                     <>
                                         <div className="text-center text-2xl font-bold">
@@ -230,7 +249,7 @@ export default function SidePanel(props: { session: any }) {
                                                                 setUploading(
                                                                     true
                                                                 );
-                                                                handleUpload(
+                                                                uploadAvatar(
                                                                     e.target
                                                                         .files[0]
                                                                 );

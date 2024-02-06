@@ -1,7 +1,6 @@
 "use client";
 
-import { Message } from "@prisma/client";
-import { useEffect, useState } from "react";
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -12,25 +11,38 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 
+// React Components
+import { useEffect, useState } from "react";
+
+// Types
+import { Message } from "@prisma/client";
+
 export default function Messages(props: { hidden: boolean }) {
+    // State for all messages once received
     const [messages, setMessages] = useState<Message[]>([]);
+    // State for the selected message to view in modal
     const [selectedMessage, setSelectedMessage] = useState(-1);
+    // Modal declarations
+    // Message view modal
     const {
         isOpen: isOpenMessageModal,
         onOpen: onOpenMessageModal,
         onOpenChange: onOpenChangeMessageModal,
     } = useDisclosure();
+    // Message delete warning modal
     const {
         isOpen: isOpenDeleteModal,
         onOpen: onOpenDeleteModal,
         onOpenChange: onOpenChangeDeleteModal,
     } = useDisclosure();
+
+    // Collect initial messages
     useEffect(() => {
         getMessages();
     }, []);
 
     async function deleteMessage(id: string) {
-        const deleted = await fetch("/api/deletemessage", {
+        await fetch("/api/deletemessage", {
             method: "POST",
             body: JSON.stringify({ id: id }),
         })
@@ -44,7 +56,7 @@ export default function Messages(props: { hidden: boolean }) {
     }
 
     async function updateMessage(id: string, value: boolean) {
-        const updated = await fetch("/api/updatemessage", {
+        await fetch("/api/updatemessage", {
             method: "POST",
             body: JSON.stringify({ id: id, value: value }),
         })
@@ -57,7 +69,7 @@ export default function Messages(props: { hidden: boolean }) {
     }
 
     async function getMessages() {
-        const messages = await fetch("/api/message", { method: "GET" })
+        await fetch("/api/message", { method: "GET" })
             .then((res) => res.json())
             .then((json) => setMessages(json))
             .catch((err: any) => console.log(err));
@@ -109,6 +121,7 @@ export default function Messages(props: { hidden: boolean }) {
                     );
                 })}
             </div>
+            {/* Message view modal */}
             <Modal
                 size="xl"
                 backdrop="blur"
@@ -178,6 +191,7 @@ export default function Messages(props: { hidden: boolean }) {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Delete message warning modal */}
             <Modal
                 size="sm"
                 backdrop="blur"
