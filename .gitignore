@@ -43,7 +43,7 @@ docker-compose.yaml
 seed.ts
 
 # media
-#public/images
+public/images
 public/videos
 public/avatars
 /images

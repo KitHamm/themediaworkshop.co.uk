@@ -1,36 +1,117 @@
+# Hi, I'm Kit! 👋
+
+## 🔗 Links
+
+**Contact me on my [website](https://kitmakesthings.co.uk/?view=contact)**
+
+[![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://github.com/KitHamm)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/kit-hamm/)
+[![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/KitHammUK)
+
+# Repo Info
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## The Media Worskhop
 
-First, run the development server:
+This repo containes the source code used to create the company website for [The Media Worskhop](https://staging.themediaworkshop.co.uk/)
+
+## My Role - Full Stack Developer
+
+`This project is still in the development stage.`
+
+## Tech Stack
+
+**Client:** Next.js, React, TypeScript, Tailwind, Next UI.
+
+**Server:** Node.js, Next.js, Prisma.
+
+**Databse:** PostgreSQL.
+
+**Development Tools:** VS Code, Docker, Insomnia API tester
+
+## Features
+
+-   Static and Dynamic SSR
+-   Custom built dashboard for content managment
+-   Add page segments as needed with customizability
+-   Media pool on dashboard for quickly seeing all media available
+-   Contact form with message center on dashboard
+-   Media storing and serving from hosting Server
+-   PostgreSQL Database with Prisma client
+-   Custom Paralax Views
+
+## TODO
+
+-   Mobile and Tablet responsive styling
+-   Add case study carousel modal for page segments
+-   Media folders for content managment
+-   Finalize styling
+
+## Environment Variables
+
+To run this project, you will need a PostgreSQL data base ideally running in a local Docker environment and to add the following environment variables to your .env file
+
+`NEXTAUTH_SECRET`
+
+`DATABASE_URL=http://localhost:3000/`
+
+`STATIC_VIDEOS="/videos"`
+
+`STATIC_IMAGES="/images"`
+
+`PUT_STATIC_VIDEOS="/public/videos/"`
+
+`PUT_STATIC_IMAGES="/public/images/"`
+
+`PUT_STATIC_AVATARS="public/avatars/"`
+
+`NEXT_PUBLIC_BASE_AVATAR_URL="/avatars/"`
+
+`NEXT_PUBLIC_BASE_VIDEO_URL="/videos/"`
+
+`NEXT_PUBLIC_BASE_IMAGE_URL="/images/"`
+
+`NEXT_PUBLIC_DELETE_IMAGE_DIR="/public/images/"`
+
+`NEXT_PUBLIC_DELETE_VIDEO_DIR="/public/videos/"`
+
+## Run Locally
+
+`subject to change - I will try to keep this updated`
+
+Clone the project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  git clone https://github.com/KitHamm/themediaworkshop.co.uk.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Go to the project directory
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+  cd my-project
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Install dependencies
 
-## Learn More
+```bash
+  npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+Migrate the Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+  npx prisma migrate dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Generate the prisma client
 
-## Deploy on Vercel
+```bash
+  npx prisma generate
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Start the server
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+  npm run dev
+```
