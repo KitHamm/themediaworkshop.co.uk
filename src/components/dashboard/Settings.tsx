@@ -98,8 +98,8 @@ export default function Settings(props: { hidden: boolean; session: any }) {
 
     async function uploadAvatar(file: File) {
         await uploadHandler(file, "avatar")
-            .then((res) => {
-                if (res === 1) {
+            .then((res: any) => {
+                if (res.message) {
                     setUploading(false);
                     setAvatar(file.name);
                     clearFileInput();

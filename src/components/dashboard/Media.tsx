@@ -86,8 +86,8 @@ export default function Media(props: {
         if (newUpload) {
             const type = newUpload.type.split("/")[0];
             await uploadHandler(newUpload, type)
-                .then((res) => {
-                    if (res === 1) {
+                .then((res: any) => {
+                    if (res.message) {
                         setUploading(false);
                         clearFileInput();
                         getVideos();

@@ -14,7 +14,8 @@ export default async function uploadHandler(file: File, type: string) {
         })
             .then((res) => {
                 if (res.ok) {
-                    resolve(1);
+                    const json = res.json();
+                    resolve(json);
                 }
             })
             .catch(() => reject(0));

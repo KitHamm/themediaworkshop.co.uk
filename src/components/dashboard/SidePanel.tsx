@@ -65,10 +65,10 @@ export default function SidePanel(props: { session: any }) {
     // Uses the upload handler returning a promise
     async function uploadAvatar(file: File) {
         await uploadHandler(file, "avatar")
-            .then((res) => {
-                if (res === 1) {
+            .then((res: any) => {
+                if (res.message) {
                     setUploading(false);
-                    setNewAvatar(file.name);
+                    setNewAvatar(res.message);
                     clearFileInput();
                 }
             })

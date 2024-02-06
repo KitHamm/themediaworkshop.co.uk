@@ -35,7 +35,7 @@ export async function POST(request: Request) {
                 },
             });
             return new NextResponse(
-                JSON.stringify({ message: "Record Created" }),
+                JSON.stringify({ message: formattedName }),
                 { status: 201 }
             );
         } catch {

@@ -30,10 +30,10 @@ export default function MainPage(props: { data: Page }) {
                     />
                     {/* Header section with content over full size video */}
                     <Header
-                        home={false}
-                        header={props.data?.header}
-                        description={props.data?.description}
-                        showreel={props.data?.showreel}
+                        home={props.data.title === "home" ? true : false}
+                        header={props.data.header}
+                        description={props.data.description}
+                        showreel={props.data.showreel}
                     />
                 </section>
             </header>
@@ -41,23 +41,6 @@ export default function MainPage(props: { data: Page }) {
             {props.data?.segment.map((segment: Segment, index: number) => {
                 return (
                     <div key={segment.title}>
-                        {/* If section header image, display image */}
-                        {segment.headerimage ? (
-                            <div className="relative flex w-full bg-black h-96 overflow-hidden">
-                                <Image
-                                    width={2560}
-                                    height={500}
-                                    className="absolute w-full h-auto"
-                                    alt={segment.headerimage}
-                                    src={
-                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                                        segment.headerimage
-                                    }
-                                />
-                            </div>
-                        ) : (
-                            ""
-                        )}
                         <PageSegment segment={segment} index={index} />
                     </div>
                 );

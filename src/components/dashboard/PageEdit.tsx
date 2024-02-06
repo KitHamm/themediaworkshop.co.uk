@@ -125,10 +125,9 @@ export default function PageEdit(props: {
             return;
         } else {
             await uploadHandler(file, "video")
-                .then((res) => {
-                    if (res === 1) {
+                .then((res: any) => {
+                    if (res.message) {
                         setUploading(false);
-
                         getVideos();
                     }
                 })

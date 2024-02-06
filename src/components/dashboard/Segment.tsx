@@ -141,12 +141,11 @@ export default function EditSegment(props: {
             return;
         } else {
             await uploadHandler(file, "image")
-                .then((res) => {
-                    console.log(res);
-                    if (res === 1) {
+                .then((res: any) => {
+                    if (res.message) {
                         setUploading(false);
                         if (target === "header") {
-                            setHeaderImage(file.name);
+                            setHeaderImage(res.message);
                             clearFileInput(target);
                         } else {
                             getImages();

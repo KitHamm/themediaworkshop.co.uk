@@ -1,4 +1,5 @@
 export default function Footer() {
+    const date = new Date();
     return (
         <div className="w-full">
             <div className="flex justify-center bg-neutral-800 py-10">
@@ -36,10 +37,21 @@ export default function Footer() {
                             />
                         </a>
                     </div>
+                    <div className="cursor-pointer hover:text-orange-400 transition-all">
+                        <a
+                            href="https://www.linkedin.com/company/themediaworkshopltd/"
+                            target="_blank"
+                            rel="noreferrer">
+                            <i
+                                aria-hidden
+                                className="fa-brands fa-linkedin fa-2xl"
+                            />
+                        </a>
+                    </div>
                 </div>
             </div>
             <div className="text-center bg-black py-4">
-                Copyright &copy;The Media Workshop 2024{" "}
+                Copyright &copy; The Media Workshop {date.getFullYear()}
             </div>
         </div>
     );

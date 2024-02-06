@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 
 // React Components
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type FormTypes = {
     name: string;
@@ -84,10 +85,25 @@ export default function Header(props: {
             <div className="absolute top-0 left-0 z-20 grid grid-cols-2 h-full">
                 <div className="flex justify-center">
                     <div className="m-auto text-center w-2/3">
-                        {props.home ? <div>WE ARE</div> : ""}
-                        <div className="font-bold text-4xl uppercase">
-                            {props.header}
-                        </div>
+                        {props.home ? (
+                            <>
+                                <div>WE ARE</div>
+                                <Image
+                                    src={"/images/tmw-logo.png"}
+                                    alt="TMW Logo"
+                                    priority
+                                    id="title-logo"
+                                    height={75}
+                                    width={720}
+                                    className="w-3/4 h-auto mx-auto mt-2"
+                                />
+                            </>
+                        ) : (
+                            <div className="font-bold text-4xl uppercase">
+                                {props.header}
+                            </div>
+                        )}
+
                         <div className="flex justify-evenly px-10 my-4">
                             {props.showreel !== null &&
                             props.showreel !== undefined &&
@@ -150,11 +166,6 @@ export default function Header(props: {
                                     <br />
                                     <p>Tel: + 44 (0)845 8628456</p>
                                     <p>Email: info@themediaworkshop.co.uk</p>
-                                    <br />
-                                    <p>
-                                        The Media Workshop, Dart Mills,
-                                        Buckfastleigh, TQ11 0NF
-                                    </p>
                                 </div>
 
                                 <div id="form-container" className="relative">
@@ -171,6 +182,54 @@ export default function Header(props: {
                                             <div>
                                                 We will get back to you as soon
                                                 as possible.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-center">
+                                        <div className="flex justify-evenly gap-10 py-5">
+                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                                <a
+                                                    href="https://www.instagram.com/themediaworkshopltd/"
+                                                    target="_blank"
+                                                    rel="noreferrer">
+                                                    <i
+                                                        aria-hidden
+                                                        className="fa-brands fa-instagram fa-2xl"
+                                                    />
+                                                </a>
+                                            </div>
+                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                                <a
+                                                    href="https://vimeo.com/themediaworkshop"
+                                                    target="_blank"
+                                                    rel="noreferrer">
+                                                    <i
+                                                        aria-hidden
+                                                        className="fa-brands fa-vimeo-v fa-2xl"
+                                                    />
+                                                </a>
+                                            </div>
+                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                                <a
+                                                    href="https://www.facebook.com/TheMediaWorkshopLtd/"
+                                                    target="_blank"
+                                                    rel="noreferrer">
+                                                    <i
+                                                        aria-hidden
+                                                        className="fa-brands fa-facebook-f fa-2xl"
+                                                    />
+                                                </a>
+                                            </div>
+                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                                <a
+                                                    href="https://www.linkedin.com/company/themediaworkshopltd/"
+                                                    target="_blank"
+                                                    rel="noreferrer">
+                                                    <i
+                                                        aria-hidden
+                                                        className="fa-brands fa-linkedin fa-2xl"
+                                                    />
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

@@ -48,7 +48,16 @@ select {
     cursor: pointer;
     transition: transform 0.2s ease-out;
 }
-
+.segment-header-image::after {
+    box-shadow: inset 0px 15px 50px -10px black,
+        inset 0px -15px 50px -10px black;
+    content: "";
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
 .fade-in {
     opacity: 100%;
     animation: fadeIn 1s ease-in-out;
