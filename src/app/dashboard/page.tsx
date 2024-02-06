@@ -10,14 +10,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { revalidatePath } from "next/cache";
 
-// Function for revalidating the dashboard route as well as the page route that the content relates to
-export async function revalidateDashboard(route: string) {
-    "use server";
-    revalidatePath("/dashboard", "page");
-    revalidatePath(route, "page");
-}
-
 export default async function Dashboard() {
+    // Function for revalidating the dashboard route as well as the page route that the content relates to
+    async function revalidateDashboard(route: string) {
+        "use server";
+        revalidatePath("/dashboard", "page");
+        revalidatePath(route, "page");
+    }
     //  Collect session data
     const session = await getServerSession(authOptions);
     //  Collect all page data including segments and case studies for CMS
