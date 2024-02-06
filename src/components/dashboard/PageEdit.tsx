@@ -1,8 +1,6 @@
 "use client";
 
-import { Page, Segment, Videos } from "@prisma/client";
-import { useEffect, useState } from "react";
-import EditSegment from "./Segment";
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -12,10 +10,25 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
+    Accordion,
+    AccordionItem,
 } from "@nextui-org/react";
-import { Accordion, AccordionItem } from "@nextui-org/react";
+
+// Components
+import EditSegment from "./Segment";
 import NewSegment from "./NewSegment";
+
+// React Components
+import { useEffect, useState } from "react";
+
+// Next Components
 import Image from "next/image";
+
+// Types
+import { Page, Segment, Videos } from "@prisma/client";
+
+// Functions
+import uploadHandler from "./uploadHandler";
 
 export default function PageEdit(props: {
     data: Page;
@@ -23,52 +36,66 @@ export default function PageEdit(props: {
     revalidateDashboard: any;
     bgVideos: Videos[];
 }) {
+    // If page has description and header set initial state of description and header
     const [description, setDescription] = useState(
         props.data.description ? props.data.description : ""
     );
     const [header, setHeader] = useState(
         props.data.header ? props.data.header : ""
     );
+    // States of background video and showreel
     const [video, setVideo] = useState(props.data.video);
-    const [uploading, setUploading] = useState(false);
     const [showreel, setShowreel] = useState(props.data.showreel);
-    const [changes, setChanges] = useState(false);
+
+    // Media uploading and error state for if not a video
+    const [uploading, setUploading] = useState(false);
     const [notVideoError, setNotVideoError] = useState(false);
+
+    // State for unsaved changes
+    const [changes, setChanges] = useState(false);
+
+    // State to hold available videos and video selected for video view modal
     const [videos, setVideos] = useState<Videos[]>([]);
     const [previewVideo, setPreviewVideo] = useState("");
+
+    // New segment modal declaration
     const {
         isOpen: isOpenAddSegment,
         onOpen: onOpenAddSegment,
         onOpenChange: onOpenChangeAddSegment,
     } = useDisclosure();
+    // Background video preview modal declaration
     const {
         isOpen: isOpenVideoModal,
         onOpen: onOpenVideoModal,
         onOpenChange: onOpenChangeVideoModal,
     } = useDisclosure();
-
+    // Showreel preview modal declaration
     const {
         isOpen: isOpenShowreelModal,
         onOpen: onOpenShowreelModal,
         onOpenChange: onOpenChangeShowreelModal,
     } = useDisclosure();
+    // Video pool modal for selecting background video declaration
     const {
         isOpen: isOpenSelectVideo,
         onOpen: onOpenSelectVideo,
         onOpenChange: onOpenChangeSelectVideo,
     } = useDisclosure();
-
+    // Video pool modal for selecting background video declaration
     const {
         isOpen: isOpenSelectShowreel,
         onOpen: onOpenSelectShowreel,
         onOpenChange: onOpenChangeSelectShowreel,
     } = useDisclosure();
+    // View already selected video modal
     const {
         isOpen: isOpenPreviewVideo,
         onOpen: onOpenPreviewVideo,
         onOpenChange: onOpenChangePreviewVideo,
     } = useDisclosure();
 
+    // Constant check for changes on the page
     useEffect(() => {
         if (
             description !== props.data.description ||
@@ -91,29 +118,21 @@ export default function PageEdit(props: {
         props.data.showreel,
     ]);
 
-    async function handleUpload(file: File) {
+    async function uploadVideo(file: File) {
         if (file.type.split("/")[0] !== "video") {
             setNotVideoError(true);
             setUploading(false);
-            console.log("Not Video");
             return;
         } else {
-            const formData = new FormData();
-
-            formData.append("file", file);
-
-            const response = await fetch("/api/uploadvideo" as string, {
-                method: "POST",
-                body: formData,
-            })
-                .then((response) => {
-                    if (response.ok) {
+            await uploadHandler(file, "video")
+                .then((res) => {
+                    if (res === 1) {
                         setUploading(false);
-                        // clearFileInput();
+
                         getVideos();
                     }
                 })
-                .catch((error) => console.log(error));
+                .catch((err) => console.log(err));
         }
     }
 
@@ -125,6 +144,7 @@ export default function PageEdit(props: {
             .catch((err) => console.log(err));
     }
 
+    // Pre populate data with update Page information
     function handleUpdate() {
         const json = {
             description: description,
@@ -135,6 +155,7 @@ export default function PageEdit(props: {
         updatePage(json);
     }
 
+    // Update page information with pre populated data
     async function updatePage(json: any) {
         const response = await fetch("/api/updatepage", {
             method: "POST",
@@ -351,6 +372,7 @@ export default function PageEdit(props: {
                     </Accordion>
                 </div>
             </div>
+            {/* Add segment modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -390,6 +412,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Preview selectable video modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -426,6 +449,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Preview Background Video Modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -466,6 +490,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Preview showreel modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -506,7 +531,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Change BG Video */}
+            {/* Change background Video modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -543,7 +568,7 @@ export default function PageEdit(props: {
                                                 onChange={(e) => {
                                                     if (e.target.files) {
                                                         setUploading(true);
-                                                        handleUpload(
+                                                        uploadVideo(
                                                             e.target.files[0]
                                                         );
                                                     }
@@ -633,6 +658,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Change showreel video modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -669,7 +695,7 @@ export default function PageEdit(props: {
                                                 onChange={(e) => {
                                                     if (e.target.files) {
                                                         setUploading(true);
-                                                        handleUpload(
+                                                        uploadVideo(
                                                             e.target.files[0]
                                                         );
                                                     }

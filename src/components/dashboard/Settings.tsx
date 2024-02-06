@@ -1,5 +1,6 @@
 "use client";
 
+// Library Components
 import { useForm } from "react-hook-form";
 import {
     Modal,
@@ -9,8 +10,13 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
+    CircularProgress,
 } from "@nextui-org/react";
+
+// React Components
 import { useEffect, useState } from "react";
+
+// Types
 type FormValues = {
     email: string;
     firstName: string;
@@ -20,15 +26,26 @@ type FormValues = {
     password: string;
 };
 
+// Function
+import uploadHandler from "./uploadHandler";
+
 export default function Settings(props: { hidden: boolean; session: any }) {
+    // Initial Users
     const [users, setUsers] = useState([]);
+    // User created or error state boolean
     const [userCreated, setUserCreated] = useState(false);
-    const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
+
+    // Random password created by api handler
+    const [password, setPassword] = useState("");
+    // Uploading state for avatar and state for avatar file name
     const [uploading, setUploading] = useState(false);
     const [avatar, setAvatar] = useState("");
+    // user Id used for deleting user
     const [userId, setUserId] = useState("");
+    // Disclosure for create user modal
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    // Disclosure for delete user warning
     const {
         isOpen: deleteIsOpen,
         onOpen: deleteOnOpen,
@@ -44,8 +61,11 @@ export default function Settings(props: { hidden: boolean; session: any }) {
             password: "",
         },
     });
+    // React Hook Form declarations
     const { register, handleSubmit, formState, reset } = form;
     const { errors } = formState;
+
+    // Get initial users
     useEffect(() => {
         getUsers();
     }, []);
@@ -76,22 +96,16 @@ export default function Settings(props: { hidden: boolean; session: any }) {
             });
     }
 
-    async function handleUpload(file: File) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/uploadavatar" as string, {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
+    async function uploadAvatar(file: File) {
+        await uploadHandler(file, "avatar")
+            .then((res) => {
+                if (res === 1) {
                     setUploading(false);
                     setAvatar(file.name);
                     clearFileInput();
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
     function clearFileInput() {
@@ -103,6 +117,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
         }
     }
 
+    // Submit user to database and retrieve password to display one time
     async function onSubmit(data: FormValues) {
         await fetch("/api/users", {
             method: "POST",
@@ -142,187 +157,6 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     onPress={onOpen}>
                     Add User Account
                 </Button>
-                <Modal
-                    backdrop="blur"
-                    isOpen={isOpen}
-                    className="dark"
-                    isDismissable={false}
-                    onOpenChange={onOpenChange}>
-                    <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader
-                                    className={`${
-                                        error ? "text-red-400" : ""
-                                    } flex flex-col gap-1`}>
-                                    {error
-                                        ? "Account with email already exists"
-                                        : userCreated
-                                        ? "User Account Created"
-                                        : "Add User Account"}
-                                </ModalHeader>
-                                <ModalBody>
-                                    {userCreated ? (
-                                        <>
-                                            <div className="text-center">
-                                                Please send them their password
-                                            </div>
-                                            <div className="text-center bg-white text-black p-2 rounded-xl">
-                                                {password}
-                                            </div>
-                                            <Button
-                                                color="danger"
-                                                variant="light"
-                                                onPress={() => {
-                                                    onClose();
-                                                    reset();
-                                                    setPassword("");
-                                                    setUserCreated(false);
-                                                }}>
-                                                Close
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <form
-                                                className=""
-                                                onSubmit={handleSubmit(
-                                                    onSubmit
-                                                )}>
-                                                <div>First Name</div>
-                                                <input
-                                                    className={`${
-                                                        errors.firstName
-                                                            ? "placeholder:text-red-400"
-                                                            : ""
-                                                    } `}
-                                                    placeholder={
-                                                        errors.firstName
-                                                            ? "First Name is required."
-                                                            : "First Name"
-                                                    }
-                                                    type="text"
-                                                    {...register("firstName", {
-                                                        required: {
-                                                            value: true,
-                                                            message:
-                                                                "First Name is required",
-                                                        },
-                                                    })}
-                                                />
-
-                                                <div>Last Name</div>
-                                                <input
-                                                    className={`${
-                                                        errors.lastName
-                                                            ? "placeholder:text-red-400"
-                                                            : ""
-                                                    } `}
-                                                    placeholder={
-                                                        errors.lastName
-                                                            ? "Last Name is required."
-                                                            : "Last Name"
-                                                    }
-                                                    type="text"
-                                                    {...register("lastName", {
-                                                        required: {
-                                                            value: true,
-                                                            message:
-                                                                "Last Name is required",
-                                                        },
-                                                    })}
-                                                />
-                                                <div>Email</div>
-                                                <input
-                                                    className={`${
-                                                        errors.email
-                                                            ? "placeholder:text-red-400"
-                                                            : ""
-                                                    } `}
-                                                    placeholder={
-                                                        errors.email
-                                                            ? "Email is required."
-                                                            : "Email"
-                                                    }
-                                                    type="email"
-                                                    {...register("email", {
-                                                        required: {
-                                                            value: true,
-                                                            message:
-                                                                "Email is required",
-                                                        },
-                                                    })}
-                                                />
-                                                <div>Position</div>
-                                                <input
-                                                    className=""
-                                                    placeholder="Position"
-                                                    type="text"
-                                                    {...register("position")}
-                                                />
-                                                <div className="mb-2">
-                                                    Avatar
-                                                </div>
-                                                {avatar === "" ? (
-                                                    <div className="file-input">
-                                                        <input
-                                                            onChange={(e) => {
-                                                                if (
-                                                                    e.target
-                                                                        .files
-                                                                ) {
-                                                                    setUploading(
-                                                                        true
-                                                                    );
-                                                                    handleUpload(
-                                                                        e.target
-                                                                            .files[0]
-                                                                    );
-                                                                }
-                                                            }}
-                                                            type="file"
-                                                            className="inputFile"
-                                                            id="new-avatar"
-                                                        />
-                                                        <label htmlFor="new-avatar">
-                                                            {avatar !== ""
-                                                                ? avatar
-                                                                : "Select file"}
-                                                        </label>
-                                                    </div>
-                                                ) : (
-                                                    <div>{avatar}</div>
-                                                )}
-                                                <div className="flex justify-between mt-5">
-                                                    <Button
-                                                        color="danger"
-                                                        variant="light"
-                                                        onPress={() => {
-                                                            onClose();
-                                                            reset();
-                                                            setPassword("");
-                                                            setAvatar("");
-                                                            setUserCreated(
-                                                                false
-                                                            );
-                                                        }}>
-                                                        Close
-                                                    </Button>
-                                                    <button
-                                                        type="submit"
-                                                        className="px-4 py-2 bg-orange-400 rounded-xl">
-                                                        Submit
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </>
-                                    )}
-                                </ModalBody>
-                                <ModalFooter></ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
-                </Modal>
                 <table className="table-auto text-left">
                     <thead className="bg-neutral-600">
                         <tr>
@@ -377,6 +211,196 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     </tbody>
                 </table>
             </div>
+            {/* Create user modal */}
+            <Modal
+                backdrop="blur"
+                isOpen={isOpen}
+                className="dark"
+                isDismissable={false}
+                onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader
+                                className={`${
+                                    error ? "text-red-400" : ""
+                                } flex flex-col gap-1`}>
+                                {error
+                                    ? "Account with email already exists"
+                                    : userCreated
+                                    ? "User Account Created"
+                                    : "Add User Account"}
+                            </ModalHeader>
+                            <ModalBody>
+                                {userCreated ? (
+                                    <>
+                                        <div className="text-center">
+                                            Please send them their password
+                                        </div>
+                                        <div className="text-center bg-white text-black p-2 rounded-xl">
+                                            {password}
+                                        </div>
+                                        <Button
+                                            color="danger"
+                                            variant="light"
+                                            onPress={() => {
+                                                onClose();
+                                                reset();
+                                                setPassword("");
+                                                setUserCreated(false);
+                                            }}>
+                                            Close
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <form
+                                            className=""
+                                            onSubmit={handleSubmit(onSubmit)}>
+                                            <div>First Name</div>
+                                            <input
+                                                className={`${
+                                                    errors.firstName
+                                                        ? "placeholder:text-red-400"
+                                                        : ""
+                                                } `}
+                                                placeholder={
+                                                    errors.firstName
+                                                        ? "First Name is required."
+                                                        : "First Name"
+                                                }
+                                                type="text"
+                                                {...register("firstName", {
+                                                    required: {
+                                                        value: true,
+                                                        message:
+                                                            "First Name is required",
+                                                    },
+                                                })}
+                                            />
+
+                                            <div>Last Name</div>
+                                            <input
+                                                className={`${
+                                                    errors.lastName
+                                                        ? "placeholder:text-red-400"
+                                                        : ""
+                                                } `}
+                                                placeholder={
+                                                    errors.lastName
+                                                        ? "Last Name is required."
+                                                        : "Last Name"
+                                                }
+                                                type="text"
+                                                {...register("lastName", {
+                                                    required: {
+                                                        value: true,
+                                                        message:
+                                                            "Last Name is required",
+                                                    },
+                                                })}
+                                            />
+                                            <div>Email</div>
+                                            <input
+                                                className={`${
+                                                    errors.email
+                                                        ? "placeholder:text-red-400"
+                                                        : ""
+                                                } `}
+                                                placeholder={
+                                                    errors.email
+                                                        ? "Email is required."
+                                                        : "Email"
+                                                }
+                                                type="email"
+                                                {...register("email", {
+                                                    required: {
+                                                        value: true,
+                                                        message:
+                                                            "Email is required",
+                                                    },
+                                                })}
+                                            />
+                                            <div>Position</div>
+                                            <input
+                                                className=""
+                                                placeholder="Position"
+                                                type="text"
+                                                {...register("position")}
+                                            />
+                                            <div className="mb-2">Avatar</div>
+                                            <div className="w-full flex justify-center">
+                                                {avatar === "" ? (
+                                                    uploading ? (
+                                                        <CircularProgress
+                                                            color="warning"
+                                                            aria-label="Loading..."
+                                                            className="ms-4"
+                                                        />
+                                                    ) : (
+                                                        <div className="file-input">
+                                                            <input
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    if (
+                                                                        e.target
+                                                                            .files
+                                                                    ) {
+                                                                        setUploading(
+                                                                            true
+                                                                        );
+                                                                        uploadAvatar(
+                                                                            e
+                                                                                .target
+                                                                                .files[0]
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                type="file"
+                                                                className="inputFile"
+                                                                id="new-avatar"
+                                                            />
+                                                            <label htmlFor="new-avatar">
+                                                                {avatar !== ""
+                                                                    ? avatar
+                                                                    : "Select file"}
+                                                            </label>
+                                                        </div>
+                                                    )
+                                                ) : (
+                                                    <div>{avatar}</div>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between mt-5">
+                                                <Button
+                                                    color="danger"
+                                                    variant="light"
+                                                    onPress={() => {
+                                                        onClose();
+                                                        reset();
+                                                        setPassword("");
+                                                        setAvatar("");
+                                                        setUserCreated(false);
+                                                    }}>
+                                                    Close
+                                                </Button>
+                                                <button
+                                                    type="submit"
+                                                    className="px-4 py-2 bg-orange-400 rounded-xl">
+                                                    Submit
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </>
+                                )}
+                            </ModalBody>
+                            <ModalFooter></ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Delete user warning modal */}
             <Modal
                 backdrop="blur"
                 className="dark"

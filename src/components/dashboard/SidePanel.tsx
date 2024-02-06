@@ -29,7 +29,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 //  Functions
-import handleUpload from "./uploadHandler";
+import uploadHandler from "./uploadHandler";
 
 export default function SidePanel(props: { session: any }) {
     //? States
@@ -64,7 +64,7 @@ export default function SidePanel(props: { session: any }) {
     // Handler for uploading avatar
     // Uses the upload handler returning a promise
     async function uploadAvatar(file: File) {
-        await handleUpload(file, "avatar")
+        await uploadHandler(file, "avatar")
             .then((res) => {
                 if (res === 1) {
                     setUploading(false);
@@ -238,41 +238,43 @@ export default function SidePanel(props: { session: any }) {
                                     <>
                                         <div className="flex">
                                             {newAvatar === "" ? (
-                                                <div className="file-input flex w-full justify-center">
-                                                    <input
-                                                        id="new-avatar"
-                                                        className="inputFile mx-auto"
-                                                        onChange={(e) => {
-                                                            if (
-                                                                e.target.files
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                uploadAvatar(
+                                                uploading ? (
+                                                    <div className="w-full flex justify-center">
+                                                        <CircularProgress
+                                                            color="warning"
+                                                            aria-label="Loading..."
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="file-input flex w-full justify-center">
+                                                        <input
+                                                            id="new-avatar"
+                                                            className="inputFile mx-auto"
+                                                            onChange={(e) => {
+                                                                if (
                                                                     e.target
-                                                                        .files[0]
-                                                                );
-                                                            }
-                                                        }}
-                                                        type="file"
-                                                    />
-                                                    <label htmlFor="new-avatar">
-                                                        {newAvatar !== ""
-                                                            ? newAvatar
-                                                            : "Select file"}
-                                                    </label>
-                                                </div>
+                                                                        .files
+                                                                ) {
+                                                                    setUploading(
+                                                                        true
+                                                                    );
+                                                                    uploadAvatar(
+                                                                        e.target
+                                                                            .files[0]
+                                                                    );
+                                                                }
+                                                            }}
+                                                            type="file"
+                                                        />
+                                                        <label htmlFor="new-avatar">
+                                                            {newAvatar !== ""
+                                                                ? newAvatar
+                                                                : "Select file"}
+                                                        </label>
+                                                    </div>
+                                                )
                                             ) : (
                                                 <div>{newAvatar}</div>
-                                            )}
-                                            {uploading ? (
-                                                <CircularProgress
-                                                    color="warning"
-                                                    aria-label="Loading..."
-                                                />
-                                            ) : (
-                                                ""
                                             )}
                                         </div>
                                         <div className="flex justify-between mt-2">

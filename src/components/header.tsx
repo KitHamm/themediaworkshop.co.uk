@@ -1,5 +1,6 @@
 "use client";
 
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -10,8 +11,10 @@ import {
     useDisclosure,
     CircularProgress,
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
+// React Components
+import { useEffect, useState } from "react";
 
 type FormTypes = {
     name: string;
@@ -25,23 +28,28 @@ export default function Header(props: {
     home: boolean;
     showreel: string;
 }) {
+    // Contact form states
     const [sending, setSending] = useState(false);
     const [success, setSuccess] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    // Contact from declaration
     const form = useForm<FormTypes>();
     const { register, handleSubmit, formState, reset } = form;
     const { errors } = formState;
+    // Contact modal declaration
     const {
         isOpen: isOpenContact,
         onOpen: onOpenContact,
         onOpenChange: onOpenChangeContact,
     } = useDisclosure();
+    // Showreel modal declaration
     const {
         isOpen: isOpenShowreel,
         onOpen: onOpenShowreel,
         onOpenChange: onOpenChangeShowreel,
     } = useDisclosure();
 
+    // Showing sending and success states
     useEffect(() => {
         if (sending && success) {
             setTimeout(() => {
@@ -108,6 +116,7 @@ export default function Header(props: {
                     </div>
                 </div>
             </div>
+            {/* Contact modal */}
             <Modal
                 size="2xl"
                 backdrop="blur"
@@ -261,6 +270,7 @@ export default function Header(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Showreel modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"

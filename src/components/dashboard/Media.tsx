@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -12,35 +11,55 @@ import {
     useDisclosure,
     CircularProgress,
 } from "@nextui-org/react";
+
+// React Components
+import { useEffect, useState } from "react";
+
+// Next Components
+import Image from "next/image";
+
+// Types
 import { Images, Videos } from "@prisma/client";
+
+// Functions
+import uploadHandler from "./uploadHandler";
 
 export default function Media(props: {
     hidden: boolean;
     revalidateDashboard: any;
 }) {
+    // States of videos and Images to display
     const [videos, setVideos] = useState<Videos[]>([]);
     const [images, setImages] = useState<Images[]>([]);
+    // State for file to upload
     const [newUpload, setNewUpload] = useState<File>();
+    // Is uploading state
     const [uploading, setUploading] = useState(false);
+    // Selected Video and Image to view in modal
     const [selectedVideo, setSelectedVideo] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
+    // Delete state with file and file type
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
+    // Image view modal declaration
     const {
         isOpen: isOpenImage,
         onOpen: onOpenImage,
         onOpenChange: onOpenChangeImage,
     } = useDisclosure();
+    // Video view modal declaration
     const {
         isOpen: isOpenVideo,
         onOpen: onOpenVideo,
         onOpenChange: onOpenChangeVideo,
     } = useDisclosure();
+    // Delete modal declaration
     const {
         isOpen: isOpenDelete,
         onOpen: onOpenDelete,
         onOpenChange: onOpenChangeDelete,
     } = useDisclosure();
 
+    // Get initial videos and images to populate pool
     useEffect(() => {
         getVideos();
         getImages();
@@ -62,32 +81,21 @@ export default function Media(props: {
             .catch((err) => console.log(err));
     }
 
-    async function handleUpload() {
-        var type;
-        var url;
-        const formData = new FormData();
+    // Delete media depending on file type
+    async function uploadMedia() {
         if (newUpload) {
-            formData.append("file", newUpload);
-            type = newUpload.type.split("/")[0];
-            if (type === "video") {
-                url = "/api/uploadvideo";
-            } else {
-                url = "/api/uploadimage";
-            }
+            const type = newUpload.type.split("/")[0];
+            await uploadHandler(newUpload, type)
+                .then((res) => {
+                    if (res === 1) {
+                        setUploading(false);
+                        clearFileInput();
+                        getVideos();
+                        getImages();
+                    }
+                })
+                .catch((err) => console.log(err));
         }
-        const response = await fetch(url as string, {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setUploading(false);
-                    clearFileInput();
-                    getVideos();
-                    getImages();
-                }
-            })
-            .catch((error) => console.log(error));
     }
 
     async function deleteFile(type: string, file: string) {
@@ -98,7 +106,7 @@ export default function Media(props: {
             dir = process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR;
         }
 
-        const response = await fetch("/api/deletefile", {
+        await fetch("/api/deletefile", {
             method: "POST",
             body: JSON.stringify({
                 name: file,
@@ -165,7 +173,7 @@ export default function Media(props: {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setUploading(true);
-                                    handleUpload();
+                                    uploadMedia();
                                 }}
                                 disabled={newUpload ? false : true}
                                 className="ms-4 my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
@@ -192,7 +200,7 @@ export default function Media(props: {
                                 className="cursor-pointer fa-solid fa-arrows-rotate"
                             />
                         </div>
-
+                        {/* Videos section */}
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
                             {videos.map((video: Videos, index: number) => {
                                 return (
@@ -235,6 +243,7 @@ export default function Media(props: {
                             })}
                         </div>
                     </div>
+                    {/* Images section */}
                     <div className="w-full">
                         <div className="flex justify-between border-b mb-5">
                             <div className="font-bold text-xl">Images</div>
@@ -292,6 +301,7 @@ export default function Media(props: {
                     </div>
                 </div>
             </div>
+            {/* Delete warning modal */}
             <Modal
                 size="xl"
                 backdrop="blur"
@@ -341,6 +351,7 @@ export default function Media(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Image view modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -379,6 +390,7 @@ export default function Media(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Video view modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"

@@ -1,6 +1,4 @@
-import { Images, Segment } from "@prisma/client";
-import { useEffect, useState } from "react";
-import Image from "next/image";
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -12,44 +10,66 @@ import {
     CircularProgress,
 } from "@nextui-org/react";
 
+// React Components
+import { useEffect, useState } from "react";
+
+// Next Components
+import Image from "next/image";
+
+// Types
+import { Images, Segment } from "@prisma/client";
+
+// Functions
+import uploadHandler from "./uploadHandler";
+
 export default function EditSegment(props: {
     segment: Segment;
     index: number;
     title: string;
     revalidateDashboard: any;
 }) {
+    // Pre populate state for title and c opy if present
     const [title, setTitle] = useState(
         props.segment.title ? props.segment.title : ""
     );
     const [copy, setCopy] = useState(
         props.segment.copy ? props.segment.copy : ""
     );
+    // Uploading State
     const [uploading, setUploading] = useState(false);
+    const [notImageError, setNotImageError] = useState(false);
+    // State for already selected images of segment and available images from media pool
     const [images, setImages] = useState(props.segment.image);
     const [availableImages, setAvailableImages] = useState<Images[]>([]);
     const [headerImage, setHeaderImage] = useState(
         props.segment.headerimage ? props.segment.headerimage : ""
     );
+    // Segment order state
     const [order, setOrder] = useState<number>(
         props.segment.order ? props.segment.order : 0
     );
+    // State for if there are unsaved changes on the segment
     const [changes, setChanges] = useState(false);
+    // Top image modal declaration
     const {
         isOpen: isOpenTopImage,
         onOpen: onOpenTopImage,
         onOpenChange: onOpenChangeTopImage,
     } = useDisclosure();
-    const {
-        isOpen: isOpenDelete,
-        onOpen: onOpenDelete,
-        onOpenChange: onOpenChangeDelete,
-    } = useDisclosure();
+    // Segment images modal declaration
     const {
         isOpen: isOpenAddImage,
         onOpen: onOpenAddImage,
         onOpenChange: onOpenChangeAddImage,
     } = useDisclosure();
+    // Delete warning modal declaration
+    const {
+        isOpen: isOpenDelete,
+        onOpen: onOpenDelete,
+        onOpenChange: onOpenChangeDelete,
+    } = useDisclosure();
 
+    // Constant check for unsaved changes
     useEffect(() => {
         if (
             title !== props.segment.title ||
@@ -75,6 +95,7 @@ export default function EditSegment(props: {
         props.segment.headerimage,
     ]);
 
+    // Pre populate information for segment update
     function handleUpdate() {
         const json = {
             title: title,
@@ -85,52 +106,7 @@ export default function EditSegment(props: {
         };
         updateSegment(json);
     }
-
-    function removeImage(index: number) {
-        setImages(
-            images.filter((_image: string, _index: number) => _index !== index)
-        );
-    }
-
-    async function handleUpload(file: File, target: string) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/uploadimage" as string, {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setUploading(false);
-                    if (target === "header") {
-                        setHeaderImage(file.name);
-                        clearFileInput(target);
-                    } else {
-                        getImages();
-                        clearFileInput(target);
-                    }
-                }
-            })
-            .catch((error) => console.log(error));
-    }
-
-    function clearFileInput(target: string) {
-        var id = target === "header" ? "-top-image-input" : "-image-input";
-        const inputElm = document.getElementById(
-            props.segment.id + id
-        ) as HTMLInputElement;
-        if (inputElm) {
-            inputElm.value = "";
-        }
-    }
-    async function getImages() {
-        fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableImages(json))
-            .catch((err) => console.log(err));
-    }
-
+    // Update segment with pre populated data
     async function updateSegment(json: any) {
         const response = await fetch("/api/updatesegment", {
             method: "POST",
@@ -149,6 +125,53 @@ export default function EditSegment(props: {
                 }
             })
             .catch((error) => console.log(error));
+    }
+
+    function removeImage(index: number) {
+        setImages(
+            images.filter((_image: string, _index: number) => _index !== index)
+        );
+    }
+
+    async function uploadImage(file: File, target: string) {
+        if (file.type.split("/")[0] !== "image") {
+            console.log("Not Image");
+            setNotImageError(true);
+            setUploading(false);
+            return;
+        } else {
+            await uploadHandler(file, "image")
+                .then((res) => {
+                    console.log(res);
+                    if (res === 1) {
+                        setUploading(false);
+                        if (target === "header") {
+                            setHeaderImage(file.name);
+                            clearFileInput(target);
+                        } else {
+                            getImages();
+                            clearFileInput(target);
+                        }
+                    }
+                })
+                .catch((err) => console.log(err));
+        }
+    }
+
+    function clearFileInput(target: string) {
+        var id = target === "header" ? "-top-image-input" : "-image-input";
+        const inputElm = document.getElementById(
+            props.segment.id + id
+        ) as HTMLInputElement;
+        if (inputElm) {
+            inputElm.value = "";
+        }
+    }
+    async function getImages() {
+        fetch("/api/images", { method: "GET" })
+            .then((res) => res.json())
+            .then((json) => setAvailableImages(json))
+            .catch((err) => console.log(err));
     }
 
     async function deleteSegment() {
@@ -227,31 +250,39 @@ export default function EditSegment(props: {
                                 />
                             ) : (
                                 <>
-                                    <div className="file-input shadow-xl">
-                                        <input
-                                            onChange={(e) => {
-                                                if (e.target.files) {
-                                                    setUploading(true);
-                                                    handleUpload(
-                                                        e.target.files[0],
-                                                        "header"
-                                                    );
+                                    <div>
+                                        <div className="file-input shadow-xl">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        setUploading(true);
+                                                        uploadImage(
+                                                            e.target.files[0],
+                                                            "header"
+                                                        );
+                                                    }
+                                                }}
+                                                id={
+                                                    props.segment.id +
+                                                    "-top-image-input"
                                                 }
-                                            }}
-                                            id={
-                                                props.segment.id +
-                                                "-top-image-input"
-                                            }
-                                            type="file"
-                                            className="inputFile"
-                                        />
-                                        <label
-                                            htmlFor={
-                                                props.segment.id +
-                                                "-top-image-input"
-                                            }>
-                                            Upload New
-                                        </label>
+                                                type="file"
+                                                className="inputFile"
+                                            />
+                                            <label
+                                                className="mx-auto"
+                                                htmlFor={
+                                                    props.segment.id +
+                                                    "-top-image-input"
+                                                }>
+                                                Upload New
+                                            </label>
+                                        </div>
+                                        <div className="w-full text-center text-red-400">
+                                            {notImageError
+                                                ? "Please upload media in Image format"
+                                                : ""}
+                                        </div>
                                     </div>
                                     <div>
                                         <button
@@ -368,6 +399,7 @@ export default function EditSegment(props: {
                         </button>
                     }
                 </div>
+                {/* Top Image modal */}
                 <Modal
                     size="5xl"
                     backdrop="blur"
@@ -428,46 +460,7 @@ export default function EditSegment(props: {
                         )}
                     </ModalContent>
                 </Modal>
-                <Modal
-                    size="2xl"
-                    backdrop="blur"
-                    isOpen={isOpenDelete}
-                    className="dark"
-                    scrollBehavior="inside"
-                    onOpenChange={onOpenChangeDelete}>
-                    <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader>
-                                    <div className="w-full text-center font-bold text-red-400">
-                                        {"Delete " +
-                                            props.segment.title +
-                                            " segment?"}
-                                    </div>
-                                </ModalHeader>
-                                <ModalBody></ModalBody>
-                                <ModalFooter>
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            deleteSegment();
-                                            onClose();
-                                        }}>
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        color="danger"
-                                        onPress={() => {
-                                            onClose();
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
-                </Modal>
+                {/* Segment images select modal */}
                 <Modal
                     size="2xl"
                     backdrop="blur"
@@ -496,7 +489,7 @@ export default function EditSegment(props: {
                                                     onChange={(e) => {
                                                         if (e.target.files) {
                                                             setUploading(true);
-                                                            handleUpload(
+                                                            uploadImage(
                                                                 e.target
                                                                     .files[0],
                                                                 "image"
@@ -522,7 +515,7 @@ export default function EditSegment(props: {
                                     </div>
                                     <div className="grid grid-cols-4 gap-5">
                                         {availableImages.map(
-                                            (image: string, index: number) => {
+                                            (image: Images, index: number) => {
                                                 if (
                                                     image !== "None" &&
                                                     !images.includes(image)
@@ -530,7 +523,7 @@ export default function EditSegment(props: {
                                                     return (
                                                         <div
                                                             key={
-                                                                image +
+                                                                image.name +
                                                                 "-" +
                                                                 index
                                                             }
@@ -538,7 +531,7 @@ export default function EditSegment(props: {
                                                             onClick={() => {
                                                                 setImages([
                                                                     ...images,
-                                                                    image,
+                                                                    image.name,
                                                                 ]);
                                                                 onClose();
                                                             }}>
@@ -548,9 +541,9 @@ export default function EditSegment(props: {
                                                                 src={
                                                                     process.env
                                                                         .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                    image
+                                                                    image.name
                                                                 }
-                                                                alt={image}
+                                                                alt={image.name}
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
@@ -560,6 +553,47 @@ export default function EditSegment(props: {
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
+                                    <Button
+                                        color="danger"
+                                        onPress={() => {
+                                            onClose();
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+                {/* Delete warning modal */}
+                <Modal
+                    size="2xl"
+                    backdrop="blur"
+                    isOpen={isOpenDelete}
+                    className="dark"
+                    scrollBehavior="inside"
+                    onOpenChange={onOpenChangeDelete}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader>
+                                    <div className="w-full text-center font-bold text-red-400">
+                                        {"Delete " +
+                                            props.segment.title +
+                                            " segment?"}
+                                    </div>
+                                </ModalHeader>
+                                <ModalBody></ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            deleteSegment();
+                                            onClose();
+                                        }}>
+                                        Delete
+                                    </Button>
                                     <Button
                                         color="danger"
                                         onPress={() => {

@@ -1,5 +1,8 @@
-import { Segment } from "@prisma/client";
+// Next Components
 import Image from "next/image";
+
+// Types
+import { Segment } from "@prisma/client";
 
 export default function PageSegment(props: {
     segment: Segment;

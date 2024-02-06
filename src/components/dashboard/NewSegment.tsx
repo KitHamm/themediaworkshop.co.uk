@@ -1,5 +1,4 @@
-import { useState } from "react";
-import Image from "next/image";
+// Library Components
 import {
     Modal,
     ModalContent,
@@ -10,27 +9,47 @@ import {
     useDisclosure,
     CircularProgress,
 } from "@nextui-org/react";
+
+// React Components
+import { useState } from "react";
+
+// Next Components
+import Image from "next/image";
+
+// Types
 import { Images } from "@prisma/client";
+
+// Functions
+import uploadHandler from "./uploadHandler";
 
 export default function NewSegment(props: {
     revalidateDashboard: any;
     title: string;
     pageID: number;
 }) {
+    // States for title, copy and order of segment
     const [title, setTitle] = useState("");
     const [copy, setCopy] = useState("");
-    const [changes, setChanges] = useState(false);
-    const [images, setImages] = useState<string[]>([]);
-    const [availableImages, setAvailableImages] = useState<Images[]>([]);
-    const [headerImage, setHeaderImage] = useState("");
-    const [uploading, setUploading] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [order, setOrder] = useState(0);
+
+    // State for images selected and header image for segment
+    const [images, setImages] = useState<string[]>([]);
+    const [headerImage, setHeaderImage] = useState("");
+
+    // State for images from image media pool
+    const [availableImages, setAvailableImages] = useState<Images[]>([]);
+
+    // Uploading, not image error and success states
+    const [uploading, setUploading] = useState(false);
+    const [notImageError, setNotImageError] = useState(false);
+    const [success, setSuccess] = useState(false);
+    // Top image select modal
     const {
         isOpen: isOpenTopImage,
         onOpen: onOpenTopImage,
         onOpenChange: onOpenChangeTopImage,
     } = useDisclosure();
+    // Segment images select modal
     const {
         isOpen: isOpenAddImage,
         onOpen: onOpenAddImage,
@@ -56,31 +75,34 @@ export default function NewSegment(props: {
             inputElm.value = "";
         }
     }
-    async function handleUpload(file: File, target: string) {
-        const formData = new FormData();
-        formData.append("file", file);
 
-        const response = await fetch("/api/uploadimage" as string, {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setUploading(false);
-                    if (target === "header") {
-                        setHeaderImage(file.name);
-                        clearFileInput(target);
-                    } else {
-                        getImages();
-                        clearFileInput(target);
+    async function uploadImage(file: File, target: string) {
+        if (file.type.split("/")[0] !== "image") {
+            console.log("Not Image");
+            setNotImageError(true);
+            setUploading(false);
+            return;
+        } else {
+            await uploadHandler(file, "image")
+                .then((res) => {
+                    console.log(res);
+                    if (res === 1) {
+                        setUploading(false);
+                        if (target === "header") {
+                            setHeaderImage(file.name);
+                            clearFileInput(target);
+                        } else {
+                            getImages();
+                            clearFileInput(target);
+                        }
                     }
-                }
-            })
-            .catch((error) => console.log(error));
+                })
+                .catch((err) => console.log(err));
+        }
     }
 
     async function addSegment() {
-        const response = await fetch("/api/addsegment", {
+        await fetch("/api/addsegment", {
             method: "POST",
             body: JSON.stringify({
                 title: title,
@@ -122,13 +144,6 @@ export default function NewSegment(props: {
                 <div className="light rounded-md px-5 mb-4 py-4">
                     <div className="flex justify-between border-b pb-2">
                         <div className="">Top Image</div>
-                        {changes ? (
-                            <div className="fade-in font-bold text-red-400">
-                                There are unsaved changes on this segment
-                            </div>
-                        ) : (
-                            ""
-                        )}
                     </div>
                     <div className="relative my-2">
                         {headerImage !== "" ? (
@@ -176,24 +191,34 @@ export default function NewSegment(props: {
                                     />
                                 ) : (
                                     <>
-                                        <div className="file-input shadow-xl">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        setUploading(true);
-                                                        handleUpload(
-                                                            e.target.files[0],
-                                                            "header"
-                                                        );
-                                                    }
-                                                }}
-                                                id={"top-image-input"}
-                                                type="file"
-                                                className="inputFile"
-                                            />
-                                            <label htmlFor={"top-image-input"}>
-                                                Upload New
-                                            </label>
+                                        <div>
+                                            <div className="file-input shadow-xl">
+                                                <input
+                                                    onChange={(e) => {
+                                                        if (e.target.files) {
+                                                            setUploading(true);
+                                                            uploadImage(
+                                                                e.target
+                                                                    .files[0],
+                                                                "header"
+                                                            );
+                                                        }
+                                                    }}
+                                                    id={"top-image-input"}
+                                                    type="file"
+                                                    className="inputFile"
+                                                />
+                                                <label
+                                                    className="mx-auto"
+                                                    htmlFor={"top-image-input"}>
+                                                    Upload New
+                                                </label>
+                                            </div>
+                                            <div className="w-full text-center text-red-400">
+                                                {notImageError
+                                                    ? "Please upload media in Image format"
+                                                    : ""}
+                                            </div>
                                         </div>
                                         <div>
                                             <button
@@ -310,6 +335,7 @@ export default function NewSegment(props: {
                             Submit
                         </button>
                     </div>
+                    {/* Top Image modal */}
                     <Modal
                         size="5xl"
                         backdrop="blur"
@@ -371,6 +397,7 @@ export default function NewSegment(props: {
                             )}
                         </ModalContent>
                     </Modal>
+                    {/* Segment images modal */}
                     <Modal
                         size="2xl"
                         backdrop="blur"
@@ -403,7 +430,7 @@ export default function NewSegment(props: {
                                                                 setUploading(
                                                                     true
                                                                 );
-                                                                handleUpload(
+                                                                uploadImage(
                                                                     e.target
                                                                         .files[0],
                                                                     "image"

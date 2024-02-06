@@ -1,9 +1,16 @@
 "use client";
 
+// Components
+import PageEdit from "./PageEdit";
+
+// React Components
 import { useState, useEffect } from "react";
+
+// Next Components
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import PageEdit from "./PageEdit";
+
+// Types
 import { Page, Videos } from "@prisma/client";
 
 export default function Pages(props: {
@@ -11,12 +18,15 @@ export default function Pages(props: {
     data: Page;
     revalidateDashboard: any;
 }) {
+    // State list of background videos
     const [bgVideos, setBgVideos] = useState<Videos>([]);
+    // Search params for which page edit to display
     const searchParams = useSearchParams();
     const pageEdit: string = searchParams.get("pageEdit")
         ? searchParams.get("pageEdit")!
         : "home";
 
+    // Get initial videos
     useEffect(() => {
         fetch("/api/videos", { method: "GET" })
             .then((res) => res.json())
@@ -30,6 +40,7 @@ export default function Pages(props: {
                 <div className="my-10 border-b py-4 text-3xl font-bold capitalize">
                     Pages
                 </div>
+                {/* Links for which page edit to display */}
                 <div className="flex justify-evenly">
                     <Link
                         className={`${
@@ -84,6 +95,7 @@ export default function Pages(props: {
                         Art
                     </Link>
                 </div>
+                {/* Pre load all page edits and hide non selected */}
                 {props.data.map((page: Page, index: number) => {
                     return (
                         <div key={index}>
