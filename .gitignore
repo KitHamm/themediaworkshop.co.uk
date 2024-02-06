@@ -48,3 +48,6 @@ public/videos
 public/avatars
 /images
 /videos
+
+#vscode
+.vscode
