@@ -275,11 +275,29 @@ export default function Media(props: {
                                                 </div>
                                                 <div className="bg-neutral-800 bg-opacity-25">
                                                     <div className="text-center truncate p-2 h-full">
-                                                        {
-                                                            video.name
-                                                                .split("_")[1]
-                                                                .split("-")[0]
-                                                        }
+                                                        {video.name.includes(
+                                                            "_"
+                                                        )
+                                                            ? video.name.includes(
+                                                                  "-"
+                                                              )
+                                                                ? video.name
+                                                                      .split(
+                                                                          "_"
+                                                                      )[1]
+                                                                      .split(
+                                                                          "-"
+                                                                      )[0]
+                                                                : video.name.split(
+                                                                      "_"
+                                                                  )[1]
+                                                            : video.name.includes(
+                                                                  "-"
+                                                              )
+                                                            ? video.name.split(
+                                                                  "-"
+                                                              )[0]
+                                                            : video.name}
                                                     </div>
                                                 </div>
                                             </div>
@@ -386,11 +404,29 @@ export default function Media(props: {
                                                     <div
                                                         id={image.name}
                                                         className="text-center truncate p-2">
-                                                        {
-                                                            image.name
-                                                                .split("_")[1]
-                                                                .split("-")[0]
-                                                        }
+                                                        {image.name.includes(
+                                                            "_"
+                                                        )
+                                                            ? image.name.includes(
+                                                                  "-"
+                                                              )
+                                                                ? image.name
+                                                                      .split(
+                                                                          "_"
+                                                                      )[1]
+                                                                      .split(
+                                                                          "-"
+                                                                      )[0]
+                                                                : image.name.split(
+                                                                      "_"
+                                                                  )[1]
+                                                            : image.name.includes(
+                                                                  "-"
+                                                              )
+                                                            ? image.name.split(
+                                                                  "-"
+                                                              )[0]
+                                                            : image.name}
                                                     </div>
                                                 </div>
                                             </div>
