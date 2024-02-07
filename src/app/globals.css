@@ -23,6 +23,14 @@ select {
     /* height: -webkit-fill-available; */
 }
 
+img {
+    max-width: none;
+}
+
+video {
+    object-fit: cover;
+}
+
 .inputFile {
     width: 0.1px;
     height: 0.1px;

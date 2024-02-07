@@ -82,12 +82,14 @@ export default function Header(props: {
 
     return (
         <>
-            <div className="absolute top-0 left-0 z-20 grid grid-cols-2 h-full">
-                <div className="flex justify-center">
-                    <div className="m-auto text-center w-2/3">
+            <div className="bg-black bg-opacity-30 xl:bg-opacity-0 flex absolute top-0 left-0 z-20 xl:grid xl:grid-cols-2 h-full">
+                <div className="m-auto xl:m-0 flex w-5/6 xl:w-auto justify-center">
+                    <div className="m-auto text-center w-full xl:w-2/3">
                         {props.home ? (
                             <>
-                                <div>WE ARE</div>
+                                <div className="text-2xl xl:text-md">
+                                    WE ARE
+                                </div>
                                 <Image
                                     src={"/images/tmw-logo.png"}
                                     alt="TMW Logo"
@@ -95,7 +97,7 @@ export default function Header(props: {
                                     id="title-logo"
                                     height={75}
                                     width={720}
-                                    className="w-3/4 h-auto mx-auto mt-2"
+                                    className="w-full xl:w-3/4 h-auto mx-auto mt-2"
                                 />
                             </>
                         ) : (
@@ -104,14 +106,14 @@ export default function Header(props: {
                             </div>
                         )}
 
-                        <div className="flex justify-evenly px-10 my-4">
+                        <div className="flex justify-evenly px-10 my-10 xl:my-4">
                             {props.showreel !== null &&
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <div>
                                     <button
                                         onClick={onOpenChangeShowreel}
-                                        className="font-bold bg-orange-600 px-8 py-3">
+                                        className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
                                         SHOWREEL
                                     </button>
                                 </div>
@@ -121,7 +123,7 @@ export default function Header(props: {
                             <div>
                                 <button
                                     onClick={onOpenChangeContact}
-                                    className="font-bold bg-white px-8 py-3 text-black">
+                                    className="font-bold bg-white px-2 py-1 xl:px-8 xl:py-3 text-black">
                                     CONTACT
                                 </button>
                             </div>
@@ -138,6 +140,7 @@ export default function Header(props: {
                 backdrop="blur"
                 isOpen={isOpenContact}
                 className="dark transition-all"
+                placement="center"
                 onOpenChange={onOpenChangeContact}>
                 <ModalContent>
                     {(onClose) => (
@@ -284,7 +287,7 @@ export default function Header(props: {
                                                 errors.message
                                                     ? "placeholder:text-red-400"
                                                     : ""
-                                            } text-black h-52`}
+                                            } text-black h-auto xl:h-52`}
                                             placeholder={
                                                 errors.message
                                                     ? errors.message.message
@@ -335,6 +338,7 @@ export default function Header(props: {
                 backdrop="blur"
                 isOpen={isOpenShowreel}
                 className="dark transition-all"
+                placement="center"
                 onOpenChange={onOpenChangeShowreel}>
                 <ModalContent>
                     {(onClose) => (

@@ -14,6 +14,8 @@ export default function PageSegment(props: {
     index: number;
 }) {
     const [parallaxValue, setParallaxValue] = useState(0);
+    const [containerHeight, setContainerHeight] = useState(0);
+
     useEffect(() => {
         const headerImage = document.getElementById(
             "segment-header-image-" + props.index
@@ -34,6 +36,7 @@ export default function PageSegment(props: {
         ) as HTMLElement;
         const containerHeight = headerImageContainer.offsetHeight;
         const imageHeight = headerImage.offsetHeight;
+        setContainerHeight((imageHeight / 5) * 4);
         if (
             headerImageContainer.getBoundingClientRect().top <
                 window.innerHeight &&
@@ -66,14 +69,15 @@ export default function PageSegment(props: {
             {/* If section header image, display image */}
             {props.segment.headerimage ? (
                 <div
+                    style={{ height: containerHeight + "px" }}
                     id={"segment-header-image-container-" + props.index}
-                    className="relative flex w-full bg-black h-96 overflow-hidden segment-header-image">
+                    className="relative flex w-full bg-black  overflow-hidden segment-header-image">
                     <Image
                         id={"segment-header-image-" + props.index}
                         style={{ top: parallaxValue + "px" }}
                         width={2560}
                         height={500}
-                        className="opacity-0 absolute w-full h-auto"
+                        className="opacity-0 absolute h-auto w-full xl:w-full xl:h-auto"
                         alt={props.segment.headerimage}
                         src={
                             process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
@@ -84,13 +88,13 @@ export default function PageSegment(props: {
             ) : (
                 ""
             )}
-            <div className="xl:grid xl:grid-cols-2 w-full px-60 py-10">
+            <div className="xl:grid grid-cols-1 xl:grid-cols-2 w-full px-10 xl:px-60 py-10">
                 {props.index % 2 === 0 ? (
                     <div className="text-center my-auto z-20">
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-lg">
+                        <div className="text-justify text-lg xl:mb-0 mb-10">
                             {props.segment.copy}
                         </div>
                     </div>
@@ -100,7 +104,9 @@ export default function PageSegment(props: {
                 <div className="text-center">
                     <div
                         className={`${
-                            props.index % 2 === 0 ? "-ms-24" : "-me-24"
+                            props.index % 2 === 0
+                                ? "ms-0 xl:-ms-24"
+                                : "ms-0 xl:-me-24"
                         }  relative`}>
                         <Image
                             width={900}
@@ -123,7 +129,7 @@ export default function PageSegment(props: {
                 </div>
                 {props.index % 2 !== 0 ? (
                     <div className="text-center z-20 m-auto">
-                        <div className="uppercase font-bold text-3xl mb-4">
+                        <div className="uppercase font-bold mt-10 xl:mt-0 text-3xl mb-4">
                             {props.segment.title}
                         </div>
                         <div className="text-justify text-lg">

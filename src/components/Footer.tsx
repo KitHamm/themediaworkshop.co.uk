@@ -50,7 +50,7 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="text-center bg-black py-4">
+            <div className="pb-20 xl:pb-0 text-center bg-black py-4">
                 Copyright &copy; The Media Workshop {date.getFullYear()}
             </div>
         </div>
