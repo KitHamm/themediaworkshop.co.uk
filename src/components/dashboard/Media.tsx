@@ -75,6 +75,12 @@ export default function Media(props: {
         onOpen: onOpenDelete,
         onOpenChange: onOpenChangeDelete,
     } = useDisclosure();
+    // Upload modal declaration
+    const {
+        isOpen: isOpenUpload,
+        onOpen: onOpenUpload,
+        onOpenChange: onOpenChangeUpload,
+    } = useDisclosure();
 
     // Get initial videos and images to populate pool
     useEffect(() => {
@@ -157,6 +163,13 @@ export default function Media(props: {
                     Media
                 </div>
                 <div className="my-6">
+                    <button
+                        onClick={onOpenChangeUpload}
+                        className="px-10 py-4 rounded bg-orange-400">
+                        Upload Media
+                    </button>
+                </div>
+                {/* <div className="my-6">
                     <div className="font-bold mb-2">Upload New</div>
                     <div className=" flex">
                         <div className="file-input">
@@ -206,7 +219,7 @@ export default function Media(props: {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="xl:flex xl:grid-cols-2 xl:gap-10">
                     <div className="w-full">
                         <div className="flex justify-between border-b mb-5">
@@ -559,6 +572,140 @@ export default function Media(props: {
                                     color="danger"
                                     onPress={() => {
                                         onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Media upload modal */}
+            <Modal
+                size="lg"
+                backdrop="blur"
+                isOpen={isOpenUpload}
+                className="dark"
+                onOpenChange={onOpenChangeUpload}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>Upload New Media</ModalHeader>
+                            <ModalBody>
+                                <div className="mx-auto">
+                                    <div className="text-center text-2xl font-bold">
+                                        Naming Conventions
+                                    </div>
+                                    <div className="px-4">
+                                        <div className=" mt-4">
+                                            When uploading new videos please
+                                            follow these naming conventions to
+                                            make sure the media is served in the
+                                            correct way and is visible on all
+                                            areas of the site.
+                                        </div>
+                                        <div className="mt-2">
+                                            All files should be prefixed with
+                                            the correct keyword (listed below)
+                                            and contain no other special
+                                            characters.
+                                        </div>
+                                        <div className="mt-2">
+                                            <strong>For example:</strong>{" "}
+                                            HEADER_NameOfImage.ext
+                                        </div>
+                                        <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
+                                            Images
+                                        </div>
+                                        <div>
+                                            <strong>Section Headers: </strong>
+                                            SEGHEAD_
+                                        </div>
+                                        <div>
+                                            <strong>Section Images: </strong>
+                                            SEGMENT_
+                                        </div>
+                                        <div>
+                                            <strong>Case Study Images: </strong>
+                                            STUDY_
+                                        </div>
+                                        <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
+                                            Videos
+                                        </div>
+                                        <div>
+                                            <strong>Background Videos: </strong>
+                                            HEADER_
+                                        </div>
+                                        <div>
+                                            <strong>Showreel Videos: </strong>
+                                            SHOWREEL_
+                                        </div>
+                                        <div>
+                                            <strong>
+                                                Year Review Videos:{" "}
+                                            </strong>
+                                            YEAR_
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex mx-auto mt-4">
+                                    <div className="file-input">
+                                        <input
+                                            onChange={(e) => {
+                                                if (e.target.files)
+                                                    setNewUpload(
+                                                        e.target.files[0]
+                                                    );
+                                            }}
+                                            className="inputFile"
+                                            type="file"
+                                            name={"new-video"}
+                                            id={"new-video"}
+                                        />
+                                        <label htmlFor="new-video">
+                                            {newUpload !== undefined
+                                                ? newUpload.name
+                                                : "Select file"}
+                                        </label>
+                                    </div>
+                                    {uploading ? (
+                                        <CircularProgress
+                                            color="warning"
+                                            aria-label="Loading..."
+                                            className="ms-4"
+                                        />
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div className="flex justify-evenly">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setUploading(true);
+                                            uploadMedia();
+                                        }}
+                                        disabled={newUpload ? false : true}
+                                        className="ms-4 my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
+                                        Upload
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            clearFileInput();
+                                        }}
+                                        className="my-auto ms-4 bg-red-400 text-black rounded-md px-4 py-2">
+                                        Clear
+                                    </button>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                        clearFileInput();
                                     }}>
                                     Close
                                 </Button>
