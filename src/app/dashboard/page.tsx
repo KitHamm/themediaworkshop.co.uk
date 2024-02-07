@@ -40,7 +40,7 @@ export default async function Dashboard() {
                 {/* Side panel for dashboard showing user information */}
                 <SidePanel session={session} />
             </div>
-            <div className="xl:basis-5/6">
+            <div className="xl:basis-5/6 min-h-screen">
                 {/* Main dashboard panel with all views available */}
                 <DashboardMain
                     revalidateDashboard={revalidateDashboard}

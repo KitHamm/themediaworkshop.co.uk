@@ -122,7 +122,7 @@ export default function SidePanel(props: { session: any }) {
                         id="title-logo"
                         height={75}
                         width={720}
-                        className="cursor-pointer"
+                        className="cursor-pointer max-w-full"
                     />
                 </div>
                 {/* User information and avatar */}
