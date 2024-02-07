@@ -347,6 +347,8 @@ export default function Header(props: {
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <video
+                                    autoPlay={true}
+                                    autoFocus={false}
                                     id="bg-video"
                                     controls={true}
                                     src={
