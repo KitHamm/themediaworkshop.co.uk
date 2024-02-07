@@ -15,6 +15,7 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
+    Badge,
 } from "@nextui-org/react";
 
 //  React Components
@@ -31,8 +32,9 @@ import { useSearchParams } from "next/navigation";
 
 //  Functions
 import uploadHandler from "./uploadHandler";
+import { Message } from "@prisma/client";
 
-export default function SidePanel(props: { session: any }) {
+export default function SidePanel(props: { session: any; messages: Message }) {
     // Search params for which view is active
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
@@ -42,6 +44,8 @@ export default function SidePanel(props: { session: any }) {
     // Current avatar and possible new avatar for user
     const [avatar, setAvatar] = useState("");
     const [newAvatar, setNewAvatar] = useState("");
+    // The count of unread messages
+    const [unreadMessages, setUnreadMessages] = useState(0);
     // Change avatar success state
     const [changeSuccess, setChangeSuccess] = useState(false);
     // Uploading avatar state
@@ -54,6 +58,10 @@ export default function SidePanel(props: { session: any }) {
         getAvatar();
     }, []);
 
+    useEffect(() => {
+        handleMessageCount(props.messages);
+    }, [props.messages]);
+
     async function getAvatar() {
         fetch("/api/avatar", {
             method: "POST",
@@ -64,6 +72,16 @@ export default function SidePanel(props: { session: any }) {
             .then((res) => res.json())
             .then((json) => setAvatar(json.avatar))
             .catch((err) => console.log(err));
+    }
+
+    function handleMessageCount(messages: Message) {
+        var count = 0;
+        messages.forEach((message: any) => {
+            if (!message.read) {
+                count++;
+            }
+            setUnreadMessages(count);
+        });
     }
 
     // Handler for uploading avatar
@@ -230,10 +248,15 @@ export default function SidePanel(props: { session: any }) {
                             ? "bg-orange-400 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <i
-                        aria-hidden
-                        className="fa-regular fa-message fa-xl my-auto"
-                    />
+                    <Badge
+                        isInvisible={unreadMessages === 0 ? true : false}
+                        color="danger"
+                        content={unreadMessages}>
+                        <i
+                            aria-hidden
+                            className="fa-regular fa-message fa-xl my-auto"
+                        />
+                    </Badge>
                     <div className="my-auto">Messages</div>
                 </Link>
                 <Link

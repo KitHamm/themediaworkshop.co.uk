@@ -50,6 +50,8 @@ export default function PageEdit(props: {
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
     const [notVideoError, setNotVideoError] = useState(false);
+    const [showreelNamingError, setShowreelNamingError] = useState(false);
+    const [backgroundNamingError, setBackgroundNamingError] = useState(false);
 
     // State for unsaved changes
     const [changes, setChanges] = useState(false);
@@ -117,6 +119,14 @@ export default function PageEdit(props: {
         props.data.video,
         props.data.showreel,
     ]);
+
+    function namingErrorCheck(fileName: string, check: string) {
+        if (fileName.split("_")[0] === check) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     async function uploadVideo(file: File) {
         if (file.type.split("/")[0] !== "video") {
@@ -213,7 +223,7 @@ export default function PageEdit(props: {
                                         <div className="text-center">
                                             {video}
                                         </div>
-                                        <div className="flex justify-center mt-2">
+                                        <div className="text-center mt-2 mt-2">
                                             <button
                                                 onClick={() => {
                                                     onOpenSelectVideo();
@@ -229,7 +239,7 @@ export default function PageEdit(props: {
                                         <div className="text-center mt-4">
                                             None Selected
                                         </div>
-                                        <div className="flex justify-center h-full">
+                                        <div className="text-center mt-2 h-full">
                                             <button
                                                 onClick={() => {
                                                     onOpenSelectVideo();
@@ -261,7 +271,7 @@ export default function PageEdit(props: {
                                         <div className="text-center">
                                             {showreel}
                                         </div>
-                                        <div className="flex justify-center mt-2">
+                                        <div className="text-center mt-2">
                                             <button
                                                 onClick={() => {
                                                     onOpenSelectShowreel();
@@ -277,7 +287,7 @@ export default function PageEdit(props: {
                                         <div className="text-center mt-4">
                                             None Selected
                                         </div>
-                                        <div className="flex justify-center h-full">
+                                        <div className="text-center mt-2">
                                             <button
                                                 onClick={() => {
                                                     onOpenSelectShowreel();
@@ -291,20 +301,22 @@ export default function PageEdit(props: {
                                 )}
                             </div>
                         </div>
-                        <div className="mt-4 mb-10">
-                            <div className="border-b pb-2 mb-2">Header</div>
-                            <input
-                                placeholder="Title"
-                                value={header}
-                                onChange={(e) => setHeader(e.target.value)}
-                                id={"header-" + props.data.title}
-                                name={"header-" + props.data.title}
-                                type="text"
-                                className="text-black"
-                            />
-                        </div>
                     </div>
                     <div id="right-colum">
+                        {props.data.title !== "home" && (
+                            <div className="mb-5">
+                                <div className="border-b pb-2 mb-2">Header</div>
+                                <input
+                                    placeholder="Title"
+                                    value={header}
+                                    onChange={(e) => setHeader(e.target.value)}
+                                    id={"header-" + props.data.title}
+                                    name={"header-" + props.data.title}
+                                    type="text"
+                                    className="text-black"
+                                />
+                            </div>
+                        )}
                         <div>
                             <div className="border-b pb-2 mb-2">
                                 Description
@@ -333,11 +345,11 @@ export default function PageEdit(props: {
                     </div>
                 </div>
                 <div id="segments">
-                    <div className="flex justify-between border-b pb-2 mt-10 mb-2">
+                    <div className="flex gap-5 border-b pb-2 mt-10 mb-2">
                         <div className="font-bold text-2xl">Segments</div>
                         <button
                             onClick={onOpenAddSegment}
-                            className="px-4 py-2 bg-orange-400 rounded">
+                            className="px-2 py-1 bg-orange-400 rounded">
                             Add Segment
                         </button>
                     </div>
@@ -548,12 +560,16 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
-                                {notVideoError ? (
+                                {notVideoError && (
                                     <div className="w-full text-center text-red-400">
                                         Please Upload file in video format.
                                     </div>
-                                ) : (
-                                    ""
+                                )}
+                                {backgroundNamingError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File name should be prefixed with
+                                        HEADER_
+                                    </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
@@ -566,10 +582,28 @@ export default function PageEdit(props: {
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        setUploading(true);
-                                                        uploadVideo(
-                                                            e.target.files[0]
-                                                        );
+                                                        if (
+                                                            namingErrorCheck(
+                                                                e.target
+                                                                    .files[0]
+                                                                    .name,
+                                                                "HEADER"
+                                                            )
+                                                        ) {
+                                                            setUploading(true);
+                                                            setBackgroundNamingError(
+                                                                false
+                                                            );
+                                                            uploadVideo(
+                                                                e.target
+                                                                    .files[0]
+                                                            );
+                                                        } else {
+                                                            setBackgroundNamingError(
+                                                                true
+                                                            );
+                                                            e.target.value = "";
+                                                        }
                                                     }
                                                 }}
                                                 id={"upload-showreel"}
@@ -585,46 +619,56 @@ export default function PageEdit(props: {
                                 <div className="grid grid-cols-4 gap-4">
                                     {videos.map(
                                         (video: Videos, index: number) => {
-                                            return (
-                                                <div
-                                                    key={
-                                                        video.name + "-" + index
-                                                    }>
+                                            if (
+                                                video.name.split("_")[0] ===
+                                                "HEADER"
+                                            ) {
+                                                return (
                                                     <div
-                                                        onClick={() => {
-                                                            setPreviewVideo(
-                                                                video.name
-                                                            );
-                                                            onOpenChangePreviewVideo();
-                                                        }}
-                                                        className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                        <Image
-                                                            height={100}
-                                                            width={100}
-                                                            src={
-                                                                "/images/play.png"
-                                                            }
-                                                            alt="play"
-                                                            className="w-full h-auto m-auto"
-                                                        />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        {video.name}
-                                                    </div>
-                                                    <div className="flex justify-center mt-2">
-                                                        <button
+                                                        key={
+                                                            video.name +
+                                                            "-" +
+                                                            index
+                                                        }>
+                                                        <div
                                                             onClick={() => {
-                                                                setVideo(
+                                                                setPreviewVideo(
                                                                     video.name
                                                                 );
-                                                                onClose();
+                                                                onOpenChangePreviewVideo();
                                                             }}
-                                                            className="px-10 py-2 bg-orange-400 rounded">
-                                                            Select
-                                                        </button>
+                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                            <Image
+                                                                height={100}
+                                                                width={100}
+                                                                src={
+                                                                    "/images/play.png"
+                                                                }
+                                                                alt="play"
+                                                                className="w-full h-auto m-auto"
+                                                            />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            {video.name}
+                                                        </div>
+                                                        <div className="flex justify-center mt-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setVideo(
+                                                                        video.name
+                                                                    );
+                                                                    onClose();
+                                                                    setBackgroundNamingError(
+                                                                        false
+                                                                    );
+                                                                }}
+                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                Select
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
+                                                );
+                                            }
                                         }
                                     )}
                                 </div>
@@ -636,6 +680,7 @@ export default function PageEdit(props: {
                                             setVideo("");
                                             onClose();
                                             setNotVideoError(false);
+                                            setBackgroundNamingError(false);
                                         }}
                                         className="px-10 py-2 bg-red-400 rounded-xl">
                                         Remove
@@ -649,6 +694,7 @@ export default function PageEdit(props: {
                                     onPress={() => {
                                         onClose();
                                         setNotVideoError(false);
+                                        setBackgroundNamingError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -675,12 +721,16 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
-                                {notVideoError ? (
+                                {notVideoError && (
                                     <div className="w-full text-center text-red-400">
                                         Please Upload file in video format.
                                     </div>
-                                ) : (
-                                    ""
+                                )}
+                                {showreelNamingError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File name should be prefixed with
+                                        SHOWREEL_
+                                    </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
@@ -693,10 +743,28 @@ export default function PageEdit(props: {
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        setUploading(true);
-                                                        uploadVideo(
-                                                            e.target.files[0]
-                                                        );
+                                                        if (
+                                                            namingErrorCheck(
+                                                                e.target
+                                                                    .files[0]
+                                                                    .name,
+                                                                "SHOWREEL"
+                                                            )
+                                                        ) {
+                                                            setUploading(true);
+                                                            setShowreelNamingError(
+                                                                false
+                                                            );
+                                                            uploadVideo(
+                                                                e.target
+                                                                    .files[0]
+                                                            );
+                                                        } else {
+                                                            setShowreelNamingError(
+                                                                true
+                                                            );
+                                                            e.target.value = "";
+                                                        }
                                                     }
                                                 }}
                                                 id={"upload-showreel"}
@@ -712,49 +780,59 @@ export default function PageEdit(props: {
                                 <div className="grid grid-cols-4 gap-4">
                                     {videos.map(
                                         (video: Videos, index: number) => {
-                                            return (
-                                                <div
-                                                    key={
-                                                        video.name + "-" + index
-                                                    }>
+                                            if (
+                                                video.name.split("_")[0] ===
+                                                "SHOWREEL"
+                                            ) {
+                                                return (
                                                     <div
-                                                        onClick={() => {
-                                                            setPreviewVideo(
-                                                                video.name
-                                                            );
-                                                            onOpenChangePreviewVideo();
-                                                        }}
-                                                        className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                        <Image
-                                                            height={100}
-                                                            width={100}
-                                                            src={
-                                                                "/images/play.png"
-                                                            }
-                                                            alt="play"
-                                                            className="w-full h-auto m-auto"
-                                                        />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        {video.name}
-                                                    </div>
-                                                    <div className="flex justify-center mt-2">
-                                                        <button
+                                                        key={
+                                                            video.name +
+                                                            "-" +
+                                                            index
+                                                        }>
+                                                        <div
                                                             onClick={() => {
-                                                                setShowreel(
+                                                                setPreviewVideo(
                                                                     video.name
                                                                 );
-                                                                onClose();
-                                                                setNotVideoError(
-                                                                    false
-                                                                );
+                                                                onOpenChangePreviewVideo();
                                                             }}
-                                                            className="px-10 py-2 bg-orange-400 rounded">
-                                                            Select
-                                                        </button>
+                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                            <Image
+                                                                height={100}
+                                                                width={100}
+                                                                src={
+                                                                    "/images/play.png"
+                                                                }
+                                                                alt="play"
+                                                                className="w-full h-auto m-auto"
+                                                            />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            {video.name}
+                                                        </div>
+                                                        <div className="flex justify-center mt-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setShowreel(
+                                                                        video.name
+                                                                    );
+                                                                    onClose();
+                                                                    setShowreelNamingError(
+                                                                        false
+                                                                    );
+                                                                    setNotVideoError(
+                                                                        false
+                                                                    );
+                                                                }}
+                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                Select
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
+                                                );
+                                            }
                                         }
                                     )}
                                 </div>
@@ -766,6 +844,7 @@ export default function PageEdit(props: {
                                             setShowreel("");
                                             onClose();
                                             setNotVideoError(false);
+                                            setShowreelNamingError(false);
                                         }}
                                         className="px-10 py-2 bg-red-400 rounded-xl">
                                         Remove
@@ -779,6 +858,7 @@ export default function PageEdit(props: {
                                     onPress={() => {
                                         onClose();
                                         setNotVideoError(false);
+                                        setShowreelNamingError(false);
                                     }}>
                                     Close
                                 </Button>

@@ -32,36 +32,49 @@ export default function EditSegment(props: {
     const [title, setTitle] = useState(
         props.segment.title ? props.segment.title : ""
     );
+
     const [copy, setCopy] = useState(
         props.segment.copy ? props.segment.copy : ""
     );
+
+    // State for naming convention errors on upload
+    const [topImageNamingError, setTopImageNamingError] = useState(false);
+    const [segmentImageNamingError, setSegmentImageNamingError] =
+        useState(false);
+
     // Uploading State
     const [uploading, setUploading] = useState(false);
     const [notImageError, setNotImageError] = useState(false);
+
     // State for already selected images of segment and available images from media pool
     const [images, setImages] = useState(props.segment.image);
     const [availableImages, setAvailableImages] = useState<Images[]>([]);
     const [headerImage, setHeaderImage] = useState(
         props.segment.headerimage ? props.segment.headerimage : ""
     );
+
     // Segment order state
     const [order, setOrder] = useState<number>(
         props.segment.order ? props.segment.order : 0
     );
+
     // State for if there are unsaved changes on the segment
     const [changes, setChanges] = useState(false);
+
     // Top image modal declaration
     const {
         isOpen: isOpenTopImage,
         onOpen: onOpenTopImage,
         onOpenChange: onOpenChangeTopImage,
     } = useDisclosure();
+
     // Segment images modal declaration
     const {
         isOpen: isOpenAddImage,
         onOpen: onOpenAddImage,
         onOpenChange: onOpenChangeAddImage,
     } = useDisclosure();
+
     // Delete warning modal declaration
     const {
         isOpen: isOpenDelete,
@@ -94,6 +107,15 @@ export default function EditSegment(props: {
         JSON.stringify(props.segment.image),
         props.segment.headerimage,
     ]);
+
+    // Check naming conventions for uploads
+    function namingConventionCheck(fileName: string, check: string) {
+        if (fileName.split("_")[0] !== check) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     // Pre populate information for segment update
     function handleUpdate() {
@@ -250,15 +272,41 @@ export default function EditSegment(props: {
                             ) : (
                                 <>
                                     <div>
+                                        {topImageNamingError && (
+                                            <div className="text-center text-red-400">
+                                                File name prefix should be
+                                                SEGHEAD_
+                                            </div>
+                                        )}
                                         <div className="file-input shadow-xl">
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        setUploading(true);
-                                                        uploadImage(
-                                                            e.target.files[0],
-                                                            "header"
-                                                        );
+                                                        if (
+                                                            namingConventionCheck(
+                                                                e.target
+                                                                    .files[0]
+                                                                    .name,
+                                                                "SEGHEAD"
+                                                            )
+                                                        ) {
+                                                            setUploading(true);
+                                                            uploadImage(
+                                                                e.target
+                                                                    .files[0],
+                                                                "header"
+                                                            );
+                                                            setTopImageNamingError(
+                                                                false
+                                                            );
+                                                        } else {
+                                                            setTopImageNamingError(
+                                                                true
+                                                            );
+                                                            clearFileInput(
+                                                                "header"
+                                                            );
+                                                        }
                                                     }
                                                 }}
                                                 id={
@@ -416,32 +464,37 @@ export default function EditSegment(props: {
                                     <div className="grid grid-cols-4 gap-5">
                                         {availableImages.map(
                                             (image: Images, index: number) => {
-                                                return (
-                                                    <div
-                                                        key={
-                                                            image.name +
-                                                            "-" +
-                                                            index
-                                                        }
-                                                        className="flex cursor-pointer"
-                                                        onClick={() =>
-                                                            setHeaderImage(
-                                                                image.name
-                                                            )
-                                                        }>
-                                                        <Image
-                                                            height={300}
-                                                            width={300}
-                                                            src={
-                                                                process.env
-                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                image.name
+                                                if (
+                                                    image.name.split("_")[0] ===
+                                                    "SEGHEAD"
+                                                ) {
+                                                    return (
+                                                        <div
+                                                            key={
+                                                                image.name +
+                                                                "-" +
+                                                                index
                                                             }
-                                                            alt={image.name}
-                                                            className="w-full h-auto m-auto"
-                                                        />
-                                                    </div>
-                                                );
+                                                            className="flex cursor-pointer"
+                                                            onClick={() =>
+                                                                setHeaderImage(
+                                                                    image.name
+                                                                )
+                                                            }>
+                                                            <Image
+                                                                height={300}
+                                                                width={300}
+                                                                src={
+                                                                    process.env
+                                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                    image.name
+                                                                }
+                                                                alt={image.name}
+                                                                className="w-full h-auto m-auto"
+                                                            />
+                                                        </div>
+                                                    );
+                                                }
                                             }
                                         )}
                                     </div>
@@ -476,6 +529,11 @@ export default function EditSegment(props: {
                                     </div>
                                 </ModalHeader>
                                 <ModalBody>
+                                    {segmentImageNamingError && (
+                                        <div className="text-center text-red-400">
+                                            File name prefix should be SEGMENT_
+                                        </div>
+                                    )}
                                     <div className="w-full flex justify-center mb-10">
                                         {uploading ? (
                                             <CircularProgress
@@ -483,41 +541,66 @@ export default function EditSegment(props: {
                                                 aria-label="Loading..."
                                             />
                                         ) : (
-                                            <div className="file-input shadow-xl">
-                                                <input
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            setUploading(true);
-                                                            uploadImage(
-                                                                e.target
-                                                                    .files[0],
-                                                                "image"
-                                                            );
+                                            <>
+                                                <div className="file-input shadow-xl">
+                                                    <input
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.files
+                                                            ) {
+                                                                if (
+                                                                    namingConventionCheck(
+                                                                        e.target
+                                                                            .files[0]
+                                                                            .name,
+                                                                        "SEGMENT"
+                                                                    )
+                                                                ) {
+                                                                    setSegmentImageNamingError(
+                                                                        false
+                                                                    );
+                                                                    setUploading(
+                                                                        true
+                                                                    );
+                                                                    uploadImage(
+                                                                        e.target
+                                                                            .files[0],
+                                                                        "image"
+                                                                    );
+                                                                } else {
+                                                                    setSegmentImageNamingError(
+                                                                        true
+                                                                    );
+                                                                    clearFileInput(
+                                                                        "SEGMENT"
+                                                                    );
+                                                                }
+                                                            }
+                                                        }}
+                                                        id={
+                                                            props.segment.id +
+                                                            "-image-input"
                                                         }
-                                                    }}
-                                                    id={
-                                                        props.segment.id +
-                                                        "-image-input"
-                                                    }
-                                                    type="file"
-                                                    className="inputFile"
-                                                />
-                                                <label
-                                                    htmlFor={
-                                                        props.segment.id +
-                                                        "-image-input"
-                                                    }>
-                                                    Upload New
-                                                </label>
-                                            </div>
+                                                        type="file"
+                                                        className="inputFile"
+                                                    />
+                                                    <label
+                                                        htmlFor={
+                                                            props.segment.id +
+                                                            "-image-input"
+                                                        }>
+                                                        Upload New
+                                                    </label>
+                                                </div>
+                                            </>
                                         )}
                                     </div>
                                     <div className="grid grid-cols-4 gap-5">
                                         {availableImages.map(
                                             (image: Images, index: number) => {
                                                 if (
-                                                    image !== "None" &&
-                                                    !images.includes(image)
+                                                    image.name.split("_")[0] ===
+                                                    "SEGMENT"
                                                 )
                                                     return (
                                                         <div

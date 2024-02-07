@@ -39,6 +39,11 @@ export default function NewSegment(props: {
     // State for images from image media pool
     const [availableImages, setAvailableImages] = useState<Images[]>([]);
 
+    // State for naming convention errors on upload
+    const [topImageNamingError, setTopImageNamingError] = useState(false);
+    const [segmentImageNamingError, setSegmentImageNamingError] =
+        useState(false);
+
     // Uploading, not image error and success states
     const [uploading, setUploading] = useState(false);
     const [notImageError, setNotImageError] = useState(false);
@@ -73,6 +78,15 @@ export default function NewSegment(props: {
         const inputElm = document.getElementById(id) as HTMLInputElement;
         if (inputElm) {
             inputElm.value = "";
+        }
+    }
+
+    // Check naming conventions for uploads
+    function namingConventionCheck(fileName: string, check: string) {
+        if (fileName.split("_")[0] !== check) {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -191,16 +205,43 @@ export default function NewSegment(props: {
                                 ) : (
                                     <>
                                         <div>
+                                            {topImageNamingError && (
+                                                <div className="text-center text-red-400">
+                                                    File name should be prefixed
+                                                    with SEGHEAD_
+                                                </div>
+                                            )}
                                             <div className="file-input shadow-xl">
                                                 <input
                                                     onChange={(e) => {
                                                         if (e.target.files) {
-                                                            setUploading(true);
-                                                            uploadImage(
-                                                                e.target
-                                                                    .files[0],
-                                                                "header"
-                                                            );
+                                                            if (
+                                                                namingConventionCheck(
+                                                                    e.target
+                                                                        .files[0]
+                                                                        .name,
+                                                                    "SEGHEAD"
+                                                                )
+                                                            ) {
+                                                                setUploading(
+                                                                    true
+                                                                );
+                                                                setTopImageNamingError(
+                                                                    false
+                                                                );
+                                                                uploadImage(
+                                                                    e.target
+                                                                        .files[0],
+                                                                    "header"
+                                                                );
+                                                            } else {
+                                                                setTopImageNamingError(
+                                                                    true
+                                                                );
+                                                                clearFileInput(
+                                                                    "header"
+                                                                );
+                                                            }
                                                         }
                                                     }}
                                                     id={"top-image-input"}
@@ -353,32 +394,40 @@ export default function NewSegment(props: {
                                                     image: Images,
                                                     index: number
                                                 ) => {
-                                                    return (
-                                                        <div
-                                                            key={
-                                                                image.name +
-                                                                "-" +
-                                                                index
-                                                            }
-                                                            className="flex cursor-pointer"
-                                                            onClick={() =>
-                                                                setHeaderImage(
-                                                                    image.name
-                                                                )
-                                                            }>
-                                                            <Image
-                                                                height={300}
-                                                                width={300}
-                                                                src={
-                                                                    process.env
-                                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                    image.name
+                                                    if (
+                                                        image.name.split(
+                                                            "_"
+                                                        )[0] === "SEGHEAD"
+                                                    )
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    image.name +
+                                                                    "-" +
+                                                                    index
                                                                 }
-                                                                alt={image.name}
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                    );
+                                                                className="flex cursor-pointer"
+                                                                onClick={() =>
+                                                                    setHeaderImage(
+                                                                        image.name
+                                                                    )
+                                                                }>
+                                                                <Image
+                                                                    height={300}
+                                                                    width={300}
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                        image.name
+                                                                    }
+                                                                    alt={
+                                                                        image.name
+                                                                    }
+                                                                    className="w-full h-auto m-auto"
+                                                                />
+                                                            </div>
+                                                        );
                                                 }
                                             )}
                                         </div>
@@ -413,6 +462,12 @@ export default function NewSegment(props: {
                                         </div>
                                     </ModalHeader>
                                     <ModalBody>
+                                        {segmentImageNamingError && (
+                                            <div className="text-center text-red-400">
+                                                File name should be prefix with
+                                                SEGMENT_
+                                            </div>
+                                        )}
                                         <div className="w-full flex justify-center mb-10">
                                             {uploading ? (
                                                 <CircularProgress
@@ -426,14 +481,33 @@ export default function NewSegment(props: {
                                                             if (
                                                                 e.target.files
                                                             ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                uploadImage(
-                                                                    e.target
-                                                                        .files[0],
-                                                                    "image"
-                                                                );
+                                                                if (
+                                                                    namingConventionCheck(
+                                                                        e.target
+                                                                            .files[0]
+                                                                            .name,
+                                                                        "SEGMENT"
+                                                                    )
+                                                                ) {
+                                                                    setUploading(
+                                                                        true
+                                                                    );
+                                                                    setSegmentImageNamingError(
+                                                                        false
+                                                                    );
+                                                                    uploadImage(
+                                                                        e.target
+                                                                            .files[0],
+                                                                        "image"
+                                                                    );
+                                                                } else {
+                                                                    setSegmentImageNamingError(
+                                                                        true
+                                                                    );
+                                                                    clearFileInput(
+                                                                        "segment"
+                                                                    );
+                                                                }
                                                             }
                                                         }}
                                                         id={"image-input"}
@@ -454,9 +528,9 @@ export default function NewSegment(props: {
                                                     index: number
                                                 ) => {
                                                     if (
-                                                        !images.includes(
-                                                            image.name
-                                                        )
+                                                        image.name.split(
+                                                            "_"
+                                                        )[0] === "SEGMENT"
                                                     )
                                                         return (
                                                             <div

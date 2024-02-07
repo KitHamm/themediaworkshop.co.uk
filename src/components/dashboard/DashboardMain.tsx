@@ -4,6 +4,7 @@
 import { NextUIProvider } from "@nextui-org/react";
 
 // Components
+import DashboardView from "./Dashboard";
 import Messages from "./Message";
 import Settings from "./Settings";
 import Media from "./Media";
@@ -13,12 +14,13 @@ import Pages from "./Pages";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Page } from "@prisma/client";
+import { Message, Page } from "@prisma/client";
 
 export default function DashboardMain(props: {
     data: Page;
     revalidateDashboard: any;
     session: any;
+    messages: Message;
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -29,7 +31,9 @@ export default function DashboardMain(props: {
 
     return (
         <NextUIProvider>
+            <DashboardView hidden={view === "dashboard" ? false : true} />
             {/* Main CMS pages view */}
+
             <Pages
                 hidden={view === "pages" ? false : true}
                 data={props.data}
@@ -41,7 +45,11 @@ export default function DashboardMain(props: {
                 hidden={view === "media" ? false : true}
             />
             {/* Messages view */}
-            <Messages hidden={view === "messages" ? false : true} />
+            <Messages
+                messages={props.messages}
+                revalidateDashboard={props.revalidateDashboard}
+                hidden={view === "messages" ? false : true}
+            />
 
             {/* Settings view */}
             <Settings

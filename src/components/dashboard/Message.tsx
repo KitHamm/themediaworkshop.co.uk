@@ -17,7 +17,11 @@ import { useEffect, useState } from "react";
 // Types
 import { Message } from "@prisma/client";
 
-export default function Messages(props: { hidden: boolean }) {
+export default function Messages(props: {
+    hidden: boolean;
+    revalidateDashboard: any;
+    messages: Message;
+}) {
     // State for all messages once received
     const [messages, setMessages] = useState<Message[]>([]);
     // State for the selected message to view in modal
@@ -38,8 +42,16 @@ export default function Messages(props: { hidden: boolean }) {
 
     // Collect initial messages
     useEffect(() => {
-        getMessages();
-    }, []);
+        setMessages(props.messages);
+    }, [props.messages]);
+
+    // async function getMessages() {
+    //     props.revalidateDashboard("/");
+    //     await fetch("/api/message", { method: "GET" })
+    //         .then((res) => res.json())
+    //         .then((json) => setMessages(json))
+    //         .catch((err: any) => console.log(err));
+    // }
 
     async function deleteMessage(id: string) {
         await fetch("/api/deletemessage", {
@@ -48,7 +60,7 @@ export default function Messages(props: { hidden: boolean }) {
         })
             .then((res) => {
                 if (res.ok) {
-                    getMessages();
+                    props.revalidateDashboard("/dashboard");
                     setSelectedMessage(-1);
                 }
             })
@@ -62,17 +74,10 @@ export default function Messages(props: { hidden: boolean }) {
         })
             .then((res) => {
                 if (res.ok) {
-                    getMessages();
+                    props.revalidateDashboard("/");
                 }
             })
             .catch((err) => console.log(err));
-    }
-
-    async function getMessages() {
-        await fetch("/api/message", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setMessages(json))
-            .catch((err: any) => console.log(err));
     }
 
     return (

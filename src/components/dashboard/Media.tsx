@@ -27,6 +27,17 @@ import { Images, Videos } from "@prisma/client";
 import uploadHandler from "./uploadHandler";
 import Link from "next/link";
 
+// File Prefix Values
+
+const filePrefixList = [
+    "HEADER",
+    "SHOWREEL",
+    "YEAR",
+    "SEGHEAD",
+    "SEGMENT",
+    "STUDY",
+];
+
 export default function Media(props: {
     hidden: boolean;
     revalidateDashboard: any;
@@ -53,6 +64,9 @@ export default function Media(props: {
     // Selected Video and Image to view in modal
     const [selectedVideo, setSelectedVideo] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
+
+    // Error state for if the media upload has wrong naming convention
+    const [namingError, setNamingError] = useState(false);
 
     // Delete state with file and file type
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
@@ -156,6 +170,11 @@ export default function Media(props: {
         setNewUpload(undefined);
     }
 
+    function fileNamingCheck(fileName: string) {
+        const filePrefix = fileName.split("_")[0];
+        return filePrefixList.includes(filePrefix);
+    }
+
     return (
         <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
             <div className="my-10">
@@ -169,57 +188,6 @@ export default function Media(props: {
                         Upload Media
                     </button>
                 </div>
-                {/* <div className="my-6">
-                    <div className="font-bold mb-2">Upload New</div>
-                    <div className=" flex">
-                        <div className="file-input">
-                            <input
-                                onChange={(e) => {
-                                    if (e.target.files)
-                                        setNewUpload(e.target.files[0]);
-                                }}
-                                className="inputFile"
-                                type="file"
-                                name={"new-video"}
-                                id={"new-video"}
-                            />
-                            <label htmlFor="new-video">
-                                {newUpload !== undefined
-                                    ? newUpload.name
-                                    : "Select file"}
-                            </label>
-                        </div>
-                        {uploading ? (
-                            <CircularProgress
-                                color="warning"
-                                aria-label="Loading..."
-                                className="ms-4"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        <div className="flex my-auto">
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setUploading(true);
-                                    uploadMedia();
-                                }}
-                                disabled={newUpload ? false : true}
-                                className="ms-4 my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
-                                Upload
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    clearFileInput();
-                                }}
-                                className="my-auto ms-4 bg-red-400 text-black rounded-md px-4 py-2">
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                </div> */}
                 <div className="xl:flex xl:grid-cols-2 xl:gap-10">
                     <div className="w-full">
                         <div className="flex justify-between border-b mb-5">
@@ -282,7 +250,9 @@ export default function Media(props: {
                                 ) {
                                     return (
                                         <Tooltip
+                                            delay={1000}
                                             className="dark"
+                                            placement="bottom"
                                             key={video.name + "-" + index}
                                             content={video.name}>
                                             <div className="flex flex-col border rounded border-neutral-800">
@@ -384,6 +354,8 @@ export default function Media(props: {
                                 ) {
                                     return (
                                         <Tooltip
+                                            delay={1000}
+                                            placement="bottom"
                                             className="dark"
                                             key={image.name + "-" + index}
                                             content={image.name}>
@@ -586,6 +558,7 @@ export default function Media(props: {
                 backdrop="blur"
                 isOpen={isOpenUpload}
                 className="dark"
+                isDismissable={false}
                 onOpenChange={onOpenChangeUpload}>
                 <ModalContent>
                     {(onClose) => (
@@ -598,7 +571,7 @@ export default function Media(props: {
                                     </div>
                                     <div className="px-4">
                                         <div className=" mt-4">
-                                            When uploading new videos please
+                                            When uploading new media please
                                             follow these naming conventions to
                                             make sure the media is served in the
                                             correct way and is visible on all
@@ -608,7 +581,7 @@ export default function Media(props: {
                                             All files should be prefixed with
                                             the correct keyword (listed below)
                                             and contain no other special
-                                            characters.
+                                            characters. Specifically hyphens (-)
                                         </div>
                                         <div className="mt-2">
                                             <strong>For example:</strong>{" "}
@@ -648,14 +621,29 @@ export default function Media(props: {
                                         </div>
                                     </div>
                                 </div>
+                                {namingError && (
+                                    <div className="text-center text-red-400">
+                                        Please check the file name prefix
+                                    </div>
+                                )}
                                 <div className="flex mx-auto mt-4">
                                     <div className="file-input">
                                         <input
                                             onChange={(e) => {
                                                 if (e.target.files)
-                                                    setNewUpload(
-                                                        e.target.files[0]
-                                                    );
+                                                    if (
+                                                        fileNamingCheck(
+                                                            e.target.files[0]
+                                                                .name
+                                                        )
+                                                    ) {
+                                                        setNamingError(false);
+                                                        setNewUpload(
+                                                            e.target.files[0]
+                                                        );
+                                                    } else {
+                                                        setNamingError(true);
+                                                    }
                                             }}
                                             className="inputFile"
                                             type="file"
@@ -704,6 +692,7 @@ export default function Media(props: {
                                     color="danger"
                                     variant="light"
                                     onPress={() => {
+                                        setNamingError(false);
                                         onClose();
                                         clearFileInput();
                                     }}>
