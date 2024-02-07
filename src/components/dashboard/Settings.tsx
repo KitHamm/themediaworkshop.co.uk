@@ -146,7 +146,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20`}>
+        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
             <div className="my-10">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Settings

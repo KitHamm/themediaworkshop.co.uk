@@ -84,9 +84,9 @@ export default function PageSegment(props: {
             ) : (
                 ""
             )}
-            <div className="xl:grid xl:grid-cols-2 xl:gap-20 w-full px-60 py-10">
+            <div className="xl:grid xl:grid-cols-2 w-full px-60 py-10">
                 {props.index % 2 === 0 ? (
-                    <div className="text-center m-auto">
+                    <div className="text-center my-auto z-20">
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>
@@ -98,19 +98,31 @@ export default function PageSegment(props: {
                     ""
                 )}
                 <div className="text-center">
-                    <Image
-                        width={900}
-                        height={500}
-                        src={
-                            process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                            props.segment.image[0]
-                        }
-                        alt="Placeholder"
-                        className="m-auto w-full h-auto"
-                    />
+                    <div
+                        className={`${
+                            props.index % 2 === 0 ? "-ms-24" : "-me-24"
+                        }  relative`}>
+                        <Image
+                            width={900}
+                            height={500}
+                            src={
+                                process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                props.segment.image[0]
+                            }
+                            alt="Placeholder"
+                            className="w-full h-auto"
+                        />
+                        <div
+                            className={
+                                props.index % 2 === 0
+                                    ? "gradient-left"
+                                    : "gradient-right"
+                            }
+                        />
+                    </div>
                 </div>
                 {props.index % 2 !== 0 ? (
-                    <div className="text-center m-auto">
+                    <div className="text-center z-20 m-auto">
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>

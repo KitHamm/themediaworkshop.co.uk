@@ -134,7 +134,7 @@ export default function Media(props: {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20`}>
+        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
             <div className="my-10">
                 <div className="border-b py-4 mb-10 text-3xl font-bold capitalize">
                     Media
