@@ -221,7 +221,7 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center">
-                                            {video}
+                                            {video.split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2 mt-2">
                                             <button
@@ -269,7 +269,7 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center">
-                                            {showreel}
+                                            {showreel.split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
@@ -649,7 +649,11 @@ export default function PageEdit(props: {
                                                             />
                                                         </div>
                                                         <div className="text-center">
-                                                            {video.name}
+                                                            {
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
+                                                            }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button
@@ -810,7 +814,11 @@ export default function PageEdit(props: {
                                                             />
                                                         </div>
                                                         <div className="text-center">
-                                                            {video.name}
+                                                            {
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
+                                                            }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button

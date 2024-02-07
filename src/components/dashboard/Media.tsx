@@ -246,7 +246,8 @@ export default function Media(props: {
                                         video.name.split("_")[0] ===
                                             "SHOWREEL") ||
                                     (videoView === "year" &&
-                                        video.name.split("_")[0] === "YEAR")
+                                        video.name.split("_")[0] === "YEAR") ||
+                                    videoView === "all"
                                 ) {
                                     return (
                                         <Tooltip
@@ -350,7 +351,8 @@ export default function Media(props: {
                                             "SEGMENT") ||
                                     (imageView === "study" &&
                                         image.name.split("_")[0] ===
-                                            "CASESTUDY")
+                                            "CASESTUDY") ||
+                                    imageView === "all"
                                 ) {
                                     return (
                                         <Tooltip
