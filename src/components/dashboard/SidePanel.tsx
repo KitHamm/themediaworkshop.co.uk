@@ -27,12 +27,17 @@ import { User } from "@nextui-org/react";
 // Next Components
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 //  Functions
 import uploadHandler from "./uploadHandler";
 
 export default function SidePanel(props: { session: any }) {
-    //? States
+    // Search params for which view is active
+    const searchParams = useSearchParams();
+    const view: string = searchParams.get("view")
+        ? searchParams.get("view")!
+        : "dashboard";
 
     // Current avatar and possible new avatar for user
     const [avatar, setAvatar] = useState("");
@@ -108,7 +113,7 @@ export default function SidePanel(props: { session: any }) {
         <>
             {/* Side panel set to 1/6 width of the screen in a fixed position on the left */}
             <div className="min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-400">
-                <div className="xl:flex xl:p-10">
+                <div className="xl:flex xl:p-10 border-b border-neutral-400 mb-4">
                     <Image
                         onClick={() => (window.location.href = "/")}
                         src={"/images/tmw-logo.png"}
@@ -181,28 +186,65 @@ export default function SidePanel(props: { session: any }) {
                 {/* Navigation Links using state props */}
                 <Link
                     href={"?view=dashboard"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Dashboard
+                    className={`${
+                        view === "dashboard"
+                            ? "bg-orange-400 border-l-5 border-white"
+                            : ""
+                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
+                    <i
+                        aria-hidden
+                        className="fa-solid fa-house fa-xl my-auto"
+                    />
+                    <div className="my-auto">Dashboard</div>
                 </Link>
                 <Link
                     href={"?view=pages"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Pages
+                    className={`${
+                        view === "pages"
+                            ? "bg-orange-400 border-l-5 border-white"
+                            : ""
+                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
+                    <i
+                        aria-hidden
+                        className="fa-regular fa-window-restore fa-xl my-auto"
+                    />
+                    <div className="my-auto">Pages</div>
                 </Link>
                 <Link
                     href={"?view=media"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Media
+                    className={`${
+                        view === "media"
+                            ? "bg-orange-400 border-l-5 border-white"
+                            : ""
+                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
+                    <i
+                        aria-hidden
+                        className="fa-regular fa-images fa-xl my-auto"
+                    />
+                    <div className="my-auto">Media</div>
                 </Link>
                 <Link
                     href={"?view=messages"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Messages
+                    className={`${
+                        view === "messages"
+                            ? "bg-orange-400 border-l-5 border-white"
+                            : ""
+                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
+                    <i
+                        aria-hidden
+                        className="fa-regular fa-message fa-xl my-auto"
+                    />
+                    <div className="my-auto">Messages</div>
                 </Link>
                 <Link
                     href={"?view=settings"}
-                    className="flex hover:bg-orange-400 cursor-pointer font-bold text-2xl pe-5 py-5 ps-10">
-                    Settings
+                    className={`${
+                        view === "settings"
+                            ? "bg-orange-400 border-l-5 border-white"
+                            : ""
+                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
+                    <i aria-hidden className="fa-solid fa-gear fa-xl my-auto" />
+                    <div className="my-auto">Settings</div>
                 </Link>
             </div>
             {/* Modal for uploading new avatar */}

@@ -1,7 +1,6 @@
 "use client";
 
 // Library Components
-import { useSearchParams } from "next/navigation";
 import { NextUIProvider } from "@nextui-org/react";
 
 // Components
@@ -9,6 +8,9 @@ import Messages from "./Message";
 import Settings from "./Settings";
 import Media from "./Media";
 import Pages from "./Pages";
+
+// Next Components
+import { useSearchParams } from "next/navigation";
 
 // Types
 import { Page } from "@prisma/client";
@@ -23,7 +25,7 @@ export default function DashboardMain(props: {
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
         ? searchParams.get("view")!
-        : "none";
+        : "dashboard";
 
     return (
         <NextUIProvider>
