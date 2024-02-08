@@ -90,6 +90,7 @@ export default function Header(props: {
                                 <div className="text-2xl xl:text-md">
                                     WE ARE
                                 </div>
+                                <h1 className="hidden">{props.header}</h1>
                                 <Image
                                     src={"/images/tmw-logo.png"}
                                     alt="TMW Logo"
@@ -101,9 +102,9 @@ export default function Header(props: {
                                 />
                             </>
                         ) : (
-                            <div className="font-bold text-4xl uppercase">
+                            <h1 className="font-bold text-4xl uppercase">
                                 {props.header}
-                            </div>
+                            </h1>
                         )}
 
                         <div className="flex justify-evenly px-10 my-10 xl:my-4">
@@ -339,6 +340,7 @@ export default function Header(props: {
                 isOpen={isOpenShowreel}
                 className="dark transition-all"
                 placement="center"
+                // closeButton={<div></div>}
                 onOpenChange={onOpenChangeShowreel}>
                 <ModalContent>
                     {(onClose) => (
@@ -347,6 +349,7 @@ export default function Header(props: {
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <video
+                                    className="-z-10"
                                     autoPlay={true}
                                     autoFocus={false}
                                     id="bg-video"

@@ -34,25 +34,27 @@ export default function PageSegment(props: {
         const headerImage = document.getElementById(
             "segment-header-image-" + props.index
         ) as HTMLElement;
-        const containerHeight = headerImageContainer.offsetHeight;
-        const imageHeight = headerImage.offsetHeight;
-        setContainerHeight((imageHeight / 5) * 4);
-        if (
-            headerImageContainer.getBoundingClientRect().top <
-                window.innerHeight &&
-            headerImageContainer.getBoundingClientRect().top >
-                0 - containerHeight
-        ) {
-            setParallaxValue(
-                0 -
-                    mapNumRange(
-                        headerImageContainer.getBoundingClientRect().top,
-                        window.innerHeight,
-                        0,
-                        imageHeight - containerHeight,
-                        0
-                    )
-            );
+        if (headerImageContainer && headerImage) {
+            const containerHeight = headerImageContainer.offsetHeight;
+            const imageHeight = headerImage.offsetHeight;
+            setContainerHeight((imageHeight / 5) * 4);
+            if (
+                headerImageContainer.getBoundingClientRect().top <
+                    window.innerHeight &&
+                headerImageContainer.getBoundingClientRect().top >
+                    0 - containerHeight
+            ) {
+                setParallaxValue(
+                    0 -
+                        mapNumRange(
+                            headerImageContainer.getBoundingClientRect().top,
+                            window.innerHeight,
+                            0,
+                            imageHeight - containerHeight,
+                            0
+                        )
+                );
+            }
         }
     }
 

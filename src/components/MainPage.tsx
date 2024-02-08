@@ -16,10 +16,10 @@ export default function MainPage(props: { data: Page }) {
             <header id="header" className="w-full h-full">
                 <section
                     id="bg-video-container"
-                    className="relative top-0 left-0 w-full h-[100dvh] overflow-hidden">
+                    className="relative top-0 left-0 w-full h-screen overflow-hidden">
                     <video
                         id="bg-video"
-                        className="h-[100dvh] w-auto xl:w-full xl:h-auto fade-in"
+                        className="h-screen w-auto xl:w-full xl:h-auto fade-in"
                         autoPlay={true}
                         muted
                         loop
