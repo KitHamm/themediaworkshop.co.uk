@@ -34,6 +34,7 @@ export default function MainPage(props: { data: Page }) {
                         header={props.data.header}
                         description={props.data.description}
                         showreel={props.data.showreel}
+                        year={props.data.year}
                     />
                 </section>
             </header>

@@ -46,12 +46,17 @@ export default function PageEdit(props: {
     // States of background video and showreel
     const [video, setVideo] = useState(props.data.video);
     const [showreel, setShowreel] = useState(props.data.showreel);
+    const [year, setYear] = useState(props.data.year);
 
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
     const [notVideoError, setNotVideoError] = useState(false);
     const [showreelNamingError, setShowreelNamingError] = useState(false);
     const [backgroundNamingError, setBackgroundNamingError] = useState(false);
+    const [yearNamingError, setYearNamingError] = useState(false);
+
+    // State for type of video being previewed
+    const [previewType, setPreviewType] = useState("");
 
     // State for unsaved changes
     const [changes, setChanges] = useState(false);
@@ -78,6 +83,12 @@ export default function PageEdit(props: {
         onOpen: onOpenShowreelModal,
         onOpenChange: onOpenChangeShowreelModal,
     } = useDisclosure();
+    // Year In Review preview modal declaration
+    const {
+        isOpen: isOpenYearModal,
+        onOpen: onOpenYearModal,
+        onOpenChange: onOpenChangeYearModal,
+    } = useDisclosure();
     // Video pool modal for selecting background video declaration
     const {
         isOpen: isOpenSelectVideo,
@@ -89,6 +100,12 @@ export default function PageEdit(props: {
         isOpen: isOpenSelectShowreel,
         onOpen: onOpenSelectShowreel,
         onOpenChange: onOpenChangeSelectShowreel,
+    } = useDisclosure();
+    // Video pool modal for selecting year review video declaration
+    const {
+        isOpen: isOpenSelectYear,
+        onOpen: onOpenSelectYear,
+        onOpenChange: onOpenChangeSelectYear,
     } = useDisclosure();
     // View already selected video modal
     const {
@@ -103,7 +120,8 @@ export default function PageEdit(props: {
             description !== props.data.description ||
             header !== props.data.header ||
             video !== props.data.video ||
-            showreel !== props.data.showreel
+            showreel !== props.data.showreel ||
+            year !== props.data.year
         ) {
             setChanges(true);
         } else {
@@ -114,10 +132,12 @@ export default function PageEdit(props: {
         header,
         video,
         showreel,
+        year,
         props.data.description,
         props.data.header,
         props.data.video,
         props.data.showreel,
+        props.data.year,
     ]);
 
     function namingErrorCheck(fileName: string, check: string) {
@@ -160,13 +180,14 @@ export default function PageEdit(props: {
             header: header,
             video: video,
             showreel: showreel,
+            year: year,
         };
         updatePage(json);
     }
 
     // Update page information with pre populated data
     async function updatePage(json: any) {
-        const response = await fetch("/api/updatepage", {
+        await fetch("/api/updatepage", {
             method: "POST",
             body: JSON.stringify({
                 id: props.data.id as number,
@@ -203,10 +224,13 @@ export default function PageEdit(props: {
                 <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
                     <div id="left-column">
                         <div className="border-b pb-2">Page Videos</div>
-                        <div className="xl:grid xl:grid-cols-2 xl:gap-10 min-h-20">
+                        <div className="xl:grid xl:grid-cols-3 xl:gap-10 min-h-20">
                             <div>
                                 {video ? (
                                     <>
+                                        <div className="text-center">
+                                            Header Background
+                                        </div>
                                         <div
                                             onClick={() => {
                                                 onOpenChangeVideoModal();
@@ -236,6 +260,9 @@ export default function PageEdit(props: {
                                     </>
                                 ) : (
                                     <>
+                                        <div className="text-center">
+                                            Header Background
+                                        </div>
                                         <div className="text-center mt-4">
                                             None Selected
                                         </div>
@@ -255,6 +282,9 @@ export default function PageEdit(props: {
                             <div>
                                 {showreel ? (
                                     <>
+                                        <div className="text-center">
+                                            Showreel
+                                        </div>
                                         <div
                                             onClick={() => {
                                                 onOpenChangeShowreelModal();
@@ -284,6 +314,9 @@ export default function PageEdit(props: {
                                     </>
                                 ) : (
                                     <>
+                                        <div className="text-center">
+                                            Showreel
+                                        </div>
                                         <div className="text-center mt-4">
                                             None Selected
                                         </div>
@@ -291,6 +324,60 @@ export default function PageEdit(props: {
                                             <button
                                                 onClick={() => {
                                                     onOpenSelectShowreel();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div>
+                                {year ? (
+                                    <>
+                                        <div className="text-center">
+                                            Year Review
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeYearModal();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={"/images/play.png"}
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {year.split("-")[0]}
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectYear();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center">
+                                            Year Review
+                                        </div>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectYear();
                                                     getVideos();
                                                 }}
                                                 className="px-10 py-2 bg-orange-400 rounded m-auto">
@@ -524,6 +611,47 @@ export default function PageEdit(props: {
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
                                         video
+                                    }
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                        setNotVideoError(false);
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Preview Year Video Modal */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenYearModal}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangeYearModal}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Year In Review
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <video
+                                    id="bg-video"
+                                    controls={true}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        year
                                     }
                                 />
                             </ModalBody>
@@ -867,6 +995,173 @@ export default function PageEdit(props: {
                                         onClose();
                                         setNotVideoError(false);
                                         setShowreelNamingError(false);
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Change year in review video modal */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenSelectYear}
+                className="dark"
+                scrollBehavior="inside"
+                isDismissable={false}
+                onOpenChange={onOpenChangeSelectYear}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    Year In Review
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                {notVideoError && (
+                                    <div className="w-full text-center text-red-400">
+                                        Please Upload file in video format.
+                                    </div>
+                                )}
+                                {yearNamingError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File name should be prefixed with YEAR_
+                                    </div>
+                                )}
+                                <div className="flex justify-evenly w-full">
+                                    {uploading ? (
+                                        <CircularProgress
+                                            color="warning"
+                                            aria-label="Loading..."
+                                        />
+                                    ) : (
+                                        <div className="file-input shadow-xl">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        if (
+                                                            namingErrorCheck(
+                                                                e.target
+                                                                    .files[0]
+                                                                    .name,
+                                                                "YEAR"
+                                                            )
+                                                        ) {
+                                                            setUploading(true);
+                                                            setYearNamingError(
+                                                                false
+                                                            );
+                                                            uploadVideo(
+                                                                e.target
+                                                                    .files[0]
+                                                            );
+                                                        } else {
+                                                            setYearNamingError(
+                                                                true
+                                                            );
+                                                            e.target.value = "";
+                                                        }
+                                                    }
+                                                }}
+                                                id={"upload-year"}
+                                                type="file"
+                                                className="inputFile"
+                                            />
+                                            <label htmlFor={"upload-year"}>
+                                                Upload New
+                                            </label>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="grid grid-cols-4 gap-4">
+                                    {videos.map(
+                                        (video: Videos, index: number) => {
+                                            if (
+                                                video.name.split("_")[0] ===
+                                                "YEAR"
+                                            ) {
+                                                return (
+                                                    <div
+                                                        key={
+                                                            video.name +
+                                                            "-" +
+                                                            index
+                                                        }>
+                                                        <div
+                                                            onClick={() => {
+                                                                setPreviewVideo(
+                                                                    video.name
+                                                                );
+                                                                onOpenChangePreviewVideo();
+                                                            }}
+                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                            <Image
+                                                                height={100}
+                                                                width={100}
+                                                                src={
+                                                                    "/images/play.png"
+                                                                }
+                                                                alt="play"
+                                                                className="w-full h-auto m-auto"
+                                                            />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            {
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
+                                                            }
+                                                        </div>
+                                                        <div className="flex justify-center mt-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setYear(
+                                                                        video.name
+                                                                    );
+                                                                    onClose();
+                                                                    setYearNamingError(
+                                                                        false
+                                                                    );
+                                                                    setNotVideoError(
+                                                                        false
+                                                                    );
+                                                                }}
+                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                Select
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        }
+                                    )}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {year ? (
+                                    <button
+                                        onClick={() => {
+                                            setYear("");
+                                            onClose();
+                                            setNotVideoError(false);
+                                            setYearNamingError(false);
+                                        }}
+                                        className="px-10 py-2 bg-red-400 rounded-xl">
+                                        Remove
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                        setNotVideoError(false);
+                                        setYearNamingError(false);
                                     }}>
                                     Close
                                 </Button>

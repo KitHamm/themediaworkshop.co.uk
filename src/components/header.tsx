@@ -28,6 +28,7 @@ export default function Header(props: {
     header: string;
     home: boolean;
     showreel: string;
+    year: string;
 }) {
     // Contact form states
     const [sending, setSending] = useState(false);
@@ -48,6 +49,12 @@ export default function Header(props: {
         isOpen: isOpenShowreel,
         onOpen: onOpenShowreel,
         onOpenChange: onOpenChangeShowreel,
+    } = useDisclosure();
+    // Year review modal declaration
+    const {
+        isOpen: isOpenYear,
+        onOpen: onOpenYear,
+        onOpenChange: onOpenChangeYear,
     } = useDisclosure();
 
     // Showing sending and success states
@@ -107,11 +114,11 @@ export default function Header(props: {
                             </h1>
                         )}
 
-                        <div className="flex justify-evenly px-10 my-10 xl:my-4">
+                        <div className="block xl:flex justify-evenly px-10 my-10 xl:my-4">
                             {props.showreel !== null &&
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
-                                <div>
+                                <div className="my-2 xl:my-0">
                                     <button
                                         onClick={onOpenChangeShowreel}
                                         className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
@@ -121,7 +128,20 @@ export default function Header(props: {
                             ) : (
                                 ""
                             )}
-                            <div>
+                            {props.year !== null &&
+                            props.year !== undefined &&
+                            props.year !== "" ? (
+                                <div className="my-2 xl:my-0">
+                                    <button
+                                        onClick={onOpenChangeYear}
+                                        className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
+                                        YEAR REVIEW
+                                    </button>
+                                </div>
+                            ) : (
+                                ""
+                            )}
+                            <div className="my-2 xl:my-0">
                                 <button
                                     onClick={onOpenChangeContact}
                                     className="font-bold bg-white px-2 py-1 xl:px-8 xl:py-3 text-black">
@@ -129,7 +149,7 @@ export default function Header(props: {
                                 </button>
                             </div>
                         </div>
-                        <p className="text-justify text-lg">
+                        <p className="text-justify text-md xl:text-lg">
                             {props?.description}
                         </p>
                     </div>
@@ -357,6 +377,39 @@ export default function Header(props: {
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
                                         props.showreel
+                                    }
+                                />
+                            ) : (
+                                ""
+                            )}
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Year in review modal */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenYear}
+                className="dark transition-all"
+                placement="center"
+                // closeButton={<div></div>}
+                onOpenChange={onOpenChangeYear}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            {props.showreel !== null &&
+                            props.showreel !== undefined &&
+                            props.showreel !== "" ? (
+                                <video
+                                    className="-z-10"
+                                    autoPlay={true}
+                                    autoFocus={false}
+                                    id="bg-video"
+                                    controls={true}
+                                    src={
+                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        props.year
                                     }
                                 />
                             ) : (

@@ -27,6 +27,7 @@ model Page {
     description String?
     video String?
     showreel String?
+    year String?
     segment Segment[]
 }
 
