@@ -20,7 +20,7 @@ import Image from "next/image";
 import { Images } from "@prisma/client";
 
 // Functions
-import uploadHandler from "./uploadHandler";
+import uploadHandler from "../uploadHandler";
 
 export default function NewSegment(props: {
     revalidateDashboard: any;

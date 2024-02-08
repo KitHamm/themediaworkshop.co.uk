@@ -234,6 +234,17 @@ export default function Media(props: {
                                 } px-4 py-2 rounded transition-all`}>
                                 Year Review
                             </Link>
+                            <Link
+                                href={
+                                    `?view=media&video=study&image=` + imageView
+                                }
+                                className={`${
+                                    videoView === "study"
+                                        ? "bg-orange-400"
+                                        : "bg-neutral-600"
+                                } px-4 py-2 rounded transition-all`}>
+                                Case Study
+                            </Link>
                         </div>
                         {/* Videos section */}
                         <div className="xl:grid xl:grid-cols-4 xl:gap-4">
@@ -247,6 +258,8 @@ export default function Media(props: {
                                             "SHOWREEL") ||
                                     (videoView === "year" &&
                                         video.name.split("_")[0] === "YEAR") ||
+                                    (videoView === "study" &&
+                                        video.name.split("_")[0] === "STUDY") ||
                                     videoView === "all"
                                 ) {
                                     return (

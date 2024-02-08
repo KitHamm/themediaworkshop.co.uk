@@ -8,7 +8,7 @@ import DashboardView from "./Dashboard";
 import Messages from "./Message";
 import Settings from "./Settings";
 import Media from "./Media";
-import Pages from "./Pages";
+import Pages from "./Pages/Pages";
 
 // Next Components
 import { useSearchParams } from "next/navigation";

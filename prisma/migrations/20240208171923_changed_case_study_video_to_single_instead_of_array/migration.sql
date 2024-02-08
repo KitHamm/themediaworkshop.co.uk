@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "CaseStudy" ALTER COLUMN "video" DROP NOT NULL,
+ALTER COLUMN "video" SET DATA TYPE TEXT;

@@ -16,11 +16,14 @@ import { useEffect, useState } from "react";
 // Next Components
 import Image from "next/image";
 
+// Components
+import EditCaseStudy from "../CaseStudy/EditCaseStudy";
+
 // Types
-import { Images, Segment } from "@prisma/client";
+import { CaseStudy, Images, Segment } from "@prisma/client";
 
 // Functions
-import uploadHandler from "./uploadHandler";
+import uploadHandler from "../uploadHandler";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -61,6 +64,9 @@ export default function EditSegment(props: {
     // State for if there are unsaved changes on the segment
     const [changes, setChanges] = useState(false);
 
+    // State for selected case study to edit
+    const [selectedCaseStudy, setSelectedCaseStudy] = useState(0);
+
     // Top image modal declaration
     const {
         isOpen: isOpenTopImage,
@@ -73,6 +79,20 @@ export default function EditSegment(props: {
         isOpen: isOpenAddImage,
         onOpen: onOpenAddImage,
         onOpenChange: onOpenChangeAddImage,
+    } = useDisclosure();
+
+    // Edit case study modal declaration
+    const {
+        isOpen: isOpenEditCaseStudy,
+        onOpen: onOpenEditCaseStudy,
+        onOpenChange: onOpenChangeEditCaseStudy,
+    } = useDisclosure();
+
+    // New case study modal declaration
+    const {
+        isOpen: isOpenNewCaseStudy,
+        onOpen: onOpenNewCaseStudy,
+        onOpenChange: onOpenChangeNewCaseStudy,
     } = useDisclosure();
 
     // Delete warning modal declaration
@@ -130,7 +150,7 @@ export default function EditSegment(props: {
     }
     // Update segment with pre populated data
     async function updateSegment(json: any) {
-        const response = await fetch("/api/updatesegment", {
+        await fetch("/api/updatesegment", {
             method: "POST",
             body: JSON.stringify({
                 id: props.segment.id as number,
@@ -216,7 +236,7 @@ export default function EditSegment(props: {
         <>
             <div className="light  rounded-md px-5 mb-4 py-4">
                 <div className="flex justify-between border-b pb-2">
-                    <div className="">Top Image</div>
+                    <div>Top Image</div>
                     {changes ? (
                         <div className="fade-in font-bold text-red-400">
                             There are unsaved changes on this segment
@@ -431,6 +451,24 @@ export default function EditSegment(props: {
                         </div>
                     </div>
                 </div>
+                <div className="border-b py-4">Case Studies</div>
+                <div className="flex flex-wrap gap-4">
+                    {props.segment.casestudy.map(
+                        (caseStudy: CaseStudy, index: number) => {
+                            return (
+                                <button
+                                    onClick={() => {
+                                        setSelectedCaseStudy(index);
+                                        onOpenChangeEditCaseStudy();
+                                    }}
+                                    key={caseStudy.title + "-" + index}
+                                    className="px-4 py-2 my-4 bg-orange-400 rounded">
+                                    {caseStudy.title}
+                                </button>
+                            );
+                        }
+                    )}
+                </div>
                 <div className="flex justify-end">
                     <button
                         onClick={onOpenChangeDelete}
@@ -639,6 +677,53 @@ export default function EditSegment(props: {
                                         color="danger"
                                         onPress={() => {
                                             onClose();
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+                {/* Edit segment modal */}
+                <Modal
+                    size="5xl"
+                    backdrop="blur"
+                    isOpen={isOpenEditCaseStudy}
+                    className="dark"
+                    isDismissable={false}
+                    scrollBehavior="inside"
+                    onOpenChange={onOpenChangeEditCaseStudy}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader>
+                                    <div className="w-full text-center text-3xl font-bold text-orange-400">
+                                        {
+                                            props.segment.casestudy[
+                                                selectedCaseStudy
+                                            ].title
+                                        }
+                                    </div>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <EditCaseStudy
+                                        revalidateDashboard={
+                                            props.revalidateDashboard
+                                        }
+                                        caseStudy={
+                                            props.segment.casestudy[
+                                                selectedCaseStudy
+                                            ]
+                                        }
+                                    />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        color="danger"
+                                        onPress={() => {
+                                            onClose();
+                                            setSelectedCaseStudy(0);
                                         }}>
                                         Close
                                     </Button>

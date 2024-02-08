@@ -15,8 +15,8 @@ import {
 } from "@nextui-org/react";
 
 // Components
-import EditSegment from "./Segment";
-import NewSegment from "./NewSegment";
+import EditSegment from "../Segments/Segment";
+import NewSegment from "../Segments/NewSegment";
 
 // React Components
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ import Image from "next/image";
 import { Page, Segment, Videos } from "@prisma/client";
 
 // Functions
-import uploadHandler from "./uploadHandler";
+import uploadHandler from "../uploadHandler";
 
 export default function PageEdit(props: {
     data: Page;

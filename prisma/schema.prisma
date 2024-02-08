@@ -49,7 +49,7 @@ model CaseStudy {
     title String
     copy String
     image String[]
-    video String[]
+    video String?
     segment Segment @relation(fields: [segmentId], references: [id])
     segmentId Int
     tags String[]
