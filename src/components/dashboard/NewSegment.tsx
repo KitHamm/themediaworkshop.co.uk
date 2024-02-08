@@ -92,7 +92,6 @@ export default function NewSegment(props: {
 
     async function uploadImage(file: File, target: string) {
         if (file.type.split("/")[0] !== "image") {
-            console.log("Not Image");
             setNotImageError(true);
             setUploading(false);
             return;

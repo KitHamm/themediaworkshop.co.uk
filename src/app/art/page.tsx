@@ -14,7 +14,7 @@ export default async function Home() {
         include: {
             segment: {
                 orderBy: { order: "asc" },
-                include: { casestudy: true },
+                include: { casestudy: { orderBy: { order: "asc" } } },
             },
         },
     });

@@ -52,6 +52,8 @@ model CaseStudy {
     video String[]
     segment Segment @relation(fields: [segmentId], references: [id])
     segmentId Int
+    tags String[]
+    order Int?
 }
 
 model Message {

@@ -1,5 +1,4 @@
 // Components
-import Image from "next/image";
 import Header from "./header";
 import Navbar from "./Navbar";
 import PageSegment from "./PageSegment";
