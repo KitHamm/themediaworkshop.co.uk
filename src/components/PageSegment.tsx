@@ -96,7 +96,7 @@ export default function PageSegment(props: {
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-lg xl:mb-0 mb-10">
+                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-10">
                             {props.segment.copy}
                         </div>
                     </div>

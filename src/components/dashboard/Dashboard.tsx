@@ -6,7 +6,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                     Welcome to your Dashboard!
                 </div>
                 <div className="text-xl font-bold">
-                    This will soon be populated with more stuff..
+                    This will soon be populated with more stuff...
                 </div>
                 <div className="text-lg mt-10">
                     But for now just poke around and try to break it.
