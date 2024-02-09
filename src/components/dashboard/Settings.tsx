@@ -507,13 +507,17 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                                 }
                                                 type="email"
                                                 {...register("email", {
-                                                    required: {
-                                                        value: true,
-                                                        message:
-                                                            "Email is required",
-                                                    },
+                                                    validate: (value) =>
+                                                        value.split("@")[1] ===
+                                                            "themediaworkshop.co.uk" ||
+                                                        "Email needs to be a TMW domain email. Eg: someone@themediaworkshop.co.uk",
                                                 })}
                                             />
+                                            {errors.email && (
+                                                <p className="text-red-400 mb-4">
+                                                    {errors.email.message}
+                                                </p>
+                                            )}
                                             <div>Position</div>
                                             <input
                                                 className=""

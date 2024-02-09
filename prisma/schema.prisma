@@ -22,7 +22,7 @@ model User {
     position String?
     image String?
     activated Boolean @default(false)
-    role Role @default(EDITOR)
+    role Role @default(ADMIN)
 }
 
 model Page {
