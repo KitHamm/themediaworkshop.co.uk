@@ -25,7 +25,6 @@ import { useSearchParams } from "next/navigation";
 // Types
 import { Message, Page } from "@prisma/client";
 import { useEffect } from "react";
-import { Session } from "inspector";
 
 export default function DashboardMain(props: {
     data: Page;
@@ -43,10 +42,24 @@ export default function DashboardMain(props: {
 
     // Initial pop up if this is the first log in
     useEffect(() => {
-        if (!props.session.user.activated) {
-            onOpenChange();
-        }
+        checkActivation();
     }, []);
+
+    async function checkActivation() {
+        await fetch("/api/activated", {
+            method: "POST",
+            body: JSON.stringify({
+                id: props.session.user.id,
+            }),
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (!json.activated) {
+                    onOpenChange();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
@@ -61,7 +74,7 @@ export default function DashboardMain(props: {
         })
             .then((res) => {
                 if (res.ok) {
-                    props.revalidateDashboard("/");
+                    props.revalidateDashboard("/api/users");
                 }
             })
             .catch((err) => console.log(err));
