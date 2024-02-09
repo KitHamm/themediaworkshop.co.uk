@@ -315,12 +315,11 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                             <th scope="col" className="px-6 py-2">
                                 Role
                             </th>
-                            {props.session.user.role === "ADMIN" ||
-                                (props.session.user.role === "EDITOR" && (
-                                    <th scope="col" className="px-6 py-2">
-                                        <span className="sr-only">Edit</span>
-                                    </th>
-                                ))}
+                            {props.session.user.role === "ADMIN" && (
+                                <th scope="col" className="px-6 py-2">
+                                    <span className="sr-only">Edit</span>
+                                </th>
+                            )}
                             <th scope="col" className="px-6 py-2">
                                 <span className="sr-only">Delete</span>
                             </th>
@@ -367,26 +366,22 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                     <td scope="col" className="px-6 py-4">
                                         {user.role}
                                     </td>
-                                    {props.session.user.role === "ADMIN" ||
-                                        (props.session.user.role ===
-                                            "EDITOR" && (
-                                            <td
-                                                onClick={() => {
-                                                    setNewName(user.name);
-                                                    setNewEmail(user.email);
-                                                    setNewRole(user.role);
-                                                    setNewPosition(
-                                                        user.position
-                                                    );
-                                                    setUserId(user.id);
-                                                    setUserResetId(user.id);
-                                                    OnOpenEditUser();
-                                                }}
-                                                scope="col"
-                                                className="px-6 py-2 text-orange-400 cursor-pointer">
-                                                Edit
-                                            </td>
-                                        ))}
+                                    {props.session.user.role === "ADMIN" && (
+                                        <td
+                                            onClick={() => {
+                                                setNewName(user.name);
+                                                setNewEmail(user.email);
+                                                setNewRole(user.role);
+                                                setNewPosition(user.position);
+                                                setUserId(user.id);
+                                                setUserResetId(user.id);
+                                                OnOpenEditUser();
+                                            }}
+                                            scope="col"
+                                            className="px-6 py-2 text-orange-400 cursor-pointer">
+                                            Edit
+                                        </td>
+                                    )}
                                     {props.session.user.role === "ADMIN" &&
                                     user.id !== props.session.user.id ? (
                                         <td

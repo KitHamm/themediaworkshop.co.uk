@@ -13,8 +13,14 @@ export default async function Home() {
         },
         include: {
             segment: {
+                where: { published: true },
                 orderBy: { order: "asc" },
-                include: { casestudy: { orderBy: { order: "asc" } } },
+                include: {
+                    casestudy: {
+                        where: { published: true },
+                        orderBy: { order: "asc" },
+                    },
+                },
             },
         },
     });
