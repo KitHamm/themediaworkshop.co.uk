@@ -45,14 +45,6 @@ export default function Messages(props: {
         setMessages(props.messages);
     }, [props.messages]);
 
-    // async function getMessages() {
-    //     props.revalidateDashboard("/");
-    //     await fetch("/api/message", { method: "GET" })
-    //         .then((res) => res.json())
-    //         .then((json) => setMessages(json))
-    //         .catch((err: any) => console.log(err));
-    // }
-
     async function deleteMessage(id: string) {
         await fetch("/api/deletemessage", {
             method: "POST",

@@ -78,7 +78,7 @@ export default function PageSegment(props: {
         if (headerImageContainer && headerImage) {
             const containerHeight = headerImageContainer.offsetHeight;
             const imageHeight = headerImage.offsetHeight;
-            setContainerHeight((imageHeight / 5) * 4);
+            setContainerHeight((imageHeight / 8) * 6);
             if (
                 headerImageContainer.getBoundingClientRect().top <
                     window.innerHeight &&

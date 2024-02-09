@@ -670,6 +670,10 @@ export default function Media(props: {
                                             </strong>
                                             YEAR_
                                         </div>
+                                        <div>
+                                            <strong>Case Study Videos: </strong>
+                                            STUDY_
+                                        </div>
                                     </div>
                                 </div>
                                 {namingError && (

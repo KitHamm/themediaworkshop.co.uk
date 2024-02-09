@@ -18,6 +18,7 @@ import Image from "next/image";
 
 // Components
 import EditCaseStudy from "../CaseStudy/EditCaseStudy";
+import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 
 // Types
 import { CaseStudy, Images, Segment } from "@prisma/client";
@@ -215,6 +216,19 @@ export default function EditSegment(props: {
             .catch((err) => console.log(err));
     }
 
+    async function updatePublished(value: boolean) {
+        await fetch("/api/publishsegment", {
+            method: "POST",
+            body: JSON.stringify({ id: props.segment.id, value: value }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    props.revalidateDashboard("/");
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
     async function deleteSegment() {
         const response = await fetch("/api/deletesegment", {
             method: "POST",
@@ -234,9 +248,32 @@ export default function EditSegment(props: {
 
     return (
         <>
-            <div className="light  rounded-md px-5 mb-4 py-4">
+            <div className="light rounded-md px-5 mb-4 py-4">
+                {props.segment.published ? (
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => {
+                                updatePublished(false);
+                            }}
+                            className="px-4 py-2 rounded bg-red-400">
+                            UNPUBLISH
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => {
+                                updatePublished(true);
+                            }}
+                            className="px-4 py-2 rounded bg-orange-400">
+                            PUBLISH
+                        </button>
+                    </div>
+                )}
                 <div className="flex justify-between border-b pb-2">
-                    <div>Top Image</div>
+                    <div className="text-orange-400 font-bold text-xl">
+                        Top Image
+                    </div>
                     {changes ? (
                         <div className="fade-in font-bold text-red-400">
                             There are unsaved changes on this segment
@@ -283,7 +320,7 @@ export default function EditSegment(props: {
                             </div>
                         </div>
                     ) : (
-                        <div className="w-full flex justify-evenly my-10">
+                        <div className="rounded-lg bg-neutral-800 w-full flex justify-evenly py-10">
                             {uploading ? (
                                 <CircularProgress
                                     color="warning"
@@ -366,10 +403,12 @@ export default function EditSegment(props: {
                         </div>
                     )}
                 </div>
-                <div className="xl:grid xl:grid-cols-2 xl:gap-10 ">
+                <div className="xl:grid xl:grid-cols-2 xl:gap-10 mt-8">
                     <div id={"left-segment-" + props.index + "-column"}>
                         <div>
-                            <div className="border-b pb-2 mb-2">Title</div>
+                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
+                                Title
+                            </div>
                             <input
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
@@ -378,7 +417,9 @@ export default function EditSegment(props: {
                             />
                         </div>
                         <div>
-                            <div className="border-b pb-2 mb-2">Copy</div>
+                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2 mt-6">
+                                Copy
+                            </div>
                             <textarea
                                 value={copy}
                                 onChange={(e) => setCopy(e.target.value)}
@@ -388,10 +429,12 @@ export default function EditSegment(props: {
                             />
                         </div>
                         <div className="w-1/6">
-                            <div className="border-b pb-2 mb-2">Order</div>
+                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
+                                Order
+                            </div>
                             <input
                                 className="text-black"
-                                value={order}
+                                value={!Number.isNaN(order) ? order : ""}
                                 onChange={(e) =>
                                     setOrder(parseInt(e.target.value))
                                 }
@@ -401,7 +444,9 @@ export default function EditSegment(props: {
                     </div>
                     <div className={"right-segment-" + props.index + "-column"}>
                         <div className="">
-                            <div className="border-b pb-2">Images</div>
+                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
+                                Images
+                            </div>
                             <div className="grid grid-cols-4 gap-4 p-2">
                                 {images.map((image: string, index: number) => {
                                     return (
@@ -449,26 +494,71 @@ export default function EditSegment(props: {
                                 </div>
                             </div>
                         </div>
+                        <div className="flex gap-4 border-b mt-6 bg">
+                            <div className="py-4 text-orange-400 font-bold text-xl">
+                                Case Studies
+                            </div>
+                            <button
+                                onClick={onOpenChangeNewCaseStudy}
+                                className="px-2 py-1 my-auto rounded bg-orange-400">
+                                Add Case Study
+                            </button>
+                        </div>
+                        <div className="text-green-600 font-bold text-lg my-4">
+                            PUBLISHED
+                        </div>
+                        <div className="flex flex-wrap gap-4 bg-neutral-800 mt-2 rounded-lg px-2 min-h-10">
+                            {props.segment.casestudy.map(
+                                (caseStudy: CaseStudy, index: number) => {
+                                    if (caseStudy.published) {
+                                        return (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedCaseStudy(index);
+                                                    onOpenChangeEditCaseStudy();
+                                                }}
+                                                key={
+                                                    caseStudy.title +
+                                                    "-" +
+                                                    index
+                                                }
+                                                className="transition-all hover:bg-orange-400 px-4 py-2 my-4 bg-neutral-600 rounded">
+                                                {caseStudy.title}
+                                            </button>
+                                        );
+                                    }
+                                }
+                            )}
+                        </div>
+                        <div className="text-red-400 font-bold text-lg my-4">
+                            DRAFTS
+                        </div>
+                        <div className="flex flex-wrap gap-4 bg-neutral-800 mt-2 rounded-lg px-2 min-h-10">
+                            {props.segment.casestudy.map(
+                                (caseStudy: CaseStudy, index: number) => {
+                                    if (!caseStudy.published) {
+                                        return (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedCaseStudy(index);
+                                                    onOpenChangeEditCaseStudy();
+                                                }}
+                                                key={
+                                                    caseStudy.title +
+                                                    "-" +
+                                                    index
+                                                }
+                                                className="transition-all hover:bg-orange-400 px-4 py-2 my-4 bg-neutral-600 rounded">
+                                                {caseStudy.title}
+                                            </button>
+                                        );
+                                    }
+                                }
+                            )}
+                        </div>
                     </div>
                 </div>
-                <div className="border-b py-4">Case Studies</div>
-                <div className="flex flex-wrap gap-4">
-                    {props.segment.casestudy.map(
-                        (caseStudy: CaseStudy, index: number) => {
-                            return (
-                                <button
-                                    onClick={() => {
-                                        setSelectedCaseStudy(index);
-                                        onOpenChangeEditCaseStudy();
-                                    }}
-                                    key={caseStudy.title + "-" + index}
-                                    className="px-4 py-2 my-4 bg-orange-400 rounded">
-                                    {caseStudy.title}
-                                </button>
-                            );
-                        }
-                    )}
-                </div>
+
                 <div className="flex justify-end">
                     <button
                         onClick={onOpenChangeDelete}
@@ -685,7 +775,7 @@ export default function EditSegment(props: {
                         )}
                     </ModalContent>
                 </Modal>
-                {/* Edit segment modal */}
+                {/* Edit Case Study modal */}
                 <Modal
                     size="5xl"
                     backdrop="blur"
@@ -697,15 +787,7 @@ export default function EditSegment(props: {
                     <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader>
-                                    <div className="w-full text-center text-3xl font-bold text-orange-400">
-                                        {
-                                            props.segment.casestudy[
-                                                selectedCaseStudy
-                                            ].title
-                                        }
-                                    </div>
-                                </ModalHeader>
+                                <ModalHeader></ModalHeader>
                                 <ModalBody>
                                     <EditCaseStudy
                                         revalidateDashboard={
@@ -715,6 +797,45 @@ export default function EditSegment(props: {
                                             props.segment.casestudy[
                                                 selectedCaseStudy
                                             ]
+                                        }
+                                    />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        color="danger"
+                                        onPress={() => {
+                                            onClose();
+                                            setSelectedCaseStudy(0);
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+                {/* New Case Study modal */}
+                <Modal
+                    size="5xl"
+                    backdrop="blur"
+                    isOpen={isOpenNewCaseStudy}
+                    className="dark"
+                    isDismissable={false}
+                    scrollBehavior="inside"
+                    onOpenChange={onOpenChangeNewCaseStudy}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader>
+                                    <div className="w-full text-center text-3xl font-bold text-orange-400">
+                                        New Case Study
+                                    </div>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <NewCaseStudy
+                                        segmentId={props.segment.id as number}
+                                        revalidateDashboard={
+                                            props.revalidateDashboard
                                         }
                                     />
                                 </ModalBody>

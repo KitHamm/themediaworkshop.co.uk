@@ -42,18 +42,20 @@ model Segment {
     page Page @relation(fields: [pageId], references: [id])
     pageId Int
     casestudy CaseStudy[]
+    published Boolean @default(false)
 }
 
 model CaseStudy {
     id Int @unique @default(autoincrement())
     title String
-    copy String
+    copy String @db.Text
     image String[]
     video String?
     segment Segment @relation(fields: [segmentId], references: [id])
     segmentId Int
     tags String[]
     order Int?
+    published Boolean @default(false)
 }
 
 model Message {

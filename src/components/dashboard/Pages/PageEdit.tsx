@@ -446,12 +446,25 @@ export default function PageEdit(props: {
                                 return (
                                     <AccordionItem
                                         className="dark"
+                                        startContent={
+                                            segment.published ? (
+                                                <div className="text-green-600 font-bold">
+                                                    LIVE
+                                                </div>
+                                            ) : (
+                                                <div className="text-red-400 font-bold">
+                                                    DRAFT
+                                                </div>
+                                            )
+                                        }
                                         key={index}
                                         aria-label={segment.title}
                                         title={
-                                            segment.title
-                                                ? segment.title
-                                                : "Untitled Segment"
+                                            <div>
+                                                {segment.title
+                                                    ? segment.title
+                                                    : "Untitled Segment"}
+                                            </div>
                                         }>
                                         <div key={segment.title + "-" + index}>
                                             <EditSegment

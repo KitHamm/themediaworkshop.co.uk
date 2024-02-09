@@ -19,17 +19,17 @@ import { CaseStudy, Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import uploadHandler from "../uploadHandler";
 
-export default function EditCaseStudy(props: {
-    caseStudy: CaseStudy;
+export default function NewCaseStudy(props: {
     revalidateDashboard: any;
+    segmentId: number;
 }) {
     // States for initial case study content
-    const [title, setTitle] = useState(props.caseStudy.title);
-    const [copy, setCopy] = useState(props.caseStudy.copy);
-    const [images, setImages] = useState(props.caseStudy.image);
-    const [video, setVideo] = useState<string>(props.caseStudy.video);
-    const [tags, setTags] = useState(props.caseStudy.tags);
-    const [order, setOrder] = useState(props.caseStudy.order);
+    const [title, setTitle] = useState("");
+    const [copy, setCopy] = useState("");
+    const [images, setImages] = useState<string[]>([]);
+    const [video, setVideo] = useState<string>("");
+    const [tags, setTags] = useState<string[]>([]);
+    const [order, setOrder] = useState(0);
     // New Tag State
     const [newTag, setNewTag] = useState("");
 
@@ -41,11 +41,11 @@ export default function EditCaseStudy(props: {
     const [availableImages, setAvailableImages] = useState<string[]>([]);
     const [availableVideos, setAvailableVideos] = useState<string[]>([]);
 
-    // Delete Success
-    const [deleted, setDeleted] = useState(false);
-
     // State for if there are unsaved changes
     const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+    // Submit success state
+    const [success, setSuccess] = useState(false);
 
     // States for naming errors of uploads
     const [imageNamingError, setImageNamingError] = useState(false);
@@ -86,14 +86,7 @@ export default function EditCaseStudy(props: {
 
     // Constant check for unsaved changes
     useEffect(() => {
-        if (
-            title !== props.caseStudy.title ||
-            copy !== props.caseStudy.copy ||
-            JSON.stringify(images) !== JSON.stringify(props.caseStudy.image) ||
-            video !== props.caseStudy.video ||
-            JSON.stringify(tags) !== JSON.stringify(props.caseStudy.tags) ||
-            order !== props.caseStudy.order
-        ) {
+        if (title !== "" && copy !== "" && images.length > 0) {
             setUnsavedChanges(true);
         } else {
             setUnsavedChanges(false);
@@ -105,12 +98,6 @@ export default function EditCaseStudy(props: {
         video,
         JSON.stringify(tags),
         order,
-        props.caseStudy.title,
-        props.caseStudy.copy,
-        JSON.stringify(props.caseStudy.image),
-        props.caseStudy.video,
-        JSON.stringify(props.caseStudy.tags),
-        props.caseStudy.order,
     ]);
 
     // Check naming conventions for uploads
@@ -150,7 +137,7 @@ export default function EditCaseStudy(props: {
 
     function clearFileInput(target: string) {
         const inputElm = document.getElementById(
-            props.caseStudy.id + "-" + target + "-upload"
+            "new-case-study-" + target + "-upload"
         ) as HTMLInputElement;
         if (inputElm) {
             inputElm.value = "";
@@ -165,39 +152,36 @@ export default function EditCaseStudy(props: {
             image: images,
             video: video,
             tags: tags,
-            order: order as number,
+            order: order,
         };
-        updateCaseStudy(json);
+        addCaseStudy(json);
     }
     // Update segment with pre populated data
-    async function updateCaseStudy(json: any) {
-        await fetch("/api/updatecasestudy", {
+    async function addCaseStudy(json: any) {
+        await fetch("/api/addcasestudy", {
             method: "POST",
             body: JSON.stringify({
-                id: props.caseStudy.id as number,
-                data: json,
+                title: title,
+                copy: copy,
+                image: images,
+                video: video,
+                order: order as number,
+                segment: { connect: { id: props.segmentId } },
             }),
         })
             .then((response) => {
                 if (response.ok) {
+                    setSuccess(true);
+                    setTitle("");
+                    setCopy("");
+                    setImages([]);
+                    setVideo("");
+                    setTags([]);
+                    setOrder(0);
                     props.revalidateDashboard("/");
                 }
             })
             .catch((error) => console.log(error));
-    }
-
-    async function deleteCaseStudy() {
-        const response = await fetch("/api/deletecasestudy", {
-            method: "POST",
-            body: JSON.stringify({ id: props.caseStudy.id }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setDeleted(true);
-                    props.revalidateDashboard("/");
-                }
-            })
-            .catch((err) => console.log(err));
     }
 
     async function uploadImage(file: File, target: string) {
@@ -216,19 +200,6 @@ export default function EditCaseStudy(props: {
                 })
                 .catch((err) => console.log(err));
         }
-    }
-
-    async function updatePublished(value: boolean) {
-        await fetch("/api/publishcasestudy", {
-            method: "POST",
-            body: JSON.stringify({ id: props.caseStudy.id, value: value }),
-        })
-            .then((res) => {
-                if (res.ok) {
-                    props.revalidateDashboard("/");
-                }
-            })
-            .catch((err) => console.log(err));
     }
 
     async function uploadVideo(file: File, target: string) {
@@ -251,62 +222,27 @@ export default function EditCaseStudy(props: {
 
     return (
         <div className="px-10">
-            <div className="w-full text-center text-3xl font-bold text-orange-400">
-                {title}
-            </div>
-            {deleted ? (
+            {success ? (
                 <>
                     <div className="text-center font-bold text-3xl mb-4">
-                        Deleted!
+                        Success!
                     </div>
-                    <div className="text-center text-xl">
-                        You can now close this popup.
-                    </div>
+                    <div className="text-center text-xl">Case study added</div>
                 </>
             ) : (
                 <>
-                    <div className="flex justify-between">
-                        <div
-                            className={`${
-                                props.caseStudy.published
-                                    ? "text-green-600"
-                                    : "text-red-400"
-                            } font-bold text-xl mb-4`}>
-                            {props.caseStudy.published ? "LIVE" : "DRAFT"}
-                        </div>
+                    {unsavedChanges && (
                         <div className="flex gap-4">
-                            {unsavedChanges && (
-                                <div className="flex gap-4">
-                                    <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
-                                        There are unsaved changes
-                                    </div>
-                                    <button
-                                        onClick={handleUpdate}
-                                        className=" my-auto bg-orange-400 px-4 py-2 rounded">
-                                        Update
-                                    </button>
-                                </div>
-                            )}
-                            {props.caseStudy.published ? (
-                                <button
-                                    onClick={() => {
-                                        updatePublished(false);
-                                    }}
-                                    className="px-4 py-2 bg-red-400 rounded">
-                                    UNPUBLISH
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => {
-                                        updatePublished(true);
-                                    }}
-                                    className="px-4 py-2 bg-green-600 rounded">
-                                    PUBLISH
-                                </button>
-                            )}
+                            <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
+                                Case Study can be saved
+                            </div>
+                            <button
+                                onClick={handleUpdate}
+                                className=" my-auto bg-orange-400 px-4 py-2 rounded">
+                                Submit
+                            </button>
                         </div>
-                    </div>
-
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                         <div id="left">
                             <div className="min-h-[50%]">
@@ -493,14 +429,6 @@ export default function EditCaseStudy(props: {
                                 />
                             </div>
                         </div>
-                        <div>
-                            <Button
-                                onClick={deleteCaseStudy}
-                                variant="light"
-                                color="danger">
-                                Delete Case Study
-                            </Button>
-                        </div>
                     </div>
                 </>
             )}
@@ -570,16 +498,14 @@ export default function EditCaseStudy(props: {
                                                     }
                                                 }}
                                                 id={
-                                                    props.caseStudy.id +
-                                                    "-video-upload"
+                                                    "new-case-study-video-upload"
                                                 }
                                                 type="file"
                                                 className="inputFile"
                                             />
                                             <label
                                                 htmlFor={
-                                                    props.caseStudy.id +
-                                                    "-video-upload"
+                                                    "new-case-study-video-upload"
                                                 }>
                                                 Upload New
                                             </label>
@@ -744,16 +670,14 @@ export default function EditCaseStudy(props: {
                                                         }
                                                     }}
                                                     id={
-                                                        props.caseStudy.id +
-                                                        "-image-upload"
+                                                        "new-case-study-image-upload"
                                                     }
                                                     type="file"
                                                     className="inputFile"
                                                 />
                                                 <label
                                                     htmlFor={
-                                                        props.caseStudy.id +
-                                                        "-image-upload"
+                                                        "new-case-study-image-upload"
                                                     }>
                                                     Upload New
                                                 </label>
