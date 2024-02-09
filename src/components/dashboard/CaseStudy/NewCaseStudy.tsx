@@ -164,6 +164,7 @@ export default function NewCaseStudy(props: {
                 title: title,
                 copy: copy,
                 image: images,
+                tags: tags,
                 video: video,
                 order: order as number,
                 segment: { connect: { id: props.segmentId } },
