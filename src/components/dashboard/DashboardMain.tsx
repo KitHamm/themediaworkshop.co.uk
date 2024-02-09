@@ -2,6 +2,15 @@
 
 // Library Components
 import { NextUIProvider } from "@nextui-org/react";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+} from "@nextui-org/react";
 
 // Components
 import DashboardView from "./Dashboard";
@@ -15,6 +24,8 @@ import { useSearchParams } from "next/navigation";
 
 // Types
 import { Message, Page } from "@prisma/client";
+import { useEffect } from "react";
+import { Session } from "inspector";
 
 export default function DashboardMain(props: {
     data: Page;
@@ -28,6 +39,33 @@ export default function DashboardMain(props: {
     const view: string = searchParams.get("view")
         ? searchParams.get("view")!
         : "dashboard";
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    // Initial pop up if this is the first log in
+    useEffect(() => {
+        if (!props.session.user.activated) {
+            onOpenChange();
+        }
+    }, []);
+
+    // Set user as active on dismissing the initial pop up
+    async function updateUser() {
+        fetch("/api/updateuser", {
+            method: "POST",
+            body: JSON.stringify({
+                id: props.session.user.id,
+                data: {
+                    activated: true,
+                },
+            }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    props.revalidateDashboard("/");
+                }
+            })
+            .catch((err) => console.log(err));
+    }
 
     return (
         <NextUIProvider>
@@ -41,6 +79,7 @@ export default function DashboardMain(props: {
             />
             {/* Media pool view */}
             <Media
+                session={props.session}
                 revalidateDashboard={props.revalidateDashboard}
                 hidden={view === "media" ? false : true}
             />
@@ -56,6 +95,44 @@ export default function DashboardMain(props: {
                 session={props.session}
                 hidden={view === "settings" ? false : true}
             />
+            <Modal
+                isDismissable={false}
+                isOpen={isOpen}
+                className="dark"
+                onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex text-center flex-col text-orange-400 text-2xl">
+                                Welcome!
+                            </ModalHeader>
+                            <ModalBody>
+                                <p>Welcome to the TMW Dashboard.</p>
+                                <p>Your account has not been activated.</p>
+                                <p>
+                                    On the main dashboard you can find
+                                    information on how best to use this service.
+                                    You have the ability to edit, draft and
+                                    publish page content and case study content,
+                                    upload images and videos, and check messages
+                                    received through the contact from on the
+                                    main website.
+                                </p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    className="bg-orange-400"
+                                    onPress={() => {
+                                        onClose();
+                                        updateUser();
+                                    }}>
+                                    Okay!
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </NextUIProvider>
     );
 }

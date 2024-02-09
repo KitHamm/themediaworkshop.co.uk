@@ -11,7 +11,7 @@ export async function POST(request: Request) {
         data: json.data,
     });
 
-    return new NextResponse(JSON.stringify({ message: "Avatar Updated" }), {
+    return new NextResponse(JSON.stringify({ message: "Updated" }), {
         status: 201,
     });
 }

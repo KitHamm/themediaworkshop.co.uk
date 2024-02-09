@@ -41,6 +41,7 @@ const filePrefixList = [
 export default function Media(props: {
     hidden: boolean;
     revalidateDashboard: any;
+    session: any;
 }) {
     // Search Param state to set which videos or images to view
     const searchParams = useSearchParams();
@@ -528,19 +529,21 @@ export default function Media(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onOpenChangeDelete();
-                                        onClose();
-                                        setToDelete({
-                                            file: selectedImage,
-                                            type: "image",
-                                        });
-                                    }}>
-                                    Delete
-                                </Button>
+                                {props.session.user.role === "ADMIN" && (
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            onOpenChangeDelete();
+                                            onClose();
+                                            setToDelete({
+                                                file: selectedImage,
+                                                type: "image",
+                                            });
+                                        }}>
+                                        Delete
+                                    </Button>
+                                )}
                                 <Button
                                     color="danger"
                                     onPress={() => {
@@ -578,19 +581,21 @@ export default function Media(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onOpenChangeDelete();
-                                        onClose();
-                                        setToDelete({
-                                            file: selectedVideo,
-                                            type: "video",
-                                        });
-                                    }}>
-                                    Delete
-                                </Button>
+                                {props.session.user.role === "ADMIN" && (
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            onOpenChangeDelete();
+                                            onClose();
+                                            setToDelete({
+                                                file: selectedVideo,
+                                                type: "video",
+                                            });
+                                        }}>
+                                        Delete
+                                    </Button>
+                                )}
                                 <Button
                                     color="danger"
                                     onPress={() => {

@@ -3,6 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 import { compare } from "bcrypt";
+import { User } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
     session: {
@@ -27,7 +28,7 @@ export const authOptions: NextAuthOptions = {
                 if (!credentials?.email || !credentials.password) {
                     return null;
                 }
-                const user = await prisma.user.findUnique({
+                const user: User = await prisma.user.findUnique({
                     where: {
                         email: credentials.email,
                     },
@@ -49,6 +50,8 @@ export const authOptions: NextAuthOptions = {
                     name: user.firstname + " " + user.lastname,
                     position: user.position,
                     image: user.image,
+                    role: user.role,
+                    activated: user.activated,
                 };
             },
         }),
@@ -66,6 +69,8 @@ export const authOptions: NextAuthOptions = {
                     name: token.name,
                     email: token.email,
                     position: token.position,
+                    role: token.role,
+                    activated: token.activated,
                 },
             };
         },
@@ -79,6 +84,8 @@ export const authOptions: NextAuthOptions = {
                     name: u.name,
                     position: u.position,
                     image: u.image,
+                    role: u.role,
+                    activated: u.activated,
                 };
             }
             return token;

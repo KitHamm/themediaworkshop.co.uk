@@ -2,6 +2,21 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { hash } from "bcrypt";
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: 587,
+    tls: {
+        ciphers: "SSLv3",
+        rejectUnauthorized: false,
+    },
+
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+    },
+});
 
 export async function GET(request: Request) {
     const users = await prisma.user.findMany();
@@ -14,6 +29,8 @@ export async function GET(request: Request) {
             email: user.email,
             position: user.position,
             image: user.image,
+            activated: user.activated,
+            role: user.role,
         });
     }
 
@@ -36,15 +53,41 @@ export async function POST(request: Request) {
                 password: hashedPassword,
             },
         });
-        return new NextResponse(
-            JSON.stringify({
-                message: "User Created",
-                password: json.password,
-            }),
-            {
-                status: 201,
-            }
-        );
+        try {
+            const mail = await transporter.sendMail({
+                from: "TMW Website",
+                to: json.email,
+                replyTo: process.env.SMTP_EMAIL,
+                subject: `New Account Created!`,
+                html: `
+                <p>A new account has been created for you on the TMW website.</p>
+                <p>Sign in with your TMW email address and the following password.</p>
+                <p>${json.password}</p>
+                <p>Link to sign in: ${
+                    process.env.NEXTAUTH_URL + "dashboard"
+                }</p>
+                `,
+            });
+
+            return new NextResponse(
+                JSON.stringify({
+                    message: "User Created",
+                    password: json.password,
+                }),
+                {
+                    status: 201,
+                }
+            );
+        } catch (error) {
+            console.log(error);
+            return new NextResponse(
+                JSON.stringify({
+                    message: "User Created",
+                    password: json.password,
+                }),
+                { status: 201 }
+            );
+        }
     } catch (e: any) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
             // The .code property can be accessed in a type-safe manner

@@ -40,7 +40,6 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     const view: string = searchParams.get("view")
         ? searchParams.get("view")!
         : "dashboard";
-
     // Current avatar and possible new avatar for user
     const [avatar, setAvatar] = useState("");
     const [newAvatar, setNewAvatar] = useState("");

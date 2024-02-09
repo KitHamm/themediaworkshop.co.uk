@@ -11,10 +11,15 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
+    Switch,
+    Avatar,
 } from "@nextui-org/react";
 
 // React Components
 import { useEffect, useState } from "react";
+
+// Next Components
+import { signOut } from "next-auth/react";
 
 // Types
 type FormValues = {
@@ -25,32 +30,82 @@ type FormValues = {
     image: string;
     password: string;
 };
+type PasswordFormValues = {
+    password: string;
+    confirmPassword: string;
+    currentPassword: string;
+};
 
 // Function
 import uploadHandler from "./uploadHandler";
+import { User } from "@prisma/client";
 
 export default function Settings(props: { hidden: boolean; session: any }) {
     // Initial Users
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<User>([]);
+
     // User created or error state boolean
     const [userCreated, setUserCreated] = useState(false);
     const [error, setError] = useState(false);
 
     // Random password created by api handler
     const [password, setPassword] = useState("");
+
     // Uploading state for avatar and state for avatar file name
     const [uploading, setUploading] = useState(false);
+
+    // Reset Password Details
+    const [adminPassword, setAdminPassword] = useState("");
+    const [userResetId, setUserResetId] = useState("");
+
+    // Update password states
+    const [passwordError, setPasswordError] = useState(false);
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+    const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
+
     const [avatar, setAvatar] = useState("");
+
+    // Password hidden State
+    const [passwordHidden, setPasswordHidden] = useState(true);
+
     // user Id used for deleting user
     const [userId, setUserId] = useState("");
+
     // Disclosure for create user modal
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    // Edit user values
+    const [newName, setNewName] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+    const [newRole, setNewRole] = useState("");
+    const [newPosition, setNewPosition] = useState("");
+
     // Disclosure for delete user warning
     const {
         isOpen: deleteIsOpen,
         onOpen: deleteOnOpen,
         onOpenChange: deleteOnChange,
     } = useDisclosure();
+    // Disclosure for edit user modal
+    const {
+        isOpen: IsOpenEditUser,
+        onOpen: OnOpenEditUser,
+        onOpenChange: OnChangeEditUser,
+    } = useDisclosure();
+    // Disclosure for new password modal
+    const {
+        isOpen: IsOpenNewPassword,
+        onOpen: OnOpenNewPassword,
+        onOpenChange: OnChangeNewPassword,
+    } = useDisclosure();
+    // Disclosure for reset password modal
+    const {
+        isOpen: IsOpenResetPassword,
+        onOpen: OnOpenResetPassword,
+        onOpenChange: OnChangeResetPassword,
+    } = useDisclosure();
+
+    // Form for creating user
     const form = useForm<FormValues>({
         defaultValues: {
             email: "",
@@ -61,6 +116,17 @@ export default function Settings(props: { hidden: boolean; session: any }) {
             password: "",
         },
     });
+
+    const passwordChangeForm = useForm<PasswordFormValues>();
+    const {
+        getValues,
+        register: newPassRegister,
+        handleSubmit: newPassHandleSubmit,
+        formState: newPassFormState,
+        reset: newPassReset,
+    } = passwordChangeForm;
+    const { errors: newPassErrors } = newPassFormState;
+
     // React Hook Form declarations
     const { register, handleSubmit, formState, reset } = form;
     const { errors } = formState;
@@ -145,13 +211,87 @@ export default function Settings(props: { hidden: boolean; session: any }) {
             .catch((err) => console.log(err));
     }
 
+    async function onSubmitNewPassword(data: PasswordFormValues) {
+        await fetch("/api/changepassword", {
+            method: "POST",
+            body: JSON.stringify({
+                id: props.session.user.id,
+                password: data.password,
+                currentPassword: data.currentPassword,
+            }),
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.message) {
+                    setPasswordSuccess(true);
+                    setPasswordError(false);
+                } else {
+                    if (json.error) {
+                        setPasswordSuccess(false);
+                        setPasswordError(true);
+                    }
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
+    async function resetPassword() {
+        await fetch("/api/resetpassword", {
+            method: "POST",
+            body: JSON.stringify({
+                id: userResetId,
+                password: randomPassword(10),
+                adminId: props.session.user.id,
+                adminPassword: adminPassword,
+            }),
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.message) {
+                    setResetPasswordSuccess(true);
+                    setPassword(json.password);
+                } else {
+                    setResetPasswordSuccess(false);
+                    setPasswordError(true);
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
+    async function updateUser() {
+        await fetch("/api/updateuser", {
+            method: "POST",
+            body: JSON.stringify({
+                id: userId,
+                data: {
+                    firstname: newName.split(" ")[0],
+                    lastname: newName.split(" ")[1],
+                    email: newEmail,
+                    position: newPosition,
+                    role: newRole,
+                },
+            }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    setUserId("");
+                    setNewName("");
+                    setNewEmail("");
+                    setNewRole("");
+                    getUsers();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
     return (
         <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
             <div className="my-10">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Settings
                 </div>
-                <div className="font-bold mt-10 mb-5 text-xl">Users</div>
+
+                <div className="font-bold mt-10 mb-5 text-xl">All Users</div>
                 <Button
                     className="py-2 px-4 bg-orange-400 rounded mb-5"
                     onPress={onOpen}>
@@ -161,6 +301,9 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     <thead className="bg-neutral-600">
                         <tr>
                             <th scope="col" className="px-6 py-2">
+                                Status
+                            </th>
+                            <th scope="col" className="px-6 py-2">
                                 Name
                             </th>
                             <th scope="col" className="px-6 py-2">
@@ -169,7 +312,14 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                             <th scope="col" className="px-6 py-2">
                                 Position
                             </th>
-
+                            <th scope="col" className="px-6 py-2">
+                                Role
+                            </th>
+                            {props.session.user.role === "ADMIN" && (
+                                <th scope="col" className="px-6 py-2">
+                                    <span className="sr-only">Edit</span>
+                                </th>
+                            )}
                             <th scope="col" className="px-6 py-2">
                                 <span className="sr-only">Delete</span>
                             </th>
@@ -179,8 +329,33 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                         {users.map((user: any, index: number) => {
                             return (
                                 <tr key={index}>
-                                    <td scope="col" className="px-6 py-4">
-                                        {user.name}
+                                    <td
+                                        scope="col"
+                                        className={`${
+                                            user.activated
+                                                ? "text-green-600"
+                                                : "text-neutral-600"
+                                        } px-6 py-4`}>
+                                        {user.activated
+                                            ? "Activated"
+                                            : "Not Activated"}
+                                    </td>
+                                    <td
+                                        scope="col"
+                                        className="px-6 py-4 flex gap-2">
+                                        <Avatar
+                                            src={
+                                                user.image
+                                                    ? process.env
+                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                      user.image
+                                                    : undefined
+                                            }
+                                            size="md"
+                                        />
+                                        <div className="my-auto">
+                                            {user.name}
+                                        </div>
                                     </td>
                                     <td scope="col" className="px-6 py-4">
                                         {user.email}
@@ -188,7 +363,27 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                     <td scope="col" className="px-6 py-4">
                                         {user.position}
                                     </td>
-                                    {user.id !== props.session.user.id ? (
+                                    <td scope="col" className="px-6 py-4">
+                                        {user.role}
+                                    </td>
+                                    {props.session.user.role === "ADMIN" && (
+                                        <td
+                                            onClick={() => {
+                                                setNewName(user.name);
+                                                setNewEmail(user.email);
+                                                setNewRole(user.role);
+                                                setNewPosition(user.position);
+                                                setUserId(user.id);
+                                                setUserResetId(user.id);
+                                                OnOpenEditUser();
+                                            }}
+                                            scope="col"
+                                            className="px-6 py-2 text-orange-400 cursor-pointer">
+                                            Edit
+                                        </td>
+                                    )}
+                                    {props.session.user.role === "ADMIN" &&
+                                    user.id !== props.session.user.id ? (
                                         <td
                                             onClick={() => {
                                                 setUserId(user.id);
@@ -254,9 +449,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                     </>
                                 ) : (
                                     <>
-                                        <form
-                                            className=""
-                                            onSubmit={handleSubmit(onSubmit)}>
+                                        <form onSubmit={handleSubmit(onSubmit)}>
                                             <div>First Name</div>
                                             <input
                                                 className={`${
@@ -396,6 +589,387 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                 )}
                             </ModalBody>
                             <ModalFooter></ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Edit user modal */}
+            <Modal
+                backdrop="blur"
+                className="dark"
+                isOpen={IsOpenEditUser}
+                onOpenChange={OnChangeEditUser}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 text-orange-400">
+                                {newName}
+                            </ModalHeader>
+                            <ModalBody>
+                                <div>Name:</div>
+                                <input
+                                    required
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    type="text"
+                                />
+                                <div>Email:</div>
+                                <input
+                                    required
+                                    value={newEmail}
+                                    onChange={(e) =>
+                                        setNewEmail(e.target.value)
+                                    }
+                                    type="email"
+                                />
+                                <div>Position:</div>
+                                <input
+                                    required
+                                    value={newPosition}
+                                    onChange={(e) =>
+                                        setNewPosition(e.target.value)
+                                    }
+                                    type="text"
+                                />
+                                <Switch
+                                    onValueChange={() =>
+                                        setNewRole(
+                                            newRole === "ADMIN"
+                                                ? "EDITOR"
+                                                : "ADMIN"
+                                        )
+                                    }
+                                    isSelected={
+                                        newRole === "ADMIN" ? true : false
+                                    }
+                                    color="warning">
+                                    Admin
+                                </Switch>
+                                {userId === props.session.user.id ? (
+                                    <div className="mt-2">
+                                        <button
+                                            onClick={OnOpenNewPassword}
+                                            className="px-2 py-1 rounded bg-orange-400">
+                                            Change Password
+                                        </button>
+                                    </div>
+                                ) : props.session.user.role === "ADMIN" ? (
+                                    <div className="mt-2">
+                                        <button
+                                            onClick={OnOpenResetPassword}
+                                            className="px-2 py-1 rounded bg-orange-400">
+                                            Reset Password
+                                        </button>
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        onClose();
+                                        setUserId("");
+                                        setNewName("");
+                                        setNewEmail("");
+                                        setNewRole("");
+                                    }}>
+                                    Close
+                                </Button>
+                                <Button
+                                    className="bg-orange-400"
+                                    onPress={() => {
+                                        onClose();
+                                        updateUser();
+                                    }}>
+                                    Submit
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* change password modal */}
+            <Modal
+                backdrop="blur"
+                className="dark"
+                isDismissable={false}
+                isOpen={IsOpenNewPassword}
+                onOpenChange={OnChangeNewPassword}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="text-center flex flex-col gap-1 text-orange-400">
+                                Change Password
+                            </ModalHeader>
+                            <ModalBody>
+                                {passwordSuccess ? (
+                                    <>
+                                        <div className="flex flex-col text-center text-2xl text-orange-400">
+                                            Success
+                                        </div>
+                                        <div className="flex flex-col text-center text-lg">
+                                            Your password has been changed.
+                                            Please log out and log back in with
+                                            your new password.
+                                        </div>
+                                        <div className="flex justify-end my-4">
+                                            <Button
+                                                onClick={() =>
+                                                    signOut({
+                                                        callbackUrl:
+                                                            "/dashboard",
+                                                    })
+                                                }
+                                                className="bg-orange-400">
+                                                Log Out
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <form
+                                        onSubmit={newPassHandleSubmit(
+                                            onSubmitNewPassword
+                                        )}>
+                                        <div className="flex justify-between">
+                                            <div className="font-bold text-xl mt-4">
+                                                New password
+                                            </div>
+                                            <i
+                                                onClick={() =>
+                                                    setPasswordHidden(
+                                                        !passwordHidden
+                                                    )
+                                                }
+                                                aria-hidden
+                                                className={`fa-solid my-auto cursor-pointer ${
+                                                    passwordHidden
+                                                        ? "fa-eye"
+                                                        : "fa-eye-slash"
+                                                } fa-2xl`}
+                                            />
+                                        </div>
+
+                                        <input
+                                            {...newPassRegister("password", {
+                                                required: {
+                                                    value: true,
+                                                    message:
+                                                        "New Password is required",
+                                                },
+                                            })}
+                                            className={
+                                                newPassErrors.password
+                                                    ? "placeholder:text-red-400"
+                                                    : ""
+                                            }
+                                            placeholder={
+                                                newPassErrors.password
+                                                    ? newPassErrors.password
+                                                          .message
+                                                    : "New Password"
+                                            }
+                                            id="new-password"
+                                            type={
+                                                passwordHidden
+                                                    ? "password"
+                                                    : "text"
+                                            }
+                                        />
+
+                                        <div className="font-bold text-xl mt-4">
+                                            Confirm password
+                                        </div>
+                                        <input
+                                            {...newPassRegister(
+                                                "confirmPassword",
+                                                {
+                                                    validate: (value) =>
+                                                        value ===
+                                                            getValues(
+                                                                "password"
+                                                            ) ||
+                                                        "Passwords do not match.",
+                                                }
+                                            )}
+                                            placeholder="Confirm New Password"
+                                            id="confirm-new-password"
+                                            type={
+                                                passwordHidden
+                                                    ? "password"
+                                                    : "text"
+                                            }
+                                        />
+                                        {newPassErrors.confirmPassword && (
+                                            <p className="text-red-400">
+                                                {
+                                                    newPassErrors
+                                                        .confirmPassword.message
+                                                }
+                                            </p>
+                                        )}
+                                        <div className="font-bold text-xl mt-4">
+                                            Current Password
+                                        </div>
+                                        <input
+                                            {...newPassRegister(
+                                                "currentPassword",
+                                                {
+                                                    required: {
+                                                        value: true,
+                                                        message:
+                                                            "Current Password is required",
+                                                    },
+                                                }
+                                            )}
+                                            className={
+                                                newPassErrors.currentPassword
+                                                    ? "placeholder:text-red-400"
+                                                    : ""
+                                            }
+                                            placeholder={
+                                                newPassErrors.currentPassword
+                                                    ? newPassErrors
+                                                          .currentPassword
+                                                          .message
+                                                    : "Current password"
+                                            }
+                                            id="current-password"
+                                            type={
+                                                passwordHidden
+                                                    ? "password"
+                                                    : "text"
+                                            }
+                                        />
+                                        {passwordError && (
+                                            <p className="text-red-400">
+                                                Password is incorrect.
+                                            </p>
+                                        )}
+                                        <div className="flex justify-end my-4 gap-4">
+                                            <Button
+                                                variant="light"
+                                                color="danger"
+                                                onPress={() => {
+                                                    onClose();
+                                                    newPassReset();
+                                                }}>
+                                                Close
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                className="bg-orange-400">
+                                                Submit
+                                            </Button>
+                                        </div>
+                                    </form>
+                                )}
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Reset password modal */}
+            <Modal
+                size="xl"
+                backdrop="blur"
+                className="dark"
+                isDismissable={false}
+                isOpen={IsOpenResetPassword}
+                onOpenChange={OnChangeResetPassword}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="text-center flex flex-col gap-1 text-red-400">
+                                Reset Password
+                            </ModalHeader>
+                            <ModalBody>
+                                {resetPasswordSuccess ? (
+                                    <>
+                                        <div className="flex flex-col text-center text-2xl text-orange-400">
+                                            Success
+                                        </div>
+                                        <div className="flex flex-col text-center text-lg">
+                                            This users password has been
+                                            changed. They will receive an email
+                                            with their new password shortly.
+                                        </div>
+                                        <div className="text-center">
+                                            Or please send them their password
+                                        </div>
+                                        <div className="text-center bg-white text-black p-2 rounded-xl">
+                                            {password}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex flex-col text-center text-xl">
+                                            Are you sure you want to reset this
+                                            users password?
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <div className="mt-6">
+                                                Enter your password to continue.
+                                            </div>
+                                            <i
+                                                onClick={() =>
+                                                    setPasswordHidden(
+                                                        !passwordHidden
+                                                    )
+                                                }
+                                                aria-hidden
+                                                className={`fa-solid my-auto cursor-pointer ${
+                                                    passwordHidden
+                                                        ? "fa-eye"
+                                                        : "fa-eye-slash"
+                                                } fa-2xl`}
+                                            />
+                                        </div>
+                                        <input
+                                            className="text-center"
+                                            placeholder="Password"
+                                            value={adminPassword}
+                                            onChange={(e) =>
+                                                setAdminPassword(e.target.value)
+                                            }
+                                            type={
+                                                passwordHidden
+                                                    ? "password"
+                                                    : "text"
+                                            }
+                                        />
+                                        {passwordError && (
+                                            <p className="text-red-400">
+                                                Password is incorrect.
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            </ModalBody>
+                            <ModalFooter>
+                                {resetPasswordSuccess ? (
+                                    ""
+                                ) : (
+                                    <Button
+                                        onClick={resetPassword}
+                                        variant="light"
+                                        color="danger">
+                                        Reset Password
+                                    </Button>
+                                )}
+                                <Button
+                                    onClick={() => {
+                                        onClose();
+                                        setAdminPassword("");
+                                        setUserResetId("");
+                                        setPassword("");
+                                    }}
+                                    className="bg-orange-400">
+                                    Close
+                                </Button>
+                            </ModalFooter>
                         </>
                     )}
                 </ModalContent>
