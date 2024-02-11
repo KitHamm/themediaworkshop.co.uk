@@ -75,7 +75,7 @@ export default function Header(props: {
 
     const onSubmit = (data: FormTypes) => {
         setSending(true);
-        fetch("api/message", {
+        fetch("send/message", {
             method: "POST",
             body: JSON.stringify(data),
         })
