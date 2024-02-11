@@ -13,6 +13,8 @@ import {
     CircularProgress,
     Switch,
     Avatar,
+    Accordion,
+    AccordionItem,
 } from "@nextui-org/react";
 
 // React Components
@@ -286,18 +288,108 @@ export default function Settings(props: { hidden: boolean; session: any }) {
 
     return (
         <div
-            className={`${props.hidden ? "hidden" : ""} xl:mx-20 mx-4 fade-in`}>
+            className={`${
+                props.hidden ? "hidden" : ""
+            } xl:mx-20 mx-4 fade-in xl:pb-0 pb-20`}>
             <div className="xl:my-10">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Settings
                 </div>
-
-                <div className="font-bold mt-10 mb-5 text-xl">All Users</div>
                 <Button
-                    className="py-2 px-4 bg-orange-400 rounded mb-5"
+                    className="py-2 px-4 xl:mt-10 mt-5 mb-5  bg-orange-400 rounded mb-5"
                     onPress={onOpen}>
                     Add User Account
                 </Button>
+                <div className="font-bold mb-5 text-xl">All Users</div>
+
+                {/* Mobile Accordion */}
+                <div className="xl:hidden">
+                    <Accordion className="dark" variant="splitted">
+                        {users.map((user: any, index: number) => {
+                            return (
+                                <AccordionItem
+                                    key={index}
+                                    aria-label={user.name}
+                                    startContent={
+                                        <Avatar
+                                            radius="lg"
+                                            src={
+                                                user.image
+                                                    ? process.env
+                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                      user.image
+                                                    : undefined
+                                            }
+                                        />
+                                    }
+                                    subtitle={
+                                        <div
+                                            className={`${
+                                                user.activated
+                                                    ? "text-green-600"
+                                                    : "text-neutral-600"
+                                            }`}>
+                                            {user.activated
+                                                ? "Activated"
+                                                : "Not Activated"}
+                                        </div>
+                                    }
+                                    title={user.name}>
+                                    <div className="px-6 py-2">
+                                        <div className="font-bold text-lg">
+                                            Email:
+                                        </div>
+                                        {user.email}
+                                    </div>
+                                    <div className="px-6 py-2">
+                                        <div className="font-bold text-lg">
+                                            Position:
+                                        </div>
+                                        {user.position}
+                                    </div>
+                                    <div className="px-6 py-2">
+                                        <div className="font-bold text-lg">
+                                            Role:
+                                        </div>
+                                        {user.role}
+                                    </div>
+                                    {props.session.user.role === "ADMIN" && (
+                                        <div className="flex justify-evenly my-2">
+                                            <Button
+                                                onPress={() => {
+                                                    setNewName(user.name);
+                                                    setNewEmail(user.email);
+                                                    setNewRole(user.role);
+                                                    setNewPosition(
+                                                        user.position
+                                                    );
+                                                    setUserId(user.id);
+                                                    setUserResetId(user.id);
+                                                    OnOpenEditUser();
+                                                }}
+                                                className="bg-orange-400">
+                                                Edit
+                                            </Button>
+                                            {user.id !==
+                                                props.session.user.id && (
+                                                <Button
+                                                    onPress={() => {
+                                                        setUserId(user.id);
+                                                        deleteOnOpen();
+                                                    }}
+                                                    color="danger"
+                                                    variant="light">
+                                                    Delete
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
+                                </AccordionItem>
+                            );
+                        })}
+                    </Accordion>
+                </div>
+                {/* Desktop Table */}
                 <table className="hidden xl:block table-auto text-left">
                     <thead className="bg-neutral-600">
                         <tr>
@@ -317,13 +409,16 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                 Role
                             </th>
                             {props.session.user.role === "ADMIN" && (
-                                <th scope="col" className="px-6 py-2">
-                                    <span className="sr-only">Edit</span>
-                                </th>
+                                <>
+                                    <th scope="col" className="px-6 py-2">
+                                        <span className="sr-only">Edit</span>
+                                    </th>
+
+                                    <th scope="col" className="px-6 py-2">
+                                        <span className="sr-only">Delete</span>
+                                    </th>
+                                </>
                             )}
-                            <th scope="col" className="px-6 py-2">
-                                <span className="sr-only">Delete</span>
-                            </th>
                         </tr>
                     </thead>
                     <tbody className="text-left bg-neutral-800">
@@ -395,11 +490,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                             Delete
                                         </td>
                                     ) : (
-                                        <td
-                                            scope="col"
-                                            className="px-6 py-4 text-neutral-400 cursor-pointer">
-                                            Delete
-                                        </td>
+                                        ""
                                     )}
                                 </tr>
                             );
@@ -998,14 +1089,6 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                             </ModalBody>
                             <ModalFooter>
                                 <Button
-                                    color="danger"
-                                    onPress={() => {
-                                        onClose();
-                                        setUserId("");
-                                    }}>
-                                    Close
-                                </Button>
-                                <Button
                                     variant="light"
                                     color="danger"
                                     onPress={() => {
@@ -1013,6 +1096,14 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                         onClose();
                                     }}>
                                     Delete
+                                </Button>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                        setUserId("");
+                                    }}>
+                                    Close
                                 </Button>
                             </ModalFooter>
                         </>

@@ -2,6 +2,7 @@
 
 // Library Components
 import {
+    Avatar,
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
@@ -16,6 +17,7 @@ import {
     useDisclosure,
     CircularProgress,
     Badge,
+    User,
 } from "@nextui-org/react";
 
 //  React Components
@@ -23,7 +25,6 @@ import { useEffect, useState } from "react";
 
 // Next Auth
 import { signOut } from "next-auth/react";
-import { User } from "@nextui-org/react";
 
 // Next Components
 import Image from "next/image";
@@ -130,10 +131,50 @@ export default function SidePanel(props: { session: any; messages: Message }) {
         <>
             {/* Mobile Navigation Bar */}
             <div className="z-40 fixed w-screen bottom-0 left-0 xl:hidden bg-neutral-800 border-t border-orange-400">
-                <div className="flex justify-evenly py-2">
+                <div className="flex justify-evenly pb-2 pt-2">
+                    <Dropdown placement="top-start" className="dark z-0">
+                        <DropdownTrigger>
+                            <Avatar
+                                showFallback
+                                name={
+                                    Array.from(
+                                        props.session.user.name
+                                    )[0] as string
+                                }
+                                src={
+                                    avatar
+                                        ? process.env
+                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                          avatar
+                                        : undefined
+                                }
+                            />
+                        </DropdownTrigger>
+                        <DropdownMenu aria-label="Static Actions">
+                            <DropdownSection showDivider>
+                                <DropdownItem
+                                    onClick={() => onOpen()}
+                                    key="new-avatar">
+                                    Change Avatar
+                                </DropdownItem>
+                            </DropdownSection>
+
+                            <DropdownSection>
+                                <DropdownItem
+                                    onClick={() =>
+                                        signOut({ callbackUrl: "/" })
+                                    }
+                                    key="logout"
+                                    className="text-red-400">
+                                    Log Out
+                                </DropdownItem>
+                            </DropdownSection>
+                        </DropdownMenu>
+                    </Dropdown>
+
                     <Link
                         href={"?view=dashboard"}
-                        className={`my-auto transition-all text-center text-sm`}>
+                        className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
                             className={`${
@@ -146,7 +187,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     </Link>
                     <Link
                         href={"?view=pages"}
-                        className={`my-auto transition-all text-center text-sm`}>
+                        className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
                             className={`${
@@ -159,7 +200,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     </Link>
                     <Link
                         href={"?view=media"}
-                        className={`my-auto transition-all text-center text-sm`}>
+                        className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
                             className={`${
@@ -172,7 +213,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     </Link>
                     <Link
                         href={"?view=messages"}
-                        className={`my-auto transition-all text-center text-sm`}>
+                        className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
                             className={`${
@@ -193,7 +234,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
 
                     <Link
                         href={"?view=settings"}
-                        className={`my-auto transition-all text-center text-sm`}>
+                        className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
                             className={`${
