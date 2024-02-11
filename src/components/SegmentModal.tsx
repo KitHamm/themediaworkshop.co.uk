@@ -53,9 +53,11 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                         className={`py-8 ${
                             caseIndex !== 0 ? "border-t border-neutral-600" : ""
                         } `}>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid xl:grid-cols-2 grid-cols-1 gap-4">
                             {caseIndex % 2 === 0 ? (
-                                <div id="left" className="my-auto p-5">
+                                <div
+                                    id="left"
+                                    className="my-auto p-5 order-first">
                                     <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-400">
                                         {casestudy.title}
                                     </div>
@@ -132,7 +134,9 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                 </div>
                             </div>
                             {caseIndex % 2 !== 0 ? (
-                                <div id="right" className="my-auto p-5">
+                                <div
+                                    id="right"
+                                    className="my-auto p-5 order-first xl:order-last">
                                     <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-400">
                                         {casestudy.title}
                                     </div>

@@ -137,14 +137,14 @@ export default function PageSegment(props: {
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-10">
+                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
                             {props.segment.copy}
                         </div>
                         {props.segment.casestudy.length > 0 && (
-                            <div className="text-left">
+                            <div className="xl:text-left">
                                 <button
                                     onClick={onOpenChangeCaseStudy}
-                                    className="mt-2 px-4 py-2 rounded bg-orange-400">
+                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 rounded bg-orange-400">
                                     Examples
                                 </button>
                             </div>
