@@ -84,7 +84,6 @@ export default function DashboardMain(props: {
         <NextUIProvider>
             <DashboardView hidden={view === "dashboard" ? false : true} />
             {/* Main CMS pages view */}
-
             <Pages
                 hidden={view === "pages" ? false : true}
                 data={props.data}

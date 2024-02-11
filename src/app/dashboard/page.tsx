@@ -41,8 +41,8 @@ export default async function Dashboard() {
     });
 
     return (
-        <main className="xl:flex xl:min-h-screen">
-            <div className="xl:basis-1/6">
+        <main className="xl:flex xl:h-auto min-h-screen">
+            <div className="relative xl:h-auto xl:basis-1/6">
                 {/* Side panel for dashboard showing user information */}
                 <SidePanel messages={messages} session={session} />
             </div>

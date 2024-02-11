@@ -248,39 +248,38 @@ export default function EditSegment(props: {
 
     return (
         <>
-            <div className="light rounded-md px-5 mb-4 py-4">
-                {props.segment.published ? (
-                    <div className="flex justify-end">
+            <div className="light rounded-md xl:px-5 mb-4 py-4">
+                <div className="flex justify-between">
+                    {changes ? (
+                        <div className="fade-in font-bold text-red-400">
+                            Unsaved Changes
+                        </div>
+                    ) : (
+                        <div></div>
+                    )}
+                    {props.segment.published ? (
                         <button
                             onClick={() => {
                                 updatePublished(false);
                             }}
-                            className="px-4 py-2 rounded bg-red-400">
+                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-red-400">
                             UNPUBLISH
                         </button>
-                    </div>
-                ) : (
-                    <div className="flex justify-end">
+                    ) : (
                         <button
                             onClick={() => {
                                 updatePublished(true);
                             }}
-                            className="px-4 py-2 rounded bg-orange-400">
+                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-orange-400">
                             PUBLISH
                         </button>
-                    </div>
-                )}
+                    )}
+                </div>
+
                 <div className="flex justify-between border-b pb-2">
                     <div className="text-orange-400 font-bold text-xl">
                         Top Image
                     </div>
-                    {changes ? (
-                        <div className="fade-in font-bold text-red-400">
-                            There are unsaved changes on this segment
-                        </div>
-                    ) : (
-                        ""
-                    )}
                 </div>
                 <div className="relative my-2">
                     {headerImage !== null &&
@@ -327,7 +326,7 @@ export default function EditSegment(props: {
                                     aria-label="Loading..."
                                 />
                             ) : (
-                                <>
+                                <div className="grid xl:grid-cols-2 xl:gap-40 gap-4">
                                     <div>
                                         {topImageNamingError && (
                                             <div className="text-center text-red-400">
@@ -398,7 +397,7 @@ export default function EditSegment(props: {
                                             Select
                                         </button>
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
                     )}
@@ -428,7 +427,7 @@ export default function EditSegment(props: {
                                 id=""
                             />
                         </div>
-                        <div className="w-1/6">
+                        <div className="xl:w-1/6 w-1/2">
                             <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
                                 Order
                             </div>
@@ -447,7 +446,7 @@ export default function EditSegment(props: {
                             <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
                                 Images
                             </div>
-                            <div className="grid grid-cols-4 gap-4 p-2">
+                            <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
                                 {images.map((image: string, index: number) => {
                                     return (
                                         <div
@@ -559,7 +558,7 @@ export default function EditSegment(props: {
                     </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end xl:mt-0 mt-4">
                     <button
                         onClick={onOpenChangeDelete}
                         className="px-4 py-2 hover:bg-red-800 hover:text-white text-red-600 rounded transition-all">
@@ -589,7 +588,7 @@ export default function EditSegment(props: {
                                     {"Top Image for " + props.segment.title}
                                 </ModalHeader>
                                 <ModalBody>
-                                    <div className="grid grid-cols-4 gap-5">
+                                    <div className="grid xl:grid-cols-4 gap-5">
                                         {availableImages.map(
                                             (image: Images, index: number) => {
                                                 if (
@@ -723,7 +722,7 @@ export default function EditSegment(props: {
                                             </>
                                         )}
                                     </div>
-                                    <div className="grid grid-cols-4 gap-5">
+                                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                         {availableImages.map(
                                             (image: Images, index: number) => {
                                                 if (

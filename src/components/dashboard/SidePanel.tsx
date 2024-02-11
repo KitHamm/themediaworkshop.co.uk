@@ -128,8 +128,87 @@ export default function SidePanel(props: { session: any; messages: Message }) {
 
     return (
         <>
+            {/* Mobile Navigation Bar */}
+            <div className="z-40 fixed w-screen bottom-0 left-0 xl:hidden bg-neutral-800 border-t border-orange-400">
+                <div className="flex justify-evenly py-2">
+                    <Link
+                        href={"?view=dashboard"}
+                        className={`my-auto transition-all text-center text-sm`}>
+                        <i
+                            aria-hidden
+                            className={`${
+                                view === "dashboard"
+                                    ? "text-orange-400"
+                                    : "text-white"
+                            } fa-solid fa-house fa-xl`}
+                        />
+                        <div className="mt-1">Dash</div>
+                    </Link>
+                    <Link
+                        href={"?view=pages"}
+                        className={`my-auto transition-all text-center text-sm`}>
+                        <i
+                            aria-hidden
+                            className={`${
+                                view === "pages"
+                                    ? "text-orange-400"
+                                    : "text-white"
+                            } fa-regular fa-window-restore fa-xl`}
+                        />
+                        <div className="mt-1">Pages</div>
+                    </Link>
+                    <Link
+                        href={"?view=media"}
+                        className={`my-auto transition-all text-center text-sm`}>
+                        <i
+                            aria-hidden
+                            className={`${
+                                view === "media"
+                                    ? "text-orange-400"
+                                    : "text-white"
+                            } fa-regular fa-images fa-xl`}
+                        />
+                        <div className="mt-1">Media</div>
+                    </Link>
+                    <Link
+                        href={"?view=messages"}
+                        className={`my-auto transition-all text-center text-sm`}>
+                        <i
+                            aria-hidden
+                            className={`${
+                                view === "messages"
+                                    ? "text-orange-400"
+                                    : "text-white"
+                            } fa-regular fa-message fa-xl`}
+                        />
+                        <Badge
+                            placement="top-right"
+                            color="danger"
+                            isInvisible={unreadMessages === 0 ? true : false}
+                            content={unreadMessages}>
+                            {""}
+                        </Badge>
+                        <div className="mt-1">Msg</div>
+                    </Link>
+
+                    <Link
+                        href={"?view=settings"}
+                        className={`my-auto transition-all text-center text-sm`}>
+                        <i
+                            aria-hidden
+                            className={`${
+                                view === "settings"
+                                    ? "text-orange-400"
+                                    : "text-white"
+                            } fa-solid fa-gear fa-xl`}
+                        />
+                        <div className="mt-1">Settings</div>
+                    </Link>
+                </div>
+            </div>
+            {/* Desktop Side Panel */}
             {/* Side panel set to 1/6 width of the screen in a fixed position on the left */}
-            <div className="min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-400">
+            <div className="hidden xl:block min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-400">
                 <div className="xl:flex xl:p-10 border-b border-neutral-400 mb-4">
                     <Image
                         onClick={() => (window.location.href = "/")}
@@ -248,8 +327,8 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <Badge
-                        isInvisible={unreadMessages === 0 ? true : false}
                         color="danger"
+                        isInvisible={unreadMessages === 0 ? true : false}
                         content={unreadMessages}>
                         <i
                             aria-hidden

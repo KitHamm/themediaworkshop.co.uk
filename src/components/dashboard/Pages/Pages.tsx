@@ -36,18 +36,21 @@ export default function Pages(props: {
 
     return (
         <>
-            <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
-                <div className="my-10 border-b py-4 text-3xl font-bold capitalize">
+            <div
+                className={`${
+                    props.hidden ? "hidden" : ""
+                } xl:mx-20 mx-4 fade-in`}>
+                <div className="xl:my-10 mb-4 border-b py-4 text-3xl font-bold capitalize">
                     Pages
                 </div>
                 {/* Links for which page edit to display */}
-                <div className="flex justify-evenly">
+                <div className="grid grid-cols-3 xl:grid-cols-6 xl:flex-nowrap gap-2 xl:gap-4">
                     <Link
                         className={`${
                             pageEdit === "home"
                                 ? "bg-orange-400"
                                 : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=home"}>
                         Home
                     </Link>
@@ -56,7 +59,7 @@ export default function Pages(props: {
                             pageEdit === "film"
                                 ? "bg-orange-400"
                                 : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=film"}>
                         Film
                     </Link>
@@ -65,7 +68,7 @@ export default function Pages(props: {
                             pageEdit === "digital"
                                 ? "bg-orange-400"
                                 : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=digital"}>
                         Digital
                     </Link>
@@ -74,7 +77,7 @@ export default function Pages(props: {
                             pageEdit === "light"
                                 ? "bg-orange-400"
                                 : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=light"}>
                         Light
                     </Link>
@@ -83,14 +86,14 @@ export default function Pages(props: {
                             pageEdit === "events"
                                 ? "bg-orange-400"
                                 : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=events"}>
                         Events
                     </Link>
                     <Link
                         className={`${
                             pageEdit === "art" ? "bg-orange-400" : "bg-gray-400"
-                        } w-full text-center mx-4 py-2 rounded`}
+                        } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=art"}>
                         Art
                     </Link>

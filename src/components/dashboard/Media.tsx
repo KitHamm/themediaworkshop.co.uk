@@ -177,281 +177,258 @@ export default function Media(props: {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
-            <div className="my-10">
-                <div className="border-b py-4 mb-10 text-3xl font-bold capitalize">
-                    Media
-                </div>
-                <div className="my-6">
-                    <button
-                        onClick={onOpenChangeUpload}
-                        className="px-10 py-4 rounded bg-orange-400">
-                        Upload Media
-                    </button>
-                </div>
-                <div className="xl:flex xl:grid-cols-2 xl:gap-10">
-                    <div className="w-full">
-                        <div className="flex justify-between border-b mb-5">
-                            <div className="font-bold text-xl">Videos</div>
-                            <i
-                                onClick={() => getVideos()}
-                                aria-hidden
-                                className="cursor-pointer fa-solid fa-arrows-rotate"
-                            />
-                        </div>
-                        <div className="flex gap-4 mb-4">
-                            <Link
-                                href={
-                                    `?view=media&video=background&image=` +
-                                    imageView
-                                }
-                                className={`${
-                                    videoView === "background"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Background
-                            </Link>
-                            <Link
-                                href={
-                                    `?view=media&video=showreel&image=` +
-                                    imageView
-                                }
-                                className={`${
-                                    videoView === "showreel"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Showreel
-                            </Link>
-                            <Link
-                                href={
-                                    `?view=media&video=year&image=` + imageView
-                                }
-                                className={`${
-                                    videoView === "year"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Year Review
-                            </Link>
-                            <Link
-                                href={
-                                    `?view=media&video=study&image=` + imageView
-                                }
-                                className={`${
-                                    videoView === "study"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Case Study
-                            </Link>
-                        </div>
-                        {/* Videos section */}
-                        <div className="xl:grid xl:grid-cols-4 xl:gap-4">
-                            {videos.map((video: Videos, index: number) => {
-                                if (
-                                    (videoView === "background" &&
-                                        video.name.split("_")[0] ===
-                                            "HEADER") ||
-                                    (videoView === "showreel" &&
-                                        video.name.split("_")[0] ===
-                                            "SHOWREEL") ||
-                                    (videoView === "year" &&
-                                        video.name.split("_")[0] === "YEAR") ||
-                                    (videoView === "study" &&
-                                        video.name.split("_")[0] === "STUDY") ||
-                                    videoView === "all"
-                                ) {
-                                    return (
-                                        <Tooltip
-                                            delay={1000}
-                                            className="dark"
-                                            placement="bottom"
-                                            key={video.name + "-" + index}
-                                            content={video.name}>
-                                            <div className="flex flex-col border rounded border-neutral-800">
-                                                <div
-                                                    onClick={() => {
-                                                        setSelectedVideo(
-                                                            video.name
-                                                        );
-                                                        onOpenVideo();
-                                                    }}
-                                                    className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
-                                                    <Image
-                                                        height={100}
-                                                        width={100}
-                                                        src={"/images/play.png"}
-                                                        alt="play"
-                                                        className="w-full h-auto m-auto"
-                                                    />
-                                                </div>
-                                                <div className="bg-neutral-800 bg-opacity-25">
-                                                    <div className="text-center truncate p-2 h-full">
-                                                        {video.name.includes(
-                                                            "_"
-                                                        )
-                                                            ? video.name.includes(
-                                                                  "-"
-                                                              )
-                                                                ? video.name
-                                                                      .split(
-                                                                          "_"
-                                                                      )[1]
-                                                                      .split(
-                                                                          "-"
-                                                                      )[0]
-                                                                : video.name.split(
-                                                                      "_"
-                                                                  )[1]
-                                                            : video.name.includes(
-                                                                  "-"
-                                                              )
-                                                            ? video.name.split(
-                                                                  "-"
-                                                              )[0]
-                                                            : video.name}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Tooltip>
-                                    );
-                                }
-                            })}
-                        </div>
+        <div className={`${props.hidden ? "hidden" : ""} xl:mx-20 fade-in`}>
+            <div className="xl:my-10 border-b py-4 mb-10 text-3xl font-bold capitalize">
+                Media
+            </div>
+            <div className="my-6">
+                <button
+                    onClick={onOpenChangeUpload}
+                    className="px-10 py-4 rounded bg-orange-400">
+                    Upload Media
+                </button>
+            </div>
+            <div className="hidden xl:flex xl:grid-cols-2 xl:gap-10">
+                <div className="w-full">
+                    <div className="flex justify-between border-b mb-5">
+                        <div className="font-bold text-xl">Videos</div>
+                        <i
+                            onClick={() => getVideos()}
+                            aria-hidden
+                            className="cursor-pointer fa-solid fa-arrows-rotate"
+                        />
                     </div>
-                    {/* Images section */}
-                    <div className="w-full">
-                        <div className="flex justify-between border-b mb-5">
-                            <div className="font-bold text-xl">Images</div>
-                            <i
-                                onClick={() => getImages()}
-                                aria-hidden
-                                className="cursor-pointer fa-solid fa-arrows-rotate"
-                            />
-                        </div>
-                        <div className="flex gap-4 mb-4">
-                            <Link
-                                href={
-                                    `?view=media&video=` +
-                                    videoView +
-                                    `&image=header`
-                                }
-                                className={`${
-                                    imageView === "header"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Header
-                            </Link>
-                            <Link
-                                href={
-                                    `?view=media&video=` +
-                                    videoView +
-                                    `&image=segment`
-                                }
-                                className={`${
-                                    imageView === "segment"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Segment
-                            </Link>
-                            <Link
-                                href={
-                                    `?view=media&video=` +
-                                    videoView +
-                                    `&image=study`
-                                }
-                                className={`${
-                                    imageView === "study"
-                                        ? "bg-orange-400"
-                                        : "bg-neutral-600"
-                                } px-4 py-2 rounded transition-all`}>
-                                Case Study
-                            </Link>
-                        </div>
-                        <div className="xl:grid xl:grid-cols-4 xl:gap-2">
-                            {images.map((image: Images, index: number) => {
-                                if (
-                                    (imageView === "header" &&
-                                        image.name.split("_")[0] ===
-                                            "SEGHEAD") ||
-                                    (imageView === "segment" &&
-                                        image.name.split("_")[0] ===
-                                            "SEGMENT") ||
-                                    (imageView === "study" &&
-                                        image.name.split("_")[0] ===
-                                            "CASESTUDY") ||
-                                    imageView === "all"
-                                ) {
-                                    return (
-                                        <Tooltip
-                                            delay={1000}
-                                            placement="bottom"
-                                            className="dark"
-                                            key={image.name + "-" + index}
-                                            content={image.name}>
-                                            <div className="fade-in flex flex-col border rounded border-neutral-800">
-                                                <div
-                                                    onClick={() => {
-                                                        setSelectedImage(
-                                                            image.name
-                                                        );
-                                                        onOpenImage();
-                                                    }}
-                                                    className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
-                                                    <Image
-                                                        height={100}
-                                                        width={100}
-                                                        src={
-                                                            process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                            image.name
-                                                        }
-                                                        alt={image.name}
-                                                        className="w-full h-auto m-auto"
-                                                    />
-                                                </div>
-                                                <div className="bg-neutral-800 bg-opacity-25">
-                                                    <div
-                                                        id={image.name}
-                                                        className="text-center truncate p-2">
-                                                        {image.name.includes(
-                                                            "_"
-                                                        )
-                                                            ? image.name.includes(
-                                                                  "-"
-                                                              )
-                                                                ? image.name
-                                                                      .split(
-                                                                          "_"
-                                                                      )[1]
-                                                                      .split(
-                                                                          "-"
-                                                                      )[0]
-                                                                : image.name.split(
-                                                                      "_"
-                                                                  )[1]
-                                                            : image.name.includes(
-                                                                  "-"
-                                                              )
-                                                            ? image.name.split(
-                                                                  "-"
-                                                              )[0]
-                                                            : image.name}
-                                                    </div>
+                    <div className="flex gap-4 mb-4">
+                        <Link
+                            href={
+                                `?view=media&video=background&image=` +
+                                imageView
+                            }
+                            className={`${
+                                videoView === "background"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Background
+                        </Link>
+                        <Link
+                            href={
+                                `?view=media&video=showreel&image=` + imageView
+                            }
+                            className={`${
+                                videoView === "showreel"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Showreel
+                        </Link>
+                        <Link
+                            href={`?view=media&video=year&image=` + imageView}
+                            className={`${
+                                videoView === "year"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Year Review
+                        </Link>
+                        <Link
+                            href={`?view=media&video=study&image=` + imageView}
+                            className={`${
+                                videoView === "study"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Case Study
+                        </Link>
+                    </div>
+                    {/* Videos section */}
+                    <div className="xl:grid xl:grid-cols-4 xl:gap-4">
+                        {videos.map((video: Videos, index: number) => {
+                            if (
+                                (videoView === "background" &&
+                                    video.name.split("_")[0] === "HEADER") ||
+                                (videoView === "showreel" &&
+                                    video.name.split("_")[0] === "SHOWREEL") ||
+                                (videoView === "year" &&
+                                    video.name.split("_")[0] === "YEAR") ||
+                                (videoView === "study" &&
+                                    video.name.split("_")[0] === "STUDY") ||
+                                videoView === "all"
+                            ) {
+                                return (
+                                    <Tooltip
+                                        delay={1000}
+                                        className="dark"
+                                        placement="bottom"
+                                        key={video.name + "-" + index}
+                                        content={video.name}>
+                                        <div className="flex flex-col border rounded border-neutral-800">
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedVideo(
+                                                        video.name
+                                                    );
+                                                    onOpenVideo();
+                                                }}
+                                                className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
+                                                <Image
+                                                    height={100}
+                                                    width={100}
+                                                    src={"/images/play.png"}
+                                                    alt="play"
+                                                    className="w-full h-auto m-auto"
+                                                />
+                                            </div>
+                                            <div className="bg-neutral-800 bg-opacity-25">
+                                                <div className="text-center truncate p-2 h-full">
+                                                    {video.name.includes("_")
+                                                        ? video.name.includes(
+                                                              "-"
+                                                          )
+                                                            ? video.name
+                                                                  .split("_")[1]
+                                                                  .split("-")[0]
+                                                            : video.name.split(
+                                                                  "_"
+                                                              )[1]
+                                                        : video.name.includes(
+                                                              "-"
+                                                          )
+                                                        ? video.name.split(
+                                                              "-"
+                                                          )[0]
+                                                        : video.name}
                                                 </div>
                                             </div>
-                                        </Tooltip>
-                                    );
-                                }
-                            })}
-                        </div>
+                                        </div>
+                                    </Tooltip>
+                                );
+                            }
+                        })}
+                    </div>
+                </div>
+                {/* Images section */}
+                <div className="w-full">
+                    <div className="flex justify-between border-b mb-5">
+                        <div className="font-bold text-xl">Images</div>
+                        <i
+                            onClick={() => getImages()}
+                            aria-hidden
+                            className="cursor-pointer fa-solid fa-arrows-rotate"
+                        />
+                    </div>
+                    <div className="flex gap-4 mb-4">
+                        <Link
+                            href={
+                                `?view=media&video=` +
+                                videoView +
+                                `&image=header`
+                            }
+                            className={`${
+                                imageView === "header"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Header
+                        </Link>
+                        <Link
+                            href={
+                                `?view=media&video=` +
+                                videoView +
+                                `&image=segment`
+                            }
+                            className={`${
+                                imageView === "segment"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Segment
+                        </Link>
+                        <Link
+                            href={
+                                `?view=media&video=` +
+                                videoView +
+                                `&image=study`
+                            }
+                            className={`${
+                                imageView === "study"
+                                    ? "bg-orange-400"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Case Study
+                        </Link>
+                    </div>
+                    <div className="xl:grid xl:grid-cols-4 xl:gap-2">
+                        {images.map((image: Images, index: number) => {
+                            if (
+                                (imageView === "header" &&
+                                    image.name.split("_")[0] === "SEGHEAD") ||
+                                (imageView === "segment" &&
+                                    image.name.split("_")[0] === "SEGMENT") ||
+                                (imageView === "study" &&
+                                    image.name.split("_")[0] === "CASESTUDY") ||
+                                imageView === "all"
+                            ) {
+                                return (
+                                    <Tooltip
+                                        delay={1000}
+                                        placement="bottom"
+                                        className="dark"
+                                        key={image.name + "-" + index}
+                                        content={image.name}>
+                                        <div className="fade-in flex flex-col border rounded border-neutral-800">
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedImage(
+                                                        image.name
+                                                    );
+                                                    onOpenImage();
+                                                }}
+                                                className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
+                                                <Image
+                                                    height={100}
+                                                    width={100}
+                                                    src={
+                                                        process.env
+                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                        image.name
+                                                    }
+                                                    alt={image.name}
+                                                    className="w-full h-auto m-auto"
+                                                />
+                                            </div>
+                                            <div className="bg-neutral-800 bg-opacity-25">
+                                                <div
+                                                    id={image.name}
+                                                    className="text-center truncate p-2">
+                                                    {image.name.includes("_")
+                                                        ? image.name.includes(
+                                                              "-"
+                                                          )
+                                                            ? image.name
+                                                                  .split("_")[1]
+                                                                  .split("-")[0]
+                                                            : image.name.split(
+                                                                  "_"
+                                                              )[1]
+                                                        : image.name.includes(
+                                                              "-"
+                                                          )
+                                                        ? image.name.split(
+                                                              "-"
+                                                          )[0]
+                                                        : image.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Tooltip>
+                                );
+                            }
+                        })}
                     </div>
                 </div>
             </div>
+
             {/* Delete warning modal */}
             <Modal
                 size="xl"

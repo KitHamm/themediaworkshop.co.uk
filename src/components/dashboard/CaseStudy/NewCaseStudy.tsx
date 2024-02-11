@@ -222,7 +222,7 @@ export default function NewCaseStudy(props: {
     }
 
     return (
-        <div className="px-10">
+        <div className="xl:px-10">
             {success ? (
                 <>
                     <div className="text-center font-bold text-3xl mb-4">
@@ -233,24 +233,24 @@ export default function NewCaseStudy(props: {
             ) : (
                 <>
                     {unsavedChanges && (
-                        <div className="flex gap-4">
-                            <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
+                        <div className="flex justify-between">
+                            <div className="my-auto text-sm xl:text-xl font-bold text-red-400 fade-in mb-4">
                                 Case Study can be saved
                             </div>
                             <button
                                 onClick={handleUpdate}
-                                className=" my-auto bg-orange-400 px-4 py-2 rounded">
+                                className="my-auto bg-orange-400 xl:px-4 xl:py-2 px-2 py-1 rounded">
                                 Submit
                             </button>
                         </div>
                     )}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid xl:grid-cols-2 gap-4">
                         <div id="left">
                             <div className="min-h-[50%]">
                                 <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
                                     Images:
                                 </div>
-                                <div className="grid grid-cols-3 gap-4 p-2">
+                                <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
                                     {images.map(
                                         (image: string, index: number) => {
                                             return (
@@ -513,7 +513,7 @@ export default function NewCaseStudy(props: {
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {availableVideos.map(
                                         (video: Videos, index: number) => {
                                             if (
@@ -566,7 +566,7 @@ export default function NewCaseStudy(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -686,7 +686,7 @@ export default function NewCaseStudy(props: {
                                         </>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-5">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                     {availableImages.map(
                                         (image: Images, index: number) => {
                                             if (

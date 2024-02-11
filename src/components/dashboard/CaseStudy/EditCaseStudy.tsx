@@ -250,13 +250,13 @@ export default function EditCaseStudy(props: {
     }
 
     return (
-        <div className="px-10">
+        <div className="xl:px-10">
             <div className="w-full text-center text-3xl font-bold text-orange-400">
                 {title}
             </div>
             {deleted ? (
                 <>
-                    <div className="text-center font-bold text-3xl mb-4">
+                    <div className="text-center font-bold text-3xl mt-4 xl:mt-0 mb-4">
                         Deleted!
                     </div>
                     <div className="text-center text-xl">
@@ -265,7 +265,7 @@ export default function EditCaseStudy(props: {
                 </>
             ) : (
                 <>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between mt-4 xl:mt-0">
                         <div
                             className={`${
                                 props.caseStudy.published
@@ -288,32 +288,36 @@ export default function EditCaseStudy(props: {
                                 </div>
                             )}
                             {props.caseStudy.published ? (
-                                <button
-                                    onClick={() => {
-                                        updatePublished(false);
-                                    }}
-                                    className="px-4 py-2 bg-red-400 rounded">
-                                    UNPUBLISH
-                                </button>
+                                <div>
+                                    <button
+                                        onClick={() => {
+                                            updatePublished(false);
+                                        }}
+                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-red-400 rounded">
+                                        UNPUBLISH
+                                    </button>
+                                </div>
                             ) : (
-                                <button
-                                    onClick={() => {
-                                        updatePublished(true);
-                                    }}
-                                    className="px-4 py-2 bg-green-600 rounded">
-                                    PUBLISH
-                                </button>
+                                <div>
+                                    <button
+                                        onClick={() => {
+                                            updatePublished(true);
+                                        }}
+                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-green-600 rounded">
+                                        PUBLISH
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid xl:grid-cols-2 gap-4">
                         <div id="left">
                             <div className="min-h-[50%]">
                                 <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
                                     Images:
                                 </div>
-                                <div className="grid grid-cols-3 gap-4 p-2">
+                                <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
                                     {images.map(
                                         (image: string, index: number) => {
                                             return (
@@ -586,7 +590,7 @@ export default function EditCaseStudy(props: {
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {availableVideos.map(
                                         (video: Videos, index: number) => {
                                             if (
@@ -639,7 +643,7 @@ export default function EditCaseStudy(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -761,7 +765,7 @@ export default function EditCaseStudy(props: {
                                         </>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-5">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                     {availableImages.map(
                                         (image: Images, index: number) => {
                                             if (

@@ -73,13 +73,16 @@ export default function Messages(props: {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
-            <div className="my-10">
+        <div
+            className={`${
+                props.hidden ? "hidden" : ""
+            } xl:mx-20 mx-4 fade-in pb-20 xl:pb-0`}>
+            <div className="xl:my-10">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Messages
                 </div>
             </div>
-            <div className="grid grid-cols-4 gap-10">
+            <div className="grid xl:grid-cols-4 xl:gap-10 gap-4 xl:mt-0 mt-4">
                 {messages.map((message: Message, index: number) => {
                     return (
                         <div

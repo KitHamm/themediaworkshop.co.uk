@@ -285,8 +285,9 @@ export default function Settings(props: { hidden: boolean; session: any }) {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in`}>
-            <div className="my-10">
+        <div
+            className={`${props.hidden ? "hidden" : ""} xl:mx-20 mx-4 fade-in`}>
+            <div className="xl:my-10">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Settings
                 </div>
@@ -297,7 +298,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     onPress={onOpen}>
                     Add User Account
                 </Button>
-                <table className="table-auto text-left">
+                <table className="hidden xl:block table-auto text-left">
                     <thead className="bg-neutral-600">
                         <tr>
                             <th scope="col" className="px-6 py-2">

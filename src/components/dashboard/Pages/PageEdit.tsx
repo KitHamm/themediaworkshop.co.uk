@@ -207,7 +207,10 @@ export default function PageEdit(props: {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} mx-20 fade-in mb-10`}>
+        <div
+            className={`${
+                props.hidden ? "hidden" : ""
+            } xl:mx-20 fade-in mb-10  xl:pb-0 pb-16`}>
             <div className="my-10 border-b py-4 flex justify-between">
                 <div className="text-3xl font-bold capitalize">
                     {props.data.title}
@@ -223,19 +226,19 @@ export default function PageEdit(props: {
             <div className="">
                 <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
                     <div id="left-column">
-                        <div className="border-b pb-2">Page Videos</div>
-                        <div className="xl:grid xl:grid-cols-3 xl:gap-10 min-h-20">
-                            <div>
+                        <div className="border-b pb-2 mb-4">Page Videos</div>
+                        <div className="grid xl:grid-cols-3 grid-cols-2 grid-cols-1 gap-4 xl:gap-10 min-h-20 xl:mb-0 mb-4">
+                            <div className="">
                                 {video ? (
                                     <>
                                         <div className="text-center">
-                                            Header Background
+                                            Background
                                         </div>
                                         <div
                                             onClick={() => {
                                                 onOpenChangeVideoModal();
                                             }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
                                                 height={100}
                                                 width={100}
@@ -244,7 +247,7 @@ export default function PageEdit(props: {
                                                 className="w-full h-auto m-auto"
                                             />
                                         </div>
-                                        <div className="text-center">
+                                        <div className="text-center truncate">
                                             {video.split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2 mt-2">
@@ -253,7 +256,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectVideo();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -261,7 +264,7 @@ export default function PageEdit(props: {
                                 ) : (
                                     <>
                                         <div className="text-center">
-                                            Header Background
+                                            Background
                                         </div>
                                         <div className="text-center mt-4">
                                             None Selected
@@ -272,7 +275,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectVideo();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -289,7 +292,7 @@ export default function PageEdit(props: {
                                             onClick={() => {
                                                 onOpenChangeShowreelModal();
                                             }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
                                                 height={100}
                                                 width={100}
@@ -307,7 +310,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectShowreel();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -326,7 +329,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectShowreel();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -343,7 +346,7 @@ export default function PageEdit(props: {
                                             onClick={() => {
                                                 onOpenChangeYearModal();
                                             }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
                                                 height={100}
                                                 width={100}
@@ -361,7 +364,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectYear();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -380,7 +383,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectYear();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -424,7 +427,7 @@ export default function PageEdit(props: {
                                         handleUpdate();
                                     }}
                                     disabled={!changes}
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-400 disabled:text-black rounded-md px-4 py-2">
+                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-400 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
                                     Update
                                 </button>
                             </div>
@@ -460,7 +463,7 @@ export default function PageEdit(props: {
                                         key={index}
                                         aria-label={segment.title}
                                         title={
-                                            <div>
+                                            <div className="text-sm xl:text-base">
                                                 {segment.title
                                                     ? segment.title
                                                     : "Untitled Segment"}
@@ -757,7 +760,7 @@ export default function PageEdit(props: {
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {videos.map(
                                         (video: Videos, index: number) => {
                                             if (
@@ -789,7 +792,7 @@ export default function PageEdit(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
-                                                        <div className="text-center">
+                                                        <div className="text-center truncate">
                                                             {
                                                                 video.name.split(
                                                                     "-"
@@ -807,7 +810,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -827,7 +830,7 @@ export default function PageEdit(props: {
                                             setNotVideoError(false);
                                             setBackgroundNamingError(false);
                                         }}
-                                        className="px-10 py-2 bg-red-400 rounded-xl">
+                                        className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
                                         Remove
                                     </button>
                                 ) : (
@@ -922,7 +925,7 @@ export default function PageEdit(props: {
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {videos.map(
                                         (video: Videos, index: number) => {
                                             if (
@@ -975,7 +978,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -995,7 +998,7 @@ export default function PageEdit(props: {
                                             setNotVideoError(false);
                                             setShowreelNamingError(false);
                                         }}
-                                        className="px-10 py-2 bg-red-400 rounded-xl">
+                                        className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
                                         Remove
                                     </button>
                                 ) : (
@@ -1089,7 +1092,7 @@ export default function PageEdit(props: {
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {videos.map(
                                         (video: Videos, index: number) => {
                                             if (
@@ -1142,7 +1145,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="px-10 py-2 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
                                                                 Select
                                                             </button>
                                                         </div>

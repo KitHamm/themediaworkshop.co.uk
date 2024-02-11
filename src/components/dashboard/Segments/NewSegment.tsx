@@ -153,7 +153,7 @@ export default function NewSegment(props: {
                     <div className="font-bold text-3xl">Success!</div>
                 </div>
             ) : (
-                <div className="light rounded-md px-5 mb-4 py-4">
+                <div className="light rounded-md xl:px-5 mb-4 py-4">
                     <div className="flex justify-between border-b pb-2">
                         <div className="">Top Image</div>
                     </div>
@@ -195,7 +195,7 @@ export default function NewSegment(props: {
                                 </div>
                             </div>
                         ) : (
-                            <div className="w-full flex justify-evenly my-10">
+                            <div className="w-full grid xl:grid-cols-2 xl:gap-0 gap-4 my-10">
                                 {uploading ? (
                                     <CircularProgress
                                         color="warning"
@@ -210,7 +210,7 @@ export default function NewSegment(props: {
                                                     with SEGHEAD_
                                                 </div>
                                             )}
-                                            <div className="file-input shadow-xl">
+                                            <div className="file-input">
                                                 <input
                                                     onChange={(e) => {
                                                         if (e.target.files) {
@@ -259,7 +259,7 @@ export default function NewSegment(props: {
                                                     : ""}
                                             </div>
                                         </div>
-                                        <div>
+                                        <div className="text-center">
                                             <button
                                                 onClick={() => {
                                                     onOpenChangeTopImage();
@@ -297,7 +297,7 @@ export default function NewSegment(props: {
                             </div>
                             <div>
                                 <div className="border-b pb-2 mb-2">Order</div>
-                                <div className="w-1/6">
+                                <div className="xl:w-1/6 w-1/2">
                                     <input
                                         value={
                                             !Number.isNaN(order) ? order : ""
@@ -314,7 +314,7 @@ export default function NewSegment(props: {
                         <div className={"right-segment-column"}>
                             <div className="">
                                 <div className="border-b pb-2">Images</div>
-                                <div className="grid grid-cols-4 gap-4 p-2">
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
                                     {images.map(
                                         (image: string, index: number) => {
                                             return (
@@ -349,7 +349,6 @@ export default function NewSegment(props: {
                                             );
                                         }
                                     )}
-
                                     <div
                                         onClick={() => {
                                             onOpenChangeAddImage();
@@ -387,7 +386,7 @@ export default function NewSegment(props: {
                                 <>
                                     <ModalHeader>{"Top Image"}</ModalHeader>
                                     <ModalBody>
-                                        <div className="grid grid-cols-4 gap-5">
+                                        <div className="grid xl:grid-cols-4 grid-cols-1 gap-5">
                                             {availableImages.map(
                                                 (
                                                     image: Images,
@@ -520,7 +519,7 @@ export default function NewSegment(props: {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="grid grid-cols-4 gap-5">
+                                        <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                             {availableImages.map(
                                                 (
                                                     image: Images,

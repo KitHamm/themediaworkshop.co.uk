@@ -6,9 +6,9 @@ export default function DashboardView(props: { hidden: boolean }) {
         <div
             className={`${
                 props.hidden ? "hidden" : ""
-            } mx-20 fade-in grid grid-cols-2 gap-10`}>
-            <div id="left" className="grid">
-                <div className="border-b py-4 text-3xl font-bold capitalize my-10">
+            } xl:mx-20 mx-4 pb-20 xl:pb-0 fade-in grid xl:grid-cols-2 grid-cols-1 xl:gap-10`}>
+            <div id="left" className="grid xl:order-first order-last">
+                <div className="border-b py-4 text-3xl font-bold capitalize my-4 xl:my-10">
                     Information
                 </div>
                 <Accordion variant="splitted">
@@ -35,7 +35,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                             to add a title. On all pages there is a required
                             description.
                         </p>
-                        <div className="grid grid-cols-2 gap-10">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-10 gap-5">
                             <div id="left">
                                 <div className="border-b py-4 mb-5 text-xl font-bold capitalize ">
                                     Segments
@@ -52,7 +52,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                                 </p>
                             </div>
                             <div id="right">
-                                <div className="border-b py-4 mb-5 text-xl font-bold capitalize ">
+                                <div className="border-b pb-4 xl:py-4 mb-5 text-xl font-bold capitalize ">
                                     Case Studies
                                 </div>
                                 <p className="text-lg text-justify">
@@ -109,7 +109,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                             If you are deleting media make sure that it is not
                             being used in any sections or case studies.
                         </p>
-                        <div className="grid grid-cols-2 gap-10">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-10 gap-5">
                             <div id="left">
                                 <div className="border-b py-4 mb-5 text-xl font-bold capitalize ">
                                     Video Prefix
@@ -132,7 +132,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                                 </div>
                             </div>
                             <div id="right">
-                                <div className="border-b py-4 mb-5 text-xl font-bold capitalize ">
+                                <div className="border-b pb-4 xl:py-4 mb-5 text-xl font-bold capitalize ">
                                     Image Prefix
                                 </div>
                                 <div className="flex gap-2 text-lg">
@@ -199,7 +199,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                 </Accordion>
             </div>
             <div id="right">
-                <div className="border-b py-4  text-3xl my-10 font-bold capitalize">
+                <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
                     Welcome to your Dashboard!
                 </div>
                 <div className="text-xl font-bold">
