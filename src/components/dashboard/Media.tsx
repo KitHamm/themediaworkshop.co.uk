@@ -177,19 +177,22 @@ export default function Media(props: {
     }
 
     return (
-        <div className={`${props.hidden ? "hidden" : ""} xl:mx-20 fade-in`}>
+        <div
+            className={`${
+                props.hidden ? "hidden" : ""
+            } xl:mx-20 mx-4 fade-in xl:pb-0 pb-20`}>
             <div className="xl:my-10 border-b py-4 mb-10 text-3xl font-bold capitalize">
                 Media
             </div>
             <div className="my-6">
                 <button
                     onClick={onOpenChangeUpload}
-                    className="px-10 py-4 rounded bg-orange-400">
+                    className="xl:px-10 xl:py-4 px-4 py-2 rounded bg-orange-400">
                     Upload Media
                 </button>
             </div>
-            <div className="hidden xl:flex xl:grid-cols-2 xl:gap-10">
-                <div className="w-full">
+            <div className="xl:flex xl:grid-cols-2 grid-cols-1 xl:gap-10">
+                <div className="xl:w-full">
                     <div className="flex justify-between border-b mb-5">
                         <div className="font-bold text-xl">Videos</div>
                         <i
@@ -198,7 +201,7 @@ export default function Media(props: {
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
                     </div>
-                    <div className="flex gap-4 mb-4">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4">
                         <Link
                             href={
                                 `?view=media&video=background&image=` +
@@ -242,7 +245,7 @@ export default function Media(props: {
                         </Link>
                     </div>
                     {/* Videos section */}
-                    <div className="xl:grid xl:grid-cols-4 xl:gap-4">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                         {videos.map((video: Videos, index: number) => {
                             if (
                                 (videoView === "background" &&
@@ -276,7 +279,7 @@ export default function Media(props: {
                                                     width={100}
                                                     src={"/images/play.png"}
                                                     alt="play"
-                                                    className="w-full h-auto m-auto"
+                                                    className="xl:w-full h-auto m-auto"
                                                 />
                                             </div>
                                             <div className="bg-neutral-800 bg-opacity-25">
@@ -309,7 +312,7 @@ export default function Media(props: {
                 </div>
                 {/* Images section */}
                 <div className="w-full">
-                    <div className="flex justify-between border-b mb-5">
+                    <div className="flex justify-between border-b mb-5 xl:mt-0 mt-6">
                         <div className="font-bold text-xl">Images</div>
                         <i
                             onClick={() => getImages()}
@@ -317,7 +320,7 @@ export default function Media(props: {
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
                     </div>
-                    <div className="flex gap-4 mb-4">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4">
                         <Link
                             href={
                                 `?view=media&video=` +
@@ -358,7 +361,7 @@ export default function Media(props: {
                             Case Study
                         </Link>
                     </div>
-                    <div className="xl:grid xl:grid-cols-4 xl:gap-2">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-2">
                         {images.map((image: Images, index: number) => {
                             if (
                                 (imageView === "header" &&
@@ -587,7 +590,7 @@ export default function Media(props: {
             </Modal>
             {/* Media upload modal */}
             <Modal
-                size="lg"
+                size="xl"
                 backdrop="blur"
                 isOpen={isOpenUpload}
                 className="dark"
@@ -596,13 +599,15 @@ export default function Media(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader>Upload New Media</ModalHeader>
+                            <ModalHeader className="flex justify-center">
+                                Upload New Media
+                            </ModalHeader>
                             <ModalBody>
                                 <div className="mx-auto">
                                     <div className="text-center text-2xl font-bold">
                                         Naming Conventions
                                     </div>
-                                    <div className="px-4">
+                                    <div className="px-4 xl:text-base text-sm">
                                         <div className=" mt-4">
                                             When uploading new media please
                                             follow these naming conventions to
@@ -620,41 +625,59 @@ export default function Media(props: {
                                             <strong>For example:</strong>{" "}
                                             HEADER_NameOfImage.ext
                                         </div>
-                                        <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
-                                            Images
-                                        </div>
-                                        <div>
-                                            <strong>Section Headers: </strong>
-                                            SEGHEAD_
-                                        </div>
-                                        <div>
-                                            <strong>Section Images: </strong>
-                                            SEGMENT_
-                                        </div>
-                                        <div>
-                                            <strong>Case Study Images: </strong>
-                                            STUDY_
-                                        </div>
-                                        <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
-                                            Videos
-                                        </div>
-                                        <div>
-                                            <strong>Background Videos: </strong>
-                                            HEADER_
-                                        </div>
-                                        <div>
-                                            <strong>Showreel Videos: </strong>
-                                            SHOWREEL_
-                                        </div>
-                                        <div>
-                                            <strong>
-                                                Year Review Videos:{" "}
-                                            </strong>
-                                            YEAR_
-                                        </div>
-                                        <div>
-                                            <strong>Case Study Videos: </strong>
-                                            STUDY_
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
+                                                    Images
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Section Headers:{" "}
+                                                    </strong>
+                                                    SEGHEAD_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Section Images:{" "}
+                                                    </strong>
+                                                    SEGMENT_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Case Study Images:{" "}
+                                                    </strong>
+                                                    STUDY_
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
+                                                    Videos
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Background Videos:{" "}
+                                                    </strong>
+                                                    HEADER_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Showreel Videos:{" "}
+                                                    </strong>
+                                                    SHOWREEL_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Year Review Videos:{" "}
+                                                    </strong>
+                                                    YEAR_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Case Study Videos:{" "}
+                                                    </strong>
+                                                    STUDY_
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -711,7 +734,7 @@ export default function Media(props: {
                                             uploadMedia();
                                         }}
                                         disabled={newUpload ? false : true}
-                                        className="ms-4 my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
+                                        className=" my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
                                         Upload
                                     </button>
                                     <button
@@ -719,7 +742,7 @@ export default function Media(props: {
                                             e.preventDefault();
                                             clearFileInput();
                                         }}
-                                        className="my-auto ms-4 bg-red-400 text-black rounded-md px-4 py-2">
+                                        className="my-auto  bg-red-400 text-black rounded-md px-4 py-2">
                                         Clear
                                     </button>
                                 </div>

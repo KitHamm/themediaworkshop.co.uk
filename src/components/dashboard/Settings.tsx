@@ -295,12 +295,14 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Settings
                 </div>
-                <Button
-                    className="py-2 px-4 xl:mt-10 mt-5 mb-5  bg-orange-400 rounded mb-5"
-                    onPress={onOpen}>
-                    Add User Account
-                </Button>
-                <div className="font-bold mb-5 text-xl">All Users</div>
+                {props.session.user.role === "ADMIN" && (
+                    <Button
+                        className="py-2 px-4 xl:mt-10 mt-5 bg-orange-400 rounded"
+                        onPress={onOpen}>
+                        Add User Account
+                    </Button>
+                )}
+                <div className="font-bold mb-5 mt-5 text-xl">All Users</div>
 
                 {/* Mobile Accordion */}
                 <div className="xl:hidden">
@@ -354,7 +356,7 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                         {user.role}
                                     </div>
                                     {props.session.user.role === "ADMIN" && (
-                                        <div className="flex justify-evenly my-2">
+                                        <div className="flex justify-end gap-2 my-2">
                                             <Button
                                                 onPress={() => {
                                                     setNewName(user.name);

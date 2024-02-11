@@ -8,6 +8,34 @@ export default function DashboardView(props: { hidden: boolean }) {
                 props.hidden ? "hidden" : ""
             } xl:mx-20 mx-4 pb-20 xl:pb-0 fade-in grid xl:grid-cols-2 grid-cols-1 xl:gap-10`}>
             <div id="left" className="grid xl:order-first order-last">
+                <div className="xl:hidden mt-4">
+                    <Accordion variant="splitted">
+                        <AccordionItem
+                            className="dark"
+                            key={1}
+                            aria-label="Pages"
+                            title={
+                                <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                                    Welcome to your Dashboard!
+                                </div>
+                            }>
+                            <div id="right">
+                                <div className="text-xl font-bold">
+                                    This will soon be populated with more
+                                    stuff...
+                                </div>
+                                <div className="text-lg mt-10">
+                                    But for now just poke around and try to
+                                    break it.
+                                </div>
+                                <div className="text-lg">
+                                    If you do manage to break it, let me know so
+                                    I can work on it!
+                                </div>
+                            </div>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
                 <div className="border-b py-4 text-3xl font-bold capitalize my-4 xl:my-10">
                     Information
                 </div>
@@ -198,7 +226,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                     </AccordionItem>
                 </Accordion>
             </div>
-            <div id="right">
+            <div className="hidden xl:block" id="right">
                 <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
                     Welcome to your Dashboard!
                 </div>
