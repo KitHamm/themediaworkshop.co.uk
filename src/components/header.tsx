@@ -114,11 +114,11 @@ export default function Header(props: {
                             </h1>
                         )}
 
-                        <div className="block xl:flex justify-evenly px-10 my-10 xl:my-4">
+                        <div className="block grid xl:grid-cols-3 xl:flex xl:justify-evenly grid-cols-1 gap-4 xl:gap-2 px-10 my-10 xl:my-4">
                             {props.showreel !== null &&
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
-                                <div className="my-2 xl:my-0">
+                                <div className="">
                                     <button
                                         onClick={onOpenChangeShowreel}
                                         className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
@@ -131,7 +131,7 @@ export default function Header(props: {
                             {props.year !== null &&
                             props.year !== undefined &&
                             props.year !== "" ? (
-                                <div className="my-2 xl:my-0">
+                                <div className="my-auto">
                                     <button
                                         onClick={onOpenChangeYear}
                                         className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
@@ -141,7 +141,7 @@ export default function Header(props: {
                             ) : (
                                 ""
                             )}
-                            <div className="my-2 xl:my-0">
+                            <div className="">
                                 <button
                                     onClick={onOpenChangeContact}
                                     className="font-bold bg-white px-2 py-1 xl:px-8 xl:py-3 text-black">

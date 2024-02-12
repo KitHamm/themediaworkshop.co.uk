@@ -17,6 +17,8 @@ export default function MainPage(props: { data: Page }) {
                     id="bg-video-container"
                     className="relative top-0 left-0 w-full h-screen overflow-hidden">
                     <video
+                        playsInline
+                        disablePictureInPicture
                         id="bg-video"
                         className="h-screen w-auto xl:w-full xl:h-auto fade-in"
                         autoPlay={true}

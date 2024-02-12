@@ -131,7 +131,7 @@ export default function PageSegment(props: {
             ) : (
                 ""
             )}
-            <div className="xl:grid grid-cols-1 xl:grid-cols-2 w-full px-10 xl:px-60 py-10">
+            <div className="grid grid-cols-1 xl:grid-cols-2 w-full px-10 xl:px-60 py-10">
                 {props.index % 2 === 0 ? (
                     <div className="text-center my-auto z-20">
                         <div className="uppercase font-bold text-3xl mb-4">
@@ -218,7 +218,7 @@ export default function PageSegment(props: {
                     </div>
                 </div>
                 {props.index % 2 !== 0 ? (
-                    <div className="text-center z-20 m-auto">
+                    <div className="text-center z-20 xl:m-auto mx-auto my-5 order-first xl:order-last">
                         <div className="uppercase font-bold mt-10 xl:mt-0 text-3xl mb-4">
                             {props.segment.title}
                         </div>
