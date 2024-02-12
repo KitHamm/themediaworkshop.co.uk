@@ -35,9 +35,12 @@ export default async function Dashboard() {
     });
     const emailHost: emailHost = await prisma.emailHost.findFirst();
     const messages: Message = await prisma.message.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
+        orderBy: [
+            {
+                createdAt: "desc",
+            },
+            { name: "asc" },
+        ],
     });
 
     return (
@@ -48,6 +51,7 @@ export default async function Dashboard() {
             </div>
             <div className="xl:basis-5/6 min-h-screen">
                 {/* Main dashboard panel with all views available */}
+
                 <DashboardMain
                     emailHost={emailHost.emailHost}
                     messages={messages}

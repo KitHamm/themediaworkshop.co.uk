@@ -76,13 +76,124 @@ export default function Messages(props: {
         <div
             className={`${
                 props.hidden ? "hidden" : ""
-            } xl:mx-20 mx-4 fade-in pb-20 xl:pb-0`}>
-            <div className="xl:my-10">
+            } xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 xl:h-screen flex flex-col`}>
+            <div className="xl:py-10 w-full">
                 <div className="border-b py-4 text-3xl font-bold capitalize">
                     Messages
                 </div>
             </div>
-            <div className="grid xl:grid-cols-4 xl:gap-10 gap-4 xl:mt-0 mt-4">
+            <div className="hidden h-full overflow-hidden xl:flex border-2 border-neutral-800 rounded mb-6">
+                <div className="basis-2/6 overflow-y-scroll dark">
+                    {messages.map((message: Message, index: number) => {
+                        return (
+                            <div
+                                key={index}
+                                onClick={() => {
+                                    setSelectedMessage(index);
+                                    updateMessage(message.id, true);
+                                }}
+                                className={`${
+                                    message.read
+                                        ? " bg-neutral-800"
+                                        : " bg-neutral-600"
+                                } py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}>
+                                <div
+                                    className={`font-bold ${
+                                        message.read
+                                            ? "text-neutral-600"
+                                            : "text-green-400"
+                                    } my-auto`}>
+                                    {message.read ? "Read" : "New"}
+                                </div>
+                                <div>
+                                    <div className="font-bold capitalize my-auto text-xl">
+                                        {message.name}
+                                    </div>
+                                    <div className="text-sm text-neutral-400">
+                                        {message.email}
+                                    </div>
+                                </div>
+                                <div className="flex grow text-neutral-400  justify-end">
+                                    {message.createdAt.toLocaleDateString()}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="basis-4/6 p-4">
+                    {selectedMessage !== -1 ? (
+                        <>
+                            <div className="flex w-full gap-6 p-4">
+                                <div className="font-bold">Actions:</div>
+                                <div
+                                    onClick={() => {
+                                        onOpenChangeDeleteModal();
+                                    }}
+                                    className="text-red-400 cursor-pointer">
+                                    Delete
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        updateMessage(
+                                            messages[selectedMessage].id,
+                                            false
+                                        );
+                                        setSelectedMessage(-1);
+                                    }}
+                                    className="text-orange-400 cursor-pointer">
+                                    Mark as unread
+                                </div>
+                                <a
+                                    href={
+                                        "mailto:" +
+                                        messages[selectedMessage].email
+                                    }
+                                    className="text-green-400">
+                                    Reply
+                                </a>
+                                <div className="flex grow justify-end">
+                                    <div
+                                        onClick={() => setSelectedMessage(-1)}
+                                        className="transition-all flex hover:bg-neutral-800 rounded-full p-1">
+                                        <i
+                                            aria-hidden
+                                            className="fa-regular text-neutral-400 hover:text-neutral-500 m-auto cursor-pointer text-3xl fa-circle-xmark"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex w-full gap-2 px-4">
+                                    <div className="font-bold text-base">
+                                        From:
+                                    </div>
+                                    <div className="text-base">
+                                        {messages[selectedMessage].name}
+                                    </div>
+                                </div>
+                                <div className="flex w-full gap-2 px-4">
+                                    <div className="font-bold text-base">
+                                        Email:
+                                    </div>
+                                    <div className="text-base">
+                                        {messages[selectedMessage].email}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mx-4 mt-4 bg-white text-black rounded-lg p-4">
+                                {messages[selectedMessage].message}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex h-full justify-center">
+                            <div className="my-auto font-bold text-3xl">
+                                Select a message...
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div className="grid xl:hidden xl:grid-cols-4 xl:gap-10 gap-4 xl:mt-0 mt-4">
                 {messages.map((message: Message, index: number) => {
                     return (
                         <div
