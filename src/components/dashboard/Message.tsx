@@ -104,6 +104,18 @@ export default function Messages(props: {
             .catch((err) => console.log(err));
     }
 
+    async function selectAll() {
+        if (multipleMessages.length === props.messages.length) {
+            setMultipleMessages([]);
+        } else {
+            var temp = [];
+            for (let index = 0; index < props.messages.length; index++) {
+                temp.push(props.messages[index].id);
+            }
+            setMultipleMessages(temp);
+        }
+    }
+
     return (
         <div
             className={`${
@@ -146,9 +158,17 @@ export default function Messages(props: {
                 </div>
             </div>
             <div className="flex gap-2">
-                {/* <div className="py-2 text-lg">
-                    {multipleMessages.length} Messages Selected
-                </div> */}
+                <Checkbox
+                    color="success"
+                    onChange={() => selectAll()}
+                    isSelected={
+                        multipleMessages.length === props.messages.length
+                    }
+                    className="dark mb-2 ms-2">
+                    {multipleMessages.length === props.messages.length
+                        ? "Unselect All"
+                        : "Select All"}
+                </Checkbox>
             </div>
             <div className="hidden h-full overflow-hidden xl:flex border-2 border-neutral-800 rounded mb-6">
                 <div className="basis-2/6 overflow-y-scroll dark">
