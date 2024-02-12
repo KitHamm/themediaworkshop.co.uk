@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     const json = await request.json();
 
-    const deleted = await prisma.message.delete({
-        where: { id: json.id },
+    const deleted = await prisma.message.deleteMany({
+        where: { id: { in: json.id } },
     });
 
     return new NextResponse(JSON.stringify({ message: "Deleted" }), {

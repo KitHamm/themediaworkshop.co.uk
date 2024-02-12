@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const json = await request.json();
-    const updated = await prisma.message.update({
+    const updated = await prisma.message.updateMany({
         where: {
-            id: json.id,
+            id: { in: json.id },
         },
         data: {
             read: json.value,

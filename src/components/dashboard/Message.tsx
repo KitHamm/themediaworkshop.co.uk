@@ -9,6 +9,7 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
+    Checkbox,
 } from "@nextui-org/react";
 
 // React Components
@@ -26,6 +27,8 @@ export default function Messages(props: {
     const [messages, setMessages] = useState<Message[]>([]);
     // State for the selected message to view in modal
     const [selectedMessage, setSelectedMessage] = useState(-1);
+    // State for multiple selected messages for actions
+    const [multipleMessages, setMultipleMessages] = useState<string[]>([]);
     // Modal declarations
     // Message view modal
     const {
@@ -45,10 +48,25 @@ export default function Messages(props: {
         setMessages(props.messages);
     }, [props.messages]);
 
+    async function deleteMultipleMessage() {
+        await fetch("/api/deletemessage", {
+            method: "POST",
+            body: JSON.stringify({ id: multipleMessages }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    props.revalidateDashboard("/dashboard");
+                    setSelectedMessage(-1);
+                    setMultipleMessages([]);
+                }
+            })
+            .catch((err: any) => console.log(err));
+    }
+
     async function deleteMessage(id: string) {
         await fetch("/api/deletemessage", {
             method: "POST",
-            body: JSON.stringify({ id: id }),
+            body: JSON.stringify({ id: [id] }),
         })
             .then((res) => {
                 if (res.ok) {
@@ -59,10 +77,24 @@ export default function Messages(props: {
             .catch((err: any) => console.log(err));
     }
 
+    async function updateMultipleMessage(value: boolean) {
+        await fetch("/api/updatemessage", {
+            method: "POST",
+            body: JSON.stringify({ id: multipleMessages, value: value }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    props.revalidateDashboard("/");
+                    setMultipleMessages([]);
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
     async function updateMessage(id: string, value: boolean) {
         await fetch("/api/updatemessage", {
             method: "POST",
-            body: JSON.stringify({ id: id, value: value }),
+            body: JSON.stringify({ id: [id], value: value }),
         })
             .then((res) => {
                 if (res.ok) {
@@ -78,9 +110,45 @@ export default function Messages(props: {
                 props.hidden ? "hidden" : ""
             } xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 xl:h-screen flex flex-col`}>
             <div className="xl:py-10 w-full">
-                <div className="border-b py-4 text-3xl font-bold capitalize">
-                    Messages
+                <div className="border-b flex gap-10 w-full py-4">
+                    <div className="text-3xl font-bold capitalize">
+                        Messages
+                    </div>
+                    <div className="mt-auto">
+                        {multipleMessages.length > 0 && (
+                            <div className="fade-in flex gap-4">
+                                <div
+                                    onClick={() => {
+                                        deleteMultipleMessage();
+                                    }}
+                                    className="mt-auto text-lg text-red-400 cursor-pointer">
+                                    Delete {multipleMessages.length} Message(s)
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        updateMultipleMessage(false);
+                                    }}
+                                    className="mt-auto text-lg text-orange-400 cursor-pointer">
+                                    Mark {multipleMessages.length} Message(s)
+                                    Unread
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        updateMultipleMessage(true);
+                                    }}
+                                    className="mt-auto text-lg text-green-400 cursor-pointer">
+                                    Mark {multipleMessages.length} Message(s)
+                                    Read
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
+            </div>
+            <div className="flex gap-2">
+                {/* <div className="py-2 text-lg">
+                    {multipleMessages.length} Messages Selected
+                </div> */}
             </div>
             <div className="hidden h-full overflow-hidden xl:flex border-2 border-neutral-800 rounded mb-6">
                 <div className="basis-2/6 overflow-y-scroll dark">
@@ -93,27 +161,66 @@ export default function Messages(props: {
                                     updateMessage(message.id, true);
                                 }}
                                 className={`${
-                                    message.read
+                                    index === selectedMessage
+                                        ? "bg-orange-400"
+                                        : message.read
                                         ? " bg-neutral-800"
                                         : " bg-neutral-600"
-                                } py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}>
-                                <div
-                                    className={`font-bold ${
-                                        message.read
-                                            ? "text-neutral-600"
-                                            : "text-green-400"
-                                    } my-auto`}>
-                                    {message.read ? "Read" : "New"}
+                                } fade-in py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}>
+                                <div className="flex gap-2">
+                                    <Checkbox
+                                        color="success"
+                                        isSelected={multipleMessages.includes(
+                                            message.id
+                                        )}
+                                        onChange={() => {
+                                            if (
+                                                !multipleMessages.includes(
+                                                    message.id
+                                                )
+                                            ) {
+                                                setMultipleMessages([
+                                                    ...multipleMessages,
+                                                    message.id,
+                                                ]);
+                                            } else {
+                                                setMultipleMessages(
+                                                    multipleMessages.filter(
+                                                        (id) =>
+                                                            id !== message.id
+                                                    )
+                                                );
+                                            }
+                                        }}
+                                    />
+                                    <div
+                                        className={`font-bold ${
+                                            message.read
+                                                ? "text-neutral-600"
+                                                : "text-green-400"
+                                        } my-auto`}>
+                                        {message.read ? "Read" : "New"}
+                                    </div>
                                 </div>
                                 <div>
                                     <div className="font-bold capitalize my-auto text-xl">
                                         {message.name}
                                     </div>
-                                    <div className="text-sm text-neutral-400">
+                                    <div
+                                        className={`text-sm transition-all ${
+                                            index === selectedMessage
+                                                ? "text-white"
+                                                : "text-neutral-400"
+                                        }`}>
                                         {message.email}
                                     </div>
                                 </div>
-                                <div className="flex grow text-neutral-400  justify-end">
+                                <div
+                                    className={`${
+                                        index === selectedMessage
+                                            ? "text-white"
+                                            : "text-neutral-400"
+                                    } flex grow justify-end transition-all`}>
                                     {message.createdAt.toLocaleDateString()}
                                 </div>
                             </div>
