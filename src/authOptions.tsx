@@ -56,9 +56,10 @@ export const authOptions: NextAuthOptions = {
             },
         }),
     ],
-    // pages: {
-    //     signIn: "/signin",
-    // },
+    pages: {
+        signIn: "/signin",
+        error: "/login",
+    },
     callbacks: {
         session: ({ session, token }) => {
             return {
