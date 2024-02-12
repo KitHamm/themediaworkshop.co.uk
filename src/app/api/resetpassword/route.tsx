@@ -20,6 +20,7 @@ const transporter = nodemailer.createTransport({
 export async function POST(request: Request) {
     const json = await request.json();
     const hashedPassword = await hash(json.password, 12);
+    const emailHost = await prisma.emailHost.findFirst();
     const adminUser = await prisma.user.findUnique({
         where: {
             id: json.adminId,
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
         const mail = await transporter.sendMail({
             from: "TMW Website",
             to: user.email,
-            replyTo: process.env.SMTP_EMAIL,
+            replyTo: emailHost.emailHost,
             subject: `Password Reset`,
             html: `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

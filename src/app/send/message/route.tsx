@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
     const json = await request.json();
-
+    const emailHost = await prisma.emailHost.findFirst();
     const created = await prisma.message.create({
         data: json,
     });
@@ -27,8 +27,8 @@ export async function POST(request: Request) {
     try {
         const mail = await transporter.sendMail({
             from: "Website",
-            to: process.env.SMTP_EMAIL,
-            replyTo: process.env.SMTP_EMAIL,
+            to: emailHost.emailHost,
+            replyTo: emailHost.emailHost,
             subject: `New Contact Form Message`,
             html: `
                         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

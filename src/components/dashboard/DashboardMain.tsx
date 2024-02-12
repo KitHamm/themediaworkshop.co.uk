@@ -23,7 +23,7 @@ import Pages from "./Pages/Pages";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Message, Page } from "@prisma/client";
+import { Message, Page, emailHost } from "@prisma/client";
 import { useEffect } from "react";
 
 export default function DashboardMain(props: {
@@ -31,6 +31,7 @@ export default function DashboardMain(props: {
     revalidateDashboard: any;
     session: any;
     messages: Message;
+    emailHost: emailHost;
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -39,7 +40,6 @@ export default function DashboardMain(props: {
         ? searchParams.get("view")!
         : "dashboard";
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
     // Initial pop up if this is the first log in
     useEffect(() => {
         checkActivation();
@@ -104,6 +104,8 @@ export default function DashboardMain(props: {
 
             {/* Settings view */}
             <Settings
+                revalidateDashboard={props.revalidateDashboard}
+                emailHost={props.emailHost}
                 session={props.session}
                 hidden={view === "settings" ? false : true}
             />

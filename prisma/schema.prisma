@@ -82,3 +82,7 @@ model Videos {
     name String @unique
     createdAt DateTime @default(now())
 }
+
+model emailHost {
+    emailHost String @unique @default("kit@themediaworkshop.co.uk")
+}

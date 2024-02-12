@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import SidePanel from "@/components/dashboard/SidePanel";
 import DashboardMain from "@/components/dashboard/DashboardMain";
 //  Types
-import { Message, Page } from "@prisma/client";
+import { Message, Page, emailHost } from "@prisma/client";
 //  Functions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
@@ -33,7 +33,7 @@ export default async function Dashboard() {
             },
         },
     });
-
+    const emailHost: emailHost = await prisma.emailHost.findFirst();
     const messages: Message = await prisma.message.findMany({
         orderBy: {
             createdAt: "desc",
@@ -49,6 +49,7 @@ export default async function Dashboard() {
             <div className="xl:basis-5/6 min-h-screen">
                 {/* Main dashboard panel with all views available */}
                 <DashboardMain
+                    emailHost={emailHost.emailHost}
                     messages={messages}
                     revalidateDashboard={revalidateDashboard}
                     session={session}

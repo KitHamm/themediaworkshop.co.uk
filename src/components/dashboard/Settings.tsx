@@ -40,9 +40,14 @@ type PasswordFormValues = {
 
 // Function
 import uploadHandler from "./uploadHandler";
-import { User } from "@prisma/client";
+import { User, emailHost } from "@prisma/client";
 
-export default function Settings(props: { hidden: boolean; session: any }) {
+export default function Settings(props: {
+    hidden: boolean;
+    session: any;
+    emailHost: emailHost;
+    revalidateDashboard: any;
+}) {
     // Initial Users
     const [users, setUsers] = useState<User>([]);
 
@@ -81,6 +86,9 @@ export default function Settings(props: { hidden: boolean; session: any }) {
     const [newEmail, setNewEmail] = useState("");
     const [newRole, setNewRole] = useState("");
     const [newPosition, setNewPosition] = useState("");
+
+    // Settings states
+    const [emailHost, setEmailHost] = useState(props.emailHost);
 
     // Disclosure for delete user warning
     const {
@@ -183,6 +191,25 @@ export default function Settings(props: { hidden: boolean; session: any }) {
         if (inputElm) {
             inputElm.value = "";
         }
+    }
+
+    // Update the email host
+    async function updateEmailHost() {
+        fetch("/api/emailhost", {
+            method: "POST",
+            body: JSON.stringify({
+                old: props.emailHost,
+                data: {
+                    emailHost: emailHost,
+                },
+            }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    props.revalidateDashboard("/api/emailhost");
+                }
+            })
+            .catch((err) => console.log(err));
     }
 
     // Submit user to database and retrieve password to display one time
@@ -296,11 +323,49 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                     Settings
                 </div>
                 {props.session.user.role === "ADMIN" && (
-                    <Button
-                        className="py-2 px-4 xl:mt-10 mt-5 bg-orange-400 rounded"
-                        onPress={onOpen}>
-                        Add User Account
-                    </Button>
+                    <>
+                        <div className="">
+                            <div className="mt-5 font-bold text-xl">
+                                Notification Email:
+                            </div>
+                            <div className="grid gap-2 xl:flex xl:gap-4">
+                                <div className="flex gap-4">
+                                    <input
+                                        value={emailHost}
+                                        onChange={(e) =>
+                                            setEmailHost(e.target.value)
+                                        }
+                                        className="text-black xl:min-w-80"
+                                        type="email"
+                                    />
+                                    <div
+                                        onClick={() => {
+                                            if (emailHost !== props.emailHost) {
+                                                updateEmailHost();
+                                            }
+                                        }}
+                                        className={`${
+                                            emailHost !== props.emailHost
+                                                ? "text-orange-400 cursor-pointer"
+                                                : "text-neutral-400 cursor-not-allowed"
+                                        } xl:my-auto my-5`}>
+                                        Set
+                                    </div>
+                                </div>
+                                <em className="text-neutral-500 my-auto xl:ms-10">
+                                    This is the email address that you will
+                                    receive notifications of new messages on. It
+                                    will also appear as the sender email on
+                                    outgoing messages.
+                                </em>
+                            </div>
+                        </div>
+                        <Button
+                            className="py-2 px-4 xl:mt-10 mt-5 bg-orange-400 rounded"
+                            onPress={onOpen}>
+                            Add User Account
+                        </Button>
+                    </>
                 )}
                 <div className="font-bold mb-5 mt-5 text-xl">All Users</div>
 

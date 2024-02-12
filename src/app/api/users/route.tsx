@@ -44,6 +44,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     const json = await request.json();
     const hashedPassword = await hash(json.password, 12);
+    const emailHost = await prisma.emailHost.findFirst();
     try {
         await prisma.user.create({
             data: {
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
             const mail = await transporter.sendMail({
                 from: "TMW Website",
                 to: json.email,
-                replyTo: process.env.SMTP_EMAIL,
+                replyTo: emailHost.emailHost,
                 subject: `New Account Created!`,
                 html: `
                 
