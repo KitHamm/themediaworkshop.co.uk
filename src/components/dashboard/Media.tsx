@@ -201,7 +201,7 @@ export default function Media(props: {
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
                     </div>
-                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4 text-center">
                         <Link
                             href={
                                 `?view=media&video=background&image=` +
@@ -320,7 +320,7 @@ export default function Media(props: {
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
                     </div>
-                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4">
+                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4 text-center">
                         <Link
                             href={
                                 `?view=media&video=` +
