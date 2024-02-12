@@ -8,9 +8,9 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-    title: "The Media Workshop",
+    title: "The Media Workshop Ltd",
     description:
-        "The Media Workshop is made up of a wide network of digital specialists, producers and creative professionals with a vast level of experience in a range of specialist areas. We are built around an ethos of creative innovation, developing the potential in technology for a range of clients and markets.",
+        "The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
 };
 
 export default function RootLayout({

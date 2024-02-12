@@ -464,36 +464,42 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                     <td scope="col" className="px-6 py-4">
                                         {user.role}
                                     </td>
-                                    {props.session.user.role === "ADMIN" && (
-                                        <td
-                                            onClick={() => {
-                                                setNewName(user.name);
-                                                setNewEmail(user.email);
-                                                setNewRole(user.role);
-                                                setNewPosition(user.position);
-                                                setUserId(user.id);
-                                                setUserResetId(user.id);
-                                                OnOpenEditUser();
-                                            }}
-                                            scope="col"
-                                            className="px-6 py-2 text-orange-400 cursor-pointer">
-                                            Edit
-                                        </td>
-                                    )}
-                                    {props.session.user.role === "ADMIN" &&
-                                    user.id !== props.session.user.id ? (
-                                        <td
-                                            onClick={() => {
-                                                setUserId(user.id);
-                                                deleteOnOpen();
-                                            }}
-                                            scope="col"
-                                            className="px-6 py-4 text-red-400 cursor-pointer">
-                                            Delete
-                                        </td>
-                                    ) : (
-                                        ""
-                                    )}
+
+                                    <td scope="col">
+                                        {props.session.user.role ===
+                                            "ADMIN" && (
+                                            <div
+                                                onClick={() => {
+                                                    setNewName(user.name);
+                                                    setNewEmail(user.email);
+                                                    setNewRole(user.role);
+                                                    setNewPosition(
+                                                        user.position
+                                                    );
+                                                    setUserId(user.id);
+                                                    setUserResetId(user.id);
+                                                    OnOpenEditUser();
+                                                }}
+                                                className="px-6 py-2 text-orange-400 cursor-pointer">
+                                                Edit
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td scope="col">
+                                        {props.session.user.role === "ADMIN" &&
+                                        user.id !== props.session.user.id ? (
+                                            <div
+                                                onClick={() => {
+                                                    setUserId(user.id);
+                                                    deleteOnOpen();
+                                                }}
+                                                className="px-6 py-4 text-red-400 cursor-pointer">
+                                                Delete
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </td>
                                 </tr>
                             );
                         })}
@@ -600,12 +606,15 @@ export default function Settings(props: { hidden: boolean; session: any }) {
                                                         : "Email"
                                                 }
                                                 type="email"
-                                                {...register("email", {
-                                                    validate: (value) =>
-                                                        value.split("@")[1] ===
-                                                            "themediaworkshop.co.uk" ||
-                                                        "Email needs to be a TMW domain email. Eg: someone@themediaworkshop.co.uk",
-                                                })}
+                                                {...register(
+                                                    "email"
+                                                    // , {
+                                                    //     validate: (value) =>
+                                                    //         value.split("@")[1] ===
+                                                    //             "themediaworkshop.co.uk" ||
+                                                    //         "Email needs to be a TMW domain email. Eg: someone@themediaworkshop.co.uk",
+                                                    // }
+                                                )}
                                             />
                                             {errors.email && (
                                                 <p className="text-red-400 mb-4">
