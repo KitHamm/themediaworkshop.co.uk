@@ -218,11 +218,11 @@ export default function PageSegment(props: {
                     </div>
                 </div>
                 {props.index % 2 !== 0 ? (
-                    <div className="text-center z-20 xl:m-auto mx-auto my-5 order-first xl:order-last">
-                        <div className="uppercase font-bold mt-10 xl:mt-0 text-3xl mb-4">
+                    <div className="text-center z-20 xl:m-auto mx-auto order-first xl:order-last">
+                        <div className="uppercase font-bold xl:mt-0 text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-lg">
+                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
                             {props.segment.copy}
                         </div>
                         {props.segment.casestudy.length > 0 && (

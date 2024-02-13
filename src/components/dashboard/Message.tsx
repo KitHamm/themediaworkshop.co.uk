@@ -157,7 +157,7 @@ export default function Messages(props: {
                     </div>
                 </div>
             </div>
-            <div className="flex gap-2">
+            <div className="hidden xl:flex gap-2">
                 <Checkbox
                     color="success"
                     onChange={() => selectAll()}

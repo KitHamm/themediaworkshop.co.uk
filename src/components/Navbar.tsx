@@ -5,8 +5,8 @@ import Link from "next/link";
 export default function Navbar(props: { active: string }) {
     return (
         <>
-            <nav className="hidden xl:block fixed z-40 bg-black top-0 w-full">
-                <ul className="flex justify-evenly w-4/6 mx-auto uppercase font-normal py-3 text-2xl">
+            <nav className="fixed z-40 bg-black bottom-0 xl:bottom-auto xl:border-t-0 border-t border-orange-400 xl:top-0 w-full">
+                <ul className="flex justify-evenly xl:w-4/6 mx-auto uppercase font-bold xl:font-normal xl:py-3 pt-3 pb-4 text-base xl:text-2xl">
                     <li
                         className={`${
                             props.active === "home" ? "text-orange-600" : ""
@@ -111,7 +111,8 @@ export default function Navbar(props: { active: string }) {
                     </li>
                 </ul>
             </nav>
-            <nav className="xl:hidden block fixed z-40 bg-neutral-900 border-t border-orange-400 bottom-0 w-full">
+            {/* Mobile Nav */}
+            {/* <nav className="hidden fixed z-40 bg-neutral-900 border-t border-orange-400 bottom-0 w-full">
                 <ul className="flex justify-evenly w-full uppercase font-bold py-4 text-md">
                     <li
                         className={`${
@@ -216,7 +217,7 @@ export default function Navbar(props: { active: string }) {
                         </Link>
                     </li>
                 </ul>
-            </nav>
+            </nav> */}
         </>
     );
 }

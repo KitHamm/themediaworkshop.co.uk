@@ -90,7 +90,7 @@ export default function Header(props: {
     return (
         <>
             <div className="bg-black bg-opacity-30 xl:bg-opacity-0 flex absolute top-0 left-0 z-20 xl:grid xl:grid-cols-2 h-full">
-                <div className="m-auto xl:m-0 flex w-5/6 xl:w-auto justify-center">
+                <div className="m-auto xl:m-0 flex w-full xl:w-auto justify-center">
                     <div className="m-auto text-center w-full xl:w-2/3">
                         {props.home ? (
                             <>
@@ -105,7 +105,7 @@ export default function Header(props: {
                                     id="title-logo"
                                     height={75}
                                     width={720}
-                                    className="w-full xl:w-3/4 h-auto mx-auto mt-2"
+                                    className="w-11/12 xl:w-3/4 h-auto mx-auto mt-2"
                                 />
                             </>
                         ) : (
@@ -114,14 +114,14 @@ export default function Header(props: {
                             </h1>
                         )}
 
-                        <div className="block grid xl:grid-cols-3 xl:flex xl:justify-evenly grid-cols-1 gap-4 xl:gap-2 px-10 my-10 xl:my-4">
+                        <div className="block grid xl:grid-cols-3 xl:flex xl:justify-evenly grid-cols-1 gap-4 xl:gap-2 xl:px-10 my-10 xl:my-4">
                             {props.showreel !== null &&
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <div className="">
                                     <button
                                         onClick={onOpenChangeShowreel}
-                                        className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
+                                        className="font-bold bg-orange-600 max-w-52 text-sm w-full xl:w-auto py-2 xl:px-8 xl:py-3">
                                         SHOWREEL
                                     </button>
                                 </div>
@@ -134,7 +134,7 @@ export default function Header(props: {
                                 <div className="my-auto">
                                     <button
                                         onClick={onOpenChangeYear}
-                                        className="font-bold bg-orange-600 px-2 py-1 xl:px-8 xl:py-3">
+                                        className="font-bold bg-orange-600 max-w-52 w-full text-sm xl:w-auto py-2 xl:px-8 xl:py-3">
                                         YEAR REVIEW
                                     </button>
                                 </div>
@@ -144,12 +144,12 @@ export default function Header(props: {
                             <div className="">
                                 <button
                                     onClick={onOpenChangeContact}
-                                    className="font-bold bg-white px-2 py-1 xl:px-8 xl:py-3 text-black">
+                                    className="font-bold bg-white max-w-52 w-full xl:w-auto text-sm py-2 xl:px-8 xl:py-3 text-black">
                                     CONTACT
                                 </button>
                             </div>
                         </div>
-                        <p className="text-justify text-md xl:text-lg">
+                        <p className="bg-black shadow-2xl px-4 py-4 xl:py-0 xl:bg-opacity-0 bg-opacity-25 xl:shadow-none xl:backdrop-blur-none backdrop-blur-sm text-justify text-md xl:text-lg">
                             {props?.description}
                         </p>
                     </div>
