@@ -123,7 +123,7 @@ export default function Header(props: {
                                 <div className="">
                                     <button
                                         onClick={onOpenChangeShowreel}
-                                        className="font-bold bg-orange-600 max-w-52 text-sm w-full xl:w-auto py-2 xl:px-8 xl:py-3">
+                                        className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 font-bold bg-orange-600 max-w-52 text-sm w-full xl:w-auto py-2 xl:px-8 xl:py-3">
                                         SHOWREEL
                                     </button>
                                 </div>
@@ -136,7 +136,7 @@ export default function Header(props: {
                                 <div className="my-auto">
                                     <button
                                         onClick={onOpenChangeYear}
-                                        className="font-bold bg-orange-600 max-w-52 w-full text-sm xl:w-auto py-2 xl:px-8 xl:py-3">
+                                        className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 font-bold bg-orange-600 max-w-52 w-full text-sm xl:w-auto py-2 xl:px-8 xl:py-3">
                                         YEAR REVIEW
                                     </button>
                                 </div>
@@ -146,7 +146,7 @@ export default function Header(props: {
                             <div className="">
                                 <button
                                     onClick={onOpenChangeContact}
-                                    className="font-bold bg-white max-w-52 w-full xl:w-auto text-sm py-2 xl:px-8 xl:py-3 text-black">
+                                    className="transition-all hover:bg-opacity-0 hover:text-white border border-white bg-opacity-90 font-bold bg-white max-w-52 w-full xl:w-auto text-sm py-2 xl:px-8 xl:py-3 text-black">
                                     CONTACT
                                 </button>
                             </div>

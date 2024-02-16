@@ -145,7 +145,7 @@ export default function PageSegment(props: {
                             <div className="xl:text-center xl:mt-4">
                                 <button
                                     onClick={onOpenChangeCaseStudy}
-                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                    className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
                                     {props.segment.buttonText
                                         ? props.segment.buttonText
                                         : "Examples"}
@@ -232,7 +232,7 @@ export default function PageSegment(props: {
                             <div className="text-center xl:mt-4">
                                 <button
                                     onClick={onOpenChangeCaseStudy}
-                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                    className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
                                     {props.segment.buttonText
                                         ? props.segment.buttonText
                                         : "Examples"}
