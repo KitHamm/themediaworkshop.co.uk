@@ -9,7 +9,11 @@ import {
     useDisclosure,
     CircularProgress,
     Chip,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@nextui-org/react";
+import Markdown from "react-markdown";
 
 // React Components
 import { useState, useEffect } from "react";
@@ -41,6 +45,8 @@ export default function NewCaseStudy(props: {
     const [availableImages, setAvailableImages] = useState<string[]>([]);
     const [availableVideos, setAvailableVideos] = useState<string[]>([]);
 
+    // State for preview description text
+    const [previewText, setPreviewText] = useState(false);
     // State for if there are unsaved changes
     const [unsavedChanges, setUnsavedChanges] = useState(false);
 
@@ -239,7 +245,7 @@ export default function NewCaseStudy(props: {
                             </div>
                             <button
                                 onClick={handleUpdate}
-                                className="my-auto bg-orange-400 xl:px-4 xl:py-2 px-2 py-1 rounded">
+                                className="my-auto bg-orange-600 xl:px-4 xl:py-2 px-2 py-1 rounded">
                                 Submit
                             </button>
                         </div>
@@ -329,7 +335,7 @@ export default function NewCaseStudy(props: {
                                                     onOpenVideoSelect();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -345,7 +351,7 @@ export default function NewCaseStudy(props: {
                                                     onOpenVideoSelect();
                                                     getVideos();
                                                 }}
-                                                className="px-10 py-2 bg-orange-400 rounded m-auto">
+                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -362,16 +368,66 @@ export default function NewCaseStudy(props: {
                                     setTitle(e.target.value);
                                 }}
                             />
-                            <div className="font-bold text-2xl mt-5">
-                                Detail:
+                            <div>
+                                <div className="flex gap-4 w-full mt-5">
+                                    <div className="font-bold text-2xl">
+                                        Detail:
+                                    </div>
+                                    <Popover
+                                        className="dark"
+                                        placement="right-end">
+                                        <PopoverTrigger>
+                                            <i
+                                                aria-hidden
+                                                className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                            />
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <div className="text-left p-2 xl:w-96">
+                                                <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                    Text Info
+                                                </div>
+                                                <p className="mb-2">
+                                                    The text is rendered using
+                                                    Markdown. This means that
+                                                    you can add headers, links,
+                                                    and line breaks
+                                                </p>
+                                                <p className="mb-2">
+                                                    **Header** (bold text)
+                                                </p>
+                                                <p className="mb-2">
+                                                    [Link Text
+                                                    Here](https://link-here.com/)
+                                                </p>
+                                                <p>New line\</p>
+                                                <p>\</p>
+                                                <p>New Paragraph</p>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <button
+                                        onClick={() =>
+                                            setPreviewText(!previewText)
+                                        }
+                                        className="text-orange-600 cursor-pointer">
+                                        {previewText ? "Edit" : "Preview"}
+                                    </button>
+                                </div>
+                                {previewText ? (
+                                    <div className="min-h-80">
+                                        <Markdown>{copy}</Markdown>
+                                    </div>
+                                ) : (
+                                    <textarea
+                                        className="h-80"
+                                        value={copy}
+                                        onChange={(e) => {
+                                            setCopy(e.target.value);
+                                        }}
+                                    />
+                                )}
                             </div>
-                            <textarea
-                                className="h-80"
-                                value={copy}
-                                onChange={(e) => {
-                                    setCopy(e.target.value);
-                                }}
-                            />
                             <div className="flex justify-between mt-5">
                                 <div className="font-bold text-2xl mt-auto">
                                     Tags:
@@ -412,7 +468,7 @@ export default function NewCaseStudy(props: {
                                             setNewTag("");
                                         }
                                     }}
-                                    className="my-auto px-4 py-2 bg-orange-400 rounded">
+                                    className="my-auto px-4 py-2 bg-orange-600 rounded">
                                     Add
                                 </button>
                             </div>
@@ -566,7 +622,7 @@ export default function NewCaseStudy(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
                                                                 Select
                                                             </button>
                                                         </div>

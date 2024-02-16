@@ -15,7 +15,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                             key={1}
                             aria-label="Pages"
                             title={
-                                <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                                <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
                                     Welcome to your Dashboard!
                                 </div>
                             }>
@@ -45,7 +45,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                         key={1}
                         aria-label="Pages"
                         title={
-                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
                                 Pages
                             </div>
                         }>
@@ -103,7 +103,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                         key={2}
                         aria-label="Media"
                         title={
-                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
                                 Media
                             </div>
                         }>
@@ -183,7 +183,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                         key={3}
                         aria-label="Messages"
                         title={
-                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
                                 Messages
                             </div>
                         }>
@@ -205,7 +205,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                         key={4}
                         aria-label="Settings"
                         title={
-                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-400">
+                            <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
                                 Settings
                             </div>
                         }>

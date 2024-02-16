@@ -8,6 +8,9 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
 } from "@nextui-org/react";
 
 // React Components
@@ -25,6 +28,7 @@ import { CaseStudy, Images, Segment } from "@prisma/client";
 
 // Functions
 import uploadHandler from "../uploadHandler";
+import Markdown from "react-markdown";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -56,11 +60,16 @@ export default function EditSegment(props: {
     const [headerImage, setHeaderImage] = useState(
         props.segment.headerimage ? props.segment.headerimage : ""
     );
+    const [buttonText, setButtonText] = useState(
+        props.segment.buttonText ? props.segment.buttonText : ""
+    );
 
     // Segment order state
     const [order, setOrder] = useState<number>(
         props.segment.order ? props.segment.order : 0
     );
+    // State for description preview
+    const [previewText, setPreviewText] = useState(false);
 
     // State for if there are unsaved changes on the segment
     const [changes, setChanges] = useState(false);
@@ -110,18 +119,21 @@ export default function EditSegment(props: {
             copy !== props.segment.copy ||
             JSON.stringify(images) !== JSON.stringify(props.segment.image) ||
             headerImage !== props.segment.headerimage ||
-            order !== parseInt(props.segment.order)
+            order !== parseInt(props.segment.order) ||
+            buttonText !== props.segment.buttonText
         ) {
             setChanges(true);
         } else {
             setChanges(false);
         }
     }, [
+        buttonText,
         order,
         title,
         copy,
         JSON.stringify(images),
         headerImage,
+        props.segment.buttonText,
         props.segment.order,
         props.segment.title,
         props.segment.copy,
@@ -141,6 +153,7 @@ export default function EditSegment(props: {
     // Pre populate information for segment update
     function handleUpdate() {
         const json = {
+            buttonText: buttonText,
             title: title,
             copy: copy,
             headerimage: headerImage,
@@ -270,14 +283,14 @@ export default function EditSegment(props: {
                             onClick={() => {
                                 updatePublished(true);
                             }}
-                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-orange-400">
+                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-orange-600">
                             PUBLISH
                         </button>
                     )}
                 </div>
 
                 <div className="flex justify-between border-b pb-2">
-                    <div className="text-orange-400 font-bold text-xl">
+                    <div className="text-orange-600 font-bold text-xl">
                         Top Image
                     </div>
                 </div>
@@ -393,7 +406,7 @@ export default function EditSegment(props: {
                                                 onOpenChangeTopImage();
                                                 getImages();
                                             }}
-                                            className="bg-orange-400 py-3 px-20 rounded shadow-xl">
+                                            className="bg-orange-600 py-3 px-20 rounded shadow-xl">
                                             Select
                                         </button>
                                     </div>
@@ -405,7 +418,7 @@ export default function EditSegment(props: {
                 <div className="xl:grid xl:grid-cols-2 xl:gap-10 mt-8">
                     <div id={"left-segment-" + props.index + "-column"}>
                         <div>
-                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
+                            <div className="text-orange-600 font-bold text-xl border-b pb-2 mb-2">
                                 Title
                             </div>
                             <input
@@ -416,34 +429,93 @@ export default function EditSegment(props: {
                             />
                         </div>
                         <div>
-                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2 mt-6">
-                                Copy
+                            <div className="flex gap-4 w-full border-b pb-2 mb-2 mt-6">
+                                <div className="text-orange-600 font-bold text-xl">
+                                    Description
+                                </div>
+                                <Popover className="dark" placement="right-end">
+                                    <PopoverTrigger>
+                                        <i
+                                            aria-hidden
+                                            className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                        />
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div className="text-left p-2 xl:w-96">
+                                            <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                Text Info
+                                            </div>
+                                            <p className="mb-2">
+                                                The text is rendered using
+                                                Markdown. This means that you
+                                                can add headers, links, and line
+                                                breaks
+                                            </p>
+                                            <p className="mb-2">
+                                                **Header** (bold text)
+                                            </p>
+                                            <p className="mb-2">
+                                                [Link Text
+                                                Here](https://link-here.com/)
+                                            </p>
+                                            <p>New line\</p>
+                                            <p>\</p>
+                                            <p>New Paragraph</p>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <button
+                                    onClick={() => setPreviewText(!previewText)}
+                                    className="text-orange-600 cursor-pointer">
+                                    {previewText ? "Edit" : "Preview"}
+                                </button>
                             </div>
-                            <textarea
-                                value={copy}
-                                onChange={(e) => setCopy(e.target.value)}
-                                className="text-black h-52"
-                                name=""
-                                id=""
-                            />
+                            {previewText ? (
+                                <div className="min-h-52">
+                                    <Markdown>{copy}</Markdown>
+                                </div>
+                            ) : (
+                                <textarea
+                                    value={copy}
+                                    onChange={(e) => setCopy(e.target.value)}
+                                    className="text-black h-52"
+                                    name=""
+                                    id=""
+                                />
+                            )}
                         </div>
-                        <div className="xl:w-1/6 w-1/2">
-                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
-                                Order
+                        <div className="flex gap-10">
+                            <div className="xl:w-1/6 w-1/2">
+                                <div className="text-orange-600 font-bold text-xl border-b pb-2 mb-2">
+                                    Order
+                                </div>
+                                <input
+                                    className="text-black"
+                                    value={!Number.isNaN(order) ? order : ""}
+                                    onChange={(e) =>
+                                        setOrder(parseInt(e.target.value))
+                                    }
+                                    type="number"
+                                />
                             </div>
-                            <input
-                                className="text-black"
-                                value={!Number.isNaN(order) ? order : ""}
-                                onChange={(e) =>
-                                    setOrder(parseInt(e.target.value))
-                                }
-                                type="number"
-                            />
+                            <div className="w-full">
+                                <div className="text-orange-600 font-bold text-xl border-b pb-2 mb-2">
+                                    Custom Button Text
+                                </div>
+                                <input
+                                    className="text-black"
+                                    value={buttonText}
+                                    onChange={(e) =>
+                                        setButtonText(e.target.value)
+                                    }
+                                    type="text"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div className={"right-segment-" + props.index + "-column"}>
                         <div className="">
-                            <div className="text-orange-400 font-bold text-xl border-b pb-2 mb-2">
+                            <div className="text-orange-600 font-bold text-xl border-b pb-2 mb-2">
                                 Images
                             </div>
                             <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
@@ -494,12 +566,12 @@ export default function EditSegment(props: {
                             </div>
                         </div>
                         <div className="flex gap-4 border-b mt-6 bg">
-                            <div className="py-4 text-orange-400 font-bold text-xl">
+                            <div className="py-4 text-orange-600 font-bold text-xl">
                                 Case Studies
                             </div>
                             <button
                                 onClick={onOpenChangeNewCaseStudy}
-                                className="px-2 py-1 my-auto rounded bg-orange-400">
+                                className="px-2 py-1 my-auto rounded bg-orange-600">
                                 Add Case Study
                             </button>
                         </div>
@@ -521,7 +593,7 @@ export default function EditSegment(props: {
                                                     "-" +
                                                     index
                                                 }
-                                                className="transition-all hover:bg-orange-400 px-4 py-2 xl:my-4 my-1 bg-neutral-600 rounded">
+                                                className="transition-all hover:bg-orange-600 px-4 py-2 xl:my-4 my-1 bg-neutral-600 rounded">
                                                 {caseStudy.title}
                                             </button>
                                         );
@@ -547,7 +619,7 @@ export default function EditSegment(props: {
                                                     "-" +
                                                     index
                                                 }
-                                                className="transition-all hover:bg-orange-400 px-4 py-2 my-4 bg-neutral-600 rounded">
+                                                className="transition-all hover:bg-orange-600 px-4 py-2 my-4 bg-neutral-600 rounded">
                                                 {caseStudy.title}
                                             </button>
                                         );
@@ -558,7 +630,7 @@ export default function EditSegment(props: {
                     </div>
                 </div>
 
-                <div className="flex justify-end xl:mt-0 mt-4">
+                <div className="flex justify-end mt-4">
                     <button
                         onClick={onOpenChangeDelete}
                         className="px-4 py-2 hover:bg-red-800 hover:text-white text-red-600 rounded transition-all">
@@ -568,7 +640,7 @@ export default function EditSegment(props: {
                         <button
                             disabled={!changes}
                             onClick={() => handleUpdate()}
-                            className="disabled:bg-neutral-400 disabled:cursor-not-allowed px-4 py-2 bg-orange-400 rounded ms-4">
+                            className="disabled:bg-neutral-400 disabled:cursor-not-allowed px-4 py-2 bg-orange-600 rounded ms-4">
                             Update
                         </button>
                     }
@@ -826,7 +898,7 @@ export default function EditSegment(props: {
                         {(onClose) => (
                             <>
                                 <ModalHeader>
-                                    <div className="w-full text-center text-3xl font-bold text-orange-400">
+                                    <div className="w-full text-center text-3xl font-bold text-orange-600">
                                         New Case Study
                                     </div>
                                 </ModalHeader>

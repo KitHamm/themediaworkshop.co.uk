@@ -4,7 +4,7 @@ export default function Footer() {
         <div className="w-full">
             <div className="flex justify-center bg-neutral-800 py-10">
                 <div className="flex justify-evenly gap-10">
-                    <div className="cursor-pointer hover:text-orange-400 transition-all">
+                    <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a
                             href="https://www.instagram.com/themediaworkshopltd/"
                             target="_blank"
@@ -15,7 +15,7 @@ export default function Footer() {
                             />
                         </a>
                     </div>
-                    <div className="cursor-pointer hover:text-orange-400 transition-all">
+                    <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a
                             href="https://vimeo.com/themediaworkshop"
                             target="_blank"
@@ -26,7 +26,7 @@ export default function Footer() {
                             />
                         </a>
                     </div>
-                    <div className="cursor-pointer hover:text-orange-400 transition-all">
+                    <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a
                             href="https://www.facebook.com/TheMediaWorkshopLtd/"
                             target="_blank"
@@ -37,7 +37,7 @@ export default function Footer() {
                             />
                         </a>
                     </div>
-                    <div className="cursor-pointer hover:text-orange-400 transition-all">
+                    <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a
                             href="https://www.linkedin.com/company/themediaworkshopltd/"
                             target="_blank"

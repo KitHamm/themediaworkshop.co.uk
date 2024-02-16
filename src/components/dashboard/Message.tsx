@@ -140,7 +140,7 @@ export default function Messages(props: {
                                     onClick={() => {
                                         updateMultipleMessage(false);
                                     }}
-                                    className="mt-auto text-lg text-orange-400 cursor-pointer">
+                                    className="mt-auto text-lg text-orange-600 cursor-pointer">
                                     Mark {multipleMessages.length} Message(s)
                                     Unread
                                 </div>
@@ -182,7 +182,7 @@ export default function Messages(props: {
                                 }}
                                 className={`${
                                     index === selectedMessage
-                                        ? "bg-orange-400"
+                                        ? "bg-orange-600"
                                         : message.read
                                         ? " bg-neutral-800"
                                         : " bg-neutral-600"
@@ -267,7 +267,7 @@ export default function Messages(props: {
                                         );
                                         setSelectedMessage(-1);
                                     }}
-                                    className="text-orange-400 cursor-pointer">
+                                    className="text-orange-600 cursor-pointer">
                                     Mark as unread
                                 </div>
                                 <a
@@ -337,7 +337,7 @@ export default function Messages(props: {
                                 className={`${
                                     message.read
                                         ? "bg-neutral-800"
-                                        : "bg-orange-400"
+                                        : "bg-orange-600"
                                 } rounded-lg shadow-lg p-4`}>
                                 <div className="flex border-b mb-2 pb-2 justify-end">
                                     <div className="">
@@ -414,7 +414,7 @@ export default function Messages(props: {
                                         onClose();
                                         setSelectedMessage(-1);
                                     }}
-                                    className="bg-orange-400">
+                                    className="bg-orange-600">
                                     Mark Unread
                                 </Button>
                                 <Button

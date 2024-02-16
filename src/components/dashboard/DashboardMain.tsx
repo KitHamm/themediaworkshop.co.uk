@@ -117,7 +117,7 @@ export default function DashboardMain(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex text-center flex-col text-orange-400 text-2xl">
+                            <ModalHeader className="flex text-center flex-col text-orange-600 text-2xl">
                                 Welcome!
                             </ModalHeader>
                             <ModalBody>
@@ -135,7 +135,7 @@ export default function DashboardMain(props: {
                             </ModalBody>
                             <ModalFooter>
                                 <Button
-                                    className="bg-orange-400"
+                                    className="bg-orange-600"
                                     onPress={() => {
                                         onClose();
                                         updateUser();

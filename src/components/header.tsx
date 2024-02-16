@@ -12,6 +12,7 @@ import {
     CircularProgress,
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
+import Markdown from "react-markdown";
 
 // React Components
 import { useEffect, useState } from "react";
@@ -29,6 +30,7 @@ export default function Header(props: {
     home: boolean;
     showreel: string;
     year: string;
+    subTitle: string;
 }) {
     // Contact form states
     const [sending, setSending] = useState(false);
@@ -92,11 +94,11 @@ export default function Header(props: {
             <div className="bg-black bg-opacity-30 xl:bg-opacity-0 flex absolute top-0 left-0 z-20 xl:grid xl:grid-cols-2 h-full">
                 <div className="m-auto xl:m-0 flex w-full xl:w-auto justify-center">
                     <div className="m-auto text-center w-full xl:w-2/3">
+                        <div className="text-2xl xl:text-md uppercase">
+                            {props.subTitle}
+                        </div>
                         {props.home ? (
                             <>
-                                <div className="text-2xl xl:text-md">
-                                    WE ARE
-                                </div>
                                 <h1 className="hidden">{props.header}</h1>
                                 <Image
                                     src={"/images/tmw-logo.png"}
@@ -149,9 +151,9 @@ export default function Header(props: {
                                 </button>
                             </div>
                         </div>
-                        <p className="bg-black shadow-2xl px-4 py-4 xl:py-0 xl:bg-opacity-0 bg-opacity-25 xl:shadow-none xl:backdrop-blur-none backdrop-blur-sm text-justify text-md xl:text-lg">
-                            {props?.description}
-                        </p>
+                        <div className="px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
+                            <Markdown>{props?.description as string}</Markdown>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -211,7 +213,7 @@ export default function Header(props: {
                                     </div>
                                     <div className="flex justify-center">
                                         <div className="flex justify-evenly gap-10 py-5">
-                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                            <div className="cursor-pointer hover:text-orange-600 transition-all">
                                                 <a
                                                     href="https://www.instagram.com/themediaworkshopltd/"
                                                     target="_blank"
@@ -222,7 +224,7 @@ export default function Header(props: {
                                                     />
                                                 </a>
                                             </div>
-                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                            <div className="cursor-pointer hover:text-orange-600 transition-all">
                                                 <a
                                                     href="https://vimeo.com/themediaworkshop"
                                                     target="_blank"
@@ -233,7 +235,7 @@ export default function Header(props: {
                                                     />
                                                 </a>
                                             </div>
-                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                            <div className="cursor-pointer hover:text-orange-600 transition-all">
                                                 <a
                                                     href="https://www.facebook.com/TheMediaWorkshopLtd/"
                                                     target="_blank"
@@ -244,7 +246,7 @@ export default function Header(props: {
                                                     />
                                                 </a>
                                             </div>
-                                            <div className="cursor-pointer hover:text-orange-400 transition-all">
+                                            <div className="cursor-pointer hover:text-orange-600 transition-all">
                                                 <a
                                                     href="https://www.linkedin.com/company/themediaworkshopltd/"
                                                     target="_blank"
@@ -339,7 +341,7 @@ export default function Header(props: {
                                                 />
                                             ) : (
                                                 <Button
-                                                    className="text-white bg-orange-400"
+                                                    className="text-white bg-orange-600"
                                                     type="submit">
                                                     Send
                                                 </Button>

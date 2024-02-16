@@ -130,7 +130,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     return (
         <>
             {/* Mobile Navigation Bar */}
-            <div className="z-40 fixed w-screen bottom-0 left-0 xl:hidden bg-neutral-800 border-t border-orange-400">
+            <div className="z-40 fixed w-screen bottom-0 left-0 xl:hidden bg-neutral-800 border-t border-orange-600">
                 <div className="flex justify-evenly pb-2 pt-2">
                     <Dropdown placement="top-start" className="dark z-0">
                         <DropdownTrigger>
@@ -179,7 +179,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             aria-hidden
                             className={`${
                                 view === "dashboard"
-                                    ? "text-orange-400"
+                                    ? "text-orange-600"
                                     : "text-white"
                             } fa-solid fa-house fa-xl`}
                         />
@@ -192,7 +192,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             aria-hidden
                             className={`${
                                 view === "pages"
-                                    ? "text-orange-400"
+                                    ? "text-orange-600"
                                     : "text-white"
                             } fa-regular fa-window-restore fa-xl`}
                         />
@@ -205,7 +205,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             aria-hidden
                             className={`${
                                 view === "media"
-                                    ? "text-orange-400"
+                                    ? "text-orange-600"
                                     : "text-white"
                             } fa-regular fa-images fa-xl`}
                         />
@@ -218,7 +218,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             aria-hidden
                             className={`${
                                 view === "messages"
-                                    ? "text-orange-400"
+                                    ? "text-orange-600"
                                     : "text-white"
                             } fa-regular fa-message fa-xl`}
                         />
@@ -239,7 +239,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             aria-hidden
                             className={`${
                                 view === "settings"
-                                    ? "text-orange-400"
+                                    ? "text-orange-600"
                                     : "text-white"
                             } fa-solid fa-gear fa-xl`}
                         />
@@ -249,7 +249,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
             </div>
             {/* Desktop Side Panel */}
             {/* Side panel set to 1/6 width of the screen in a fixed position on the left */}
-            <div className="hidden xl:block min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-400">
+            <div className="hidden xl:block min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-600">
                 <div className="xl:flex xl:p-10 border-b border-neutral-400 mb-4">
                     <Image
                         onClick={() => (window.location.href = "/")}
@@ -325,7 +325,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     href={"?view=dashboard"}
                     className={`${
                         view === "dashboard"
-                            ? "bg-orange-400 border-l-5 border-white"
+                            ? "bg-orange-600 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <i
@@ -338,7 +338,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     href={"?view=pages"}
                     className={`${
                         view === "pages"
-                            ? "bg-orange-400 border-l-5 border-white"
+                            ? "bg-orange-600 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <i
@@ -351,7 +351,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     href={"?view=media"}
                     className={`${
                         view === "media"
-                            ? "bg-orange-400 border-l-5 border-white"
+                            ? "bg-orange-600 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <i
@@ -364,7 +364,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     href={"?view=messages"}
                     className={`${
                         view === "messages"
-                            ? "bg-orange-400 border-l-5 border-white"
+                            ? "bg-orange-600 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <Badge
@@ -382,7 +382,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     href={"?view=settings"}
                     className={`${
                         view === "settings"
-                            ? "bg-orange-400 border-l-5 border-white"
+                            ? "bg-orange-600 border-l-5 border-white"
                             : ""
                     } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
                     <i aria-hidden className="fa-solid fa-gear fa-xl my-auto" />
@@ -482,7 +482,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                                             ? true
                                                             : false
                                                     }
-                                                    className="disabled:bg-neutral-600 disabled:cursor-not-allowed bg-orange-400 px-4 py-2 rounded-lg">
+                                                    className="disabled:bg-neutral-600 disabled:cursor-not-allowed bg-orange-600 px-4 py-2 rounded-lg">
                                                     Save
                                                 </button>
                                             </div>

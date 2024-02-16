@@ -58,7 +58,7 @@ export default function SignIn() {
                         Incorrect email or password
                     </div>
                 ) : (
-                    <div className="font-bold text-center text-orange-400 mb-4 text-xl">
+                    <div className="font-bold text-center text-orange-600 mb-4 text-xl">
                         Sign In
                     </div>
                 )}
@@ -118,15 +118,15 @@ export default function SignIn() {
                         <div className="fade-in flex justify-center mt-6">
                             <CircularProgress
                                 classNames={{
-                                    track: "text-orange-400",
-                                    indicator: "text-orange-400",
+                                    track: "text-orange-600",
+                                    indicator: "text-orange-600",
                                 }}
                                 aria-label="Signing In..."
                             />
                         </div>
                     ) : (
                         <div className="flex justify-center gap-2 mt-4">
-                            <button className="w-full bg-orange-400 rounded py-3 uppercase text-3xl">
+                            <button className="w-full bg-orange-600 rounded py-3 uppercase text-3xl">
                                 Sign In
                             </button>
                         </div>

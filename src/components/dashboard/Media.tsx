@@ -187,7 +187,7 @@ export default function Media(props: {
             <div className="my-6">
                 <button
                     onClick={onOpenChangeUpload}
-                    className="xl:px-10 xl:py-4 px-4 py-2 rounded bg-orange-400">
+                    className="xl:px-10 xl:py-4 px-4 py-2 rounded bg-orange-600">
                     Upload Media
                 </button>
             </div>
@@ -209,7 +209,7 @@ export default function Media(props: {
                             }
                             className={`${
                                 videoView === "background"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Background
@@ -220,7 +220,7 @@ export default function Media(props: {
                             }
                             className={`${
                                 videoView === "showreel"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Showreel
@@ -229,7 +229,7 @@ export default function Media(props: {
                             href={`?view=media&video=year&image=` + imageView}
                             className={`${
                                 videoView === "year"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Year Review
@@ -238,7 +238,7 @@ export default function Media(props: {
                             href={`?view=media&video=study&image=` + imageView}
                             className={`${
                                 videoView === "study"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Case Study
@@ -329,7 +329,7 @@ export default function Media(props: {
                             }
                             className={`${
                                 imageView === "header"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Header
@@ -342,7 +342,7 @@ export default function Media(props: {
                             }
                             className={`${
                                 imageView === "segment"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Segment
@@ -355,7 +355,7 @@ export default function Media(props: {
                             }
                             className={`${
                                 imageView === "study"
-                                    ? "bg-orange-400"
+                                    ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
                             Case Study
@@ -734,7 +734,7 @@ export default function Media(props: {
                                             uploadMedia();
                                         }}
                                         disabled={newUpload ? false : true}
-                                        className=" my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-400 text-black rounded-md px-4 py-2">
+                                        className=" my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 text-black rounded-md px-4 py-2">
                                         Upload
                                     </button>
                                     <button

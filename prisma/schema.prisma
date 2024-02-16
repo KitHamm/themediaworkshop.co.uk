@@ -28,6 +28,7 @@ model User {
 model Page {
     id Int @unique @default(autoincrement())
     title String @unique
+    subTitle String?
     header String?
     description String?
     video String?
@@ -46,6 +47,7 @@ model Segment {
     order Int?
     page Page @relation(fields: [pageId], references: [id])
     pageId Int
+    buttonText String?
     casestudy CaseStudy[]
     published Boolean @default(false)
 }

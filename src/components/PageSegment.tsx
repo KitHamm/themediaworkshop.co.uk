@@ -13,6 +13,7 @@ import {
     Button,
     useDisclosure,
 } from "@nextui-org/react";
+import Markdown from "react-markdown";
 
 // Embla Carousel Components
 import { EmblaOptionsType } from "embla-carousel";
@@ -138,14 +139,16 @@ export default function PageSegment(props: {
                             {props.segment.title}
                         </div>
                         <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
-                            {props.segment.copy}
+                            <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
-                            <div className="xl:text-left">
+                            <div className="xl:text-center xl:mt-4">
                                 <button
                                     onClick={onOpenChangeCaseStudy}
-                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 rounded bg-orange-400">
-                                    Examples
+                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                    {props.segment.buttonText
+                                        ? props.segment.buttonText
+                                        : "Examples"}
                                 </button>
                             </div>
                         )}
@@ -223,14 +226,16 @@ export default function PageSegment(props: {
                             {props.segment.title}
                         </div>
                         <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
-                            {props.segment.copy}
+                            <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
-                            <div className="text-end">
+                            <div className="text-center xl:mt-4">
                                 <button
                                     onClick={onOpenChangeCaseStudy}
-                                    className="px-4 py-2 rounded bg-orange-400">
-                                    Examples
+                                    className="xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                    {props.segment.buttonText
+                                        ? props.segment.buttonText
+                                        : "Examples"}
                                 </button>
                             </div>
                         )}

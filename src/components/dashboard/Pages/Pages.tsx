@@ -48,7 +48,7 @@ export default function Pages(props: {
                     <Link
                         className={`${
                             pageEdit === "home"
-                                ? "bg-orange-400"
+                                ? "bg-orange-600"
                                 : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=home"}>
@@ -57,7 +57,7 @@ export default function Pages(props: {
                     <Link
                         className={`${
                             pageEdit === "film"
-                                ? "bg-orange-400"
+                                ? "bg-orange-600"
                                 : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=film"}>
@@ -66,7 +66,7 @@ export default function Pages(props: {
                     <Link
                         className={`${
                             pageEdit === "digital"
-                                ? "bg-orange-400"
+                                ? "bg-orange-600"
                                 : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=digital"}>
@@ -75,7 +75,7 @@ export default function Pages(props: {
                     <Link
                         className={`${
                             pageEdit === "light"
-                                ? "bg-orange-400"
+                                ? "bg-orange-600"
                                 : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=light"}>
@@ -84,7 +84,7 @@ export default function Pages(props: {
                     <Link
                         className={`${
                             pageEdit === "events"
-                                ? "bg-orange-400"
+                                ? "bg-orange-600"
                                 : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=events"}>
@@ -92,7 +92,7 @@ export default function Pages(props: {
                     </Link>
                     <Link
                         className={`${
-                            pageEdit === "art" ? "bg-orange-400" : "bg-gray-400"
+                            pageEdit === "art" ? "bg-orange-600" : "bg-gray-400"
                         } xl:w-full text-center xl:mx-4 px-4 py-2 rounded`}
                         href={"?view=pages&pageEdit=art"}>
                         Art

@@ -31,6 +31,7 @@ export default function MainPage(props: { data: Page }) {
                     />
                     {/* Header section with content over full size video */}
                     <Header
+                        subTitle={props.data.subTitle}
                         home={props.data.title === "home" ? true : false}
                         header={props.data.header}
                         description={props.data.description}

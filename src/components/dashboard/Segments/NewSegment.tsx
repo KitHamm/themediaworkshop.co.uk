@@ -8,8 +8,11 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
 } from "@nextui-org/react";
-
+import Markdown from "react-markdown";
 // React Components
 import { useState } from "react";
 
@@ -44,6 +47,8 @@ export default function NewSegment(props: {
     const [segmentImageNamingError, setSegmentImageNamingError] =
         useState(false);
 
+    // State for description preview
+    const [previewText, setPreviewText] = useState(false);
     // Uploading, not image error and success states
     const [uploading, setUploading] = useState(false);
     const [notImageError, setNotImageError] = useState(false);
@@ -265,7 +270,7 @@ export default function NewSegment(props: {
                                                     onOpenChangeTopImage();
                                                     getImages();
                                                 }}
-                                                className="bg-orange-400 py-3 px-20 rounded shadow-xl">
+                                                className="bg-orange-600 py-3 px-20 rounded shadow-xl">
                                                 Select
                                             </button>
                                         </div>
@@ -286,14 +291,64 @@ export default function NewSegment(props: {
                                 />
                             </div>
                             <div>
-                                <div className="border-b pb-2 mb-2">Copy</div>
-                                <textarea
-                                    value={copy}
-                                    onChange={(e) => setCopy(e.target.value)}
-                                    className="text-black h-52"
-                                    name=""
-                                    id=""
-                                />
+                                <div className="flex gap-4 w-full border-b pb-2 mb-2">
+                                    <div>Description</div>
+                                    <Popover
+                                        className="dark"
+                                        placement="right-end">
+                                        <PopoverTrigger>
+                                            <i
+                                                aria-hidden
+                                                className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                            />
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <div className="text-left p-2 xl:w-96">
+                                                <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                    Text Info
+                                                </div>
+                                                <p className="mb-2">
+                                                    The text is rendered using
+                                                    Markdown. This means that
+                                                    you can add headers, links,
+                                                    and line breaks
+                                                </p>
+                                                <p className="mb-2">
+                                                    **Header** (bold text)
+                                                </p>
+                                                <p className="mb-2">
+                                                    [Link Text
+                                                    Here](https://link-here.com/)
+                                                </p>
+                                                <p>New line\</p>
+                                                <p>\</p>
+                                                <p>New Paragraph</p>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <button
+                                        onClick={() =>
+                                            setPreviewText(!previewText)
+                                        }
+                                        className="text-orange-600 cursor-pointer">
+                                        {previewText ? "Edit" : "Preview"}
+                                    </button>
+                                </div>
+                                {previewText ? (
+                                    <div className="min-h-52">
+                                        <Markdown>{copy}</Markdown>
+                                    </div>
+                                ) : (
+                                    <textarea
+                                        value={copy}
+                                        onChange={(e) =>
+                                            setCopy(e.target.value)
+                                        }
+                                        className="text-black h-52"
+                                        name=""
+                                        id=""
+                                    />
+                                )}
                             </div>
                             <div>
                                 <div className="border-b pb-2 mb-2">Order</div>
@@ -369,7 +424,7 @@ export default function NewSegment(props: {
                     <div className="flex justify-end">
                         <button
                             onClick={addSegment}
-                            className="px-4 py-2 bg-orange-400 rounded">
+                            className="px-4 py-2 bg-orange-600 rounded">
                             Submit
                         </button>
                     </div>

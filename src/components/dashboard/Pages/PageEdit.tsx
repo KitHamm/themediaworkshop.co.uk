@@ -12,6 +12,9 @@ import {
     CircularProgress,
     Accordion,
     AccordionItem,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
 } from "@nextui-org/react";
 
 // Components
@@ -29,6 +32,7 @@ import { Page, Segment, Videos } from "@prisma/client";
 
 // Functions
 import uploadHandler from "../uploadHandler";
+import Markdown from "react-markdown";
 
 export default function PageEdit(props: {
     data: Page;
@@ -43,6 +47,9 @@ export default function PageEdit(props: {
     const [header, setHeader] = useState(
         props.data.header ? props.data.header : ""
     );
+    const [subTitle, setSubTitle] = useState(
+        props.data.subTitle ? props.data.subTitle : ""
+    );
     // States of background video and showreel
     const [video, setVideo] = useState(props.data.video);
     const [showreel, setShowreel] = useState(props.data.showreel);
@@ -55,9 +62,8 @@ export default function PageEdit(props: {
     const [backgroundNamingError, setBackgroundNamingError] = useState(false);
     const [yearNamingError, setYearNamingError] = useState(false);
 
-    // State for type of video being previewed
-    const [previewType, setPreviewType] = useState("");
-
+    // Preview Markdown text state
+    const [previewText, setPreviewText] = useState(false);
     // State for unsaved changes
     const [changes, setChanges] = useState(false);
 
@@ -117,6 +123,7 @@ export default function PageEdit(props: {
     // Constant check for changes on the page
     useEffect(() => {
         if (
+            subTitle !== props.data.subTitle ||
             description !== props.data.description ||
             header !== props.data.header ||
             video !== props.data.video ||
@@ -128,11 +135,13 @@ export default function PageEdit(props: {
             setChanges(false);
         }
     }, [
+        subTitle,
         description,
         header,
         video,
         showreel,
         year,
+        props.data.subTitle,
         props.data.description,
         props.data.header,
         props.data.video,
@@ -176,6 +185,7 @@ export default function PageEdit(props: {
     // Pre populate data with update Page information
     function handleUpdate() {
         const json = {
+            subTitle: subTitle,
             description: description,
             header: header,
             video: video,
@@ -256,7 +266,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectVideo();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -275,7 +285,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectVideo();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -310,7 +320,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectShowreel();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -329,7 +339,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectShowreel();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -364,7 +374,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectYear();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
                                             </button>
                                         </div>
@@ -383,7 +393,7 @@ export default function PageEdit(props: {
                                                     onOpenSelectYear();
                                                     getVideos();
                                                 }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded m-auto">
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
                                             </button>
                                         </div>
@@ -409,17 +419,71 @@ export default function PageEdit(props: {
                         )}
                         <div>
                             <div className="border-b pb-2 mb-2">
-                                Description
+                                Prefix Title
                             </div>
-                            <textarea
-                                value={description ? description : ""}
-                                onChange={(e) => {
-                                    setDescription(e.target.value);
-                                }}
-                                name={"description-" + props.data.title}
-                                id={"description-" + props.data.title}
-                                className="text-black h-52"
+                            <input
+                                className="text-black"
+                                value={subTitle}
+                                onChange={(e) => setSubTitle(e.target.value)}
+                                type="text"
                             />
+                        </div>
+                        <div>
+                            <div className="flex gap-4 w-full border-b pb-2 mb-2">
+                                <div className="">Description</div>
+                                <Popover className="dark" placement="right-end">
+                                    <PopoverTrigger>
+                                        <i
+                                            aria-hidden
+                                            className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                        />
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div className="text-left p-2 xl:w-96">
+                                            <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                Text Info
+                                            </div>
+                                            <p className="mb-2">
+                                                The text is rendered using
+                                                Markdown. This means that you
+                                                can add headers, links, and line
+                                                breaks
+                                            </p>
+                                            <p className="mb-2">
+                                                **Header** (bold text)
+                                            </p>
+                                            <p className="mb-2">
+                                                [Link Text
+                                                Here](https://link-here.com/)
+                                            </p>
+                                            <p>New line\</p>
+                                            <p>\</p>
+                                            <p>New Paragraph</p>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <button
+                                    onClick={() => setPreviewText(!previewText)}
+                                    className="text-orange-600 cursor-pointer">
+                                    {previewText ? "Edit" : "Preview"}
+                                </button>
+                            </div>
+                            {previewText ? (
+                                <div className="h-52">
+                                    <Markdown>{description}</Markdown>
+                                </div>
+                            ) : (
+                                <textarea
+                                    value={description ? description : ""}
+                                    onChange={(e) => {
+                                        setDescription(e.target.value);
+                                    }}
+                                    name={"description-" + props.data.title}
+                                    id={"description-" + props.data.title}
+                                    className="text-black h-52"
+                                />
+                            )}
+
                             <div className="flex justify-end">
                                 <button
                                     onClick={(e) => {
@@ -427,7 +491,7 @@ export default function PageEdit(props: {
                                         handleUpdate();
                                     }}
                                     disabled={!changes}
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-400 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
+                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-600 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
                                     Update
                                 </button>
                             </div>
@@ -439,7 +503,7 @@ export default function PageEdit(props: {
                         <div className="font-bold text-2xl">Segments</div>
                         <button
                             onClick={onOpenAddSegment}
-                            className="px-2 py-1 bg-orange-400 rounded">
+                            className="px-2 py-1 bg-orange-600 rounded">
                             Add Segment
                         </button>
                     </div>
@@ -810,7 +874,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -978,7 +1042,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
                                                                 Select
                                                             </button>
                                                         </div>
@@ -1145,7 +1209,7 @@ export default function PageEdit(props: {
                                                                         false
                                                                     );
                                                                 }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-400 rounded">
+                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
                                                                 Select
                                                             </button>
                                                         </div>

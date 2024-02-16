@@ -11,6 +11,7 @@ import {
     useDisclosure,
     Chip,
 } from "@nextui-org/react";
+import Markdown from "react-markdown";
 
 // Next Components
 import Image from "next/image";
@@ -57,12 +58,12 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                             {caseIndex % 2 === 0 ? (
                                 <div
                                     id="left"
-                                    className="my-auto p-5 order-first">
-                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-400">
+                                    className="px-5 pb-5 order-first">
+                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-600">
                                         {casestudy.title}
                                     </div>
                                     <div className="w-full text-lg">
-                                        {casestudy.copy}
+                                        <Markdown>{casestudy.copy}</Markdown>
                                     </div>
                                     <div className="flex flex-wrap gap-2 mt-5">
                                         {casestudy.tags.map(
@@ -80,7 +81,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                             ) : (
                                 ""
                             )}
-                            <div id="media">
+                            <div id="media" className="xl:mt-10">
                                 <div
                                     id="images"
                                     className="my-auto carousel-embla">
@@ -137,11 +138,11 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                 <div
                                     id="right"
                                     className="my-auto p-5 order-first xl:order-last">
-                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-400">
+                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-600">
                                         {casestudy.title}
                                     </div>
                                     <div className="w-full text-lg">
-                                        {casestudy.copy}
+                                        <Markdown>{casestudy.copy}</Markdown>
                                     </div>
                                     <div className="flex flex-wrap gap-2 mt-5">
                                         {casestudy.tags.map(

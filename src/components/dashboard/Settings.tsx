@@ -346,7 +346,7 @@ export default function Settings(props: {
                                         }}
                                         className={`${
                                             emailHost !== props.emailHost
-                                                ? "text-orange-400 cursor-pointer"
+                                                ? "text-orange-600 cursor-pointer"
                                                 : "text-neutral-400 cursor-not-allowed"
                                         } xl:my-auto my-5`}>
                                         Set
@@ -361,7 +361,7 @@ export default function Settings(props: {
                             </div>
                         </div>
                         <Button
-                            className="py-2 px-4 xl:mt-10 mt-5 bg-orange-400 rounded"
+                            className="py-2 px-4 xl:mt-10 mt-5 bg-orange-600 rounded"
                             onPress={onOpen}>
                             Add User Account
                         </Button>
@@ -434,7 +434,7 @@ export default function Settings(props: {
                                                     setUserResetId(user.id);
                                                     OnOpenEditUser();
                                                 }}
-                                                className="bg-orange-400">
+                                                className="bg-orange-600">
                                                 Edit
                                             </Button>
                                             {user.id !==
@@ -545,7 +545,7 @@ export default function Settings(props: {
                                                     setUserResetId(user.id);
                                                     OnOpenEditUser();
                                                 }}
-                                                className="px-6 py-2 text-orange-400 cursor-pointer">
+                                                className="px-6 py-2 text-orange-600 cursor-pointer">
                                                 Edit
                                             </div>
                                         )}
@@ -752,7 +752,7 @@ export default function Settings(props: {
                                                 </Button>
                                                 <button
                                                     type="submit"
-                                                    className="px-4 py-2 bg-orange-400 rounded-xl">
+                                                    className="px-4 py-2 bg-orange-600 rounded-xl">
                                                     Submit
                                                 </button>
                                             </div>
@@ -774,7 +774,7 @@ export default function Settings(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1 text-orange-400">
+                            <ModalHeader className="flex flex-col gap-1 text-orange-600">
                                 {newName}
                             </ModalHeader>
                             <ModalBody>
@@ -821,7 +821,7 @@ export default function Settings(props: {
                                     <div className="mt-2">
                                         <button
                                             onClick={OnOpenNewPassword}
-                                            className="px-2 py-1 rounded bg-orange-400">
+                                            className="px-2 py-1 rounded bg-orange-600">
                                             Change Password
                                         </button>
                                     </div>
@@ -829,7 +829,7 @@ export default function Settings(props: {
                                     <div className="mt-2">
                                         <button
                                             onClick={OnOpenResetPassword}
-                                            className="px-2 py-1 rounded bg-orange-400">
+                                            className="px-2 py-1 rounded bg-orange-600">
                                             Reset Password
                                         </button>
                                     </div>
@@ -851,7 +851,7 @@ export default function Settings(props: {
                                     Close
                                 </Button>
                                 <Button
-                                    className="bg-orange-400"
+                                    className="bg-orange-600"
                                     onPress={() => {
                                         onClose();
                                         updateUser();
@@ -873,13 +873,13 @@ export default function Settings(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="text-center flex flex-col gap-1 text-orange-400">
+                            <ModalHeader className="text-center flex flex-col gap-1 text-orange-600">
                                 Change Password
                             </ModalHeader>
                             <ModalBody>
                                 {passwordSuccess ? (
                                     <>
-                                        <div className="flex flex-col text-center text-2xl text-orange-400">
+                                        <div className="flex flex-col text-center text-2xl text-orange-600">
                                             Success
                                         </div>
                                         <div className="flex flex-col text-center text-lg">
@@ -895,7 +895,7 @@ export default function Settings(props: {
                                                             "/dashboard",
                                                     })
                                                 }
-                                                className="bg-orange-400">
+                                                className="bg-orange-600">
                                                 Log Out
                                             </Button>
                                         </div>
@@ -1032,7 +1032,7 @@ export default function Settings(props: {
                                             </Button>
                                             <Button
                                                 type="submit"
-                                                className="bg-orange-400">
+                                                className="bg-orange-600">
                                                 Submit
                                             </Button>
                                         </div>
@@ -1060,7 +1060,7 @@ export default function Settings(props: {
                             <ModalBody>
                                 {resetPasswordSuccess ? (
                                     <>
-                                        <div className="flex flex-col text-center text-2xl text-orange-400">
+                                        <div className="flex flex-col text-center text-2xl text-orange-600">
                                             Success
                                         </div>
                                         <div className="flex flex-col text-center text-lg">
@@ -1138,7 +1138,7 @@ export default function Settings(props: {
                                         setUserResetId("");
                                         setPassword("");
                                     }}
-                                    className="bg-orange-400">
+                                    className="bg-orange-600">
                                     Close
                                 </Button>
                             </ModalFooter>
