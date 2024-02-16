@@ -91,7 +91,7 @@ export default function Header(props: {
 
     return (
         <>
-            <div className="bg-black bg-opacity-30 xl:bg-opacity-0 flex absolute top-0 left-0 z-20 xl:grid xl:grid-cols-2 h-full">
+            <div className="bg-black bg-opacity-30 xl:bg-opacity-0 flex absolute top-0 left-0 z-20 xl:grid xl:grid-cols-2 h-full w-full">
                 <div className="m-auto xl:m-0 flex w-full xl:w-auto justify-center">
                     <div className="m-auto text-center w-full xl:w-2/3">
                         <div className="text-2xl xl:text-md uppercase">
@@ -151,7 +151,7 @@ export default function Header(props: {
                                 </button>
                             </div>
                         </div>
-                        <div className="px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
+                        <div className="min-h-20 min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
                             <Markdown>{props?.description as string}</Markdown>
                         </div>
                     </div>
