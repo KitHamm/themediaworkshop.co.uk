@@ -29,6 +29,7 @@ export default function NewCaseStudy(props: {
 }) {
     // States for initial case study content
     const [title, setTitle] = useState("");
+    const [dateLocation, setDateLocation] = useState("");
     const [copy, setCopy] = useState("");
     const [images, setImages] = useState<string[]>([]);
     const [video, setVideo] = useState<string>("");
@@ -168,6 +169,7 @@ export default function NewCaseStudy(props: {
             method: "POST",
             body: JSON.stringify({
                 title: title,
+                dateLocation: dateLocation,
                 copy: copy,
                 image: images,
                 tags: tags,
@@ -368,8 +370,18 @@ export default function NewCaseStudy(props: {
                                     setTitle(e.target.value);
                                 }}
                             />
+                            <div className="font-bold text-2xl mt-2">
+                                Date/Location:
+                            </div>
+                            <input
+                                type="text"
+                                value={dateLocation}
+                                onChange={(e) => {
+                                    setDateLocation(e.target.value);
+                                }}
+                            />
                             <div>
-                                <div className="flex gap-4 w-full mt-5">
+                                <div className="flex gap-4 w-full mt-2">
                                     <div className="font-bold text-2xl">
                                         Detail:
                                     </div>

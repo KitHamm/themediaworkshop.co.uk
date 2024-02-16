@@ -59,8 +59,11 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                 <div
                                     id="left"
                                     className="px-5 pb-5 order-first">
-                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-600">
+                                    <div className="w-full pb-2 mb-2 border-b text-2xl font-bold text-orange-600">
                                         {casestudy.title}
+                                    </div>
+                                    <div className="mb-2">
+                                        {casestudy.dateLocation}
                                     </div>
                                     <div className="w-full text-lg">
                                         <Markdown>{casestudy.copy}</Markdown>
@@ -137,9 +140,12 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                             {caseIndex % 2 !== 0 ? (
                                 <div
                                     id="right"
-                                    className="my-auto p-5 order-first xl:order-last">
-                                    <div className="w-full pb-2 mb-4 border-b text-2xl font-bold text-orange-600">
+                                    className="px-5 pb-5 order-first xl:order-last">
+                                    <div className="w-full pb-2 mb-2 border-b text-2xl font-bold text-orange-600">
                                         {casestudy.title}
+                                    </div>
+                                    <div className="mb-2">
+                                        {casestudy.dateLocation}
                                     </div>
                                     <div className="w-full text-lg">
                                         <Markdown>{casestudy.copy}</Markdown>

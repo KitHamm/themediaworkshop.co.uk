@@ -29,6 +29,9 @@ export default function EditCaseStudy(props: {
 }) {
     // States for initial case study content
     const [title, setTitle] = useState(props.caseStudy.title);
+    const [dateLocation, setDateLocation] = useState(
+        props.caseStudy.dateLocation ? props.caseStudy.dateLocation : ""
+    );
     const [copy, setCopy] = useState(props.caseStudy.copy);
     const [images, setImages] = useState(props.caseStudy.image);
     const [video, setVideo] = useState<string>(props.caseStudy.video);
@@ -94,6 +97,7 @@ export default function EditCaseStudy(props: {
     useEffect(() => {
         if (
             title !== props.caseStudy.title ||
+            dateLocation !== props.caseStudy.dateLocation ||
             copy !== props.caseStudy.copy ||
             JSON.stringify(images) !== JSON.stringify(props.caseStudy.image) ||
             video !== props.caseStudy.video ||
@@ -106,11 +110,13 @@ export default function EditCaseStudy(props: {
         }
     }, [
         title,
+        dateLocation,
         copy,
         JSON.stringify(images),
         video,
         JSON.stringify(tags),
         order,
+        props.caseStudy.dateLocation,
         props.caseStudy.title,
         props.caseStudy.copy,
         JSON.stringify(props.caseStudy.image),
@@ -167,6 +173,7 @@ export default function EditCaseStudy(props: {
     function handleUpdate() {
         const json = {
             title: title,
+            dateLocation: dateLocation,
             copy: copy,
             image: images,
             video: video,
@@ -435,8 +442,18 @@ export default function EditCaseStudy(props: {
                                     setTitle(e.target.value);
                                 }}
                             />
+                            <div className="font-bold text-2xl mt-2">
+                                Date/Location:
+                            </div>
+                            <input
+                                type="text"
+                                value={dateLocation}
+                                onChange={(e) => {
+                                    setDateLocation(e.target.value);
+                                }}
+                            />
                             <div>
-                                <div className="flex gap-4 w-full mt-5">
+                                <div className="flex gap-4 w-full mt-2">
                                     <div className="font-bold text-2xl">
                                         Detail:
                                     </div>

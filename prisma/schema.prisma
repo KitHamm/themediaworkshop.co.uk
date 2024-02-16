@@ -55,6 +55,7 @@ model Segment {
 model CaseStudy {
     id Int @unique @default(autoincrement())
     title String
+    dateLocation String?
     copy String @db.Text
     image String[]
     video String?
