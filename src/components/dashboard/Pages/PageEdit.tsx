@@ -604,6 +604,8 @@ export default function PageEdit(props: {
                             <ModalHeader></ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={
@@ -645,6 +647,8 @@ export default function PageEdit(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={
@@ -686,6 +690,8 @@ export default function PageEdit(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={
@@ -727,6 +733,8 @@ export default function PageEdit(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={

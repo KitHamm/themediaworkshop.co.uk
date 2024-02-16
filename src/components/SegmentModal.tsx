@@ -117,6 +117,8 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                     )}
                                     {casestudy.video.length > 0 && (
                                         <video
+                                            playsInline
+                                            disablePictureInPicture
                                             onClick={() => {
                                                 setSelectedVideo(
                                                     casestudy.video
@@ -125,7 +127,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                             }}
                                             id="bg-video"
                                             className="h-auto w-full fade-in mt-2 cursor-pointer"
-                                            autoPlay={true}
+                                            autoPlay={false}
                                             muted
                                             loop
                                             src={
@@ -229,6 +231,8 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                             <ModalHeader></ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     className="h-auto w-full fade-in mt-2"
                                     autoPlay={true}

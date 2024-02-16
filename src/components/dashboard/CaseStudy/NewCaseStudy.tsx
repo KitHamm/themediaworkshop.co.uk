@@ -825,6 +825,8 @@ export default function NewCaseStudy(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={

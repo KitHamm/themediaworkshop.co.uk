@@ -371,6 +371,8 @@ export default function Header(props: {
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     className="-z-10"
                                     autoPlay={true}
                                     autoFocus={false}
@@ -404,6 +406,8 @@ export default function Header(props: {
                             props.showreel !== undefined &&
                             props.showreel !== "" ? (
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     className="-z-10"
                                     autoPlay={true}
                                     autoFocus={false}

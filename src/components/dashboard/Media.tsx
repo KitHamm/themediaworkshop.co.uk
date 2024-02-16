@@ -550,6 +550,8 @@ export default function Media(props: {
                             <ModalBody>
                                 <div>
                                     <video
+                                        playsInline
+                                        disablePictureInPicture
                                         id="bg-video"
                                         controls={true}
                                         src={

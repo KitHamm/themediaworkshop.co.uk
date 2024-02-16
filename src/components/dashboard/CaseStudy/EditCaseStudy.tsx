@@ -909,6 +909,8 @@ export default function EditCaseStudy(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <video
+                                    playsInline
+                                    disablePictureInPicture
                                     id="bg-video"
                                     controls={true}
                                     src={
