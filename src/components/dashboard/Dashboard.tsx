@@ -16,7 +16,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                             aria-label="Pages"
                             title={
                                 <div className="border-b pb-4 text-2xl font-bold capitalize text-orange-600">
-                                    Welcome to your Dashboard!
+                                    Welcome to your dashboard!
                                 </div>
                             }>
                             <div id="right">
@@ -175,6 +175,10 @@ export default function DashboardView(props: { hidden: boolean }) {
                                     <strong>Case Study Images:</strong>
                                     <div>STUDY_</div>
                                 </div>
+                                <div className="flex gap-2 text-lg">
+                                    <strong>Logo Images:</strong>
+                                    <div>LOGO_</div>
+                                </div>
                             </div>
                         </div>
                     </AccordionItem>
@@ -225,20 +229,58 @@ export default function DashboardView(props: { hidden: boolean }) {
                         </p>
                     </AccordionItem>
                 </Accordion>
-            </div>
-            <div className="hidden xl:block" id="right">
                 <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
-                    Welcome to your Dashboard!
+                    Change Log
                 </div>
-                <div className="text-xl font-bold">
-                    This will soon be populated with more stuff...
-                </div>
-                <div className="text-lg mt-10">
-                    But for now just poke around and try to break it.
-                </div>
-                <div className="text-lg">
-                    If you do manage to break it, let me know so I can work on
-                    it!
+                <Accordion variant="splitted">
+                    <AccordionItem
+                        className="dark"
+                        key={1}
+                        aria-label="17/2/2024"
+                        title={
+                            <div className="text-lg text-orange-600 font-bold border-b pb-2 mb-2">
+                                17/2/2024
+                            </div>
+                        }>
+                        <div className="text-lg">
+                            <ul>
+                                <li>- Ticker Tape logos on home page.</li>
+                                <li>
+                                    - Ability to upload logos of companies
+                                    worked with.
+                                </li>
+                                <li>- Button styling and animation.</li>
+                                <li>- Text animation on page segments.</li>
+                                <li>- Can add link to segment titles.</li>
+                                <li>
+                                    - Custom button text for case study pop up.
+                                </li>
+                                <li>
+                                    - Can add Date and Location to case studies.
+                                </li>
+                                <li>
+                                    - Fixed header size when no text is present.
+                                </li>
+                            </ul>
+                        </div>
+                    </AccordionItem>
+                </Accordion>
+            </div>
+            <div className="hidden xl:block mb-10" id="right">
+                <div id="right">
+                    <div className="border-b py-4 text-3xl font-bold capitalize my-4 xl:my-10">
+                        Welcome to your dashboard!
+                    </div>
+                    <div className="text-xl font-bold">
+                        This will soon be populated with more stuff...
+                    </div>
+                    <div className="text-lg mt-10">
+                        But for now just poke around and try to break it.
+                    </div>
+                    <div className="text-lg">
+                        If you do manage to break it, let me know so I can work
+                        on it!
+                    </div>
                 </div>
             </div>
         </div>
