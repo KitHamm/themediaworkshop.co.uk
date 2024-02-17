@@ -151,8 +151,8 @@ export default function Header(props: {
                                 </button>
                             </div>
                         </div>
-                        <div className="min-h-20 min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
-                            <Markdown>{props?.description as string}</Markdown>
+                        <div className="slide-up min-h-20 min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
+                            <Markdown>{props.description as string}</Markdown>
                         </div>
                     </div>
                 </div>

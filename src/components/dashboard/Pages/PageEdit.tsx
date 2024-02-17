@@ -404,7 +404,7 @@ export default function PageEdit(props: {
                     </div>
                     <div id="right-colum">
                         {props.data.title !== "home" && (
-                            <div className="mb-5">
+                            <div className="mb-2">
                                 <div className="border-b pb-2 mb-2">Header</div>
                                 <input
                                     placeholder="Title"

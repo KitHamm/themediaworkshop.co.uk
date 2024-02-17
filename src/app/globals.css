@@ -165,16 +165,39 @@ video {
     }
 }
 
+.slide-up {
+    opacity: 100%;
+    transform: translateY(0%);
+
+    animation: slideUp 1.5s ease-out;
+}
+@keyframes slideUp {
+    0% {
+        opacity: 0%;
+        transform: translateY(25%);
+    }
+    25% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 100%;
+        transform: translateY(0%);
+    }
+}
+
 .slide-in-right {
     opacity: 100%;
     transform: translateX(0%);
 
-    animation: slideInRight 1.5s ease-out;
+    animation: slideInRight 1.5s ease;
 }
 @keyframes slideInRight {
     0% {
         opacity: 0%;
         transform: translateX(-25%);
+    }
+    10% {
+        opacity: 0;
     }
     50% {
         transform: translateX(0%);
@@ -195,6 +218,9 @@ video {
     0% {
         opacity: 0%;
         transform: translateX(25%);
+    }
+    10% {
+        opacity: 0;
     }
     50% {
         transform: translateX(0%);
