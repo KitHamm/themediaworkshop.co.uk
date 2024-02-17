@@ -7,7 +7,7 @@ import Footer from "./Footer";
 // Types
 import { Logos, Page, Segment } from "@prisma/client";
 
-export default function MainPage(props: { data: Page; logoImages: Logos }) {
+export default function MainPage(props: { data: Page; logoImages?: Logos }) {
     return (
         <>
             {/* Navbar with specified active page */}
