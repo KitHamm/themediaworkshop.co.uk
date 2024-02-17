@@ -38,7 +38,7 @@ export default function PageSegment(props: {
     // InView declarations
     const { ref, inView, entry } = useInView({
         /* Optional options */
-        threshold: 1,
+        threshold: 0.1,
     });
 
     useEffect(() => {
