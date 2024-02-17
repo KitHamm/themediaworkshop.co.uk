@@ -11,6 +11,8 @@ import {
     Popover,
     PopoverTrigger,
     PopoverContent,
+    Select,
+    SelectItem,
 } from "@nextui-org/react";
 
 // React Components
@@ -25,6 +27,7 @@ import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 
 // Types
 import { CaseStudy, Images, Segment } from "@prisma/client";
+import { toLink } from "@prisma/client";
 
 // Functions
 import uploadHandler from "../uploadHandler";
@@ -57,6 +60,7 @@ export default function EditSegment(props: {
     // State for already selected images of segment and available images from media pool
     const [images, setImages] = useState(props.segment.image);
     const [availableImages, setAvailableImages] = useState<Images[]>([]);
+    const [linkTo, setLinkTo] = useState(props.segment.linkTo);
     const [headerImage, setHeaderImage] = useState(
         props.segment.headerimage ? props.segment.headerimage : ""
     );
@@ -120,19 +124,22 @@ export default function EditSegment(props: {
             JSON.stringify(images) !== JSON.stringify(props.segment.image) ||
             headerImage !== props.segment.headerimage ||
             order !== parseInt(props.segment.order) ||
-            buttonText !== props.segment.buttonText
+            buttonText !== props.segment.buttonText ||
+            linkTo !== props.segment.linkTo
         ) {
             setChanges(true);
         } else {
             setChanges(false);
         }
     }, [
+        linkTo,
         buttonText,
         order,
         title,
         copy,
         JSON.stringify(images),
         headerImage,
+        props.segment.linkTo,
         props.segment.buttonText,
         props.segment.order,
         props.segment.title,
@@ -159,6 +166,7 @@ export default function EditSegment(props: {
             headerimage: headerImage,
             image: images,
             order: order,
+            linkTo: linkTo as toLink,
         };
         updateSegment(json);
     }
@@ -427,6 +435,51 @@ export default function EditSegment(props: {
                                 type="text"
                                 className="text-black"
                             />
+                        </div>
+                        <div className="mt-2">
+                            <Select
+                                onChange={(e) => setLinkTo(e.target.value)}
+                                defaultSelectedKeys={[linkTo]}
+                                className="dark"
+                                variant="bordered"
+                                label={"Link To"}>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"NONE"}
+                                    value={"NONE"}>
+                                    None
+                                </SelectItem>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"FILM"}
+                                    value={"FILM"}>
+                                    Film
+                                </SelectItem>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"DIGITAL"}
+                                    value={"DIGITAL"}>
+                                    Digital
+                                </SelectItem>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"LIGHT"}
+                                    value={"LIGHT"}>
+                                    Light
+                                </SelectItem>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"EVENTS"}
+                                    value={"EVENTS"}>
+                                    Events
+                                </SelectItem>
+                                <SelectItem
+                                    className="text-black"
+                                    key={"ART"}
+                                    value={"ART"}>
+                                    Art
+                                </SelectItem>
+                            </Select>
                         </div>
                         <div>
                             <div className="flex gap-4 w-full border-b pb-2 mb-2 mt-6">

@@ -13,6 +13,17 @@ enum Role {
     ADMIN
     EDITOR
 }
+
+enum toLink {
+    NONE
+    HOME
+    FILM
+    DIGITAL
+    LIGHT
+    EVENTS
+    ART
+}
+
 model User {
     id String @unique @id @default(cuid())
     email String @unique
@@ -50,6 +61,7 @@ model Segment {
     buttonText String?
     casestudy CaseStudy[]
     published Boolean @default(false)
+    linkTo toLink @default(NONE)
 }
 
 model CaseStudy {

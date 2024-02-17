@@ -29,6 +29,7 @@ import Image from "next/image";
 
 // Types
 import { Segment } from "@prisma/client";
+import Link from "next/link";
 
 export default function PageSegment(props: {
     segment: Segment;
@@ -157,12 +158,20 @@ export default function PageSegment(props: {
                     <div
                         id={"fade-" + props.index}
                         className="opacity-0 text-center my-auto z-20">
-                        <div className="uppercase font-bold text-3xl mb-4">
-                            {props.segment.title}
-                        </div>
+                        {props.segment.linkTo !== "NONE" ? (
+                            <Link
+                                className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
+                                href={"/" + props.segment.linkTo.toLowerCase()}>
+                                {props.segment.title}
+                            </Link>
+                        ) : (
+                            <div className="uppercase font-bold text-3xl">
+                                {props.segment.title}
+                            </div>
+                        )}
                         <div
                             ref={ref}
-                            className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
+                            className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
@@ -248,12 +257,20 @@ export default function PageSegment(props: {
                     <div
                         id={"fade-" + props.index}
                         className=" opacity-0 text-center z-20 xl:m-auto mx-auto order-first xl:order-last">
-                        <div className="uppercase font-bold xl:mt-0 text-3xl mb-4">
-                            {props.segment.title}
-                        </div>
+                        {props.segment.linkTo !== "NONE" ? (
+                            <Link
+                                className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
+                                href={"/" + props.segment.linkTo.toLowerCase()}>
+                                {props.segment.title}
+                            </Link>
+                        ) : (
+                            <div className="uppercase font-bold text-3xl">
+                                {props.segment.title}
+                            </div>
+                        )}
                         <div
                             ref={ref}
-                            className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
+                            className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
