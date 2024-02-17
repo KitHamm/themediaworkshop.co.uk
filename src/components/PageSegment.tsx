@@ -14,6 +14,7 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import Markdown from "react-markdown";
+import { useInView } from "react-intersection-observer";
 
 // Embla Carousel Components
 import { EmblaOptionsType } from "embla-carousel";
@@ -33,6 +34,25 @@ export default function PageSegment(props: {
     segment: Segment;
     index: number;
 }) {
+    // InView declarations
+    const { ref, inView, entry } = useInView({
+        /* Optional options */
+        threshold: 1,
+    });
+
+    useEffect(() => {
+        const el = document.getElementById("fade-" + props.index);
+
+        if (el && inView) {
+            if (el.classList.contains("opacity-0")) {
+                el.classList.replace(
+                    "opacity-0",
+                    props.index % 2 === 0 ? "slide-in-right" : "slide-in-left"
+                );
+            }
+        }
+    }, [inView]);
+
     //  Parallax States
     const [parallaxValue, setParallaxValue] = useState(0);
     const [containerHeight, setContainerHeight] = useState(0);
@@ -115,13 +135,13 @@ export default function PageSegment(props: {
                 <div
                     style={{ height: containerHeight + "px" }}
                     id={"segment-header-image-container-" + props.index}
-                    className="relative flex w-full bg-black  overflow-hidden segment-header-image">
+                    className="relative flex w-full bg-black justify-center overflow-hidden segment-header-image">
                     <Image
                         id={"segment-header-image-" + props.index}
                         style={{ top: parallaxValue + "px" }}
                         width={2560}
                         height={500}
-                        className="opacity-0 absolute h-auto w-full xl:w-full xl:h-auto"
+                        className="opacity-0 absolute w-[200%] h-auto xl:w-full xl:w-full xl:h-auto"
                         alt={props.segment.headerimage}
                         src={
                             process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
@@ -134,11 +154,15 @@ export default function PageSegment(props: {
             )}
             <div className="grid grid-cols-1 xl:grid-cols-2 w-full px-10 xl:px-60 py-10">
                 {props.index % 2 === 0 ? (
-                    <div className="text-center my-auto z-20">
+                    <div
+                        id={"fade-" + props.index}
+                        className="opacity-0 text-center my-auto z-20">
                         <div className="uppercase font-bold text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
+                        <div
+                            ref={ref}
+                            className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
@@ -221,11 +245,15 @@ export default function PageSegment(props: {
                     </div>
                 </div>
                 {props.index % 2 !== 0 ? (
-                    <div className="text-center z-20 xl:m-auto mx-auto order-first xl:order-last">
+                    <div
+                        id={"fade-" + props.index}
+                        className=" opacity-0 text-center z-20 xl:m-auto mx-auto order-first xl:order-last">
                         <div className="uppercase font-bold xl:mt-0 text-3xl mb-4">
                             {props.segment.title}
                         </div>
-                        <div className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
+                        <div
+                            ref={ref}
+                            className="text-justify text-md xl:text-lg xl:mb-0 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (

@@ -165,6 +165,46 @@ video {
     }
 }
 
+.slide-in-right {
+    opacity: 100%;
+    transform: translateX(0%);
+
+    animation: slideInRight 1.5s ease-out;
+}
+@keyframes slideInRight {
+    0% {
+        opacity: 0%;
+        transform: translateX(-25%);
+    }
+    50% {
+        transform: translateX(0%);
+    }
+    100% {
+        opacity: 100%;
+        transform: translateX(0%);
+    }
+}
+
+.slide-in-left {
+    opacity: 100%;
+    transform: translateX(0%);
+
+    animation: slideInLeft 1.5s ease-out;
+}
+@keyframes slideInLeft {
+    0% {
+        opacity: 0%;
+        transform: translateX(25%);
+    }
+    50% {
+        transform: translateX(0%);
+    }
+    100% {
+        opacity: 100%;
+        transform: translateX(0%);
+    }
+}
+
 .embla {
     --slide-spacing: 0rem;
     --slide-size: 100%;
