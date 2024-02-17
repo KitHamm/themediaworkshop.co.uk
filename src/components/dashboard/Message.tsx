@@ -123,8 +123,17 @@ export default function Messages(props: {
             } xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 xl:h-screen flex flex-col`}>
             <div className="xl:py-10 w-full">
                 <div className="border-b flex gap-10 w-full py-4">
-                    <div className="text-3xl font-bold capitalize">
-                        Messages
+                    <div className="flex gap-4">
+                        <i
+                            onClick={() =>
+                                props.revalidateDashboard("/dashboard")
+                            }
+                            aria-hidden
+                            className="cursor-pointer fa-solid my-auto fa-2xl fa-arrows-rotate"
+                        />
+                        <div className="text-3xl font-bold capitalize">
+                            Messages
+                        </div>
                     </div>
                     <div className="mt-auto">
                         {multipleMessages.length > 0 && (
@@ -182,10 +191,10 @@ export default function Messages(props: {
                                 }}
                                 className={`${
                                     index === selectedMessage
-                                        ? "bg-orange-600"
+                                        ? "bg-neutral-600"
                                         : message.read
                                         ? " bg-neutral-800"
-                                        : " bg-neutral-600"
+                                        : " bg-orange-600"
                                 } fade-in py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}>
                                 <div className="flex gap-2">
                                     <Checkbox
@@ -339,14 +348,14 @@ export default function Messages(props: {
                                         ? "bg-neutral-800"
                                         : "bg-orange-600"
                                 } rounded-lg shadow-lg p-4`}>
-                                <div className="flex border-b mb-2 pb-2 justify-end">
+                                <div className="flex border-b mb-2 pb-2 justify-between">
+                                    <div>
+                                        <strong>From: </strong>
+                                        {message.name}
+                                    </div>
                                     <div className="">
                                         {message.read ? "Read" : "Unread"}
                                     </div>
-                                </div>
-                                <div>
-                                    <strong>From: </strong>
-                                    {message.name}
                                 </div>
                                 <div>
                                     <strong>Received: </strong>
