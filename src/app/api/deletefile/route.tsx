@@ -10,7 +10,9 @@ export async function POST(request: Request) {
     const fileName = json.name;
 
     try {
-        if (type === "image") {
+        if (fileName.split("_")[0] === "LOGO") {
+            await prisma.logos.delete({ where: { name: fileName } });
+        } else if (type === "image") {
             await prisma.images.delete({
                 where: { name: fileName },
             });

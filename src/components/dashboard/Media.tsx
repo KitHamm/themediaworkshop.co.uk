@@ -36,6 +36,7 @@ const filePrefixList = [
     "SEGHEAD",
     "SEGMENT",
     "STUDY",
+    "LOGO",
 ];
 
 export default function Media(props: {
@@ -54,7 +55,7 @@ export default function Media(props: {
 
     // States of videos and Images to display
     const [videos, setVideos] = useState<Videos[]>([]);
-    const [images, setImages] = useState<Images[]>([]);
+    const [images, setImages] = useState<any[]>([]);
 
     // State for file to upload
     const [newUpload, setNewUpload] = useState<File>();
@@ -105,7 +106,7 @@ export default function Media(props: {
 
     async function getVideos() {
         props.revalidateDashboard("/");
-        fetch("/api/videos", { method: "GET" })
+        await fetch("/api/videos", { method: "GET" })
             .then((res) => res.json())
             .then((json) => setVideos(json))
             .catch((err) => console.log(err));
@@ -113,16 +114,27 @@ export default function Media(props: {
 
     async function getImages() {
         props.revalidateDashboard("/");
-        fetch("/api/images", { method: "GET" })
+        var images: [] = [];
+        var logos: [] = [];
+        await fetch("/api/images", { method: "GET" })
             .then((res) => res.json())
-            .then((json) => setImages(json))
+            .then((json) => (images = json))
             .catch((err) => console.log(err));
+        await fetch("/api/logos", { method: "GET" })
+            .then((res) => res.json())
+            .then((json) => (logos = json))
+            .catch((err) => console.log(err));
+        var temp = images.concat(logos);
+        setImages(temp);
     }
 
     // Delete media depending on file type
     async function uploadMedia() {
         if (newUpload) {
-            const type = newUpload.type.split("/")[0];
+            var type = newUpload.type.split("/")[0];
+            if (newUpload.name.split("_")[0] === "LOGO") {
+                type = "logo";
+            }
             await uploadHandler(newUpload, type)
                 .then((res: any) => {
                     if (res.message) {
@@ -138,7 +150,9 @@ export default function Media(props: {
 
     async function deleteFile(type: string, file: string) {
         var dir;
-        if (type === "image") {
+        if (file.split("_")[0] === "LOGO") {
+            dir = process.env.NEXT_PUBLIC_DELETE_LOGO_DIR;
+        } else if (type === "image") {
             dir = process.env.NEXT_PUBLIC_DELETE_IMAGE_DIR;
         } else {
             dir = process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR;
@@ -360,6 +374,19 @@ export default function Media(props: {
                             } px-4 py-2 rounded transition-all`}>
                             Case Study
                         </Link>
+                        <Link
+                            href={
+                                `?view=media&video=` +
+                                videoView +
+                                `&image=logos`
+                            }
+                            className={`${
+                                imageView === "logos"
+                                    ? "bg-orange-600"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Logos
+                        </Link>
                     </div>
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-2">
                         {images.map((image: Images, index: number) => {
@@ -370,6 +397,8 @@ export default function Media(props: {
                                     image.name.split("_")[0] === "SEGMENT") ||
                                 (imageView === "study" &&
                                     image.name.split("_")[0] === "CASESTUDY") ||
+                                (imageView === "logos" &&
+                                    image.name.split("_")[0] === "LOGO") ||
                                 imageView === "all"
                             ) {
                                 return (
@@ -392,9 +421,15 @@ export default function Media(props: {
                                                     height={100}
                                                     width={100}
                                                     src={
-                                                        process.env
-                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                        image.name
+                                                        image.name.split(
+                                                            "_"
+                                                        )[0] === "LOGO"
+                                                            ? process.env
+                                                                  .NEXT_PUBLIC_BASE_LOGO_URL +
+                                                              image.name
+                                                            : process.env
+                                                                  .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                              image.name
                                                     }
                                                     alt={image.name}
                                                     className="w-full h-auto m-auto"
@@ -499,9 +534,14 @@ export default function Media(props: {
                                         height={1000}
                                         width={1000}
                                         src={
-                                            process.env
-                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                            selectedImage
+                                            selectedImage.split("_")[0] ===
+                                            "LOGO"
+                                                ? process.env
+                                                      .NEXT_PUBLIC_BASE_LOGO_URL +
+                                                  selectedImage
+                                                : process.env
+                                                      .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                  selectedImage
                                         }
                                         alt={selectedImage}
                                         className="max-w-full m-auto h-auto"

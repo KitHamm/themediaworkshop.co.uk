@@ -186,10 +186,23 @@ video {
     padding-left: var(--slide-spacing);
     position: relative;
 }
+.embla__slide_2 {
+    flex: 0 0 10%;
+    min-width: 0;
+    padding-left: var(--slide-spacing);
+    position: relative;
+}
 .embla__slide__img {
     display: block;
     height: var(--slide-height);
     width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.embla__slide__img_2 {
+    display: block;
+    height: var(--slide-height);
+    width: 75%;
     height: auto;
     object-fit: cover;
 }

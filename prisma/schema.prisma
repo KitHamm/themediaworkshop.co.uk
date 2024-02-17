@@ -86,6 +86,11 @@ model Videos {
     createdAt DateTime @default(now())
 }
 
+model Logos {
+    name String @unique
+    createdAt DateTime @default(now())
+}
+
 model emailHost {
     emailHost String @unique @default("kit@themediaworkshop.co.uk")
 }

@@ -1,12 +1,13 @@
 // Components
 import Header from "./header";
 import Navbar from "./Navbar";
+import TickerTape from "./TickerTape";
 import PageSegment from "./PageSegment";
 import Footer from "./Footer";
 // Types
-import { Page, Segment } from "@prisma/client";
+import { Logos, Page, Segment } from "@prisma/client";
 
-export default function MainPage(props: { data: Page }) {
+export default function MainPage(props: { data: Page; logoImages: Logos }) {
     return (
         <>
             {/* Navbar with specified active page */}
@@ -48,6 +49,9 @@ export default function MainPage(props: { data: Page }) {
                     </div>
                 );
             })}
+            {props.data.title === "home" && props.logoImages.length > 0 && (
+                <TickerTape logoImages={props.logoImages} />
+            )}
             <Footer />
         </>
     );
