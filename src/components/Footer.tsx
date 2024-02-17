@@ -1,4 +1,4 @@
-export default function Footer() {
+export default function Footer(props: { openContactModal: any }) {
     const date = new Date();
     return (
         <div className="w-full">
@@ -25,6 +25,14 @@ export default function Footer() {
                                 className="fa-brands fa-vimeo-v fa-2xl"
                             />
                         </a>
+                    </div>
+                    <div className="cursor-pointer hover:text-orange-600 transition-all">
+                        <div onClick={() => props.openContactModal()}>
+                            <i
+                                aria-hidden
+                                className="fa-solid fa-envelope fa-2xl"
+                            />
+                        </div>
                     </div>
                     <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a
