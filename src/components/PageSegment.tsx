@@ -22,7 +22,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // Next Components
 import Image from "next/image";
@@ -54,6 +54,10 @@ export default function PageSegment(props: {
         }
     }, [inView]);
 
+    // Parallax element ref
+    const headerImageContainer = useRef<HTMLDivElement>(null);
+    const headerImage = useRef<HTMLImageElement>(null);
+
     //  Parallax States
     const [parallaxValue, setParallaxValue] = useState(0);
     const [containerHeight, setContainerHeight] = useState(0);
@@ -65,10 +69,8 @@ export default function PageSegment(props: {
         direction: "rtl",
         loop: true,
     };
-    const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS, [
-        Autoplay({ delay: 6000 }),
-    ]);
-    const [emblaRefRTL, emblaApiRTL] = useEmblaCarousel(OPTIONSRTL, [
+    const [emblaRef] = useEmblaCarousel(OPTIONS, [Autoplay({ delay: 6000 })]);
+    const [emblaRefRTL] = useEmblaCarousel(OPTIONSRTL, [
         Autoplay({ delay: 6000 }),
     ]);
 
@@ -80,37 +82,29 @@ export default function PageSegment(props: {
     } = useDisclosure();
 
     useEffect(() => {
-        const headerImage = document.getElementById(
-            "segment-header-image-" + props.index
-        ) as HTMLElement;
-        if (headerImage) {
+        if (headerImage.current) {
             onScroll();
-            headerImage.classList.replace("opacity-0", "fade-in");
+            headerImage.current.classList.replace("opacity-0", "fade-in");
             window.addEventListener("scroll", onScroll);
         }
     }, []);
 
     function onScroll() {
-        const headerImageContainer = document.getElementById(
-            "segment-header-image-container-" + props.index
-        ) as HTMLElement;
-        const headerImage = document.getElementById(
-            "segment-header-image-" + props.index
-        ) as HTMLElement;
-        if (headerImageContainer && headerImage) {
-            const containerHeight = headerImageContainer.offsetHeight;
-            const imageHeight = headerImage.offsetHeight;
+        if (headerImageContainer.current && headerImage.current) {
+            const containerHeight = headerImageContainer.current.offsetHeight;
+            const imageHeight = headerImage.current.offsetHeight;
             setContainerHeight((imageHeight / 8) * 6);
             if (
-                headerImageContainer.getBoundingClientRect().top <
+                headerImageContainer.current.getBoundingClientRect().top <
                     window.innerHeight &&
-                headerImageContainer.getBoundingClientRect().top >
+                headerImageContainer.current.getBoundingClientRect().top >
                     0 - containerHeight
             ) {
                 setParallaxValue(
                     0 -
                         mapNumRange(
-                            headerImageContainer.getBoundingClientRect().top,
+                            headerImageContainer.current.getBoundingClientRect()
+                                .top,
                             window.innerHeight,
                             0,
                             imageHeight - containerHeight,
@@ -135,10 +129,10 @@ export default function PageSegment(props: {
             {props.segment.headerimage ? (
                 <div
                     style={{ height: containerHeight + "px" }}
-                    id={"segment-header-image-container-" + props.index}
+                    ref={headerImageContainer}
                     className="relative flex w-full bg-black justify-center overflow-hidden segment-header-image">
                     <Image
-                        id={"segment-header-image-" + props.index}
+                        ref={headerImage}
                         style={{ top: parallaxValue + "px" }}
                         width={2560}
                         height={500}
@@ -157,32 +151,39 @@ export default function PageSegment(props: {
                 {props.index % 2 === 0 ? (
                     <div
                         id={"fade-" + props.index}
-                        className="opacity-0 text-center my-auto z-20">
-                        {props.segment.linkTo !== "NONE" ? (
-                            <Link
-                                className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
-                                href={"/" + props.segment.linkTo.toLowerCase()}>
-                                {props.segment.title}
-                            </Link>
-                        ) : (
-                            <div className="uppercase font-bold text-3xl">
-                                {props.segment.title}
-                            </div>
-                        )}
+                        className="relative opacity-0 text-center my-auto z-20">
+                        <div className="xl:absolute xl:left-0 xl:right-0 xl:-top-10">
+                            {props.segment.linkTo !== "NONE" ? (
+                                <Link
+                                    className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
+                                    href={
+                                        "/" + props.segment.linkTo.toLowerCase()
+                                    }>
+                                    {props.segment.title}
+                                </Link>
+                            ) : (
+                                <div className="uppercase font-bold text-3xl">
+                                    {props.segment.title}
+                                </div>
+                            )}
+                        </div>
                         <div
                             ref={ref}
                             className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
+
                         {props.segment.casestudy.length > 0 && (
-                            <div className="xl:text-center xl:mt-4">
-                                <button
-                                    onClick={onOpenChangeCaseStudy}
-                                    className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
-                                    {props.segment.buttonText
-                                        ? props.segment.buttonText
-                                        : "Examples"}
-                                </button>
+                            <div className="xl:absolute xl:left-0 xl:right-0 xl:-bottom-15">
+                                <div className="xl:text-center xl:mt-4">
+                                    <button
+                                        onClick={onOpenChangeCaseStudy}
+                                        className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                        {props.segment.buttonText
+                                            ? props.segment.buttonText
+                                            : "Examples"}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -257,31 +258,37 @@ export default function PageSegment(props: {
                     <div
                         id={"fade-" + props.index}
                         className=" opacity-0 text-center z-20 xl:m-auto mx-auto order-first xl:order-last">
-                        {props.segment.linkTo !== "NONE" ? (
-                            <Link
-                                className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
-                                href={"/" + props.segment.linkTo.toLowerCase()}>
-                                {props.segment.title}
-                            </Link>
-                        ) : (
-                            <div className="uppercase font-bold text-3xl">
-                                {props.segment.title}
-                            </div>
-                        )}
+                        <div className="xl:absolute xl:left-0 xl:right-0 xl:-top-10">
+                            {props.segment.linkTo !== "NONE" ? (
+                                <Link
+                                    className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
+                                    href={
+                                        "/" + props.segment.linkTo.toLowerCase()
+                                    }>
+                                    {props.segment.title}
+                                </Link>
+                            ) : (
+                                <div className="uppercase font-bold text-3xl">
+                                    {props.segment.title}
+                                </div>
+                            )}
+                        </div>
                         <div
                             ref={ref}
                             className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (
-                            <div className="text-center xl:mt-4">
-                                <button
-                                    onClick={onOpenChangeCaseStudy}
-                                    className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
-                                    {props.segment.buttonText
-                                        ? props.segment.buttonText
-                                        : "Examples"}
-                                </button>
+                            <div className="xl:absolute xl:left-0 xl:right-0 xl:-bottom-15">
+                                <div className="text-center xl:mt-4">
+                                    <button
+                                        onClick={onOpenChangeCaseStudy}
+                                        className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                        {props.segment.buttonText
+                                            ? props.segment.buttonText
+                                            : "Examples"}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

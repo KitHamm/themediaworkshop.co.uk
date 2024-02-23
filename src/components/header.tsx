@@ -4,14 +4,11 @@
 import { Modal, ModalContent, useDisclosure } from "@nextui-org/react";
 import Markdown from "react-markdown";
 
-// React Components
+// Next Components
 import Image from "next/image";
 
-type FormTypes = {
-    name: string;
-    email: string;
-    message: string;
-};
+// React Components
+import { useRef, useEffect } from "react";
 
 export default function Header(props: {
     description: String;
@@ -22,6 +19,7 @@ export default function Header(props: {
     subTitle: string;
     openContactModal: any;
 }) {
+    const chevron = useRef<HTMLDivElement>(null);
     // Contact form states
     const {
         isOpen: isOpenShowreel,
@@ -34,6 +32,19 @@ export default function Header(props: {
         onOpen: onOpenYear,
         onOpenChange: onOpenChangeYear,
     } = useDisclosure();
+
+    useEffect(() => {
+        window.addEventListener("scroll", onScroll);
+        setTimeout(() => {
+            if (document.body.getBoundingClientRect().top === 0) {
+                chevron.current?.classList.replace("opacity-0", "opacity-100");
+            }
+        }, 5000);
+    }, []);
+
+    function onScroll() {
+        chevron.current?.classList.replace("opacity-100", "opacity-0");
+    }
 
     return (
         <>
@@ -100,6 +111,24 @@ export default function Header(props: {
                         <div className="slide-up min-h-20 min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
                             <Markdown>{props.description as string}</Markdown>
                         </div>
+                    </div>
+                </div>
+                <div
+                    ref={chevron}
+                    className="transition-opacity ease-in-out opacity-0 w-full absolute left-0 right-0 text-center bottom-20 xl:bottom-10">
+                    <div className="flex flex-col gap-4">
+                        <i
+                            aria-hidden
+                            className="chevron fa-solid fa-chevron-down fa-xl"
+                        />
+                        <i
+                            aria-hidden
+                            className="chevron fa-solid fa-chevron-down fa-xl"
+                        />
+                        <i
+                            aria-hidden
+                            className="chevron fa-solid fa-chevron-down fa-xl"
+                        />
                     </div>
                 </div>
             </div>

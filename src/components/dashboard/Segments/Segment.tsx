@@ -631,7 +631,7 @@ export default function EditSegment(props: {
                         <div className="text-green-600 font-bold text-lg my-4">
                             PUBLISHED
                         </div>
-                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-0 gap-2 bg-neutral-800 xl:mt-2 rounded-lg px-2 min-h-10">
+                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-neutral-800 xl:mt-2 rounded-lg px-2 min-h-10">
                             {props.segment.casestudy.map(
                                 (caseStudy: CaseStudy, index: number) => {
                                     if (caseStudy.published) {
@@ -646,7 +646,7 @@ export default function EditSegment(props: {
                                                     "-" +
                                                     index
                                                 }
-                                                className="transition-all hover:bg-orange-600 px-4 py-2 xl:my-4 my-1 bg-neutral-600 rounded">
+                                                className="transition-all hover:bg-orange-600 px-4 py-2 bg-neutral-600 rounded">
                                                 {caseStudy.title}
                                             </button>
                                         );
@@ -657,7 +657,7 @@ export default function EditSegment(props: {
                         <div className="text-red-400 font-bold text-lg my-4">
                             DRAFTS
                         </div>
-                        <div className="flex flex-wrap gap-4 bg-neutral-800 mt-2 rounded-lg px-2 min-h-10">
+                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-neutral-800 xl:mt-2 rounded-lg px-2 min-h-10">
                             {props.segment.casestudy.map(
                                 (caseStudy: CaseStudy, index: number) => {
                                     if (!caseStudy.published) {
@@ -672,7 +672,7 @@ export default function EditSegment(props: {
                                                     "-" +
                                                     index
                                                 }
-                                                className="transition-all hover:bg-orange-600 px-4 py-2 my-4 bg-neutral-600 rounded">
+                                                className="transition-all hover:bg-orange-600 px-4 py-2 bg-neutral-600 rounded">
                                                 {caseStudy.title}
                                             </button>
                                         );

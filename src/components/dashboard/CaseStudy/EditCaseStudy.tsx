@@ -35,6 +35,9 @@ export default function EditCaseStudy(props: {
     const [copy, setCopy] = useState(props.caseStudy.copy);
     const [images, setImages] = useState(props.caseStudy.image);
     const [video, setVideo] = useState<string>(props.caseStudy.video);
+    const [videoThumbnail, setVideoThumbnail] = useState<string>(
+        props.caseStudy.videoThumbnail ? props.caseStudy.videoThumbnail : ""
+    );
     const [tags, setTags] = useState(props.caseStudy.tags);
     const [order, setOrder] = useState(props.caseStudy.order);
     // New Tag State
@@ -72,6 +75,13 @@ export default function EditCaseStudy(props: {
         onOpenChange: onOpenChangeImageSelect,
     } = useDisclosure();
 
+    // Thumbnail select modal declaration
+    const {
+        isOpen: isOpenThumbnailSelect,
+        onOpen: onOpenThumbnailSelect,
+        onOpenChange: onOpenChangeThumbnailSelect,
+    } = useDisclosure();
+
     // Video select modal declaration
     const {
         isOpen: isOpenVideoSelect,
@@ -86,13 +96,6 @@ export default function EditCaseStudy(props: {
         onOpenChange: onOpenChangeVideoPreview,
     } = useDisclosure();
 
-    // Image preview modal declaration
-    const {
-        isOpen: isOpenImagePreview,
-        onOpen: onOpenImagePreview,
-        onOpenChange: onOpenChangeImagePreview,
-    } = useDisclosure();
-
     // Constant check for unsaved changes
     useEffect(() => {
         if (
@@ -102,7 +105,8 @@ export default function EditCaseStudy(props: {
             JSON.stringify(images) !== JSON.stringify(props.caseStudy.image) ||
             video !== props.caseStudy.video ||
             JSON.stringify(tags) !== JSON.stringify(props.caseStudy.tags) ||
-            order !== props.caseStudy.order
+            order !== props.caseStudy.order ||
+            videoThumbnail !== props.caseStudy.videoThumbnail
         ) {
             setUnsavedChanges(true);
         } else {
@@ -112,17 +116,19 @@ export default function EditCaseStudy(props: {
         title,
         dateLocation,
         copy,
-        JSON.stringify(images),
+        images,
         video,
-        JSON.stringify(tags),
+        tags,
         order,
+        videoThumbnail,
         props.caseStudy.dateLocation,
         props.caseStudy.title,
         props.caseStudy.copy,
-        JSON.stringify(props.caseStudy.image),
+        props.caseStudy.image,
         props.caseStudy.video,
-        JSON.stringify(props.caseStudy.tags),
+        props.caseStudy.tags,
         props.caseStudy.order,
+        props.caseStudy.videoThumbnail,
     ]);
 
     // Check naming conventions for uploads
@@ -179,6 +185,7 @@ export default function EditCaseStudy(props: {
             video: video,
             tags: tags,
             order: order as number,
+            videoThumbnail: videoThumbnail,
         };
         updateCaseStudy(json);
     }
@@ -279,23 +286,27 @@ export default function EditCaseStudy(props: {
             ) : (
                 <>
                     <div className="flex justify-between mt-4 xl:mt-0">
-                        <div
-                            className={`${
-                                props.caseStudy.published
-                                    ? "text-green-600"
-                                    : "text-red-400"
-                            } font-bold text-xl mb-4`}>
-                            {props.caseStudy.published ? "LIVE" : "DRAFT"}
+                        <div className="flex gap-4">
+                            <div
+                                className={`${
+                                    props.caseStudy.published
+                                        ? "text-green-600"
+                                        : "text-red-400"
+                                } font-bold text-xl mb-4`}>
+                                {props.caseStudy.published ? "LIVE" : "DRAFT"}
+                            </div>
+                            {unsavedChanges && (
+                                <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
+                                    There are unsaved changes
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-4">
                             {unsavedChanges && (
-                                <div className="flex gap-4">
-                                    <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
-                                        There are unsaved changes
-                                    </div>
+                                <div>
                                     <button
                                         onClick={handleUpdate}
-                                        className=" my-auto bg-orange-600 px-4 py-2 rounded">
+                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-orange-600 rounded">
                                         Update
                                     </button>
                                 </div>
@@ -324,9 +335,9 @@ export default function EditCaseStudy(props: {
                         </div>
                     </div>
 
-                    <div className="grid xl:grid-cols-2 gap-4">
+                    <div className="grid xl:grid-cols-2 gap-10">
                         <div id="left">
-                            <div className="min-h-[50%]">
+                            <div className="min-h-[33%]">
                                 <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
                                     Images:
                                 </div>
@@ -380,57 +391,110 @@ export default function EditCaseStudy(props: {
                                     </div>
                                 </div>
                             </div>
-                            <div className="h-1/2">
-                                <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-                                    Video:
+                            <div className="h-1/3 flex justify-between gap-2">
+                                <div className="basis-1/2">
+                                    <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+                                        Video:
+                                    </div>
+                                    {video !== "" ? (
+                                        <>
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedPreviewVideo(
+                                                        video
+                                                    );
+                                                    onOpenChangeVideoPreview();
+                                                }}
+                                                className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                <Image
+                                                    height={100}
+                                                    width={100}
+                                                    src={"/images/play.png"}
+                                                    alt="play"
+                                                    className="w-full h-auto m-auto"
+                                                />
+                                            </div>
+                                            <div className="text-center">
+                                                {video.split("-")[0]}
+                                            </div>
+                                            <div className="text-center mt-2 mt-2">
+                                                <button
+                                                    onClick={() => {
+                                                        onOpenVideoSelect();
+                                                        getVideos();
+                                                    }}
+                                                    className="px-10 py-2 bg-orange-600 rounded m-auto">
+                                                    Change
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="text-center mt-4">
+                                                None Selected
+                                            </div>
+                                            <div className="text-center mt-2 h-full">
+                                                <button
+                                                    onClick={() => {
+                                                        onOpenVideoSelect();
+                                                        getVideos();
+                                                    }}
+                                                    className="px-10 py-2 bg-orange-600 rounded m-auto">
+                                                    Select
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                                {video !== "" ? (
-                                    <>
-                                        <div
-                                            onClick={() => {
-                                                setSelectedPreviewVideo(video);
-                                                onOpenChangeVideoPreview();
-                                            }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                            <Image
-                                                height={100}
-                                                width={100}
-                                                src={"/images/play.png"}
-                                                alt="play"
-                                                className="w-full h-auto m-auto"
-                                            />
-                                        </div>
-                                        <div className="text-center">
-                                            {video.split("-")[0]}
-                                        </div>
-                                        <div className="text-center mt-2 mt-2">
-                                            <button
+                                <div className="basis-1/2">
+                                    <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+                                        Thumbnail:
+                                    </div>
+                                    <div className="grid grid-cols-1">
+                                        {videoThumbnail !== "" ? (
+                                            <div className="relative">
+                                                <Image
+                                                    height={300}
+                                                    width={200}
+                                                    src={
+                                                        process.env
+                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                        videoThumbnail
+                                                    }
+                                                    alt={videoThumbnail}
+                                                    className="w-full h-auto"
+                                                />
+                                                <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                                    <div className="text-red-400 h-full flex justify-center">
+                                                        <i
+                                                            onClick={() =>
+                                                                setVideoThumbnail(
+                                                                    ""
+                                                                )
+                                                            }
+                                                            aria-hidden
+                                                            className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div
                                                 onClick={() => {
-                                                    onOpenVideoSelect();
-                                                    getVideos();
+                                                    onOpenChangeThumbnailSelect();
+                                                    getImages();
                                                 }}
-                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
-                                                Change
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-center mt-4">
-                                            None Selected
-                                        </div>
-                                        <div className="text-center mt-2 h-full">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenVideoSelect();
-                                                    getVideos();
-                                                }}
-                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
-                                                Select
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
+                                                className="min-h-28 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
+                                                <div className="flex h-full justify-center">
+                                                    <i
+                                                        aria-hidden
+                                                        className="m-auto fa-solid fa-plus fa-2xl"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div id="right">
@@ -890,6 +954,138 @@ export default function EditCaseStudy(props: {
                     )}
                 </ModalContent>
             </Modal>
+            {/* Change thumbnail modal */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isOpen={isOpenThumbnailSelect}
+                className="dark"
+                scrollBehavior="inside"
+                isDismissable={false}
+                onOpenChange={onOpenChangeThumbnailSelect}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold">
+                                    Select or Upload Image
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                {imageNamingError && (
+                                    <div className="text-center text-red-400">
+                                        File name prefix should be THUMBNAIL_
+                                    </div>
+                                )}
+                                <div className="w-full flex justify-center mb-10">
+                                    {uploading ? (
+                                        <CircularProgress
+                                            color="warning"
+                                            aria-label="Loading..."
+                                        />
+                                    ) : (
+                                        <>
+                                            <div className="file-input shadow-xl">
+                                                <input
+                                                    onChange={(e) => {
+                                                        if (e.target.files) {
+                                                            if (
+                                                                namingConventionCheck(
+                                                                    e.target
+                                                                        .files[0]
+                                                                        .name,
+                                                                    "THUMBNAIL"
+                                                                )
+                                                            ) {
+                                                                setUploading(
+                                                                    true
+                                                                );
+                                                                setImageNamingError(
+                                                                    false
+                                                                );
+                                                                uploadImage(
+                                                                    e.target
+                                                                        .files[0],
+                                                                    "video"
+                                                                );
+                                                            } else {
+                                                                setImageNamingError(
+                                                                    true
+                                                                );
+                                                                e.target.value =
+                                                                    "";
+                                                            }
+                                                        }
+                                                    }}
+                                                    id={
+                                                        props.caseStudy.id +
+                                                        "-image-upload"
+                                                    }
+                                                    type="file"
+                                                    className="inputFile"
+                                                />
+                                                <label
+                                                    htmlFor={
+                                                        props.caseStudy.id +
+                                                        "-image-upload"
+                                                    }>
+                                                    Upload New
+                                                </label>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
+                                    {availableImages.map(
+                                        (image: Images, index: number) => {
+                                            if (
+                                                image.name.split("_")[0] ===
+                                                "THUMBNAIL"
+                                            )
+                                                return (
+                                                    <div
+                                                        key={
+                                                            image.name +
+                                                            "-" +
+                                                            index
+                                                        }
+                                                        className="flex cursor-pointer"
+                                                        onClick={() => {
+                                                            setVideoThumbnail(
+                                                                image.name
+                                                            );
+                                                            onClose();
+                                                        }}>
+                                                        <Image
+                                                            height={300}
+                                                            width={300}
+                                                            src={
+                                                                process.env
+                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                image.name
+                                                            }
+                                                            alt={image.name}
+                                                            className="w-full h-auto m-auto"
+                                                        />
+                                                    </div>
+                                                );
+                                        }
+                                    )}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
             {/* Preview Video Modal */}
             <Modal
                 size="5xl"
@@ -917,51 +1113,6 @@ export default function EditCaseStudy(props: {
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
                                         selectedPreviewVideo
                                     }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setVideoNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Image Preview Modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenImagePreview}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeImagePreview}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    {selectedPreviewImage}
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <Image
-                                    height={100}
-                                    width={100}
-                                    src={
-                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                                        selectedPreviewImage
-                                    }
-                                    alt={selectedPreviewImage}
-                                    className="w-full h-auto"
                                 />
                             </ModalBody>
                             <ModalFooter>

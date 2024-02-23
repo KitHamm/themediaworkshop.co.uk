@@ -10,7 +10,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "home" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({
@@ -27,7 +27,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "film" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({
@@ -44,7 +44,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "digital" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({
@@ -61,7 +61,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "light" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({
@@ -78,7 +78,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "events" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({
@@ -95,7 +95,7 @@ export default function Navbar(props: { active: string }) {
                     <li
                         className={`${
                             props.active === "art" ? "text-orange-600" : ""
-                        } hover:text-orange-600 cursor-pointer`}>
+                        } hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
                             onClick={() =>
                                 window.scrollTo({

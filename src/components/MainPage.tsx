@@ -117,7 +117,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                     </div>
                 );
             })}
-            {props.data.title === "home" && props.logoImages.length > 0 && (
+            {props.logoImages.length > 0 && (
                 <TickerTape logoImages={props.logoImages} />
             )}
             <Footer openContactModal={onOpenContact} />

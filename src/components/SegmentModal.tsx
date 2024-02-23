@@ -116,26 +116,62 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                         />
                                     )}
                                     {casestudy.video.length > 0 && (
-                                        <video
-                                            playsInline
-                                            disablePictureInPicture
-                                            onClick={() => {
-                                                setSelectedVideo(
+                                        <div className="relative">
+                                            <video
+                                                playsInline
+                                                disablePictureInPicture
+                                                id="bg-video"
+                                                className="h-auto w-full fade-in mt-2"
+                                                autoPlay={false}
+                                                muted
+                                                loop
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_VIDEO_URL +
                                                     casestudy.video
-                                                );
-                                                onOpenChangeVideo();
-                                            }}
-                                            id="bg-video"
-                                            className="h-auto w-full fade-in mt-2 cursor-pointer"
-                                            autoPlay={false}
-                                            muted
-                                            loop
-                                            src={
-                                                process.env
-                                                    .NEXT_PUBLIC_BASE_VIDEO_URL +
-                                                casestudy.video
-                                            }
-                                        />
+                                                }
+                                            />
+                                            {casestudy.videoThumbnail ? (
+                                                <div
+                                                    onClick={() => {
+                                                        setSelectedVideo(
+                                                            casestudy.video
+                                                        );
+                                                        onOpenChangeVideo();
+                                                    }}
+                                                    className="absolute z-10 bottom-0 w-full h-full flex cursor-pointer">
+                                                    <Image
+                                                        src={
+                                                            process.env
+                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                            casestudy.videoThumbnail
+                                                        }
+                                                        alt="thumbnail"
+                                                        width={500}
+                                                        height={300}
+                                                        className="h-full w-auto m-auto"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )}
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedVideo(
+                                                        casestudy.video
+                                                    );
+                                                    onOpenChangeVideo();
+                                                }}
+                                                className="transition-all absolute z-20 bg-black hover:bg-opacity-25 bg-opacity-50 bottom-0 w-full h-full flex cursor-pointer">
+                                                <Image
+                                                    src={"/images/play.png"}
+                                                    alt="play"
+                                                    width={500}
+                                                    height={300}
+                                                    className="transition-all h-1/2 w-auto m-auto hover:opacity-100 opacity-85"
+                                                />
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -174,6 +210,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
             })}
             <Modal
                 size="4xl"
+                placement="center"
                 backdrop="blur"
                 isOpen={isOpenImage}
                 className="dark"
@@ -220,6 +257,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
             </Modal>
             <Modal
                 size="4xl"
+                placement="center"
                 backdrop="blur"
                 isOpen={isOpenVideo}
                 className="dark"

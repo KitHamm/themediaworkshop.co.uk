@@ -2,7 +2,7 @@ export default function Footer(props: { openContactModal: any }) {
     const date = new Date();
     return (
         <div className="w-full">
-            <div className="flex justify-center bg-neutral-800 py-10">
+            <div className="flex justify-center bg-neutral-900 py-10">
                 <div className="flex justify-evenly gap-10">
                     <div className="cursor-pointer hover:text-orange-600 transition-all">
                         <a

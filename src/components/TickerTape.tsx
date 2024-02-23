@@ -14,10 +14,10 @@ export default function TickerTape(props: { logoImages: Logos }) {
         loop: true,
         watchDrag: false,
     };
-    const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS, [AutoScroll()]);
+    const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (
-        <div className="hidden xl:block w-full overflow-hidden bg-neutral-600">
-            <div className="embla my-10">
+        <div className="w-full overflow-hidden bg-neutral-800">
+            <div className="embla my-5 xl:my-10">
                 <div className="embla__viewport" ref={emblaRef}>
                     <div className="embla__container">
                         {props.logoImages.map((image: Logos, index: number) => (

@@ -176,6 +176,10 @@ export default function DashboardView(props: { hidden: boolean }) {
                                     <div>STUDY_</div>
                                 </div>
                                 <div className="flex gap-2 text-lg">
+                                    <strong>Thumbnail Images:</strong>
+                                    <div>THUMBNAIL_</div>
+                                </div>
+                                <div className="flex gap-2 text-lg">
                                     <strong>Logo Images:</strong>
                                     <div>LOGO_</div>
                                 </div>
@@ -233,6 +237,45 @@ export default function DashboardView(props: { hidden: boolean }) {
                     Change Log
                 </div>
                 <Accordion variant="splitted">
+                    <AccordionItem
+                        className="dark"
+                        key={2}
+                        aria-label="23/2/2024"
+                        title={
+                            <div className="text-lg text-orange-600 font-bold border-b pb-2 mb-2">
+                                23/2/2024
+                            </div>
+                        }>
+                        <div className="text-lg">
+                            <ul>
+                                <li>- Video in examples now has a play icon</li>
+                                <li>
+                                    - Video in examples has option to add a
+                                    thumbnail
+                                </li>
+                                <li>
+                                    - Logo bar moves slower and changed color
+                                    per request
+                                </li>
+                                <li>- Logo bar on all pages and mobile</li>
+                                <li>
+                                    - Socials bar changes color as per request
+                                </li>
+                                <li>
+                                    - Text positioning on segments now lines up
+                                    with body of text
+                                </li>
+                                <li>
+                                    - Call to action &quot;Scroll Down&quot;
+                                    when first load and stationary at top for 5
+                                    seconds
+                                </li>
+                                <li>
+                                    - Can now download media from the media page
+                                </li>
+                            </ul>
+                        </div>
+                    </AccordionItem>
                     <AccordionItem
                         className="dark"
                         key={1}

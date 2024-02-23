@@ -37,6 +37,7 @@ const filePrefixList = [
     "SEGMENT",
     "STUDY",
     "LOGO",
+    "THUMBNAIL",
 ];
 
 export default function Media(props: {
@@ -334,7 +335,7 @@ export default function Media(props: {
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
                     </div>
-                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 mb-4 text-center">
+                    <div className="grid xl:grid-cols-5 grid-cols-2 gap-4 mb-4 text-center">
                         <Link
                             href={
                                 `?view=media&video=` +
@@ -378,6 +379,19 @@ export default function Media(props: {
                             href={
                                 `?view=media&video=` +
                                 videoView +
+                                `&image=thumbnails`
+                            }
+                            className={`${
+                                imageView === "thumbnails"
+                                    ? "bg-orange-600"
+                                    : "bg-neutral-600"
+                            } px-4 py-2 rounded transition-all`}>
+                            Thumbnails
+                        </Link>
+                        <Link
+                            href={
+                                `?view=media&video=` +
+                                videoView +
                                 `&image=logos`
                             }
                             className={`${
@@ -399,6 +413,8 @@ export default function Media(props: {
                                     image.name.split("_")[0] === "CASESTUDY") ||
                                 (imageView === "logos" &&
                                     image.name.split("_")[0] === "LOGO") ||
+                                (imageView === "thumbnails" &&
+                                    image.name.split("_")[0] === "THUMBNAIL") ||
                                 imageView === "all"
                             ) {
                                 return (
@@ -564,6 +580,12 @@ export default function Media(props: {
                                         Delete
                                     </Button>
                                 )}
+                                <a
+                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-xl"
+                                    href="/"
+                                    download={selectedImage}>
+                                    Download
+                                </a>
                                 <Button
                                     color="danger"
                                     onPress={() => {
@@ -618,6 +640,12 @@ export default function Media(props: {
                                         Delete
                                     </Button>
                                 )}
+                                <a
+                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-xl"
+                                    href="/"
+                                    download={selectedVideo}>
+                                    Download
+                                </a>
                                 <Button
                                     color="danger"
                                     onPress={() => {
@@ -632,7 +660,7 @@ export default function Media(props: {
             </Modal>
             {/* Media upload modal */}
             <Modal
-                size="xl"
+                size="2xl"
                 backdrop="blur"
                 isOpen={isOpenUpload}
                 className="dark"
@@ -690,6 +718,18 @@ export default function Media(props: {
                                                     </strong>
                                                     STUDY_
                                                 </div>
+                                                <div>
+                                                    <strong>
+                                                        Logo Images:{" "}
+                                                    </strong>
+                                                    LOGO_
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        Video Thumbnail:{" "}
+                                                    </strong>
+                                                    THUMBNAIL_
+                                                </div>
                                             </div>
                                             <div>
                                                 <div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
@@ -729,35 +769,6 @@ export default function Media(props: {
                                     </div>
                                 )}
                                 <div className="flex mx-auto mt-4">
-                                    <div className="file-input">
-                                        <input
-                                            onChange={(e) => {
-                                                if (e.target.files)
-                                                    if (
-                                                        fileNamingCheck(
-                                                            e.target.files[0]
-                                                                .name
-                                                        )
-                                                    ) {
-                                                        setNamingError(false);
-                                                        setNewUpload(
-                                                            e.target.files[0]
-                                                        );
-                                                    } else {
-                                                        setNamingError(true);
-                                                    }
-                                            }}
-                                            className="inputFile"
-                                            type="file"
-                                            name={"new-video"}
-                                            id={"new-video"}
-                                        />
-                                        <label htmlFor="new-video">
-                                            {newUpload !== undefined
-                                                ? newUpload.name
-                                                : "Select file"}
-                                        </label>
-                                    </div>
                                     {uploading ? (
                                         <CircularProgress
                                             color="warning"
@@ -765,28 +776,65 @@ export default function Media(props: {
                                             className="ms-4"
                                         />
                                     ) : (
-                                        ""
+                                        <div className="file-input">
+                                            <input
+                                                onChange={(e) => {
+                                                    if (e.target.files)
+                                                        if (
+                                                            fileNamingCheck(
+                                                                e.target
+                                                                    .files[0]
+                                                                    .name
+                                                            )
+                                                        ) {
+                                                            setNamingError(
+                                                                false
+                                                            );
+                                                            setNewUpload(
+                                                                e.target
+                                                                    .files[0]
+                                                            );
+                                                        } else {
+                                                            setNamingError(
+                                                                true
+                                                            );
+                                                        }
+                                                }}
+                                                className="inputFile"
+                                                type="file"
+                                                name={"new-video"}
+                                                id={"new-video"}
+                                            />
+                                            <label htmlFor="new-video">
+                                                {newUpload !== undefined
+                                                    ? "Change"
+                                                    : "Select file"}
+                                            </label>
+                                            <div className="text-center mt-4">
+                                                {newUpload !== undefined
+                                                    ? newUpload.name
+                                                    : "No File Selected"}
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="flex justify-evenly">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                    <Button
+                                        onPress={() => {
+                                            clearFileInput();
+                                        }}
+                                        color="danger">
+                                        Clear
+                                    </Button>
+                                    <Button
+                                        onPress={() => {
                                             setUploading(true);
                                             uploadMedia();
                                         }}
                                         disabled={newUpload ? false : true}
-                                        className=" my-auto disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 text-black rounded-md px-4 py-2">
+                                        className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
                                         Upload
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            clearFileInput();
-                                        }}
-                                        className="my-auto  bg-red-400 text-black rounded-md px-4 py-2">
-                                        Clear
-                                    </button>
+                                    </Button>
                                 </div>
                             </ModalBody>
                             <ModalFooter>

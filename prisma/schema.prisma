@@ -71,6 +71,7 @@ model CaseStudy {
     copy String @db.Text
     image String[]
     video String?
+    videoThumbnail String?
     segment Segment @relation(fields: [segmentId], references: [id])
     segmentId Int
     tags String[]

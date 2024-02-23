@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 // Components
 import MainPage from "@/components/MainPage";
 // Types
-import { Page } from "@prisma/client";
+import { Logos, Page } from "@prisma/client";
 
 export default async function Home() {
     // Collect page data for specified page
@@ -24,6 +24,7 @@ export default async function Home() {
             },
         },
     });
+    const logoImages: Logos = await prisma.logos.findMany();
     // Main page component
-    return <MainPage data={data} />;
+    return <MainPage data={data} logoImages={logoImages} />;
 }
