@@ -115,7 +115,7 @@ export default function Header(props: {
                 </div>
                 <div
                     ref={chevron}
-                    className="transition-opacity ease-in-out opacity-0 w-full absolute left-0 right-0 text-center bottom-52 xl:bottom-10">
+                    className="transition-opacity ease-in-out opacity-0 w-full absolute left-0 right-0 text-center bottom-40 xl:bottom-10">
                     <div className="flex flex-col gap-4">
                         <i
                             aria-hidden
