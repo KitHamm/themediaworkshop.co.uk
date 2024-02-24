@@ -171,6 +171,16 @@ video {
         opacity: 0.5;
     }
 }
+.no-video {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(
+        302deg,
+        rgba(0, 0, 0, 1) 25%,
+        rgba(234, 88, 12, 1) 50%,
+        rgba(0, 0, 0, 1) 75%
+    );
+}
 .embla {
     --slide-spacing: 0rem;
     --slide-size: 100%;
