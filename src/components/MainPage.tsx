@@ -19,7 +19,7 @@ import {
 import { useForm } from "react-hook-form";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // Types
 import { Logos, Page, Segment } from "@prisma/client";
@@ -30,6 +30,10 @@ type FormTypes = {
 };
 
 export default function MainPage(props: { data: Page; logoImages?: Logos }) {
+    // Video ref
+    const video = useRef<HTMLVideoElement>(null);
+    // Video loading
+    const [loading, setLoading] = useState(true);
     // Contact form states
     const [sending, setSending] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -46,6 +50,12 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
     } = useDisclosure();
 
     useEffect(() => {
+        if (
+            video.current?.readyState === 3 ||
+            video.current?.readyState === 4
+        ) {
+            setLoading(false);
+        }
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
 
@@ -88,19 +98,41 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                 <section
                     id="bg-video-container"
                     className="relative top-0 left-0 w-full h-screen overflow-hidden">
-                    <video
-                        playsInline
-                        disablePictureInPicture
-                        id="bg-video"
-                        className="h-screen w-auto xl:w-full xl:h-auto fade-in"
-                        autoPlay={true}
-                        muted
-                        loop
-                        src={
-                            process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                            props.data?.video
-                        }
-                    />
+                    {props.data.video ? (
+                        <>
+                            <video
+                                ref={video}
+                                playsInline
+                                disablePictureInPicture
+                                id="bg-video"
+                                className={`${
+                                    !loading ? "fade-in" : "opacity-0"
+                                } h-screen w-auto xl:w-full xl:h-auto z-20`}
+                                autoPlay={true}
+                                muted
+                                onCanPlayThrough={() => setLoading(false)}
+                                loop
+                                src={
+                                    process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                    props.data?.video
+                                }
+                            />
+                            <div
+                                className={`${
+                                    !loading ? "hidden" : "flex fade-in"
+                                } absolute w-screen z-10 h-screen top-0 left-0 flex justify-center`}>
+                                <CircularProgress
+                                    classNames={{
+                                        track: "text-orange-600",
+                                        indicator: "text-orange-600",
+                                    }}
+                                    aria-label="Loading..."
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="no-video" />
+                    )}
                     {/* Header section with content over full size video */}
                     <Header
                         openContactModal={onOpenContact}
