@@ -207,7 +207,7 @@ export default function EditCaseStudy(props: {
     }
 
     async function deleteCaseStudy() {
-        const response = await fetch("/api/deletecasestudy", {
+        await fetch("/api/deletecasestudy", {
             method: "POST",
             body: JSON.stringify({ id: props.caseStudy.id }),
         })

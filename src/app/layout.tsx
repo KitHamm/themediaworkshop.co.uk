@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Lato } from "next/font/google";
 import "./globals.css";
 
@@ -6,6 +7,12 @@ const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
     subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+    initialScale: 1,
+    width: "device-width",
+    minimumScale: 1,
+};
 
 export const metadata: Metadata = {
     title: "The Media Workshop Ltd",
@@ -20,14 +27,16 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <head>
-                <script
-                    src="https://kit.fontawesome.com/9923e52d96.js"
-                    crossOrigin="anonymous"
-                    async
-                />
-            </head>
-            <body className={lato.className + " bg-neutral-900 text-white m-0"}>
+            <Script
+                src="https://kit.fontawesome.com/9923e52d96.js"
+                crossOrigin="anonymous"
+                async
+            />
+            <body
+                className={
+                    lato.className +
+                    " bg-neutral-900 text-white m-0 w-screen overflow-x-hidden"
+                }>
                 {children}
             </body>
         </html>

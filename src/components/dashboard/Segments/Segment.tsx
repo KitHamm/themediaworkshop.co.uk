@@ -137,14 +137,14 @@ export default function EditSegment(props: {
         order,
         title,
         copy,
-        JSON.stringify(images),
+        images,
         headerImage,
         props.segment.linkTo,
         props.segment.buttonText,
         props.segment.order,
         props.segment.title,
         props.segment.copy,
-        JSON.stringify(props.segment.image),
+        props.segment.image,
         props.segment.headerimage,
     ]);
 

@@ -45,6 +45,10 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
         onOpenChange: onOpenChangeContact,
     } = useDisclosure();
 
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+
     // Showing sending and success states
     useEffect(() => {
         if (sending && success) {

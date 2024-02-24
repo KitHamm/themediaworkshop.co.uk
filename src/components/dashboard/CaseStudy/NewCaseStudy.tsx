@@ -98,14 +98,7 @@ export default function NewCaseStudy(props: {
         } else {
             setUnsavedChanges(false);
         }
-    }, [
-        title,
-        copy,
-        JSON.stringify(images),
-        video,
-        JSON.stringify(tags),
-        order,
-    ]);
+    }, [title, copy, images, video, tags, order]);
 
     // Check naming conventions for uploads
     function namingConventionCheck(fileName: string, check: string) {

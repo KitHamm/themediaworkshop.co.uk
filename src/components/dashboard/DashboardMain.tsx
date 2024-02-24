@@ -39,14 +39,10 @@ export default function DashboardMain(props: {
     const view: string = searchParams.get("view")
         ? searchParams.get("view")!
         : "dashboard";
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen, onOpenChange } = useDisclosure();
     // Initial pop up if this is the first log in
     useEffect(() => {
-        checkActivation();
-    }, []);
-
-    async function checkActivation() {
-        await fetch("/api/activated", {
+        fetch("/api/activated", {
             method: "POST",
             body: JSON.stringify({
                 id: props.session.user.id,
@@ -59,7 +55,7 @@ export default function DashboardMain(props: {
                 }
             })
             .catch((err) => console.log(err));
-    }
+    }, []);
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
@@ -122,7 +118,7 @@ export default function DashboardMain(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <p>Welcome to the TMW Dashboard.</p>
-                                <p>Your account has not been activated.</p>
+                                <p>Your account has now been activated.</p>
                                 <p>
                                     On the main dashboard you can find
                                     information on how best to use this service.
