@@ -85,39 +85,28 @@ export default function EditSegment(props: {
     const [deleteError, setDeleteError] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
     // Top image modal declaration
-    const {
-        isOpen: isOpenTopImage,
-        onOpen: onOpenTopImage,
-        onOpenChange: onOpenChangeTopImage,
-    } = useDisclosure();
+    const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
+        useDisclosure();
 
     // Segment images modal declaration
-    const {
-        isOpen: isOpenAddImage,
-        onOpen: onOpenAddImage,
-        onOpenChange: onOpenChangeAddImage,
-    } = useDisclosure();
+    const { isOpen: isOpenAddImage, onOpenChange: onOpenChangeAddImage } =
+        useDisclosure();
 
     // Edit case study modal declaration
     const {
         isOpen: isOpenEditCaseStudy,
-        onOpen: onOpenEditCaseStudy,
         onOpenChange: onOpenChangeEditCaseStudy,
     } = useDisclosure();
 
     // New case study modal declaration
     const {
         isOpen: isOpenNewCaseStudy,
-        onOpen: onOpenNewCaseStudy,
         onOpenChange: onOpenChangeNewCaseStudy,
     } = useDisclosure();
 
     // Delete warning modal declaration
-    const {
-        isOpen: isOpenDelete,
-        onOpen: onOpenDelete,
-        onOpenChange: onOpenChangeDelete,
-    } = useDisclosure();
+    const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
+        useDisclosure();
 
     // Constant check for unsaved changes
     useEffect(() => {

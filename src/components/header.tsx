@@ -24,24 +24,18 @@ export default function Header(props: {
     const chevron = useRef<HTMLDivElement>(null);
     const copyText = useRef<HTMLDivElement>(null);
     // Contact form states
-    const {
-        isOpen: isOpenShowreel,
-        onOpen: onOpenShowreel,
-        onOpenChange: onOpenChangeShowreel,
-    } = useDisclosure();
+    const { isOpen: isOpenShowreel, onOpenChange: onOpenChangeShowreel } =
+        useDisclosure();
     // Year review modal declaration
-    const {
-        isOpen: isOpenYear,
-        onOpen: onOpenYear,
-        onOpenChange: onOpenChangeYear,
-    } = useDisclosure();
+    const { isOpen: isOpenYear, onOpenChange: onOpenChangeYear } =
+        useDisclosure();
 
     useEffect(() => {
         const anchors: HTMLAnchorElement[] = [];
-        if (copyText.current) {
+        if (copyText.current?.children.length! > 0) {
             for (
                 let i = 0;
-                i < copyText.current?.children[0].children.length;
+                i < copyText.current?.children[0].children.length!;
                 i++
             ) {
                 if (copyText.current?.children[0].children[i].tagName === "A")
@@ -167,7 +161,6 @@ export default function Header(props: {
                 isOpen={isOpenShowreel}
                 className="dark transition-all"
                 placement="center"
-                // closeButton={<div></div>}
                 onOpenChange={onOpenChangeShowreel}>
                 <ModalContent>
                     {(onClose) => (
@@ -202,7 +195,6 @@ export default function Header(props: {
                 isOpen={isOpenYear}
                 className="dark transition-all"
                 placement="center"
-                // closeButton={<div></div>}
                 onOpenChange={onOpenChangeYear}>
                 <ModalContent>
                     {(onClose) => (

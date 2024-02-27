@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     });
 
     try {
-        const mail = await transporter.sendMail({
+        await transporter.sendMail({
             from: "Website",
             to: emailHost.emailHost,
             replyTo: emailHost.emailHost,

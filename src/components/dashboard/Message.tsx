@@ -33,15 +33,11 @@ export default function Messages(props: {
     // Message view modal
     const {
         isOpen: isOpenMessageModal,
-        onOpen: onOpenMessageModal,
         onOpenChange: onOpenChangeMessageModal,
     } = useDisclosure();
     // Message delete warning modal
-    const {
-        isOpen: isOpenDeleteModal,
-        onOpen: onOpenDeleteModal,
-        onOpenChange: onOpenChangeDeleteModal,
-    } = useDisclosure();
+    const { isOpen: isOpenDeleteModal, onOpenChange: onOpenChangeDeleteModal } =
+        useDisclosure();
 
     // Collect initial messages
     useEffect(() => {

@@ -19,7 +19,7 @@ import Markdown from "react-markdown";
 import { useState, useEffect } from "react";
 
 // Types
-import { CaseStudy, Images, Videos } from "@prisma/client";
+import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import uploadHandler from "../uploadHandler";
 
@@ -64,11 +64,8 @@ export default function NewCaseStudy(props: {
     const [uploading, setUploading] = useState(false);
 
     // Image select modal declaration
-    const {
-        isOpen: isOpenImageSelect,
-        onOpen: onOpenImageSelect,
-        onOpenChange: onOpenChangeImageSelect,
-    } = useDisclosure();
+    const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =
+        useDisclosure();
 
     // Video select modal declaration
     const {
@@ -80,14 +77,12 @@ export default function NewCaseStudy(props: {
     // Video preview modal declaration
     const {
         isOpen: isOpenVideoPreview,
-        onOpen: onOpenVideoPreview,
         onOpenChange: onOpenChangeVideoPreview,
     } = useDisclosure();
 
     // Image preview modal declaration
     const {
         isOpen: isOpenThumbnailSelect,
-        onOpen: onOpenThumbnailSelect,
         onOpenChange: onOpenChangeThumbnailSelect,
     } = useDisclosure();
 

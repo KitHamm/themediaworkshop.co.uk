@@ -36,14 +36,13 @@ export default function PageSegment(props: {
     index: number;
 }) {
     // InView declarations
-    const { ref, inView, entry } = useInView({
+    const { ref, inView } = useInView({
         /* Optional options */
         threshold: 0.1,
     });
 
     useEffect(() => {
         const el = document.getElementById("fade-" + props.index);
-
         if (el && inView) {
             if (el.classList.contains("opacity-0")) {
                 el.classList.replace(
@@ -84,10 +83,10 @@ export default function PageSegment(props: {
 
     useEffect(() => {
         const anchors: HTMLAnchorElement[] = [];
-        if (copyText.current) {
+        if (copyText.current?.children.length! > 0) {
             for (
                 let i = 0;
-                i < copyText.current?.children[0].children.length;
+                i < copyText.current?.children[0].children.length!;
                 i++
             ) {
                 if (copyText.current?.children[0].children[i].tagName === "A")

@@ -54,17 +54,11 @@ export default function NewSegment(props: {
     const [notImageError, setNotImageError] = useState(false);
     const [success, setSuccess] = useState(false);
     // Top image select modal
-    const {
-        isOpen: isOpenTopImage,
-        onOpen: onOpenTopImage,
-        onOpenChange: onOpenChangeTopImage,
-    } = useDisclosure();
+    const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
+        useDisclosure();
     // Segment images select modal
-    const {
-        isOpen: isOpenAddImage,
-        onOpen: onOpenAddImage,
-        onOpenChange: onOpenChangeAddImage,
-    } = useDisclosure();
+    const { isOpen: isOpenAddImage, onOpenChange: onOpenChangeAddImage } =
+        useDisclosure();
 
     async function getImages() {
         fetch("/api/images", { method: "GET" })

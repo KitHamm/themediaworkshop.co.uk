@@ -147,16 +147,8 @@ export default function DashboardView(props: { hidden: boolean }) {
                                     <div>HEADER_</div>
                                 </div>
                                 <div className="flex gap-2 text-lg">
-                                    <strong>Showreel Videos:</strong>
-                                    <div>SHOWREEL_</div>
-                                </div>
-                                <div className="flex gap-2 text-lg">
-                                    <strong>Year Review Videos:</strong>
-                                    <div>YEAR_</div>
-                                </div>
-                                <div className="flex gap-2 text-lg">
-                                    <strong>Case Study Videos:</strong>
-                                    <div>STUDY_</div>
+                                    <strong>Other Videos:</strong>
+                                    <div>VIDEO_</div>
                                 </div>
                             </div>
                             <div id="right">
@@ -237,6 +229,38 @@ export default function DashboardView(props: { hidden: boolean }) {
                     Change Log
                 </div>
                 <Accordion variant="splitted">
+                    <AccordionItem
+                        className="dark"
+                        key={3}
+                        aria-label="27/2/2024"
+                        title={
+                            <div className="text-lg text-orange-600 font-bold border-b pb-2 mb-2">
+                                27/2/2024
+                            </div>
+                        }>
+                        <div className="text-lg">
+                            <ul>
+                                <li>- Media bin now sorted by upload date</li>
+                                <li>
+                                    - Ticker tape logos now sorted
+                                    alphabetically
+                                </li>
+                                <li>
+                                    - Changed video tags to HEADER_ and VIDEO_
+                                </li>
+                                <li>
+                                    - Dynamically add target _blank to a tags in
+                                    Markdown text
+                                </li>
+                                <li>
+                                    - Error handling when trying to download
+                                    Segment that has Case Studies
+                                </li>
+                                <li>- Fixed download media being corrupt</li>
+                                <li>- CTA is now 10 second delay</li>
+                            </ul>
+                        </div>
+                    </AccordionItem>
                     <AccordionItem
                         className="dark"
                         key={2}

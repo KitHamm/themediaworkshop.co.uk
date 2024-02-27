@@ -34,21 +34,15 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
     const copyText = useRef<HTMLDivElement[]>([]);
 
     // Image Preview Modal
-    const {
-        isOpen: isOpenImage,
-        onOpen: onOpenImage,
-        onOpenChange: onOpenChangeImage,
-    } = useDisclosure();
+    const { isOpen: isOpenImage, onOpenChange: onOpenChangeImage } =
+        useDisclosure();
 
     // Video Preview Modal
-    const {
-        isOpen: isOpenVideo,
-        onOpen: onOpenVideo,
-        onOpenChange: onOpenChangeVideo,
-    } = useDisclosure();
+    const { isOpen: isOpenVideo, onOpenChange: onOpenChangeVideo } =
+        useDisclosure();
 
     useEffect(() => {
-        if (copyText.current) {
+        if (copyText.current.length > 0) {
             for (let i = 0; i < copyText.current.length; i++) {
                 const anchors: HTMLAnchorElement[] = [];
                 for (

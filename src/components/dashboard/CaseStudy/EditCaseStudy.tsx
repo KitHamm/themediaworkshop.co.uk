@@ -71,16 +71,12 @@ export default function EditCaseStudy(props: {
     const [uploading, setUploading] = useState(false);
 
     // Image select modal declaration
-    const {
-        isOpen: isOpenImageSelect,
-        onOpen: onOpenImageSelect,
-        onOpenChange: onOpenChangeImageSelect,
-    } = useDisclosure();
+    const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =
+        useDisclosure();
 
     // Thumbnail select modal declaration
     const {
         isOpen: isOpenThumbnailSelect,
-        onOpen: onOpenThumbnailSelect,
         onOpenChange: onOpenChangeThumbnailSelect,
     } = useDisclosure();
 
@@ -94,7 +90,6 @@ export default function EditCaseStudy(props: {
     // Video preview modal declaration
     const {
         isOpen: isOpenVideoPreview,
-        onOpen: onOpenVideoPreview,
         onOpenChange: onOpenChangeVideoPreview,
     } = useDisclosure();
 
@@ -215,7 +210,6 @@ export default function EditCaseStudy(props: {
         })
             .then((response) => {
                 if (response.ok) {
-                    // setDeleted(true);
                     props.revalidateDashboard("/");
                     props.onOpenChangeEditCaseStudy();
                 }

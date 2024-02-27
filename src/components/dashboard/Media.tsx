@@ -86,17 +86,11 @@ export default function Media(props: {
         onOpenChange: onOpenChangeVideo,
     } = useDisclosure();
     // Delete modal declaration
-    const {
-        isOpen: isOpenDelete,
-        onOpen: onOpenDelete,
-        onOpenChange: onOpenChangeDelete,
-    } = useDisclosure();
+    const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
+        useDisclosure();
     // Upload modal declaration
-    const {
-        isOpen: isOpenUpload,
-        onOpen: onOpenUpload,
-        onOpenChange: onOpenChangeUpload,
-    } = useDisclosure();
+    const { isOpen: isOpenUpload, onOpenChange: onOpenChangeUpload } =
+        useDisclosure();
 
     // Get initial videos and images to populate pool
     useEffect(() => {
