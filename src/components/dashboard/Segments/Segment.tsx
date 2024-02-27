@@ -81,6 +81,9 @@ export default function EditSegment(props: {
     // State for selected case study to edit
     const [selectedCaseStudy, setSelectedCaseStudy] = useState(0);
 
+    // Delete States
+    const [deleteError, setDeleteError] = useState(false);
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
     // Top image modal declaration
     const {
         isOpen: isOpenTopImage,
@@ -251,20 +254,27 @@ export default function EditSegment(props: {
     }
 
     async function deleteSegment() {
-        const response = await fetch("/api/deletesegment", {
+        await fetch("/api/deletesegment", {
             method: "POST",
             body: JSON.stringify({ id: props.segment.id }),
         })
-            .then((response) => {
-                if (response.ok) {
+            .then(async (res) => {
+                if (res.ok) {
+                    setDeleteError(false);
+                    setDeleteSuccess(true);
                     if (props.title === "home") {
                         props.revalidateDashboard("/");
                     } else {
                         props.revalidateDashboard("/" + props.title);
                     }
+                } else {
+                    setDeleteError(true);
+                    setDeleteSuccess(false);
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     return (
@@ -914,6 +924,9 @@ export default function EditSegment(props: {
                                 <ModalHeader></ModalHeader>
                                 <ModalBody>
                                     <EditCaseStudy
+                                        onOpenChangeEditCaseStudy={
+                                            onOpenChangeEditCaseStudy
+                                        }
                                         revalidateDashboard={
                                             props.revalidateDashboard
                                         }
@@ -990,26 +1003,49 @@ export default function EditSegment(props: {
                             <>
                                 <ModalHeader>
                                     <div className="w-full text-center font-bold text-red-400">
-                                        {"Delete " +
-                                            props.segment.title +
-                                            " segment?"}
+                                        Are you sure?
                                     </div>
                                 </ModalHeader>
-                                <ModalBody></ModalBody>
+                                <ModalBody>
+                                    {deleteError ? (
+                                        <div>
+                                            <div className="font-bold text-2xl text-center text-red-400">
+                                                Unable to delete.
+                                            </div>
+                                            <div className="font-bold text-base text-center">
+                                                Segment may have Case Studies.
+                                                Please delete them first.
+                                            </div>
+                                        </div>
+                                    ) : deleteSuccess ? (
+                                        <div className="font-bold text-green-400 text-2xl text-center">
+                                            Successfully Deleted
+                                        </div>
+                                    ) : (
+                                        <div className="font-bold text-2xl text-center">
+                                            {"Delete " +
+                                                props.segment.title +
+                                                "?"}
+                                        </div>
+                                    )}
+                                </ModalBody>
                                 <ModalFooter>
+                                    {!deleteError && !deleteSuccess && (
+                                        <Button
+                                            color="danger"
+                                            variant="light"
+                                            onPress={() => {
+                                                deleteSegment();
+                                            }}>
+                                            Delete
+                                        </Button>
+                                    )}
                                     <Button
                                         color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            deleteSegment();
-                                            onClose();
-                                        }}>
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        color="danger"
                                         onPress={() => {
                                             onClose();
+                                            setDeleteError(false);
+                                            setDeleteSuccess(false);
                                         }}>
                                         Close
                                     </Button>

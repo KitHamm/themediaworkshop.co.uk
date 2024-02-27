@@ -185,6 +185,7 @@ export default function NewCaseStudy(props: {
             setUploading(false);
             return;
         } else {
+            setNotImageError(false);
             await uploadHandler(file, "image")
                 .then((res: any) => {
                     if (res.message) {
@@ -203,6 +204,7 @@ export default function NewCaseStudy(props: {
             setUploading(false);
             return;
         } else {
+            setNotVideoError(false);
             await uploadHandler(file, "video")
                 .then((res: any) => {
                     if (res.message) {
@@ -219,10 +221,13 @@ export default function NewCaseStudy(props: {
         <div className="xl:px-10">
             {success ? (
                 <>
-                    <div className="text-center font-bold text-3xl mb-4">
+                    <div className="text-center text-green-400 font-bold text-3xl mb-4">
                         Success!
                     </div>
-                    <div className="text-center text-xl">Case study added</div>
+                    <div className="text-center text-xl">Case study added.</div>
+                    <div className="text-center text-base">
+                        Don't forget to publish it.
+                    </div>
                 </>
             ) : (
                 <>
@@ -737,6 +742,11 @@ export default function NewCaseStudy(props: {
                                         File name prefix should be STUDY_
                                     </div>
                                 )}
+                                {notImageError && (
+                                    <div className="text-center text-red-400">
+                                        File should be an image.
+                                    </div>
+                                )}
                                 <div className="w-full flex justify-center mb-10">
                                     {uploading ? (
                                         <CircularProgress
@@ -866,6 +876,11 @@ export default function NewCaseStudy(props: {
                                 {imageNamingError && (
                                     <div className="text-center text-red-400">
                                         File name prefix should be THUMBNAIL_
+                                    </div>
+                                )}
+                                {notImageError && (
+                                    <div className="text-center text-red-400">
+                                        File should be an image.
                                     </div>
                                 )}
                                 <div className="w-full flex justify-center mb-10">

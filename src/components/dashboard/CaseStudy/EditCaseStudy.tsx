@@ -26,9 +26,12 @@ import uploadHandler from "../uploadHandler";
 export default function EditCaseStudy(props: {
     caseStudy: CaseStudy;
     revalidateDashboard: any;
+    onOpenChangeEditCaseStudy: any;
 }) {
     // States for initial case study content
-    const [title, setTitle] = useState(props.caseStudy.title);
+    const [title, setTitle] = useState(
+        props.caseStudy.title ? props.caseStudy.title : ""
+    );
     const [dateLocation, setDateLocation] = useState(
         props.caseStudy.dateLocation ? props.caseStudy.dateLocation : ""
     );
@@ -45,7 +48,6 @@ export default function EditCaseStudy(props: {
 
     // States for preview media
     const [selectedPreviewVideo, setSelectedPreviewVideo] = useState("");
-    const [selectedPreviewImage, setSelectedPreviewImage] = useState("");
 
     // States for image and video pools
     const [availableImages, setAvailableImages] = useState<string[]>([]);
@@ -213,8 +215,9 @@ export default function EditCaseStudy(props: {
         })
             .then((response) => {
                 if (response.ok) {
-                    setDeleted(true);
+                    // setDeleted(true);
                     props.revalidateDashboard("/");
+                    props.onOpenChangeEditCaseStudy();
                 }
             })
             .catch((err) => console.log(err));
