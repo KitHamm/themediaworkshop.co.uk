@@ -582,8 +582,11 @@ export default function Media(props: {
                                 )}
                                 <a
                                     className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-xl"
-                                    href="/"
-                                    download={selectedImage}>
+                                    href={
+                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                        selectedImage
+                                    }
+                                    download>
                                     Download
                                 </a>
                                 <Button
