@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 const nodemailer = require("nodemailer");
 
@@ -20,7 +19,7 @@ const transporter = nodemailer.createTransport({
 export async function POST(request: Request) {
     const json = await request.json();
     const emailHost = await prisma.emailHost.findFirst();
-    const created = await prisma.message.create({
+    await prisma.message.create({
         data: json,
     });
 

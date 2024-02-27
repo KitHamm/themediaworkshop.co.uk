@@ -24,7 +24,9 @@ export default async function Home() {
             },
         },
     });
-    const logoImages: Logos = await prisma.logos.findMany();
+    const logoImages: Logos = await prisma.logos.findMany({
+        orderBy: { name: "asc" },
+    });
     // Main page component
     return <MainPage data={data} logoImages={logoImages} />;
 }

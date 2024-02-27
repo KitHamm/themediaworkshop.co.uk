@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { CircularProgress } from "@nextui-org/react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-// import { redirect } from "next/navigation";
 
 type FormTypes = {
     email: string;
@@ -33,7 +32,6 @@ export default function SignIn() {
         })
             .then((res) => {
                 if (res?.ok) {
-                    // redirect("/dashboard");
                     window.location.href = "/dashboard";
                 } else {
                     setLoading(false);

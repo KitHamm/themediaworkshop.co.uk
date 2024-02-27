@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
     revalidatePath("/api/images");
-    const result = await prisma.images.findMany();
+    const result = await prisma.images.findMany({
+        orderBy: { createdAt: "desc" },
+    });
     return new NextResponse(JSON.stringify(result), { status: 201 });
 }
