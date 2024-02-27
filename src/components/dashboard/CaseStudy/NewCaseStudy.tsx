@@ -226,7 +226,7 @@ export default function NewCaseStudy(props: {
                     </div>
                     <div className="text-center text-xl">Case study added.</div>
                     <div className="text-center text-base">
-                        Don't forget to publish it.
+                        Don&apos;t forget to publish it.
                     </div>
                 </>
             ) : (
