@@ -31,8 +31,7 @@ import Link from "next/link";
 
 const filePrefixList = [
     "HEADER",
-    "SHOWREEL",
-    "YEAR",
+    "VIDEO",
     "SEGHEAD",
     "SEGMENT",
     "STUDY",
@@ -230,33 +229,13 @@ export default function Media(props: {
                             Background
                         </Link>
                         <Link
-                            href={
-                                `?view=media&video=showreel&image=` + imageView
-                            }
+                            href={`?view=media&video=video&image=` + imageView}
                             className={`${
-                                videoView === "showreel"
+                                videoView === "video"
                                     ? "bg-orange-600"
                                     : "bg-neutral-600"
                             } px-4 py-2 rounded transition-all`}>
-                            Showreel
-                        </Link>
-                        <Link
-                            href={`?view=media&video=year&image=` + imageView}
-                            className={`${
-                                videoView === "year"
-                                    ? "bg-orange-600"
-                                    : "bg-neutral-600"
-                            } px-4 py-2 rounded transition-all`}>
-                            Year Review
-                        </Link>
-                        <Link
-                            href={`?view=media&video=study&image=` + imageView}
-                            className={`${
-                                videoView === "study"
-                                    ? "bg-orange-600"
-                                    : "bg-neutral-600"
-                            } px-4 py-2 rounded transition-all`}>
-                            Case Study
+                            Videos
                         </Link>
                     </div>
                     {/* Videos section */}
@@ -265,12 +244,8 @@ export default function Media(props: {
                             if (
                                 (videoView === "background" &&
                                     video.name.split("_")[0] === "HEADER") ||
-                                (videoView === "showreel" &&
-                                    video.name.split("_")[0] === "SHOWREEL") ||
-                                (videoView === "year" &&
-                                    video.name.split("_")[0] === "YEAR") ||
-                                (videoView === "study" &&
-                                    video.name.split("_")[0] === "STUDY") ||
+                                (videoView === "video" &&
+                                    video.name.split("_")[0] === "VIDEO") ||
                                 videoView === "all"
                             ) {
                                 return (
@@ -754,21 +729,9 @@ export default function Media(props: {
                                                 </div>
                                                 <div>
                                                     <strong>
-                                                        Showreel Videos:{" "}
+                                                        Other Videos:{" "}
                                                     </strong>
-                                                    SHOWREEL_
-                                                </div>
-                                                <div>
-                                                    <strong>
-                                                        Year Review Videos:{" "}
-                                                    </strong>
-                                                    YEAR_
-                                                </div>
-                                                <div>
-                                                    <strong>
-                                                        Case Study Videos:{" "}
-                                                    </strong>
-                                                    STUDY_
+                                                    VIDEO_
                                                 </div>
                                             </div>
                                         </div>
@@ -816,7 +779,9 @@ export default function Media(props: {
                                                 name={"new-video"}
                                                 id={"new-video"}
                                             />
-                                            <label htmlFor="new-video">
+                                            <label
+                                                className="m-auto"
+                                                htmlFor="new-video">
                                                 {newUpload !== undefined
                                                     ? "Change"
                                                     : "Select file"}

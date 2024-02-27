@@ -590,7 +590,7 @@ export default function NewCaseStudy(props: {
                                                                 e.target
                                                                     .files[0]
                                                                     .name,
-                                                                "STUDY"
+                                                                "VIDEO"
                                                             )
                                                         ) {
                                                             setUploading(true);
@@ -630,7 +630,7 @@ export default function NewCaseStudy(props: {
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
-                                                "STUDY"
+                                                "VIDEO"
                                             ) {
                                                 return (
                                                     <div

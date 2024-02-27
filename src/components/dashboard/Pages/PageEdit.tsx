@@ -1013,7 +1013,7 @@ export default function PageEdit(props: {
                                                                 e.target
                                                                     .files[0]
                                                                     .name,
-                                                                "SHOWREEL"
+                                                                "VIDEO"
                                                             )
                                                         ) {
                                                             setUploading(true);
@@ -1047,7 +1047,7 @@ export default function PageEdit(props: {
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
-                                                "SHOWREEL"
+                                                "VIDEO"
                                             ) {
                                                 return (
                                                     <div
@@ -1180,7 +1180,7 @@ export default function PageEdit(props: {
                                                                 e.target
                                                                     .files[0]
                                                                     .name,
-                                                                "YEAR"
+                                                                "VIDEO"
                                                             )
                                                         ) {
                                                             setUploading(true);
@@ -1214,7 +1214,7 @@ export default function PageEdit(props: {
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
-                                                "YEAR"
+                                                "VIDEO"
                                             ) {
                                                 return (
                                                     <div
