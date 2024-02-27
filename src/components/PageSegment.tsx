@@ -57,6 +57,7 @@ export default function PageSegment(props: {
     // Parallax element ref
     const headerImageContainer = useRef<HTMLDivElement>(null);
     const headerImage = useRef<HTMLImageElement>(null);
+    const copyText = useRef<HTMLDivElement>(null);
 
     //  Parallax States
     const [parallaxValue, setParallaxValue] = useState(0);
@@ -82,6 +83,25 @@ export default function PageSegment(props: {
     } = useDisclosure();
 
     useEffect(() => {
+        const anchors: HTMLAnchorElement[] = [];
+        if (copyText.current) {
+            for (
+                let i = 0;
+                i < copyText.current?.children[0].children.length;
+                i++
+            ) {
+                if (copyText.current?.children[0].children[i].tagName === "A")
+                    anchors.push(
+                        copyText.current?.children[0].children[
+                            i
+                        ] as HTMLAnchorElement
+                    );
+            }
+        }
+        for (let i = 0; i < anchors.length; i++) {
+            anchors[i].setAttribute("target", "_blank");
+            anchors[i].setAttribute("rel", "noreferrer");
+        }
         if (headerImage.current) {
             onScroll();
             headerImage.current.classList.replace("opacity-0", "fade-in");
@@ -167,10 +187,12 @@ export default function PageSegment(props: {
                                 </div>
                             )}
                         </div>
-                        <div
-                            ref={ref}
-                            className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
-                            <Markdown>{props.segment.copy}</Markdown>
+                        <div ref={ref}>
+                            <div
+                                ref={copyText}
+                                className="copy-text text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
+                                <Markdown>{props.segment.copy}</Markdown>
+                            </div>
                         </div>
 
                         {props.segment.casestudy.length > 0 && (

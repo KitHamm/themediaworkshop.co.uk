@@ -22,6 +22,7 @@ export default function Header(props: {
     videoTwoButtonText: string;
 }) {
     const chevron = useRef<HTMLDivElement>(null);
+    const copyText = useRef<HTMLDivElement>(null);
     // Contact form states
     const {
         isOpen: isOpenShowreel,
@@ -36,6 +37,25 @@ export default function Header(props: {
     } = useDisclosure();
 
     useEffect(() => {
+        const anchors: HTMLAnchorElement[] = [];
+        if (copyText.current) {
+            for (
+                let i = 0;
+                i < copyText.current?.children[0].children.length;
+                i++
+            ) {
+                if (copyText.current?.children[0].children[i].tagName === "A")
+                    anchors.push(
+                        copyText.current?.children[0].children[
+                            i
+                        ] as HTMLAnchorElement
+                    );
+            }
+        }
+        for (let i = 0; i < anchors.length; i++) {
+            anchors[i].setAttribute("target", "_blank");
+            anchors[i].setAttribute("rel", "noreferrer");
+        }
         window.addEventListener("scroll", onScroll);
         setTimeout(() => {
             if (document.body.getBoundingClientRect().top === 0) {
@@ -114,7 +134,9 @@ export default function Header(props: {
                                 </button>
                             </div>
                         </div>
-                        <div className="slide-up min-h-20 xl:min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
+                        <div
+                            ref={copyText}
+                            className="copy-text slide-up min-h-20 xl:min-w-96 px-4 py-4 xl:py-0 text-justify text-md xl:text-lg">
                             <Markdown>{props.description as string}</Markdown>
                         </div>
                     </div>

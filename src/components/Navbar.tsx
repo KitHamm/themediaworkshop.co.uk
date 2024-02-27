@@ -20,7 +20,7 @@ export default function Navbar(props: { active: string }) {
 
     return (
         <>
-            <nav className="fixed z-40 bg-black bottom-0 xl:bottom-auto xl:border-t-0 border-t border-orange-600 xl:top-0 w-screen">
+            <nav className="fixed z-40 bg-black bottom-0 lg:bottom-auto lg:border-t-0 border-t border-orange-600 lg:top-0 w-screen">
                 <ul className="flex justify-evenly xl:w-4/6 mx-auto uppercase font-bold xl:font-normal xl:py-3 pt-3 pb-4 text-base xl:text-2xl">
                     <li
                         className={`${

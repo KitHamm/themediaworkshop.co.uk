@@ -30,7 +30,13 @@ img {
 video {
     object-fit: cover;
 }
-
+.copy-text a {
+    color: white;
+    transition: color 0.25s ease-in-out;
+}
+.copy-text a:hover {
+    color: rgb(234 88 12);
+}
 .inputFile {
     width: 0.1px;
     height: 0.1px;

@@ -24,12 +24,14 @@ import {
 
 // Types
 import { CaseStudy } from "@prisma/client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function SegmentModal(props: { caseStudy: CaseStudy }) {
     // States for selected video and image to view
     const [caseIndex, setCaseIndex] = useState(0);
     const [selectedVideo, setSelectedVideo] = useState("");
+
+    const copyText = useRef<HTMLDivElement[]>([]);
 
     // Image Preview Modal
     const {
@@ -44,6 +46,33 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
         onOpen: onOpenVideo,
         onOpenChange: onOpenChangeVideo,
     } = useDisclosure();
+
+    useEffect(() => {
+        if (copyText.current) {
+            for (let i = 0; i < copyText.current.length; i++) {
+                const anchors: HTMLAnchorElement[] = [];
+                for (
+                    let j = 0;
+                    j < copyText.current[i].children[0].children.length;
+                    j++
+                ) {
+                    if (
+                        copyText.current[i].children[0].children[j].tagName ===
+                        "A"
+                    )
+                        anchors.push(
+                            copyText.current[i].children[0].children[
+                                j
+                            ] as HTMLAnchorElement
+                        );
+                }
+                for (let k = 0; k < anchors.length; k++) {
+                    anchors[k].setAttribute("target", "_blank");
+                    anchors[k].setAttribute("rel", "noreferrer");
+                }
+            }
+        }
+    }, []);
 
     return (
         <div id="content">
@@ -65,7 +94,11 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                     <div className="mb-2">
                                         {casestudy.dateLocation}
                                     </div>
-                                    <div className="w-full text-lg">
+                                    <div
+                                        ref={(el: HTMLDivElement) => {
+                                            copyText.current![caseIndex] = el;
+                                        }}
+                                        className="copy-text w-full text-lg">
                                         <Markdown>{casestudy.copy}</Markdown>
                                     </div>
                                     <div className="flex flex-wrap gap-2 mt-5">
@@ -185,7 +218,11 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                     <div className="mb-2">
                                         {casestudy.dateLocation}
                                     </div>
-                                    <div className="w-full text-lg">
+                                    <div
+                                        ref={(el: HTMLDivElement) => {
+                                            copyText.current![caseIndex] = el;
+                                        }}
+                                        className="copy-text w-full text-lg">
                                         <Markdown>{casestudy.copy}</Markdown>
                                     </div>
                                     <div className="flex flex-wrap gap-2 mt-5">
