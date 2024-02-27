@@ -18,6 +18,8 @@ export default function Header(props: {
     year: string;
     subTitle: string;
     openContactModal: any;
+    videoOneButtonText: string;
+    videoTwoButtonText: string;
 }) {
     const chevron = useRef<HTMLDivElement>(null);
     // Contact form states
@@ -39,7 +41,7 @@ export default function Header(props: {
             if (document.body.getBoundingClientRect().top === 0) {
                 chevron.current?.classList.replace("opacity-0", "opacity-100");
             }
-        }, 5000);
+        }, 10000);
     }, []);
 
     function onScroll() {
@@ -81,7 +83,9 @@ export default function Header(props: {
                                     <button
                                         onClick={onOpenChangeShowreel}
                                         className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 font-bold bg-orange-600 max-w-52 text-sm w-full xl:w-auto py-2 xl:px-8 xl:py-3">
-                                        SHOWREEL
+                                        {props.videoOneButtonText !== ""
+                                            ? props.videoOneButtonText
+                                            : "SHOWREEL"}
                                     </button>
                                 </div>
                             ) : (
@@ -94,7 +98,9 @@ export default function Header(props: {
                                     <button
                                         onClick={onOpenChangeYear}
                                         className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 font-bold bg-orange-600 max-w-52 w-full text-sm xl:w-auto py-2 xl:px-8 xl:py-3">
-                                        YEAR REVIEW
+                                        {props.videoTwoButtonText !== ""
+                                            ? props.videoTwoButtonText
+                                            : "YEAR REVIEW"}
                                     </button>
                                 </div>
                             ) : (

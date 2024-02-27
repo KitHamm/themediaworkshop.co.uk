@@ -46,6 +46,8 @@ model Page {
     showreel String?
     year String?
     segment Segment[]
+    videoOneButtonText String? @default("")
+    videoTwoButtonText String? @default("")
 }
 
 model Segment {

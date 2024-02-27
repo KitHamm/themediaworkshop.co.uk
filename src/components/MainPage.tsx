@@ -142,6 +142,8 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                         description={props.data.description}
                         showreel={props.data.showreel}
                         year={props.data.year}
+                        videoOneButtonText={props.data.videoOneButtonText}
+                        videoTwoButtonText={props.data.videoTwoButtonText}
                     />
                 </section>
             </header>

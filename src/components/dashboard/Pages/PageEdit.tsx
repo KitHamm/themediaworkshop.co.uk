@@ -51,8 +51,15 @@ export default function PageEdit(props: {
         props.data.subTitle ? props.data.subTitle : ""
     );
     // States of background video and showreel
-    const [video, setVideo] = useState(props.data.video);
-    const [showreel, setShowreel] = useState(props.data.showreel);
+    const [videoOne, setVideoOne] = useState(props.data.video);
+    const [videoTwo, setVideoTwo] = useState(props.data.showreel);
+    const [videoOneButtonText, setVideoOneButtonText] = useState(
+        props.data.videoOneButtonText
+    );
+    const [videoTwoButtonText, setVideoTwoButtonText] = useState(
+        props.data.videoTwoButtonText
+    );
+
     const [year, setYear] = useState(props.data.year);
 
     // Media uploading and error state for if not a video
@@ -126,8 +133,10 @@ export default function PageEdit(props: {
             subTitle !== props.data.subTitle ||
             description !== props.data.description ||
             header !== props.data.header ||
-            video !== props.data.video ||
-            showreel !== props.data.showreel ||
+            videoOne !== props.data.video ||
+            videoTwo !== props.data.showreel ||
+            videoOneButtonText !== props.data.videoOneButtonText ||
+            videoTwoButtonText !== props.data.videoTwoButtonText ||
             year !== props.data.year
         ) {
             setChanges(true);
@@ -138,14 +147,18 @@ export default function PageEdit(props: {
         subTitle,
         description,
         header,
-        video,
-        showreel,
+        videoOne,
+        videoTwo,
+        videoOneButtonText,
+        videoTwoButtonText,
         year,
         props.data.subTitle,
         props.data.description,
         props.data.header,
         props.data.video,
         props.data.showreel,
+        props.data.videoOneButtonText,
+        props.data.videoTwoButtonText,
         props.data.year,
     ]);
 
@@ -188,9 +201,11 @@ export default function PageEdit(props: {
             subTitle: subTitle,
             description: description,
             header: header,
-            video: video,
-            showreel: showreel,
+            video: videoOne,
+            showreel: videoTwo,
             year: year,
+            videoOneButtonText: videoOneButtonText,
+            videoTwoButtonText: videoTwoButtonText,
         };
         updatePage(json);
     }
@@ -238,8 +253,116 @@ export default function PageEdit(props: {
                     <div id="left-column">
                         <div className="border-b pb-2 mb-4">Page Videos</div>
                         <div className="grid xl:grid-cols-3 grid-cols-2 grid-cols-1 gap-4 xl:gap-10 min-h-20 xl:mb-0 mb-4">
+                            <div>
+                                {videoTwo ? (
+                                    <>
+                                        <div className="text-center">
+                                            Video 1
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeShowreelModal();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={"/images/play.png"}
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {videoTwo.split("-")[0]}
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectShowreel();
+                                                    getVideos();
+                                                }}
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center">
+                                            Video 1
+                                        </div>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectShowreel();
+                                                    getVideos();
+                                                }}
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div>
+                                {year ? (
+                                    <>
+                                        <div className="text-center">
+                                            Video 2
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeYearModal();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={"/images/play.png"}
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {year.split("-")[0]}
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectYear();
+                                                    getVideos();
+                                                }}
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center">
+                                            Video 2
+                                        </div>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenSelectYear();
+                                                    getVideos();
+                                                }}
+                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                             <div className="">
-                                {video ? (
+                                {videoOne ? (
                                     <>
                                         <div className="text-center">
                                             Background
@@ -258,7 +381,7 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center truncate">
-                                            {video.split("-")[0]}
+                                            {videoOne.split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2 mt-2">
                                             <button
@@ -292,113 +415,35 @@ export default function PageEdit(props: {
                                     </>
                                 )}
                             </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-8 mt-8">
                             <div>
-                                {showreel ? (
-                                    <>
-                                        <div className="text-center">
-                                            Showreel
-                                        </div>
-                                        <div
-                                            onClick={() => {
-                                                onOpenChangeShowreelModal();
-                                            }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
-                                            <Image
-                                                height={100}
-                                                width={100}
-                                                src={"/images/play.png"}
-                                                alt="play"
-                                                className="w-full h-auto m-auto"
-                                            />
-                                        </div>
-                                        <div className="text-center">
-                                            {showreel.split("-")[0]}
-                                        </div>
-                                        <div className="text-center mt-2">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenSelectShowreel();
-                                                    getVideos();
-                                                }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
-                                                Change
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-center">
-                                            Showreel
-                                        </div>
-                                        <div className="text-center mt-4">
-                                            None Selected
-                                        </div>
-                                        <div className="text-center mt-2">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenSelectShowreel();
-                                                    getVideos();
-                                                }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
-                                                Select
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
+                                <div>
+                                    Video One Button Text <em>(Left)</em>
+                                </div>
+                                <input
+                                    value={videoOneButtonText}
+                                    onChange={(e) =>
+                                        setVideoOneButtonText(e.target.value)
+                                    }
+                                    className="text-black"
+                                    type="text"
+                                    placeholder="SHOWREEL"
+                                />
                             </div>
                             <div>
-                                {year ? (
-                                    <>
-                                        <div className="text-center">
-                                            Year Review
-                                        </div>
-                                        <div
-                                            onClick={() => {
-                                                onOpenChangeYearModal();
-                                            }}
-                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
-                                            <Image
-                                                height={100}
-                                                width={100}
-                                                src={"/images/play.png"}
-                                                alt="play"
-                                                className="w-full h-auto m-auto"
-                                            />
-                                        </div>
-                                        <div className="text-center">
-                                            {year.split("-")[0]}
-                                        </div>
-                                        <div className="text-center mt-2">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenSelectYear();
-                                                    getVideos();
-                                                }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
-                                                Change
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-center">
-                                            Year Review
-                                        </div>
-                                        <div className="text-center mt-4">
-                                            None Selected
-                                        </div>
-                                        <div className="text-center mt-2">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenSelectYear();
-                                                    getVideos();
-                                                }}
-                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
-                                                Select
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
+                                <div>
+                                    Video Two Button Text <em>(Middle)</em>
+                                </div>
+                                <input
+                                    value={videoTwoButtonText}
+                                    onChange={(e) =>
+                                        setVideoTwoButtonText(e.target.value)
+                                    }
+                                    className="text-black"
+                                    placeholder="YEAR REVIEW"
+                                    type="text"
+                                />
                             </div>
                         </div>
                     </div>
@@ -653,7 +698,7 @@ export default function PageEdit(props: {
                                     controls={true}
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                        video
+                                        videoOne
                                     }
                                 />
                             </ModalBody>
@@ -696,7 +741,7 @@ export default function PageEdit(props: {
                                     controls={true}
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                        video
+                                        videoOne
                                     }
                                 />
                             </ModalBody>
@@ -874,7 +919,7 @@ export default function PageEdit(props: {
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setVideo(
+                                                                    setVideoOne(
                                                                         video.name
                                                                     );
                                                                     onClose();
@@ -894,10 +939,10 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {video ? (
+                                {videoOne ? (
                                     <button
                                         onClick={() => {
-                                            setVideo("");
+                                            setVideoOne("");
                                             onClose();
                                             setNotVideoError(false);
                                             setBackgroundNamingError(false);
@@ -1039,7 +1084,7 @@ export default function PageEdit(props: {
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setShowreel(
+                                                                    setVideoTwo(
                                                                         video.name
                                                                     );
                                                                     onClose();
@@ -1062,10 +1107,10 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {showreel ? (
+                                {videoTwo ? (
                                     <button
                                         onClick={() => {
-                                            setShowreel("");
+                                            setVideoTwo("");
                                             onClose();
                                             setNotVideoError(false);
                                             setShowreelNamingError(false);
