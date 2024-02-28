@@ -231,6 +231,33 @@ export default function DashboardView(props: { hidden: boolean }) {
                 <Accordion variant="splitted">
                     <AccordionItem
                         className="dark"
+                        key={4}
+                        aria-label="28/2/2024"
+                        title={
+                            <div className="flex border-b pb-2 mb-2 gap-4">
+                                <div className="text-lg text-orange-600 font-bold">
+                                    28/2/2024
+                                </div>
+                                <div className="text-lg text-green-400 font-bold">
+                                    NEW!
+                                </div>
+                            </div>
+                        }>
+                        <div className="text-lg">
+                            <ul>
+                                <li>- Upload now has progress percentage.</li>
+                                <li>
+                                    - Delete file now checks if file is used.
+                                </li>
+                                <li>
+                                    - If file is used, you will receive a
+                                    message telling you where.
+                                </li>
+                            </ul>
+                        </div>
+                    </AccordionItem>
+                    <AccordionItem
+                        className="dark"
                         key={3}
                         aria-label="27/2/2024"
                         title={
