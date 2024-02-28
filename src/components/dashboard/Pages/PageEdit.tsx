@@ -299,8 +299,12 @@ export default function PageEdit(props: {
                                                 className="w-full h-auto m-auto"
                                             />
                                         </div>
-                                        <div className="text-center">
-                                            {videoTwo.split("-")[0]}
+                                        <div className="text-center truncate">
+                                            {
+                                                videoTwo
+                                                    .split("_")[1]
+                                                    .split("-")[0]
+                                            }
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
@@ -353,8 +357,8 @@ export default function PageEdit(props: {
                                                 className="w-full h-auto m-auto"
                                             />
                                         </div>
-                                        <div className="text-center">
-                                            {year.split("-")[0]}
+                                        <div className="text-center truncate">
+                                            {year.split("_")[1].split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
@@ -408,7 +412,11 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center truncate">
-                                            {videoOne.split("-")[0]}
+                                            {
+                                                videoOne
+                                                    .split("_")[1]
+                                                    .split("-")[0]
+                                            }
                                         </div>
                                         <div className="text-center mt-2 mt-2">
                                             <button

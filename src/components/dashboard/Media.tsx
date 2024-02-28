@@ -879,6 +879,7 @@ export default function Media(props: {
                                     color="danger"
                                     variant="light"
                                     onPress={() => {
+                                        setUploading(false);
                                         setNamingError(false);
                                         onClose();
                                         clearFileInput();
