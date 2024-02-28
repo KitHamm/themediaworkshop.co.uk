@@ -33,6 +33,7 @@ import { Page, Segment, Videos } from "@prisma/client";
 // Functions
 import uploadHandler from "../uploadHandler";
 import Markdown from "react-markdown";
+import axios from "axios";
 
 export default function PageEdit(props: {
     data: Page;
@@ -77,6 +78,9 @@ export default function PageEdit(props: {
     // State to hold available videos and video selected for video view modal
     const [videos, setVideos] = useState<Videos[]>([]);
     const [previewVideo, setPreviewVideo] = useState("");
+
+    // Upload Progress
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // New segment modal declaration
     const {
@@ -171,19 +175,42 @@ export default function PageEdit(props: {
     }
 
     async function uploadVideo(file: File) {
+        setUploadProgress(0);
         if (file.type.split("/")[0] !== "video") {
             setNotVideoError(true);
             setUploading(false);
             return;
         } else {
-            await uploadHandler(file, "video")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadvideo", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         getVideos();
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "video")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             getVideos();
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -835,6 +862,12 @@ export default function PageEdit(props: {
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -911,9 +944,13 @@ export default function PageEdit(props: {
                                                         </div>
                                                         <div className="text-center truncate">
                                                             {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
+                                                                video.name
+                                                                    .split(
+                                                                        "_"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "-"
+                                                                    )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
@@ -982,7 +1019,7 @@ export default function PageEdit(props: {
                         <>
                             <ModalHeader>
                                 <div className="w-full text-center font-bold text-3xl">
-                                    Showreel
+                                    Video 1
                                 </div>
                             </ModalHeader>
                             <ModalBody>
@@ -993,13 +1030,18 @@ export default function PageEdit(props: {
                                 )}
                                 {showreelNamingError && (
                                     <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with
-                                        SHOWREEL_
+                                        File name should be prefixed with VIDEO_
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -1074,11 +1116,15 @@ export default function PageEdit(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
-                                                        <div className="text-center">
+                                                        <div className="text-center truncate">
                                                             {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
+                                                                video.name
+                                                                    .split(
+                                                                        "_"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "-"
+                                                                    )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
@@ -1150,7 +1196,7 @@ export default function PageEdit(props: {
                         <>
                             <ModalHeader>
                                 <div className="w-full text-center font-bold text-3xl">
-                                    Year In Review
+                                    Video 2
                                 </div>
                             </ModalHeader>
                             <ModalBody>
@@ -1161,12 +1207,18 @@ export default function PageEdit(props: {
                                 )}
                                 {yearNamingError && (
                                     <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with YEAR_
+                                        File name should be prefixed with VIDEO_
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -1241,11 +1293,15 @@ export default function PageEdit(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
-                                                        <div className="text-center">
+                                                        <div className="text-center truncate">
                                                             {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
+                                                                video.name
+                                                                    .split(
+                                                                        "_"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "-"
+                                                                    )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">

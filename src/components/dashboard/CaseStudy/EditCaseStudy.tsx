@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { CaseStudy, Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import uploadHandler from "../uploadHandler";
+import axios from "axios";
 
 export default function EditCaseStudy(props: {
     caseStudy: CaseStudy;
@@ -53,9 +54,6 @@ export default function EditCaseStudy(props: {
     const [availableImages, setAvailableImages] = useState<string[]>([]);
     const [availableVideos, setAvailableVideos] = useState<string[]>([]);
 
-    // Delete Success
-    const [deleted, setDeleted] = useState(false);
-
     // State for preview description text
     const [previewText, setPreviewText] = useState(false);
     // State for if there are unsaved changes
@@ -69,6 +67,7 @@ export default function EditCaseStudy(props: {
 
     // Uploading State
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Image select modal declaration
     const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =
@@ -218,20 +217,44 @@ export default function EditCaseStudy(props: {
     }
 
     async function uploadImage(file: File, target: string) {
+        setUploadProgress(0);
         if (file.type.split("/")[0] !== "image") {
             setNotImageError(true);
             setUploading(false);
             return;
         } else {
-            await uploadHandler(file, "image")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadimage", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         getImages();
                         clearFileInput("image");
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "image")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             getImages();
+            //             clearFileInput("image");
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -254,15 +277,38 @@ export default function EditCaseStudy(props: {
             setUploading(false);
             return;
         } else {
-            await uploadHandler(file, "video")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadvideo", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         getVideos();
                         clearFileInput("video");
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "video")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             getVideos();
+            //             clearFileInput("video");
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -271,377 +317,353 @@ export default function EditCaseStudy(props: {
             <div className="w-full text-center text-3xl font-bold text-orange-600">
                 {title}
             </div>
-            {deleted ? (
-                <>
-                    <div className="text-center font-bold text-3xl mt-4 xl:mt-0 mb-4">
-                        Deleted!
-                    </div>
-                    <div className="text-center text-xl">
-                        You can now close this popup.
-                    </div>
-                </>
-            ) : (
-                <>
-                    <div className="flex justify-between mt-4 xl:mt-0">
-                        <div className="flex gap-4">
-                            <div
-                                className={`${
-                                    props.caseStudy.published
-                                        ? "text-green-600"
-                                        : "text-red-400"
-                                } font-bold text-xl mb-4`}>
-                                {props.caseStudy.published ? "LIVE" : "DRAFT"}
-                            </div>
-                            {unsavedChanges && (
-                                <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
-                                    There are unsaved changes
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex gap-4">
-                            {unsavedChanges && (
-                                <div>
-                                    <button
-                                        onClick={handleUpdate}
-                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-orange-600 rounded">
-                                        Update
-                                    </button>
-                                </div>
-                            )}
-                            {props.caseStudy.published ? (
-                                <div>
-                                    <button
-                                        onClick={() => {
-                                            updatePublished(false);
-                                        }}
-                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-red-400 rounded">
-                                        UNPUBLISH
-                                    </button>
-                                </div>
-                            ) : (
-                                <div>
-                                    <button
-                                        onClick={() => {
-                                            updatePublished(true);
-                                        }}
-                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-green-600 rounded">
-                                        PUBLISH
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
 
-                    <div className="grid xl:grid-cols-2 gap-10">
-                        <div id="left">
-                            <div className="min-h-[33%]">
-                                <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-                                    Images:
-                                </div>
-                                <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
-                                    {images.map(
-                                        (image: string, index: number) => {
-                                            return (
-                                                <div
-                                                    key={image + "-" + index}
-                                                    className="relative">
-                                                    <Image
-                                                        height={100}
-                                                        width={100}
-                                                        src={
-                                                            process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                            image
-                                                        }
-                                                        alt={image}
-                                                        className="w-full h-auto"
-                                                    />
-                                                    <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-                                                        <div className="text-red-400 h-full flex justify-center">
-                                                            <i
-                                                                onClick={() =>
-                                                                    removeImage(
-                                                                        index
-                                                                    )
-                                                                }
-                                                                aria-hidden
-                                                                className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-                                    <div
-                                        onClick={() => {
-                                            onOpenChangeImageSelect();
-                                            getImages();
-                                        }}
-                                        className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
-                                        <div className="flex h-full justify-center">
-                                            <i
-                                                aria-hidden
-                                                className="m-auto fa-solid fa-plus fa-2xl"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="h-1/3 flex justify-between gap-2">
-                                <div className="basis-1/2">
-                                    <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-                                        Video:
-                                    </div>
-                                    {video !== "" ? (
-                                        <>
-                                            <div
-                                                onClick={() => {
-                                                    setSelectedPreviewVideo(
-                                                        video
-                                                    );
-                                                    onOpenChangeVideoPreview();
-                                                }}
-                                                className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                <Image
-                                                    height={100}
-                                                    width={100}
-                                                    src={"/images/play.png"}
-                                                    alt="play"
-                                                    className="w-full h-auto m-auto"
-                                                />
-                                            </div>
-                                            <div className="text-center">
-                                                {video.split("-")[0]}
-                                            </div>
-                                            <div className="text-center mt-2 mt-2">
-                                                <button
-                                                    onClick={() => {
-                                                        onOpenVideoSelect();
-                                                        getVideos();
-                                                    }}
-                                                    className="px-10 py-2 bg-orange-600 rounded m-auto">
-                                                    Change
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="text-center mt-4">
-                                                None Selected
-                                            </div>
-                                            <div className="text-center mt-2 h-full">
-                                                <button
-                                                    onClick={() => {
-                                                        onOpenVideoSelect();
-                                                        getVideos();
-                                                    }}
-                                                    className="px-10 py-2 bg-orange-600 rounded m-auto">
-                                                    Select
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="basis-1/2">
-                                    <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-                                        Thumbnail:
-                                    </div>
-                                    <div className="grid grid-cols-1">
-                                        {videoThumbnail !== "" ? (
-                                            <div className="relative">
-                                                <Image
-                                                    height={300}
-                                                    width={200}
-                                                    src={
-                                                        process.env
-                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                        videoThumbnail
-                                                    }
-                                                    alt={videoThumbnail}
-                                                    className="w-full h-auto"
-                                                />
-                                                <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-                                                    <div className="text-red-400 h-full flex justify-center">
-                                                        <i
-                                                            onClick={() =>
-                                                                setVideoThumbnail(
-                                                                    ""
-                                                                )
-                                                            }
-                                                            aria-hidden
-                                                            className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                onClick={() => {
-                                                    onOpenChangeThumbnailSelect();
-                                                    getImages();
-                                                }}
-                                                className="min-h-28 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
-                                                <div className="flex h-full justify-center">
-                                                    <i
-                                                        aria-hidden
-                                                        className="m-auto fa-solid fa-plus fa-2xl"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+            <>
+                <div className="flex justify-between mt-4 xl:mt-0">
+                    <div className="flex gap-4">
+                        <div
+                            className={`${
+                                props.caseStudy.published
+                                    ? "text-green-600"
+                                    : "text-red-400"
+                            } font-bold text-xl mb-4`}>
+                            {props.caseStudy.published ? "LIVE" : "DRAFT"}
                         </div>
-                        <div id="right">
-                            <div className="font-bold text-2xl">Title:</div>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => {
-                                    setTitle(e.target.value);
-                                }}
-                            />
-                            <div className="font-bold text-2xl mt-2">
-                                Date/Location:
+                        {unsavedChanges && (
+                            <div className="my-auto text-xl font-bold text-red-400 fade-in mb-4">
+                                There are unsaved changes
                             </div>
-                            <input
-                                type="text"
-                                value={dateLocation}
-                                onChange={(e) => {
-                                    setDateLocation(e.target.value);
-                                }}
-                            />
+                        )}
+                    </div>
+                    <div className="flex gap-4">
+                        {unsavedChanges && (
                             <div>
-                                <div className="flex gap-4 w-full mt-2">
-                                    <div className="font-bold text-2xl">
-                                        Detail:
-                                    </div>
-                                    <Popover
-                                        className="dark"
-                                        placement="right-end">
-                                        <PopoverTrigger>
-                                            <i
-                                                aria-hidden
-                                                className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
-                                            />
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <div className="text-left p-2 xl:w-96">
-                                                <div className="font-bold text-xl border-b pb-2 mb-2">
-                                                    Text Info
-                                                </div>
-                                                <p className="mb-2">
-                                                    The text is rendered using
-                                                    Markdown. This means that
-                                                    you can add headers, links,
-                                                    and line breaks
-                                                </p>
-                                                <p className="mb-2">
-                                                    **Header** (bold text)
-                                                </p>
-                                                <p className="mb-2">
-                                                    [Link Text
-                                                    Here](https://link-here.com/)
-                                                </p>
-                                                <p>New line\</p>
-                                                <p>\</p>
-                                                <p>New Paragraph</p>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <button
-                                        onClick={() =>
-                                            setPreviewText(!previewText)
-                                        }
-                                        className="text-orange-600 cursor-pointer">
-                                        {previewText ? "Edit" : "Preview"}
-                                    </button>
-                                </div>
-                                {previewText ? (
-                                    <div className="min-h-80">
-                                        <Markdown>{copy}</Markdown>
-                                    </div>
-                                ) : (
-                                    <textarea
-                                        className="h-80"
-                                        value={copy}
-                                        onChange={(e) => {
-                                            setCopy(e.target.value);
-                                        }}
-                                    />
-                                )}
-                            </div>
-                            <div className="flex justify-between mt-5">
-                                <div className="font-bold text-2xl mt-auto">
-                                    Tags:
-                                </div>
-                                <em className="my-auto text-neutral-600">
-                                    Click a tag to remove it
-                                </em>
-                            </div>
-                            <div className="flex flex-wrap gap-4 mt-2">
-                                {tags.map((tag: string, index: number) => {
-                                    return (
-                                        <Chip
-                                            onClick={() => removeTag(index)}
-                                            className="cursor-pointer"
-                                            key={tag + "-" + index}>
-                                            {tag}
-                                        </Chip>
-                                    );
-                                })}
-                            </div>
-                            <div className="font-bold text-2xl mt-5">
-                                New Tag:
-                            </div>
-                            <div className="flex gap-4">
-                                <input
-                                    type="text"
-                                    placeholder="Add a new Tag"
-                                    value={newTag}
-                                    onChange={(e) => {
-                                        setNewTag(e.target.value);
-                                    }}
-                                />
-
                                 <button
-                                    onClick={() => {
-                                        if (newTag !== "") {
-                                            setTags([...tags, newTag]);
-                                            setNewTag("");
-                                        }
-                                    }}
-                                    className="my-auto px-4 py-2 bg-orange-600 rounded">
-                                    Add
+                                    onClick={handleUpdate}
+                                    className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-orange-600 rounded">
+                                    Update
                                 </button>
                             </div>
-                            <div className="font-bold text-2xl mt-5">
-                                Order:
-                            </div>
-                            <div className="w-1/4">
-                                <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={!Number.isNaN(order) ? order : ""}
-                                    onChange={(e) => {
-                                        setOrder(parseInt(e.target.value));
+                        )}
+                        {props.caseStudy.published ? (
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        updatePublished(false);
                                     }}
-                                />
+                                    className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-red-400 rounded">
+                                    UNPUBLISH
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        updatePublished(true);
+                                    }}
+                                    className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-green-600 rounded">
+                                    PUBLISH
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid xl:grid-cols-2 gap-10">
+                    <div id="left">
+                        <div className="min-h-[33%]">
+                            <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+                                Images:
+                            </div>
+                            <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
+                                {images.map((image: string, index: number) => {
+                                    return (
+                                        <div
+                                            key={image + "-" + index}
+                                            className="relative">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    image
+                                                }
+                                                alt={image}
+                                                className="w-full h-auto"
+                                            />
+                                            <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                                <div className="text-red-400 h-full flex justify-center">
+                                                    <i
+                                                        onClick={() =>
+                                                            removeImage(index)
+                                                        }
+                                                        aria-hidden
+                                                        className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <div
+                                    onClick={() => {
+                                        onOpenChangeImageSelect();
+                                        getImages();
+                                    }}
+                                    className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
+                                    <div className="flex h-full justify-center">
+                                        <i
+                                            aria-hidden
+                                            className="m-auto fa-solid fa-plus fa-2xl"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <Button
-                                onClick={deleteCaseStudy}
-                                variant="light"
-                                color="danger">
-                                Delete Case Study
-                            </Button>
+                        <div className="h-1/3 flex justify-between gap-2">
+                            <div className="basis-1/2">
+                                <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+                                    Video:
+                                </div>
+                                {video !== "" ? (
+                                    <>
+                                        <div
+                                            onClick={() => {
+                                                setSelectedPreviewVideo(video);
+                                                onOpenChangeVideoPreview();
+                                            }}
+                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                            <Image
+                                                height={100}
+                                                width={100}
+                                                src={"/images/play.png"}
+                                                alt="play"
+                                                className="w-full h-auto m-auto"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            {video.split("-")[0]}
+                                        </div>
+                                        <div className="text-center mt-2 mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenVideoSelect();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
+                                                Change
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center mt-4">
+                                            None Selected
+                                        </div>
+                                        <div className="text-center mt-2 h-full">
+                                            <button
+                                                onClick={() => {
+                                                    onOpenVideoSelect();
+                                                    getVideos();
+                                                }}
+                                                className="px-10 py-2 bg-orange-600 rounded m-auto">
+                                                Select
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="basis-1/2">
+                                <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+                                    Thumbnail:
+                                </div>
+                                <div className="grid grid-cols-1">
+                                    {videoThumbnail !== "" ? (
+                                        <div className="relative">
+                                            <Image
+                                                height={300}
+                                                width={200}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    videoThumbnail
+                                                }
+                                                alt={videoThumbnail}
+                                                className="w-full h-auto"
+                                            />
+                                            <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                                <div className="text-red-400 h-full flex justify-center">
+                                                    <i
+                                                        onClick={() =>
+                                                            setVideoThumbnail(
+                                                                ""
+                                                            )
+                                                        }
+                                                        aria-hidden
+                                                        className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeThumbnailSelect();
+                                                getImages();
+                                            }}
+                                            className="min-h-28 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
+                                            <div className="flex h-full justify-center">
+                                                <i
+                                                    aria-hidden
+                                                    className="m-auto fa-solid fa-plus fa-2xl"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </>
-            )}
+                    <div id="right">
+                        <div className="font-bold text-2xl">Title:</div>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => {
+                                setTitle(e.target.value);
+                            }}
+                        />
+                        <div className="font-bold text-2xl mt-2">
+                            Date/Location:
+                        </div>
+                        <input
+                            type="text"
+                            value={dateLocation}
+                            onChange={(e) => {
+                                setDateLocation(e.target.value);
+                            }}
+                        />
+                        <div>
+                            <div className="flex gap-4 w-full mt-2">
+                                <div className="font-bold text-2xl">
+                                    Detail:
+                                </div>
+                                <Popover className="dark" placement="right-end">
+                                    <PopoverTrigger>
+                                        <i
+                                            aria-hidden
+                                            className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                        />
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div className="text-left p-2 xl:w-96">
+                                            <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                Text Info
+                                            </div>
+                                            <p className="mb-2">
+                                                The text is rendered using
+                                                Markdown. This means that you
+                                                can add headers, links, and line
+                                                breaks
+                                            </p>
+                                            <p className="mb-2">
+                                                **Header** (bold text)
+                                            </p>
+                                            <p className="mb-2">
+                                                [Link Text
+                                                Here](https://link-here.com/)
+                                            </p>
+                                            <p>New line\</p>
+                                            <p>\</p>
+                                            <p>New Paragraph</p>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <button
+                                    onClick={() => setPreviewText(!previewText)}
+                                    className="text-orange-600 cursor-pointer">
+                                    {previewText ? "Edit" : "Preview"}
+                                </button>
+                            </div>
+                            {previewText ? (
+                                <div className="min-h-80">
+                                    <Markdown>{copy}</Markdown>
+                                </div>
+                            ) : (
+                                <textarea
+                                    className="h-80"
+                                    value={copy}
+                                    onChange={(e) => {
+                                        setCopy(e.target.value);
+                                    }}
+                                />
+                            )}
+                        </div>
+                        <div className="flex justify-between mt-5">
+                            <div className="font-bold text-2xl mt-auto">
+                                Tags:
+                            </div>
+                            <em className="my-auto text-neutral-600">
+                                Click a tag to remove it
+                            </em>
+                        </div>
+                        <div className="flex flex-wrap gap-4 mt-2">
+                            {tags.map((tag: string, index: number) => {
+                                return (
+                                    <Chip
+                                        onClick={() => removeTag(index)}
+                                        className="cursor-pointer"
+                                        key={tag + "-" + index}>
+                                        {tag}
+                                    </Chip>
+                                );
+                            })}
+                        </div>
+                        <div className="font-bold text-2xl mt-5">New Tag:</div>
+                        <div className="flex gap-4">
+                            <input
+                                type="text"
+                                placeholder="Add a new Tag"
+                                value={newTag}
+                                onChange={(e) => {
+                                    setNewTag(e.target.value);
+                                }}
+                            />
+
+                            <button
+                                onClick={() => {
+                                    if (newTag !== "") {
+                                        setTags([...tags, newTag]);
+                                        setNewTag("");
+                                    }
+                                }}
+                                className="my-auto px-4 py-2 bg-orange-600 rounded">
+                                Add
+                            </button>
+                        </div>
+                        <div className="font-bold text-2xl mt-5">Order:</div>
+                        <div className="w-1/4">
+                            <input
+                                type="number"
+                                placeholder="0"
+                                value={!Number.isNaN(order) ? order : ""}
+                                onChange={(e) => {
+                                    setOrder(parseInt(e.target.value));
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <Button
+                            onClick={deleteCaseStudy}
+                            variant="light"
+                            color="danger">
+                            Delete Case Study
+                        </Button>
+                    </div>
+                </div>
+            </>
 
             {/* Change video modal */}
             <Modal
@@ -668,12 +690,19 @@ export default function EditCaseStudy(props: {
                                 )}
                                 {videoNamingError && (
                                     <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with STUDY_
+                                        File name should be prefixed with VIDEO_
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -756,11 +785,15 @@ export default function EditCaseStudy(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
-                                                        <div className="text-center">
+                                                        <div className="text-center truncate">
                                                             {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
+                                                                video.name
+                                                                    .split(
+                                                                        "_"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "-"
+                                                                    )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
@@ -841,9 +874,21 @@ export default function EditCaseStudy(props: {
                                         File name prefix should be STUDY_
                                     </div>
                                 )}
+                                {notImageError && (
+                                    <div className="w-full text-center text-red-400">
+                                        Please Upload file in image format.
+                                    </div>
+                                )}
                                 <div className="w-full flex justify-center mb-10">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={20}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -974,9 +1019,21 @@ export default function EditCaseStudy(props: {
                                         File name prefix should be THUMBNAIL_
                                     </div>
                                 )}
+                                {notImageError && (
+                                    <div className="w-full text-center text-red-400">
+                                        Please Upload file in image format.
+                                    </div>
+                                )}
                                 <div className="w-full flex justify-center mb-10">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />

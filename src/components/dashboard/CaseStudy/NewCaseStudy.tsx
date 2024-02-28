@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import uploadHandler from "../uploadHandler";
+import axios from "axios";
 
 export default function NewCaseStudy(props: {
     revalidateDashboard: any;
@@ -62,6 +63,7 @@ export default function NewCaseStudy(props: {
 
     // Uploading State
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Image select modal declaration
     const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =
@@ -175,21 +177,45 @@ export default function NewCaseStudy(props: {
     }
 
     async function uploadImage(file: File, target: string) {
+        setUploadProgress(0);
         if (file.type.split("/")[0] !== "image") {
             setNotImageError(true);
             setUploading(false);
             return;
         } else {
             setNotImageError(false);
-            await uploadHandler(file, "image")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadimage", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         getImages();
                         clearFileInput("image");
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "image")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             getImages();
+            //             clearFileInput("image");
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -200,15 +226,38 @@ export default function NewCaseStudy(props: {
             return;
         } else {
             setNotVideoError(false);
-            await uploadHandler(file, "video")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadvideo", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         getVideos();
                         clearFileInput("video");
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "video")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             getVideos();
+            //             clearFileInput("video");
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -566,12 +615,19 @@ export default function NewCaseStudy(props: {
                                 )}
                                 {videoNamingError && (
                                     <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with STUDY_
+                                        File name should be prefixed with VIDEO_
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -745,6 +801,13 @@ export default function NewCaseStudy(props: {
                                 <div className="w-full flex justify-center mb-10">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />
@@ -881,6 +944,13 @@ export default function NewCaseStudy(props: {
                                 <div className="w-full flex justify-center mb-10">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />

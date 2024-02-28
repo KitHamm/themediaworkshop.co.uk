@@ -34,6 +34,7 @@ import { useSearchParams } from "next/navigation";
 //  Functions
 import uploadHandler from "./uploadHandler";
 import { Message } from "@prisma/client";
+import axios from "axios";
 
 export default function SidePanel(props: { session: any; messages: Message }) {
     // Search params for which view is active
@@ -50,6 +51,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     const [changeSuccess, setChangeSuccess] = useState(false);
     // Uploading avatar state
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     // Modal states
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -87,15 +89,38 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     // Handler for uploading avatar
     // Uses the upload handler returning a promise
     async function uploadAvatar(file: File) {
-        await uploadHandler(file, "avatar")
-            .then((res: any) => {
-                if (res.message) {
+        setUploadProgress(0);
+        const formData = new FormData();
+        formData.append("file", file);
+        axios
+            .post("/api/uploadavatar", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: (ProgressEvent) => {
+                    if (ProgressEvent.bytes) {
+                        let percent = Math.round(
+                            (ProgressEvent.loaded / ProgressEvent.total!) * 100
+                        );
+                        setUploadProgress(percent);
+                    }
+                },
+            })
+            .then((res) => {
+                if (res.data.message) {
                     setUploading(false);
-                    setNewAvatar(res.message);
+                    setNewAvatar(res.data.message);
                     clearFileInput();
                 }
             })
             .catch((err) => console.log(err));
+        // await uploadHandler(file, "avatar")
+        //     .then((res: any) => {
+        //         if (res.message) {
+        //             setUploading(false);
+        //             setNewAvatar(res.message);
+        //             clearFileInput();
+        //         }
+        //     })
+        //     .catch((err) => console.log(err));
     }
 
     // After the avatar has been uploaded the success message is displayed
@@ -111,8 +136,9 @@ export default function SidePanel(props: { session: any; messages: Message }) {
             .then((res) => {
                 if (res.ok) {
                     getAvatar();
-                    setChangeSuccess(true);
+                    // setChangeSuccess(true);
                     setNewAvatar("");
+                    onOpenChange();
                 }
             })
             .catch((err) => console.log(err));
@@ -425,6 +451,17 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                                 uploading ? (
                                                     <div className="w-full flex justify-center">
                                                         <CircularProgress
+                                                            classNames={{
+                                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                                value: "text-xl",
+                                                            }}
+                                                            className="m-auto"
+                                                            showValueLabel={
+                                                                true
+                                                            }
+                                                            value={
+                                                                uploadProgress
+                                                            }
                                                             color="warning"
                                                             aria-label="Loading..."
                                                         />
@@ -458,7 +495,25 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                                     </div>
                                                 )
                                             ) : (
-                                                <div>{newAvatar}</div>
+                                                <div className="w-full flex justify-center">
+                                                    <Avatar
+                                                        className="w-20 h-20 text-large"
+                                                        showFallback
+                                                        name={
+                                                            Array.from(
+                                                                props.session
+                                                                    .user.name
+                                                            )[0] as string
+                                                        }
+                                                        src={
+                                                            newAvatar
+                                                                ? process.env
+                                                                      .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                                  newAvatar
+                                                                : undefined
+                                                        }
+                                                    />
+                                                </div>
                                             )}
                                         </div>
                                         <div className="flex justify-between mt-2">

@@ -26,6 +26,7 @@ import { Images, Videos } from "@prisma/client";
 // Functions
 import uploadHandler from "./uploadHandler";
 import Link from "next/link";
+import axios from "axios";
 
 // File Prefix Values
 
@@ -72,6 +73,9 @@ export default function Media(props: {
 
     // Delete state with file and file type
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
+
+    // Upload Progress State
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Image view modal declaration
     const {
@@ -124,18 +128,34 @@ export default function Media(props: {
 
     // Delete media depending on file type
     async function uploadMedia() {
+        setUploadProgress(0);
         if (newUpload) {
             var type = newUpload.type.split("/")[0];
             if (newUpload.name.split("_")[0] === "LOGO") {
                 type = "logo";
             }
-            await uploadHandler(newUpload, type)
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", newUpload);
+            axios
+                .post(("/api/upload" as string) + type, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         clearFileInput();
                         getVideos();
                         getImages();
+                        onOpenChangeUpload();
                     }
                 })
                 .catch((err) => console.log(err));
@@ -739,6 +759,12 @@ export default function Media(props: {
                                 <div className="flex mx-auto mt-4">
                                     {uploading ? (
                                         <CircularProgress
+                                            classNames={{
+                                                svg: "w-28 h-28 drop-shadow-md",
+                                                value: "text-2xl",
+                                            }}
+                                            showValueLabel={true}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                             className="ms-4"

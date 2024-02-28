@@ -24,6 +24,7 @@ import { Images } from "@prisma/client";
 
 // Functions
 import uploadHandler from "../uploadHandler";
+import axios from "axios";
 
 export default function NewSegment(props: {
     revalidateDashboard: any;
@@ -51,6 +52,7 @@ export default function NewSegment(props: {
     const [previewText, setPreviewText] = useState(false);
     // Uploading, not image error and success states
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [notImageError, setNotImageError] = useState(false);
     const [success, setSuccess] = useState(false);
     // Top image select modal
@@ -90,17 +92,32 @@ export default function NewSegment(props: {
     }
 
     async function uploadImage(file: File, target: string) {
+        setUploadProgress(0);
         if (file.type.split("/")[0] !== "image") {
             setNotImageError(true);
             setUploading(false);
             return;
         } else {
-            await uploadHandler(file, "image")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadimage", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         if (target === "header") {
-                            setHeaderImage(res.message);
+                            setHeaderImage(res.data.message);
                             clearFileInput(target);
                         } else {
                             getImages();
@@ -109,6 +126,20 @@ export default function NewSegment(props: {
                     }
                 })
                 .catch((err) => console.log(err));
+            // await uploadHandler(file, "image")
+            //     .then((res: any) => {
+            //         if (res.message) {
+            //             setUploading(false);
+            //             if (target === "header") {
+            //                 setHeaderImage(res.message);
+            //                 clearFileInput(target);
+            //             } else {
+            //                 getImages();
+            //                 clearFileInput(target);
+            //             }
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }
     }
 
@@ -197,6 +228,13 @@ export default function NewSegment(props: {
                             <div className="w-full grid xl:grid-cols-2 xl:gap-0 gap-4 my-10">
                                 {uploading ? (
                                     <CircularProgress
+                                        classNames={{
+                                            svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                            value: "text-xl",
+                                        }}
+                                        className="m-auto"
+                                        showValueLabel={true}
+                                        value={uploadProgress}
                                         color="warning"
                                         aria-label="Loading..."
                                     />
@@ -518,6 +556,12 @@ export default function NewSegment(props: {
                                         <div className="w-full flex justify-center mb-10">
                                             {uploading ? (
                                                 <CircularProgress
+                                                    classNames={{
+                                                        svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                        value: "text-xl",
+                                                    }}
+                                                    showValueLabel={true}
+                                                    value={uploadProgress}
                                                     color="warning"
                                                     aria-label="Loading..."
                                                 />

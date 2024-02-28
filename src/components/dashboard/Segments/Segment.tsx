@@ -32,6 +32,7 @@ import { toLink } from "@prisma/client";
 // Functions
 import uploadHandler from "../uploadHandler";
 import Markdown from "react-markdown";
+import axios from "axios";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -84,6 +85,9 @@ export default function EditSegment(props: {
     // Delete States
     const [deleteError, setDeleteError] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+    // Upload Progress
+    const [uploadProgress, setUploadProgress] = useState(0);
     // Top image modal declaration
     const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
         useDisclosure();
@@ -190,18 +194,33 @@ export default function EditSegment(props: {
     }
 
     async function uploadImage(file: File, target: string) {
+        setUploadProgress(0);
         if (file.type.split("/")[0] !== "image") {
             console.log("Not Image");
             setNotImageError(true);
             setUploading(false);
             return;
         } else {
-            await uploadHandler(file, "image")
-                .then((res: any) => {
-                    if (res.message) {
+            const formData = new FormData();
+            formData.append("file", file);
+            axios
+                .post("/api/uploadimage", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    onUploadProgress: (ProgressEvent) => {
+                        if (ProgressEvent.bytes) {
+                            let percent = Math.round(
+                                (ProgressEvent.loaded / ProgressEvent.total!) *
+                                    100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    },
+                })
+                .then((res) => {
+                    if (res.data.message) {
                         setUploading(false);
                         if (target === "header") {
-                            setHeaderImage(res.message);
+                            setHeaderImage(res.data.message);
                             clearFileInput(target);
                         } else {
                             getImages();
@@ -342,6 +361,12 @@ export default function EditSegment(props: {
                         <div className="rounded-lg bg-neutral-800 w-full flex justify-evenly py-10">
                             {uploading ? (
                                 <CircularProgress
+                                    classNames={{
+                                        svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                        value: "text-xl",
+                                    }}
+                                    showValueLabel={true}
+                                    value={uploadProgress}
                                     color="warning"
                                     aria-label="Loading..."
                                 />
@@ -786,8 +811,14 @@ export default function EditSegment(props: {
                                         </div>
                                     )}
                                     <div className="w-full flex justify-center mb-10">
-                                        {uploading ? (
+                                        {!uploading ? (
                                             <CircularProgress
+                                                classNames={{
+                                                    svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                    value: "text-xl",
+                                                }}
+                                                showValueLabel={true}
+                                                value={uploadProgress}
                                                 color="warning"
                                                 aria-label="Loading..."
                                             />

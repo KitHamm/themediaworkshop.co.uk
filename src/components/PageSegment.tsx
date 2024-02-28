@@ -234,26 +234,11 @@ export default function PageSegment(props: {
                                     <div className="embla__container">
                                         {props.segment.image.map(
                                             (image: string, index: number) => {
-                                                const [isLoaded, setIsLoaded] =
-                                                    useState(false);
                                                 return (
                                                     <div
                                                         className="embla__slide w-full h-auto"
                                                         key={index}>
-                                                        <Skeleton className="dark rounded-lg">
-                                                            <div
-                                                                className={`${
-                                                                    isLoaded
-                                                                        ? "hidden"
-                                                                        : ""
-                                                                } h-[32rem] rounded-lg bg-default-300`}></div>
-                                                        </Skeleton>
                                                         <Image
-                                                            onLoad={() =>
-                                                                setIsLoaded(
-                                                                    true
-                                                                )
-                                                            }
                                                             width={900}
                                                             height={500}
                                                             className="embla__slide__img"

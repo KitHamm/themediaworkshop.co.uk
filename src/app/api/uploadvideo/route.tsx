@@ -19,7 +19,8 @@ export async function POST(request: Request) {
     const fileName = file.name.split(".")[0].replace(" ", "-");
     const extension = file.name.split(".")[1];
     const formattedDate = date.toISOString().replace(/:|\./g, "-");
-    const formattedName = fileName + "-" + formattedDate + "." + extension;
+    const formattedName =
+        fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
     try {
         await writeFile(
             path.join(
