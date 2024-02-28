@@ -74,6 +74,10 @@ export default function Media(props: {
     // Delete state with file and file type
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
 
+    // Delete Errors
+    const [deleteError, setDeleteError] = useState("");
+    const [deleteErrorArray, setDeleteErrorArray] = useState([]);
+
     // Upload Progress State
     const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -180,10 +184,15 @@ export default function Media(props: {
                 type: type,
             }),
         })
-            .then((res) => {
-                if (res.ok) {
-                    getVideos();
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.message) {
                     getImages();
+                    getVideos();
+                    onOpenChangeDelete();
+                } else if (json.error) {
+                    setDeleteError(json.where);
+                    setDeleteErrorArray(json.error);
                 }
             })
             .catch((err) => console.log(err));
@@ -476,6 +485,7 @@ export default function Media(props: {
             <Modal
                 size="xl"
                 backdrop="blur"
+                isDismissable={false}
                 isOpen={isOpenDelete}
                 className="dark"
                 onOpenChange={onOpenChangeDelete}>
@@ -490,30 +500,61 @@ export default function Media(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
-                                <div className="w-full">
-                                    <div className="text-center">
-                                        Please make sure this media is not used
-                                        on any pages before deleting.
+                                {deleteError !== "" &&
+                                deleteErrorArray.length > 0 ? (
+                                    <>
+                                        <div className="w-full text-center">
+                                            <div className="font-bold text-red-400 text-xl">
+                                                This file is being used!
+                                            </div>
+                                        </div>
+                                        <div className="font-bold text-xl">
+                                            Used As:
+                                        </div>
+                                        <div>{deleteError}</div>
+                                        <div className="font-bold text-xl">
+                                            Where:
+                                        </div>
+                                        {deleteErrorArray.map(
+                                            (error: any, index: number) => {
+                                                return (
+                                                    <div key={index}>
+                                                        {error.title}
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="w-full">
+                                        <div className="text-center">
+                                            Please make sure this media is not
+                                            used on any pages before deleting.
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </ModalBody>
                             <ModalFooter>
+                                {deleteError === "" &&
+                                    deleteErrorArray.length === 0 && (
+                                        <Button
+                                            color="danger"
+                                            variant="light"
+                                            onPress={() => {
+                                                deleteFile(
+                                                    toDelete.type,
+                                                    toDelete.file
+                                                );
+                                            }}>
+                                            Delete
+                                        </Button>
+                                    )}
                                 <Button
                                     color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        deleteFile(
-                                            toDelete.type,
-                                            toDelete.file
-                                        );
-                                        onClose();
-                                    }}>
-                                    Delete
-                                </Button>
-                                <Button
-                                    color="danger"
                                     onPress={() => {
                                         onClose();
+                                        setDeleteError("");
+                                        setDeleteErrorArray([]);
                                     }}>
                                     Close
                                 </Button>
