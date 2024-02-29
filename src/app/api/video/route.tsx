@@ -1,17 +1,27 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import path from "path";
 import { writeFile } from "fs/promises";
-import prisma from "@/lib/prisma";
 
 interface ArrayFile extends File {
     arrayBuffer: () => Promise<ArrayBuffer>;
 }
+
+export async function GET(request: Request) {
+    revalidatePath("/api/video");
+    const result = await prisma.videos.findMany({
+        orderBy: { createdAt: "desc" },
+    });
+
+    return new NextResponse(JSON.stringify(result), { status: 201 });
+}
+
 export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as ArrayFile;
     const date = new Date();
     if (!file) {
-        console.log("No File");
         return new NextResponse(JSON.stringify({ error: "No file received" }), {
             status: 400,
         });
@@ -26,23 +36,21 @@ export async function POST(request: Request) {
         await writeFile(
             path.join(
                 process.cwd(),
-                process.env.PUT_STATIC_IMAGES + formattedName
+                process.env.PUT_STATIC_VIDEOS + formattedName
             ),
             buffer
         );
         try {
-            await prisma.images.create({
+            await prisma.videos.create({
                 data: {
                     name: formattedName,
                 },
             });
-            console.log("Created");
             return new NextResponse(
                 JSON.stringify({ message: formattedName }),
                 { status: 201 }
             );
         } catch {
-            console.log("Failed to add to database");
             return new NextResponse(
                 JSON.stringify({ error: "An Error Occurred" }),
                 { status: 500 }

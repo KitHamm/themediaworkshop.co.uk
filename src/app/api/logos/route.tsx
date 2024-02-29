@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
-    revalidatePath("/api/images");
+    revalidatePath("/api/image");
     const result = await prisma.logos.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: { name: "asc" },
     });
     return new NextResponse(JSON.stringify(result), { status: 201 });
 }

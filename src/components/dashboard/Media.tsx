@@ -108,7 +108,7 @@ export default function Media(props: {
     async function getVideos() {
         props.revalidateDashboard("/");
         axios
-            .get("/api/videos")
+            .get("/api/video")
             .then((res) => {
                 setVideos(res.data);
             })
@@ -122,7 +122,7 @@ export default function Media(props: {
         var logos: [] = [];
         var temp;
         axios
-            .get("/api/images")
+            .get("/api/image")
             .then((res) => {
                 images = res.data;
                 axios
@@ -142,13 +142,11 @@ export default function Media(props: {
         setUploadProgress(0);
         if (newUpload) {
             var type = newUpload.type.split("/")[0];
-            if (newUpload.name.split("_")[0] === "LOGO") {
-                type = "logo";
-            }
+
             const formData = new FormData();
             formData.append("file", newUpload);
             axios
-                .post(("/api/upload" as string) + type, formData, {
+                .post(("/api/" as string) + type, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {

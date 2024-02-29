@@ -168,7 +168,8 @@ export default function EditSegment(props: {
     // Update segment with pre populated data
     async function updateSegment(json: any) {
         axios
-            .post("/api/updatesegment", {
+            .post("/api/segment", {
+                action: "update",
                 id: props.segment.id as number,
                 data: json,
             })
@@ -201,7 +202,7 @@ export default function EditSegment(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadimage", formData, {
+                .post("/api/image", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -240,7 +241,7 @@ export default function EditSegment(props: {
     }
     async function getImages() {
         axios
-            .get("/api/images")
+            .get("/")
             .then((res) => {
                 setAvailableImages(res.data);
             })
@@ -249,7 +250,11 @@ export default function EditSegment(props: {
 
     async function updatePublished(value: boolean) {
         axios
-            .post("/api/publishsegment", { id: props.segment.id, value: value })
+            .post("/api/segment", {
+                action: "publish",
+                id: props.segment.id,
+                value: value,
+            })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/");
@@ -260,9 +265,9 @@ export default function EditSegment(props: {
 
     async function deleteSegment() {
         axios
-            .post("/api/deletesegment", { id: props.segment.id })
+            .post("/api/segment", { action: "delete", id: props.segment.id })
             .then((res) => {
-                if (res.status === 201) {
+                if (res.data.message) {
                     setDeleteError(false);
                     setDeleteSuccess(true);
                     if (props.title === "home") {
@@ -270,7 +275,7 @@ export default function EditSegment(props: {
                     } else {
                         props.revalidateDashboard("/" + props.title);
                     }
-                } else {
+                } else if (res.data.error) {
                     setDeleteError(true);
                     setDeleteSuccess(false);
                 }

@@ -182,7 +182,7 @@ export default function PageEdit(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadvideo", formData, {
+                .post("/api/video", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -207,7 +207,7 @@ export default function PageEdit(props: {
     async function getVideos() {
         props.revalidateDashboard("/");
         axios
-            .get("/api/videos")
+            .get("/api/video")
             .then((res) => setVideos(res.data))
             .catch((err) => console.log(err));
     }
@@ -230,7 +230,8 @@ export default function PageEdit(props: {
     // Update page information with pre populated data
     async function updatePage(json: any) {
         axios
-            .post("/api/updatepage", {
+            .post("/api/page", {
+                action: "update",
                 id: props.data.id as number,
                 data: json,
             })

@@ -47,7 +47,7 @@ export default function Messages(props: {
 
     async function deleteMultipleMessage() {
         axios
-            .post("/api/deletemessage", { id: multipleMessages })
+            .post("/api/message", { action: "delete", id: multipleMessages })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/dashboard");
@@ -60,7 +60,7 @@ export default function Messages(props: {
 
     async function deleteMessage(id: string) {
         axios
-            .post("/api/deletemessage", { id: [id] })
+            .post("/api/message", { action: "delete", id: [id] })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/dashboard");
@@ -73,7 +73,11 @@ export default function Messages(props: {
 
     async function updateMultipleMessage(value: boolean) {
         axios
-            .post("/api/updatemessage", { id: multipleMessages, value: value })
+            .post("/api/message", {
+                action: "update",
+                id: multipleMessages,
+                value: value,
+            })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/");
@@ -85,7 +89,7 @@ export default function Messages(props: {
 
     async function updateMessage(id: string, value: boolean) {
         axios
-            .post("/api/updatemessage", { id: [id], value: value })
+            .post("/api/message", { action: "update", id: [id], value: value })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/");

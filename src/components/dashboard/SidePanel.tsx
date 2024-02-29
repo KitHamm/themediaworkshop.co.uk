@@ -67,7 +67,8 @@ export default function SidePanel(props: { session: any; messages: Message }) {
 
     async function getAvatar() {
         axios
-            .post("/api/avatar", {
+            .post("/api/users", {
+                action: "getAvatar",
                 id: props.session.user.id,
             })
             .then((res) => setAvatar(res.data.avatar))
@@ -91,7 +92,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
         const formData = new FormData();
         formData.append("file", file);
         axios
-            .post("/api/uploadavatar", formData, {
+            .post("/api/image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: (ProgressEvent) => {
                     if (ProgressEvent.bytes) {
@@ -116,7 +117,8 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     // The user can then save the avatar to their profile with this function
     async function updateAvatar() {
         axios
-            .post("/api/updateuser", {
+            .post("/api/users", {
+                action: "update",
                 id: props.session.user.id,
                 data: { image: newAvatar },
             })

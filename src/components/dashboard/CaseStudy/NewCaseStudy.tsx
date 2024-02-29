@@ -107,7 +107,7 @@ export default function NewCaseStudy(props: {
 
     async function getImages() {
         axios
-            .get("/api/images")
+            .get("/api/image")
             .then((res) => {
                 setAvailableImages(res.data);
             })
@@ -116,7 +116,7 @@ export default function NewCaseStudy(props: {
 
     async function getVideos() {
         axios
-            .get("/api/videos")
+            .get("/api/video")
             .then((res) => {
                 setAvailableVideos(res.data);
             })
@@ -144,24 +144,22 @@ export default function NewCaseStudy(props: {
         }
     }
 
-    // Pre populate information for segment update
-    function handleUpdate() {
-        const json = JSON.stringify({
-            title: title,
-            copy: copy,
-            image: images,
-            video: video,
-            tags: tags,
-            order: order,
-            videoThumbnail: videoThumbnail,
-            segment: { connect: { id: props.segmentId } },
-        });
-        addCaseStudy(json);
-    }
     // Update segment with pre populated data
     async function addCaseStudy(json: any) {
         axios
-            .post("/api/addcasestudy", json)
+            .post("/api/casestudy", {
+                action: "create",
+                data: {
+                    title: title,
+                    copy: copy,
+                    image: images,
+                    video: video,
+                    tags: tags,
+                    order: order,
+                    videoThumbnail: videoThumbnail,
+                    segment: { connect: { id: props.segmentId } },
+                },
+            })
             .then((res) => {
                 if (res.status === 201) {
                     setSuccess(true);
@@ -188,7 +186,7 @@ export default function NewCaseStudy(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadimage", formData, {
+                .post("/api/image", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -221,7 +219,7 @@ export default function NewCaseStudy(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadvideo", formData, {
+                .post("/api/video", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -264,7 +262,7 @@ export default function NewCaseStudy(props: {
                                 Case Study can be saved
                             </div>
                             <button
-                                onClick={handleUpdate}
+                                onClick={addCaseStudy}
                                 className="my-auto bg-orange-600 xl:px-4 xl:py-2 px-2 py-1 rounded">
                                 Submit
                             </button>

@@ -44,7 +44,8 @@ export default function DashboardMain(props: {
     // Initial pop up if this is the first log in
     useEffect(() => {
         axios
-            .post("/api/activated", {
+            .post("/api/users", {
+                action: "checkActivation",
                 id: props.session.user.id,
             })
 
@@ -59,7 +60,8 @@ export default function DashboardMain(props: {
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
         axios
-            .post("/api/updateuser", {
+            .post("/api/users", {
+                action: "update",
                 id: props.session.user.id,
                 data: { activated: true },
             })

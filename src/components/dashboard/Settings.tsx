@@ -157,7 +157,8 @@ export default function Settings(props: {
 
     async function deleteUser() {
         axios
-            .post("/api/deleteuser", {
+            .post("/api/users", {
+                action: "delete",
                 id: userId,
             })
             .then((res) => {
@@ -177,7 +178,7 @@ export default function Settings(props: {
         const formData = new FormData();
         formData.append("file", file);
         axios
-            .post("/api/uploadavatar", formData, {
+            .post("/api/image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: (ProgressEvent) => {
                     if (ProgressEvent.bytes) {
@@ -210,7 +211,8 @@ export default function Settings(props: {
     // Update the email host
     async function updateEmailHost() {
         axios
-            .post("/api/emailhost", {
+            .post("/api/settings", {
+                action: "emailHost",
                 old: props.emailHost,
                 data: {
                     emailHost: emailHost,
@@ -218,7 +220,7 @@ export default function Settings(props: {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/api/emailhost");
+                    props.revalidateDashboard("/api/settings");
                 }
             })
             .catch((err) => console.log(err));
@@ -228,6 +230,7 @@ export default function Settings(props: {
     async function onSubmit(data: FormValues) {
         axios
             .post("/api/users", {
+                action: "create",
                 email: data.email,
                 firstName: data.firstName,
                 lastName: data.lastName,
@@ -251,7 +254,8 @@ export default function Settings(props: {
 
     async function onSubmitNewPassword(data: PasswordFormValues) {
         axios
-            .post("/api/changepassword", {
+            .post("/api/users", {
+                action: "changePassword",
                 id: props.session.user.id,
                 password: data.password,
                 currentPassword: data.currentPassword,
@@ -270,7 +274,8 @@ export default function Settings(props: {
 
     async function resetPassword() {
         axios
-            .post("/api/resetpassword", {
+            .post("/api/users", {
+                action: "resetPassword",
                 id: userResetId,
                 password: randomPassword(10),
                 adminId: props.session.user.id,
@@ -290,7 +295,8 @@ export default function Settings(props: {
 
     async function updateUser() {
         axios
-            .post("/api/updateuser", {
+            .post("/api/users", {
+                action: "update",
                 id: userId,
                 data: {
                     firstname: newName.split(" ")[0],

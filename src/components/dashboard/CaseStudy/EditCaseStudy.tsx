@@ -91,6 +91,10 @@ export default function EditCaseStudy(props: {
         onOpenChange: onOpenChangeVideoPreview,
     } = useDisclosure();
 
+    // Delete warning modal declaration
+    const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
+        useDisclosure();
+
     // Constant check for unsaved changes
     useEffect(() => {
         if (
@@ -137,7 +141,7 @@ export default function EditCaseStudy(props: {
 
     async function getImages() {
         axios
-            .get("/api/images")
+            .get("/api/image")
             .then((res) => {
                 setAvailableImages(res.data);
             })
@@ -146,7 +150,7 @@ export default function EditCaseStudy(props: {
 
     async function getVideos() {
         axios
-            .get("/api/videos")
+            .get("/api/video")
             .then((res) => {
                 setAvailableVideos(res.data);
             })
@@ -191,7 +195,8 @@ export default function EditCaseStudy(props: {
     // Update segment with pre populated data
     async function updateCaseStudy(json: any) {
         axios
-            .post("/api/updatecasestudy", {
+            .post("/api/casestudy", {
+                action: "update",
                 id: props.caseStudy.id as number,
                 data: json,
             })
@@ -202,13 +207,16 @@ export default function EditCaseStudy(props: {
             })
             .catch((err) => console.log(err));
     }
-    // TODO add are you sure
     async function deleteCaseStudy() {
         axios
-            .post("/api/deletecasestudy", { id: props.caseStudy.id })
+            .post("/api/casestudy", {
+                action: "delete",
+                id: props.caseStudy.id,
+            })
             .then((res) => {
                 if (res.status === 201) {
                     props.revalidateDashboard("/");
+                    onOpenChangeDelete();
                     props.onOpenChangeEditCaseStudy();
                 }
             })
@@ -225,7 +233,7 @@ export default function EditCaseStudy(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadimage", formData, {
+                .post("/api/image", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -250,7 +258,8 @@ export default function EditCaseStudy(props: {
 
     async function updatePublished(value: boolean) {
         axios
-            .post("/api/publishcasestudy", {
+            .post("/api/casestudy", {
+                action: "publish",
                 id: props.caseStudy.id,
                 value: value,
             })
@@ -271,7 +280,7 @@ export default function EditCaseStudy(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadvideo", formData, {
+                .post("/api/video", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -638,7 +647,7 @@ export default function EditCaseStudy(props: {
                     </div>
                     <div>
                         <Button
-                            onClick={deleteCaseStudy}
+                            onClick={() => onOpenChangeDelete()}
                             variant="light"
                             color="danger">
                             Delete Case Study
@@ -1159,6 +1168,49 @@ export default function EditCaseStudy(props: {
                                         onClose();
                                         setNotVideoError(false);
                                         setVideoNamingError(false);
+                                    }}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Delete warning modal */}
+            <Modal
+                size="2xl"
+                backdrop="blur"
+                isOpen={isOpenDelete}
+                className="dark"
+                scrollBehavior="inside"
+                onOpenChange={onOpenChangeDelete}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-red-400">
+                                    Are you sure?
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <div className="font-bold text-2xl text-center">
+                                    {"Delete " + props.caseStudy.title + "?"}
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={() => {
+                                        deleteCaseStudy();
+                                    }}>
+                                    Delete
+                                </Button>
+
+                                <Button
+                                    color="danger"
+                                    onPress={() => {
+                                        onClose();
                                     }}>
                                     Close
                                 </Button>

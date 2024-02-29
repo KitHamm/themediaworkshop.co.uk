@@ -12,10 +12,12 @@ import { useState } from "react";
 export default function Navbar(props: { active: string }) {
     const [loading, setLoading] = useState(false);
 
-    function loadWait() {
-        setTimeout(() => {
-            setLoading(true);
-        }, 500);
+    function loadWait(target: string) {
+        if (props.active !== target) {
+            setTimeout(() => {
+                setLoading(true);
+            }, 1000);
+        }
     }
 
     return (
@@ -26,7 +28,10 @@ export default function Navbar(props: { active: string }) {
                         className={`${
                             props.active === "home" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
-                        <Link onClick={loadWait} scroll={false} href={"/"}>
+                        <Link
+                            onClick={() => loadWait("home")}
+                            scroll={false}
+                            href={"/"}>
                             Home
                         </Link>
                     </li>
@@ -34,7 +39,10 @@ export default function Navbar(props: { active: string }) {
                         className={`${
                             props.active === "film" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
-                        <Link onClick={loadWait} scroll={false} href={"/film"}>
+                        <Link
+                            onClick={() => loadWait("film")}
+                            scroll={false}
+                            href={"/film"}>
                             Film
                         </Link>
                     </li>
@@ -43,7 +51,7 @@ export default function Navbar(props: { active: string }) {
                             props.active === "digital" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={loadWait}
+                            onClick={() => loadWait("digital")}
                             scroll={false}
                             href={"/digital"}>
                             Digital
@@ -53,7 +61,10 @@ export default function Navbar(props: { active: string }) {
                         className={`${
                             props.active === "light" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
-                        <Link onClick={loadWait} scroll={false} href={"/light"}>
+                        <Link
+                            onClick={() => loadWait("light")}
+                            scroll={false}
+                            href={"/light"}>
                             Light
                         </Link>
                     </li>
@@ -62,7 +73,7 @@ export default function Navbar(props: { active: string }) {
                             props.active === "events" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={loadWait}
+                            onClick={() => loadWait("events")}
                             scroll={false}
                             href={"/events"}>
                             Events
@@ -72,7 +83,10 @@ export default function Navbar(props: { active: string }) {
                         className={`${
                             props.active === "art" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
-                        <Link onClick={loadWait} scroll={false} href={"/art"}>
+                        <Link
+                            onClick={() => loadWait("art")}
+                            scroll={false}
+                            href={"/art"}>
                             Art
                         </Link>
                     </li>

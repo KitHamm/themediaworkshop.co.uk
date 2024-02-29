@@ -63,7 +63,7 @@ export default function NewSegment(props: {
 
     async function getImages() {
         axios
-            .get("/api/images")
+            .get("/api/image")
             .then((res) => {
                 setAvailableImages(res.data);
             })
@@ -102,7 +102,7 @@ export default function NewSegment(props: {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/uploadimage", formData, {
+                .post("/api/image", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -132,15 +132,18 @@ export default function NewSegment(props: {
 
     async function addSegment() {
         axios
-            .post("/api/addsegment", {
-                title: title,
-                copy: copy,
-                headerimage: headerImage,
-                image: images,
-                order: order,
-                page: {
-                    connect: {
-                        id: props.pageID,
+            .post("/api/segment", {
+                action: "create",
+                data: {
+                    title: title,
+                    copy: copy,
+                    headerimage: headerImage,
+                    image: images,
+                    order: order,
+                    page: {
+                        connect: {
+                            id: props.pageID,
+                        },
                     },
                 },
             })
