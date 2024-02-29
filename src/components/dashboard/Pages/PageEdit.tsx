@@ -31,7 +31,6 @@ import Image from "next/image";
 import { Page, Segment, Videos } from "@prisma/client";
 
 // Functions
-import uploadHandler from "../uploadHandler";
 import Markdown from "react-markdown";
 import axios from "axios";
 
@@ -39,7 +38,6 @@ export default function PageEdit(props: {
     data: Page;
     hidden: boolean;
     revalidateDashboard: any;
-    bgVideos: Videos[];
 }) {
     // If page has description and header set initial state of description and header
     const [description, setDescription] = useState(
@@ -203,22 +201,14 @@ export default function PageEdit(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "video")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             getVideos();
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
     async function getVideos() {
         props.revalidateDashboard("/");
-        fetch("/api/videos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setVideos(json))
+        axios
+            .get("/api/videos")
+            .then((res) => setVideos(res.data))
             .catch((err) => console.log(err));
     }
 
@@ -239,15 +229,13 @@ export default function PageEdit(props: {
 
     // Update page information with pre populated data
     async function updatePage(json: any) {
-        await fetch("/api/updatepage", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updatepage", {
                 id: props.data.id as number,
                 data: json,
-            }),
-        })
-            .then((response) => {
-                if (response.ok) {
+            })
+            .then((res) => {
+                if (res.status === 201) {
                     if (props.data.title === "home") {
                         props.revalidateDashboard("/");
                     } else {
@@ -255,7 +243,7 @@ export default function PageEdit(props: {
                     }
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
     return (

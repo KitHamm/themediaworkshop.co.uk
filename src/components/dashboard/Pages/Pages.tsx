@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 
 // Types
 import { Page, Videos } from "@prisma/client";
+import axios from "axios";
 
 export default function Pages(props: {
     hidden: boolean;
@@ -25,14 +26,6 @@ export default function Pages(props: {
     const pageEdit: string = searchParams.get("pageEdit")
         ? searchParams.get("pageEdit")!
         : "home";
-
-    // Get initial videos
-    useEffect(() => {
-        fetch("/api/videos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setBgVideos(json))
-            .catch((err) => console.log(err));
-    }, [props.data]);
 
     return (
         <>
@@ -103,7 +96,6 @@ export default function Pages(props: {
                     return (
                         <div key={index}>
                             <PageEdit
-                                bgVideos={bgVideos}
                                 revalidateDashboard={props.revalidateDashboard}
                                 data={page}
                                 hidden={pageEdit === page.title ? false : true}

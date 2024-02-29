@@ -21,7 +21,6 @@ import { useState, useEffect } from "react";
 // Types
 import { CaseStudy, Images, Videos } from "@prisma/client";
 import Image from "next/image";
-import uploadHandler from "../uploadHandler";
 import axios from "axios";
 
 export default function EditCaseStudy(props: {
@@ -137,16 +136,20 @@ export default function EditCaseStudy(props: {
     }
 
     async function getImages() {
-        fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableImages(json))
+        axios
+            .get("/api/images")
+            .then((res) => {
+                setAvailableImages(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
     async function getVideos() {
-        fetch("/api/videos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableVideos(json))
+        axios
+            .get("/api/videos")
+            .then((res) => {
+                setAvailableVideos(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
@@ -187,28 +190,24 @@ export default function EditCaseStudy(props: {
     }
     // Update segment with pre populated data
     async function updateCaseStudy(json: any) {
-        await fetch("/api/updatecasestudy", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updatecasestudy", {
                 id: props.caseStudy.id as number,
                 data: json,
-            }),
-        })
-            .then((response) => {
-                if (response.ok) {
+            })
+            .then((res) => {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
-
+    // TODO add are you sure
     async function deleteCaseStudy() {
-        await fetch("/api/deletecasestudy", {
-            method: "POST",
-            body: JSON.stringify({ id: props.caseStudy.id }),
-        })
-            .then((response) => {
-                if (response.ok) {
+        axios
+            .post("/api/deletecasestudy", { id: props.caseStudy.id })
+            .then((res) => {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
                     props.onOpenChangeEditCaseStudy();
                 }
@@ -246,25 +245,17 @@ export default function EditCaseStudy(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "image")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             getImages();
-            //             clearFileInput("image");
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
     async function updatePublished(value: boolean) {
-        await fetch("/api/publishcasestudy", {
-            method: "POST",
-            body: JSON.stringify({ id: props.caseStudy.id, value: value }),
-        })
+        axios
+            .post("/api/publishcasestudy", {
+                id: props.caseStudy.id,
+                value: value,
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
                 }
             })
@@ -300,15 +291,6 @@ export default function EditCaseStudy(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "video")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             getVideos();
-            //             clearFileInput("video");
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
@@ -888,7 +870,7 @@ export default function EditCaseStudy(props: {
                                             }}
                                             className="m-auto"
                                             showValueLabel={true}
-                                            value={20}
+                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                         />

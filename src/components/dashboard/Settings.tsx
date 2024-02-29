@@ -39,8 +39,8 @@ type PasswordFormValues = {
 };
 
 // Function
-import uploadHandler from "./uploadHandler";
 import { User, emailHost } from "@prisma/client";
+import axios from "axios";
 
 export default function Settings(props: {
     hidden: boolean;
@@ -60,6 +60,8 @@ export default function Settings(props: {
 
     // Uploading state for avatar and state for avatar file name
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [notImageError, setNotImageError] = useState(false);
 
     // Reset Password Details
     const [adminPassword, setAdminPassword] = useState("");
@@ -147,21 +149,19 @@ export default function Settings(props: {
     }, []);
 
     async function getUsers() {
-        fetch("/api/users", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setUsers(json))
+        axios
+            .get("/api/users")
+            .then((res) => setUsers(res.data))
             .catch((err) => console.log(err));
     }
 
     async function deleteUser() {
-        fetch("/api/deleteuser", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/deleteuser", {
                 id: userId,
-            }),
-        })
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     setUserId("");
                     getUsers();
                 }
@@ -173,11 +173,25 @@ export default function Settings(props: {
     }
 
     async function uploadAvatar(file: File) {
-        await uploadHandler(file, "avatar")
-            .then((res: any) => {
-                if (res.message) {
+        setUploadProgress(0);
+        const formData = new FormData();
+        formData.append("file", file);
+        axios
+            .post("/api/uploadavatar", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: (ProgressEvent) => {
+                    if (ProgressEvent.bytes) {
+                        let percent = Math.round(
+                            (ProgressEvent.loaded / ProgressEvent.total!) * 100
+                        );
+                        setUploadProgress(percent);
+                    }
+                },
+            })
+            .then((res) => {
+                if (res.data.message) {
                     setUploading(false);
-                    setAvatar(file.name);
+                    setAvatar(res.data.message);
                     clearFileInput();
                 }
             })
@@ -195,17 +209,15 @@ export default function Settings(props: {
 
     // Update the email host
     async function updateEmailHost() {
-        fetch("/api/emailhost", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/emailhost", {
                 old: props.emailHost,
                 data: {
                     emailHost: emailHost,
                 },
-            }),
-        })
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/api/emailhost");
                 }
             })
@@ -214,21 +226,18 @@ export default function Settings(props: {
 
     // Submit user to database and retrieve password to display one time
     async function onSubmit(data: FormValues) {
-        await fetch("/api/users", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/users", {
                 email: data.email,
                 firstName: data.firstName,
                 lastName: data.lastName,
                 position: data.position,
                 image: avatar,
                 password: randomPassword(10),
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.message) {
-                    setPassword(json.password);
+            })
+            .then((res) => {
+                if (res.data.message) {
+                    setPassword(res.data.password);
                     setUserCreated(true);
                     getUsers();
                     setError(false);
@@ -241,44 +250,36 @@ export default function Settings(props: {
     }
 
     async function onSubmitNewPassword(data: PasswordFormValues) {
-        await fetch("/api/changepassword", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/changepassword", {
                 id: props.session.user.id,
                 password: data.password,
                 currentPassword: data.currentPassword,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.message) {
+            })
+            .then((res) => {
+                if (res.data.message) {
                     setPasswordSuccess(true);
                     setPasswordError(false);
-                } else {
-                    if (json.error) {
-                        setPasswordSuccess(false);
-                        setPasswordError(true);
-                    }
+                } else if (res.data.error) {
+                    setPasswordSuccess(false);
+                    setPasswordError(true);
                 }
             })
             .catch((err) => console.log(err));
     }
 
     async function resetPassword() {
-        await fetch("/api/resetpassword", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/resetpassword", {
                 id: userResetId,
                 password: randomPassword(10),
                 adminId: props.session.user.id,
                 adminPassword: adminPassword,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.message) {
+            })
+            .then((res) => {
+                if (res.data.message) {
                     setResetPasswordSuccess(true);
-                    setPassword(json.password);
+                    setPassword(res.data.password);
                 } else {
                     setResetPasswordSuccess(false);
                     setPasswordError(true);
@@ -288,9 +289,8 @@ export default function Settings(props: {
     }
 
     async function updateUser() {
-        await fetch("/api/updateuser", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updateuser", {
                 id: userId,
                 data: {
                     firstname: newName.split(" ")[0],
@@ -299,10 +299,9 @@ export default function Settings(props: {
                     position: newPosition,
                     role: newRole,
                 },
-            }),
-        })
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     setUserId("");
                     setNewName("");
                     setNewEmail("");
@@ -671,15 +670,7 @@ export default function Settings(props: {
                                                         : "Email"
                                                 }
                                                 type="email"
-                                                {...register(
-                                                    "email"
-                                                    // , {
-                                                    //     validate: (value) =>
-                                                    //         value.split("@")[1] ===
-                                                    //             "themediaworkshop.co.uk" ||
-                                                    //         "Email needs to be a TMW domain email. Eg: someone@themediaworkshop.co.uk",
-                                                    // }
-                                                )}
+                                                {...register("email")}
                                             />
                                             {errors.email && (
                                                 <p className="text-red-400 mb-4">
@@ -694,13 +685,28 @@ export default function Settings(props: {
                                                 {...register("position")}
                                             />
                                             <div className="mb-2">Avatar</div>
+                                            {notImageError && (
+                                                <div className="w-full flex justify-center text-red-400">
+                                                    File is not an image
+                                                </div>
+                                            )}
                                             <div className="w-full flex justify-center">
                                                 {avatar === "" ? (
                                                     uploading ? (
                                                         <CircularProgress
+                                                            classNames={{
+                                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                                value: "text-xl",
+                                                            }}
+                                                            className="m-auto"
+                                                            showValueLabel={
+                                                                true
+                                                            }
+                                                            value={
+                                                                uploadProgress
+                                                            }
                                                             color="warning"
                                                             aria-label="Loading..."
-                                                            className="ms-4"
                                                         />
                                                     ) : (
                                                         <div className="file-input">
@@ -712,14 +718,28 @@ export default function Settings(props: {
                                                                         e.target
                                                                             .files
                                                                     ) {
-                                                                        setUploading(
-                                                                            true
-                                                                        );
-                                                                        uploadAvatar(
-                                                                            e
-                                                                                .target
-                                                                                .files[0]
-                                                                        );
+                                                                        if (
+                                                                            e.target.files[0].type.split(
+                                                                                "/"
+                                                                            )[0] ===
+                                                                            "image"
+                                                                        ) {
+                                                                            setNotImageError(
+                                                                                false
+                                                                            );
+                                                                            setUploading(
+                                                                                true
+                                                                            );
+                                                                            uploadAvatar(
+                                                                                e
+                                                                                    .target
+                                                                                    .files[0]
+                                                                            );
+                                                                        } else {
+                                                                            setNotImageError(
+                                                                                true
+                                                                            );
+                                                                        }
                                                                     }
                                                                 }}
                                                                 type="file"
@@ -734,7 +754,28 @@ export default function Settings(props: {
                                                         </div>
                                                     )
                                                 ) : (
-                                                    <div>{avatar}</div>
+                                                    <div className="w-full flex justify-center">
+                                                        <Avatar
+                                                            className="w-20 h-20 text-large"
+                                                            showFallback
+                                                            name={
+                                                                Array.from(
+                                                                    props
+                                                                        .session
+                                                                        .user
+                                                                        .name
+                                                                )[0] as string
+                                                            }
+                                                            src={
+                                                                avatar
+                                                                    ? process
+                                                                          .env
+                                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                                      avatar
+                                                                    : undefined
+                                                            }
+                                                        />
+                                                    </div>
                                                 )}
                                             </div>
                                             <div className="flex justify-between mt-5">
@@ -742,6 +783,7 @@ export default function Settings(props: {
                                                     color="danger"
                                                     variant="light"
                                                     onPress={() => {
+                                                        setNotImageError(false);
                                                         onClose();
                                                         reset();
                                                         setPassword("");

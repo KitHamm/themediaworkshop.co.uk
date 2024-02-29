@@ -32,7 +32,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 //  Functions
-import uploadHandler from "./uploadHandler";
 import { Message } from "@prisma/client";
 import axios from "axios";
 
@@ -52,6 +51,8 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     // Uploading avatar state
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    // Not Image Error
+    const [notImageError, setNotImageError] = useState(false);
     // Modal states
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -65,14 +66,11 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     }, [props.messages]);
 
     async function getAvatar() {
-        fetch("/api/avatar", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/avatar", {
                 id: props.session.user.id,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => setAvatar(json.avatar))
+            })
+            .then((res) => setAvatar(res.data.avatar))
             .catch((err) => console.log(err));
     }
 
@@ -112,31 +110,19 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                 }
             })
             .catch((err) => console.log(err));
-        // await uploadHandler(file, "avatar")
-        //     .then((res: any) => {
-        //         if (res.message) {
-        //             setUploading(false);
-        //             setNewAvatar(res.message);
-        //             clearFileInput();
-        //         }
-        //     })
-        //     .catch((err) => console.log(err));
     }
 
     // After the avatar has been uploaded the success message is displayed
     // The user can then save the avatar to their profile with this function
     async function updateAvatar() {
-        fetch("/api/updateuser", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updateuser", {
                 id: props.session.user.id,
                 data: { image: newAvatar },
-            }),
-        })
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     getAvatar();
-                    // setChangeSuccess(true);
                     setNewAvatar("");
                     onOpenChange();
                 }
@@ -446,6 +432,11 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                     </>
                                 ) : (
                                     <>
+                                        {notImageError && (
+                                            <div className="w-full flex justify-center text-red-400">
+                                                File is not an image
+                                            </div>
+                                        )}
                                         <div className="flex">
                                             {newAvatar === "" ? (
                                                 uploading ? (
@@ -476,13 +467,28 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                                                     e.target
                                                                         .files
                                                                 ) {
-                                                                    setUploading(
-                                                                        true
-                                                                    );
-                                                                    uploadAvatar(
-                                                                        e.target
-                                                                            .files[0]
-                                                                    );
+                                                                    if (
+                                                                        e.target.files[0].type.split(
+                                                                            "/"
+                                                                        )[0] ===
+                                                                        "image"
+                                                                    ) {
+                                                                        setNotImageError(
+                                                                            false
+                                                                        );
+                                                                        setUploading(
+                                                                            true
+                                                                        );
+                                                                        uploadAvatar(
+                                                                            e
+                                                                                .target
+                                                                                .files[0]
+                                                                        );
+                                                                    } else {
+                                                                        setNotImageError(
+                                                                            true
+                                                                        );
+                                                                    }
                                                                 }
                                                             }}
                                                             type="file"
@@ -521,6 +527,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                                                 <Button
                                                     color="danger"
                                                     onPress={() => {
+                                                        setNotImageError(false);
                                                         onClose();
                                                         setNewAvatar("");
                                                     }}>

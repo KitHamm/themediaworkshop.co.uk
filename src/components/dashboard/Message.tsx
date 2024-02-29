@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 
 // Types
 import { Message } from "@prisma/client";
+import axios from "axios";
 
 export default function Messages(props: {
     hidden: boolean;
@@ -45,12 +46,10 @@ export default function Messages(props: {
     }, [props.messages]);
 
     async function deleteMultipleMessage() {
-        await fetch("/api/deletemessage", {
-            method: "POST",
-            body: JSON.stringify({ id: multipleMessages }),
-        })
+        axios
+            .post("/api/deletemessage", { id: multipleMessages })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/dashboard");
                     setSelectedMessage(-1);
                     setMultipleMessages([]);
@@ -60,26 +59,23 @@ export default function Messages(props: {
     }
 
     async function deleteMessage(id: string) {
-        await fetch("/api/deletemessage", {
-            method: "POST",
-            body: JSON.stringify({ id: [id] }),
-        })
+        axios
+            .post("/api/deletemessage", { id: [id] })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/dashboard");
                     setSelectedMessage(-1);
+                    setMultipleMessages([]);
                 }
             })
             .catch((err: any) => console.log(err));
     }
 
     async function updateMultipleMessage(value: boolean) {
-        await fetch("/api/updatemessage", {
-            method: "POST",
-            body: JSON.stringify({ id: multipleMessages, value: value }),
-        })
+        axios
+            .post("/api/updatemessage", { id: multipleMessages, value: value })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
                     setMultipleMessages([]);
                 }
@@ -88,13 +84,12 @@ export default function Messages(props: {
     }
 
     async function updateMessage(id: string, value: boolean) {
-        await fetch("/api/updatemessage", {
-            method: "POST",
-            body: JSON.stringify({ id: [id], value: value }),
-        })
+        axios
+            .post("/api/updatemessage", { id: [id], value: value })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
+                    setMultipleMessages([]);
                 }
             })
             .catch((err) => console.log(err));

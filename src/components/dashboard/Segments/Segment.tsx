@@ -30,7 +30,6 @@ import { CaseStudy, Images, Segment } from "@prisma/client";
 import { toLink } from "@prisma/client";
 
 // Functions
-import uploadHandler from "../uploadHandler";
 import Markdown from "react-markdown";
 import axios from "axios";
 
@@ -168,15 +167,13 @@ export default function EditSegment(props: {
     }
     // Update segment with pre populated data
     async function updateSegment(json: any) {
-        await fetch("/api/updatesegment", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updatesegment", {
                 id: props.segment.id as number,
                 data: json,
-            }),
-        })
-            .then((response) => {
-                if (response.ok) {
+            })
+            .then((res) => {
+                if (res.status === 201) {
                     if (props.title === "home") {
                         props.revalidateDashboard("/");
                     } else {
@@ -184,7 +181,7 @@ export default function EditSegment(props: {
                     }
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
     function removeImage(index: number) {
@@ -242,19 +239,19 @@ export default function EditSegment(props: {
         }
     }
     async function getImages() {
-        fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableImages(json))
+        axios
+            .get("/api/images")
+            .then((res) => {
+                setAvailableImages(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
     async function updatePublished(value: boolean) {
-        await fetch("/api/publishsegment", {
-            method: "POST",
-            body: JSON.stringify({ id: props.segment.id, value: value }),
-        })
+        axios
+            .post("/api/publishsegment", { id: props.segment.id, value: value })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/");
                 }
             })
@@ -262,12 +259,10 @@ export default function EditSegment(props: {
     }
 
     async function deleteSegment() {
-        await fetch("/api/deletesegment", {
-            method: "POST",
-            body: JSON.stringify({ id: props.segment.id }),
-        })
-            .then(async (res) => {
-                if (res.ok) {
+        axios
+            .post("/api/deletesegment", { id: props.segment.id })
+            .then((res) => {
+                if (res.status === 201) {
                     setDeleteError(false);
                     setDeleteSuccess(true);
                     if (props.title === "home") {
@@ -280,9 +275,7 @@ export default function EditSegment(props: {
                     setDeleteSuccess(false);
                 }
             })
-            .catch((err) => {
-                console.log(err);
-            });
+            .catch((err) => console.log(err));
     }
 
     return (
@@ -811,7 +804,7 @@ export default function EditSegment(props: {
                                         </div>
                                     )}
                                     <div className="w-full flex justify-center mb-10">
-                                        {!uploading ? (
+                                        {uploading ? (
                                             <CircularProgress
                                                 classNames={{
                                                     svg: "w-20 h-20 text-orange-600 drop-shadow-md",

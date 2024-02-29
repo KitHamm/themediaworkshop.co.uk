@@ -23,6 +23,7 @@ import { useEffect, useState, useRef } from "react";
 
 // Types
 import { Logos, Page, Segment } from "@prisma/client";
+import axios from "axios";
 type FormTypes = {
     name: string;
     email: string;
@@ -77,12 +78,10 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
 
     const onSubmit = (data: FormTypes) => {
         setSending(true);
-        fetch("send/message", {
-            method: "POST",
-            body: JSON.stringify(data),
-        })
+        axios
+            .post("send/message", JSON.stringify(data))
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     setSuccess(true);
                 }
             })

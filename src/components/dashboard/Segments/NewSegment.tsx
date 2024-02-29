@@ -23,7 +23,6 @@ import Image from "next/image";
 import { Images } from "@prisma/client";
 
 // Functions
-import uploadHandler from "../uploadHandler";
 import axios from "axios";
 
 export default function NewSegment(props: {
@@ -63,9 +62,11 @@ export default function NewSegment(props: {
         useDisclosure();
 
     async function getImages() {
-        fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableImages(json))
+        axios
+            .get("/api/images")
+            .then((res) => {
+                setAvailableImages(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
@@ -126,27 +127,12 @@ export default function NewSegment(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "image")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             if (target === "header") {
-            //                 setHeaderImage(res.message);
-            //                 clearFileInput(target);
-            //             } else {
-            //                 getImages();
-            //                 clearFileInput(target);
-            //             }
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
     async function addSegment() {
-        await fetch("/api/addsegment", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/addsegment", {
                 title: title,
                 copy: copy,
                 headerimage: headerImage,
@@ -157,10 +143,9 @@ export default function NewSegment(props: {
                         id: props.pageID,
                     },
                 },
-            }),
-        })
-            .then((response) => {
-                if (response.ok) {
+            })
+            .then((res) => {
+                if (res.status === 201) {
                     setSuccess(true);
                     setTitle("");
                     setCopy("");
@@ -173,7 +158,7 @@ export default function NewSegment(props: {
                     }
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
     return (

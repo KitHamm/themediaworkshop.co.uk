@@ -21,7 +21,6 @@ import { useState, useEffect } from "react";
 // Types
 import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
-import uploadHandler from "../uploadHandler";
 import axios from "axios";
 
 export default function NewCaseStudy(props: {
@@ -107,16 +106,20 @@ export default function NewCaseStudy(props: {
     }
 
     async function getImages() {
-        fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableImages(json))
+        axios
+            .get("/api/images")
+            .then((res) => {
+                setAvailableImages(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
     async function getVideos() {
-        fetch("/api/videos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setAvailableVideos(json))
+        axios
+            .get("/api/videos")
+            .then((res) => {
+                setAvailableVideos(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
@@ -157,12 +160,10 @@ export default function NewCaseStudy(props: {
     }
     // Update segment with pre populated data
     async function addCaseStudy(json: any) {
-        await fetch("/api/addcasestudy", {
-            method: "POST",
-            body: json,
-        })
-            .then((response) => {
-                if (response.ok) {
+        axios
+            .post("/api/addcasestudy", json)
+            .then((res) => {
+                if (res.status === 201) {
                     setSuccess(true);
                     setTitle("");
                     setCopy("");
@@ -173,7 +174,7 @@ export default function NewCaseStudy(props: {
                     props.revalidateDashboard("/");
                 }
             })
-            .catch((error) => console.log(error));
+            .catch((err) => console.log(err));
     }
 
     async function uploadImage(file: File, target: string) {
@@ -207,15 +208,6 @@ export default function NewCaseStudy(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "image")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             getImages();
-            //             clearFileInput("image");
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
@@ -249,15 +241,6 @@ export default function NewCaseStudy(props: {
                     }
                 })
                 .catch((err) => console.log(err));
-            // await uploadHandler(file, "video")
-            //     .then((res: any) => {
-            //         if (res.message) {
-            //             setUploading(false);
-            //             getVideos();
-            //             clearFileInput("video");
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
         }
     }
 
@@ -708,11 +691,15 @@ export default function NewCaseStudy(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
-                                                        <div className="text-center">
+                                                        <div className="text-center truncate">
                                                             {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
+                                                                video.name
+                                                                    .split(
+                                                                        "_"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "-"
+                                                                    )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">

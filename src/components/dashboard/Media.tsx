@@ -24,7 +24,6 @@ import { useSearchParams } from "next/navigation";
 import { Images, Videos } from "@prisma/client";
 
 // Functions
-import uploadHandler from "./uploadHandler";
 import Link from "next/link";
 import axios from "axios";
 
@@ -108,26 +107,34 @@ export default function Media(props: {
 
     async function getVideos() {
         props.revalidateDashboard("/");
-        await fetch("/api/videos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => setVideos(json))
+        axios
+            .get("/api/videos")
+            .then((res) => {
+                setVideos(res.data);
+            })
             .catch((err) => console.log(err));
     }
 
     async function getImages() {
         props.revalidateDashboard("/");
+
         var images: [] = [];
         var logos: [] = [];
-        await fetch("/api/images", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => (images = json))
+        var temp;
+        axios
+            .get("/api/images")
+            .then((res) => {
+                images = res.data;
+                axios
+                    .get("/api/logos")
+                    .then((res) => {
+                        logos = res.data;
+                        temp = images.concat(logos);
+                        setImages(temp);
+                    })
+                    .catch((err) => console.log(err));
+            })
             .catch((err) => console.log(err));
-        await fetch("/api/logos", { method: "GET" })
-            .then((res) => res.json())
-            .then((json) => (logos = json))
-            .catch((err) => console.log(err));
-        var temp = images.concat(logos);
-        setImages(temp);
     }
 
     // Delete media depending on file type
@@ -176,23 +183,20 @@ export default function Media(props: {
             dir = process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR;
         }
 
-        await fetch("/api/deletefile", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("api/deletefile", {
                 name: file,
                 file: dir + file,
                 type: type,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.message) {
+            })
+            .then((res) => {
+                if (res.data.message) {
                     getImages();
                     getVideos();
                     onOpenChangeDelete();
-                } else if (json.error) {
-                    setDeleteError(json.where);
-                    setDeleteErrorArray(json.error);
+                } else if (res.data.error) {
+                    setDeleteError(res.data.where);
+                    setDeleteErrorArray(res.data.error);
                 }
             })
             .catch((err) => console.log(err));

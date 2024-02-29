@@ -25,6 +25,7 @@ import { useSearchParams } from "next/navigation";
 // Types
 import { Message, Page, emailHost } from "@prisma/client";
 import { useEffect } from "react";
+import axios from "axios";
 
 export default function DashboardMain(props: {
     data: Page;
@@ -42,15 +43,13 @@ export default function DashboardMain(props: {
     const { isOpen, onOpenChange } = useDisclosure();
     // Initial pop up if this is the first log in
     useEffect(() => {
-        fetch("/api/activated", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/activated", {
                 id: props.session.user.id,
-            }),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (!json.activated) {
+            })
+
+            .then((res) => {
+                if (!res.data.activated) {
                     onOpenChange();
                 }
             })
@@ -59,17 +58,13 @@ export default function DashboardMain(props: {
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
-        fetch("/api/updateuser", {
-            method: "POST",
-            body: JSON.stringify({
+        axios
+            .post("/api/updateuser", {
                 id: props.session.user.id,
-                data: {
-                    activated: true,
-                },
-            }),
-        })
+                data: { activated: true },
+            })
             .then((res) => {
-                if (res.ok) {
+                if (res.status === 201) {
                     props.revalidateDashboard("/api/users");
                 }
             })
