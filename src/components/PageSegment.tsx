@@ -12,7 +12,6 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
-    Skeleton,
 } from "@nextui-org/react";
 import Markdown from "react-markdown";
 import { useInView } from "react-intersection-observer";

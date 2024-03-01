@@ -51,7 +51,6 @@ export default async function Dashboard() {
             </div>
             <div className="xl:basis-5/6 min-h-screen">
                 {/* Main dashboard panel with all views available */}
-
                 <DashboardMain
                     emailHost={emailHost.emailHost}
                     messages={messages}

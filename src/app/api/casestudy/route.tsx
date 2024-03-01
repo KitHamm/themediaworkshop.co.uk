@@ -4,14 +4,8 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     const json = await request.json();
 
-    console.log(json);
-    // return new NextResponse(JSON.stringify({ message: "Created" }), {
-    //     status: 501,
-    // });
-
     switch (json.action) {
         case "create":
-            console.log("CREATE");
             const data = json.data;
             await prisma.caseStudy.create({
                 data: data,

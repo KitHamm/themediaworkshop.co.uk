@@ -7,20 +7,33 @@ import AutoScroll from "embla-carousel-auto-scroll";
 
 import { Logos } from "@prisma/client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-export default function TickerTape(props: { logoImages: Logos }) {
+export default function TickerTape(props: { logoImages: Logos[] }) {
     const OPTIONS: EmblaOptionsType = {
         align: "start",
         loop: true,
         watchDrag: false,
     };
+    const [logos, setLogos] = useState<string[]>([]);
+    useEffect(() => {
+        let tempArray = [];
+        for (let i = 0; i < props.logoImages.length; i++) {
+            tempArray.push(props.logoImages[i].name);
+        }
+        tempArray.sort(function (a, b) {
+            return a - b;
+        });
+        setLogos(tempArray);
+        console.log(tempArray);
+    }, [props.logoImages]);
     const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (
         <div className="w-full overflow-hidden bg-neutral-800">
             <div className="embla my-5 xl:my-10">
                 <div className="embla__viewport" ref={emblaRef}>
                     <div className="embla__container">
-                        {props.logoImages.map((image: Logos, index: number) => (
+                        {logos.map((image: string, index: number) => (
                             <div className="embla__slide_2" key={index}>
                                 <Image
                                     className="embla__slide__img_2"
@@ -28,9 +41,9 @@ export default function TickerTape(props: { logoImages: Logos }) {
                                     height={250}
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_LOGO_URL +
-                                        image.name
+                                        image
                                     }
-                                    alt={image.name}
+                                    alt={image}
                                 />
                             </div>
                         ))}

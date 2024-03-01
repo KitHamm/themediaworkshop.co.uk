@@ -22,7 +22,7 @@ import EditSegment from "../Segments/Segment";
 import NewSegment from "../Segments/NewSegment";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 // Next Components
 import Image from "next/image";
@@ -33,6 +33,11 @@ import { Page, Segment, Videos } from "@prisma/client";
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
+
+// Context imports
+import { NotificationsContext } from "../DashboardMain";
+
+const accordionBaseHeight = "3.5rem";
 
 export default function PageEdit(props: {
     data: Page;
@@ -72,13 +77,16 @@ export default function PageEdit(props: {
     const [previewText, setPreviewText] = useState(false);
     // State for unsaved changes
     const [changes, setChanges] = useState(false);
-
+    // Notification Settings
+    const [notifications, setNotifications] = useContext(NotificationsContext);
     // State to hold available videos and video selected for video view modal
     const [videos, setVideos] = useState<Videos[]>([]);
     const [previewVideo, setPreviewVideo] = useState("");
 
     // Upload Progress
     const [uploadProgress, setUploadProgress] = useState(0);
+
+    const accordionItem = useRef<HTMLDivElement[]>([]);
 
     // New segment modal declaration
     const {
@@ -129,6 +137,21 @@ export default function PageEdit(props: {
         onOpenChange: onOpenChangePreviewVideo,
     } = useDisclosure();
 
+    function checkNotifications(notification: {
+        component: string;
+        title: string;
+    }) {
+        for (let i = 0; i < notifications.length; i++) {
+            if (
+                notification.component === notifications[i].component &&
+                notification.title === notifications[i].title
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Constant check for changes on the page
     useEffect(() => {
         if (
@@ -141,8 +164,26 @@ export default function PageEdit(props: {
             videoTwoButtonText !== props.data.videoTwoButtonText ||
             year !== props.data.year
         ) {
+            if (
+                !checkNotifications({
+                    component: "Page",
+                    title: props.data.title,
+                })
+            ) {
+                setNotifications([
+                    ...notifications,
+                    { component: "Page", title: props.data.title },
+                ]);
+            }
             setChanges(true);
         } else {
+            let _temp = [];
+            for (let i = 0; i < notifications.length; i++) {
+                if (notifications[i].title !== props.data.title) {
+                    _temp.push(notifications[i]);
+                }
+            }
+            setNotifications(_temp);
             setChanges(false);
         }
     }, [
@@ -163,6 +204,17 @@ export default function PageEdit(props: {
         props.data.videoTwoButtonText,
         props.data.year,
     ]);
+
+    function discardChanges() {
+        setSubTitle(props.data.subTitle);
+        setDescription(props.data.description);
+        setHeader(props.data.header);
+        setVideoOne(props.data.video);
+        setVideoTwo(props.data.showreel);
+        setVideoOneButtonText(props.data.videoOneButtonText);
+        setVideoTwoButtonText(props.data.videoTwoButtonText);
+        setYear(props.data.year);
+    }
 
     function namingErrorCheck(fileName: string, check: string) {
         if (fileName.split("_")[0] === check) {
@@ -245,6 +297,32 @@ export default function PageEdit(props: {
                 }
             })
             .catch((err) => console.log(err));
+    }
+
+    function toggleAccordion(index: number) {
+        for (let i = 0; i < accordionItem.current.length; i++) {
+            if (accordionItem.current[i].id === "accordion-" + index) {
+                console.log("Match");
+                if (
+                    accordionItem.current[i].style.height ===
+                    accordionBaseHeight
+                ) {
+                    accordionItem.current[i].style.height =
+                        accordionItem.current[i].scrollHeight + "px";
+                } else {
+                    accordionItem.current[i].style.height = accordionBaseHeight;
+                }
+            } else {
+                accordionItem.current[i].style.height = accordionBaseHeight;
+            }
+        }
+    }
+
+    function checkChanges(title: string) {
+        for (let i = 0; i < notifications.length; i++) {
+            if (notifications[i].title === title) return true;
+        }
+        return false;
     }
 
     return (
@@ -553,14 +631,21 @@ export default function PageEdit(props: {
                                 />
                             )}
 
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-4">
+                                {changes && (
+                                    <button
+                                        onClick={() => discardChanges()}
+                                        className="px-2 text-orange-400 hover:text-red-400">
+                                        Discard
+                                    </button>
+                                )}
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleUpdate();
                                     }}
                                     disabled={!changes}
-                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-orange-600 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
+                                    className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-green-400 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
                                     Update
                                 </button>
                             </div>
@@ -576,7 +661,68 @@ export default function PageEdit(props: {
                             Add Segment
                         </button>
                     </div>
-                    <Accordion variant="splitted">
+                    {props.data.segment.map(
+                        (segment: Segment, index: number) => {
+                            return (
+                                <div
+                                    id={"accordion-" + index}
+                                    ref={(el: HTMLDivElement) => {
+                                        accordionItem.current![index] = el;
+                                    }}
+                                    key={"test-" + index}
+                                    style={{ height: accordionBaseHeight }}
+                                    className={`drop-shadow-kg overflow-hidden transition-all rounded-lg mx-2 mb-2 bg-zinc-800`}>
+                                    <div
+                                        onClick={() => {
+                                            toggleAccordion(index);
+                                        }}
+                                        className="xl:hover:bg-neutral-700 truncate transition-all w-full h-14 cursor-pointer flex px-4 gap-4">
+                                        <div className="my-auto flex gap-4">
+                                            {segment.published ? (
+                                                <div className="text-green-600 font-bold">
+                                                    LIVE
+                                                </div>
+                                            ) : (
+                                                <div className="text-red-400 font-bold">
+                                                    DRAFT
+                                                </div>
+                                            )}
+                                            <div className="xl:text-base">
+                                                {segment.title
+                                                    ? segment.title
+                                                    : "Untitled Segment"}
+                                            </div>
+                                        </div>
+                                        {checkChanges(segment.title) && (
+                                            <>
+                                                <div className="fade-in hidden xl:block text-red-400 font-bold my-auto text-base xl:text-base">
+                                                    Unsaved Changes
+                                                </div>
+                                                <div className="fade-in xl:hidden m-auto bg-red-800 bg-opacity-75 rounded-full flex justify-center p-2">
+                                                    <i
+                                                        aria-hidden
+                                                        className="my-auto text-red-400 fa-solid fa-exclamation"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="px-4">
+                                        <EditSegment
+                                            revalidateDashboard={
+                                                props.revalidateDashboard
+                                            }
+                                            title={props.data.title}
+                                            segment={segment}
+                                            index={index}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        }
+                    )}
+
+                    {/* <Accordion selectionMode="single" variant="splitted">
                         {props.data.segment.map(
                             (segment: Segment, index: number) => {
                                 return (
@@ -616,7 +762,7 @@ export default function PageEdit(props: {
                                 );
                             }
                         )}
-                    </Accordion>
+                    </Accordion> */}
                 </div>
             </div>
             {/* Add segment modal */}

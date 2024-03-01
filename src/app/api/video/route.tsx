@@ -57,7 +57,6 @@ export async function POST(request: Request) {
             );
         }
     } catch (error) {
-        console.log("Error Occurred", error);
         return new NextResponse(
             JSON.stringify({ error: "An Error Occurred" }),
             { status: 500 }

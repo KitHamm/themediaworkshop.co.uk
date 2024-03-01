@@ -16,7 +16,7 @@ import {
 } from "@nextui-org/react";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 // Next Components
 import Image from "next/image";
@@ -32,6 +32,9 @@ import { toLink } from "@prisma/client";
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
+
+// Context imports
+import { NotificationsContext } from "../DashboardMain";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -78,6 +81,9 @@ export default function EditSegment(props: {
     // State for if there are unsaved changes on the segment
     const [changes, setChanges] = useState(false);
 
+    // Notification Settings
+    const [notifications, setNotifications] = useContext(NotificationsContext);
+
     // State for selected case study to edit
     const [selectedCaseStudy, setSelectedCaseStudy] = useState(0);
 
@@ -111,6 +117,21 @@ export default function EditSegment(props: {
     const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
         useDisclosure();
 
+    function checkNotifications(notification: {
+        component: string;
+        title: string;
+    }) {
+        for (let i = 0; i < notifications.length; i++) {
+            if (
+                notification.component === notifications[i].component &&
+                notification.title === notifications[i].title
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Constant check for unsaved changes
     useEffect(() => {
         if (
@@ -122,8 +143,26 @@ export default function EditSegment(props: {
             buttonText !== props.segment.buttonText ||
             linkTo !== props.segment.linkTo
         ) {
+            if (
+                !checkNotifications({
+                    component: "Segment",
+                    title: props.segment.title,
+                })
+            ) {
+                setNotifications([
+                    ...notifications,
+                    { component: "Segment", title: props.segment.title },
+                ]);
+            }
             setChanges(true);
         } else {
+            let _temp = [];
+            for (let i = 0; i < notifications.length; i++) {
+                if (notifications[i].title !== props.segment.title) {
+                    _temp.push(notifications[i]);
+                }
+            }
+            setNotifications(_temp);
             setChanges(false);
         }
     }, [
@@ -143,6 +182,16 @@ export default function EditSegment(props: {
         props.segment.headerimage,
     ]);
 
+    function discardChanges() {
+        setLinkTo(props.segment.linkTo);
+        setButtonText(props.segment.buttonText);
+        setOrder(props.segment.order);
+        setTitle(props.segment.title);
+        setCopy(props.segment.copy);
+        setImages(props.segment.image);
+        setHeaderImage(props.segment.headerimage);
+    }
+
     // Check naming conventions for uploads
     function namingConventionCheck(fileName: string, check: string) {
         if (fileName.split("_")[0] !== check) {
@@ -154,6 +203,14 @@ export default function EditSegment(props: {
 
     // Pre populate information for segment update
     function handleUpdate() {
+        let _temp = [];
+        for (let i = 0; i < notifications.length; i++) {
+            if (notifications[i].title !== props.segment.title) {
+                _temp.push(notifications[i]);
+            }
+        }
+        setNotifications(_temp);
+        setChanges(false);
         const json = {
             buttonText: buttonText,
             title: title,
@@ -194,7 +251,6 @@ export default function EditSegment(props: {
     async function uploadImage(file: File, target: string) {
         setUploadProgress(0);
         if (file.type.split("/")[0] !== "image") {
-            console.log("Not Image");
             setNotImageError(true);
             setUploading(false);
             return;
@@ -286,20 +342,47 @@ export default function EditSegment(props: {
     return (
         <>
             <div className="light rounded-md xl:px-5 mb-4 py-4">
-                <div className="flex justify-between">
-                    {changes ? (
-                        <div className="fade-in font-bold text-red-400">
-                            Unsaved Changes
-                        </div>
-                    ) : (
-                        <div></div>
-                    )}
+                <div className="hidden xl:flex justify-end">
+                    <div className="flex gap-4">
+                        {changes && (
+                            <button
+                                onClick={() => discardChanges()}
+                                className="py-2 text-orange-600 hover:text-red-400 rounded ms-4">
+                                Discard
+                            </button>
+                        )}
+                        <button
+                            disabled={!changes}
+                            onClick={() => handleUpdate()}
+                            className="disabled:bg-neutral-400 disabled:cursor-not-allowed px-4 py-2 bg-green-400 rounded ms-4">
+                            Update
+                        </button>
+                        {props.segment.published ? (
+                            <button
+                                onClick={() => {
+                                    updatePublished(false);
+                                }}
+                                className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-red-400">
+                                UNPUBLISH
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    updatePublished(true);
+                                }}
+                                className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-orange-600">
+                                PUBLISH
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div className="grid grid-col xl:hidden mb-4 gap-4">
                     {props.segment.published ? (
                         <button
                             onClick={() => {
                                 updatePublished(false);
                             }}
-                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-red-400">
+                            className="xl:px-4 xl:py-2 px-2 py-2 rounded bg-red-400">
                             UNPUBLISH
                         </button>
                     ) : (
@@ -307,12 +390,25 @@ export default function EditSegment(props: {
                             onClick={() => {
                                 updatePublished(true);
                             }}
-                            className="xl:px-4 xl:py-2 px-2 py-1 rounded bg-orange-600">
+                            className="xl:px-4 xl:py-2 px-2 py-2 rounded bg-orange-600">
                             PUBLISH
                         </button>
                     )}
-                </div>
 
+                    <button
+                        disabled={!changes}
+                        onClick={() => handleUpdate()}
+                        className="disabled:bg-neutral-400 disabled:cursor-not-allowed px-4 py-2 bg-green-400 rounded">
+                        Update
+                    </button>
+                    {changes && (
+                        <button
+                            onClick={() => discardChanges()}
+                            className="grow py-2 text-orange-600 hover:text-red-400 rounded">
+                            Discard
+                        </button>
+                    )}
+                </div>
                 <div className="flex justify-between border-b pb-2">
                     <div className="text-orange-600 font-bold text-xl">
                         Top Image
@@ -356,7 +452,7 @@ export default function EditSegment(props: {
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-lg bg-neutral-800 w-full flex justify-evenly py-10">
+                        <div className="rounded-lg bg-black w-full flex justify-evenly py-10">
                             {uploading ? (
                                 <CircularProgress
                                     classNames={{
@@ -653,7 +749,7 @@ export default function EditSegment(props: {
                         <div className="text-green-600 font-bold text-lg my-4">
                             PUBLISHED
                         </div>
-                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-neutral-800 xl:mt-2 rounded-lg px-2 min-h-10">
+                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-black xl:mt-2 rounded-lg px-2 min-h-10">
                             {props.segment.casestudy.map(
                                 (caseStudy: CaseStudy, index: number) => {
                                     if (caseStudy.published) {
@@ -679,7 +775,7 @@ export default function EditSegment(props: {
                         <div className="text-red-400 font-bold text-lg my-4">
                             DRAFTS
                         </div>
-                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-neutral-800 xl:mt-2 rounded-lg px-2 min-h-10">
+                        <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-black xl:mt-2 rounded-lg px-2 min-h-10">
                             {props.segment.casestudy.map(
                                 (caseStudy: CaseStudy, index: number) => {
                                     if (!caseStudy.published) {
@@ -711,14 +807,6 @@ export default function EditSegment(props: {
                         className="px-4 py-2 hover:bg-red-800 hover:text-white text-red-600 rounded transition-all">
                         Delete
                     </button>
-                    {
-                        <button
-                            disabled={!changes}
-                            onClick={() => handleUpdate()}
-                            className="disabled:bg-neutral-400 disabled:cursor-not-allowed px-4 py-2 bg-orange-600 rounded ms-4">
-                            Update
-                        </button>
-                    }
                 </div>
                 {/* Top Image modal */}
                 <Modal
@@ -931,10 +1019,11 @@ export default function EditSegment(props: {
                 <Modal
                     size="5xl"
                     backdrop="blur"
+                    hideCloseButton
                     isOpen={isOpenEditCaseStudy}
                     className="dark"
                     isDismissable={false}
-                    scrollBehavior="inside"
+                    scrollBehavior="outside"
                     onOpenChange={onOpenChangeEditCaseStudy}>
                     <ModalContent>
                         {(onClose) => (
@@ -942,6 +1031,10 @@ export default function EditSegment(props: {
                                 <ModalHeader></ModalHeader>
                                 <ModalBody>
                                     <EditCaseStudy
+                                        onClose={onClose}
+                                        setSelectedCaseStudy={
+                                            setSelectedCaseStudy
+                                        }
                                         onOpenChangeEditCaseStudy={
                                             onOpenChangeEditCaseStudy
                                         }
@@ -955,16 +1048,6 @@ export default function EditSegment(props: {
                                         }
                                     />
                                 </ModalBody>
-                                <ModalFooter>
-                                    <Button
-                                        color="danger"
-                                        onPress={() => {
-                                            onClose();
-                                            setSelectedCaseStudy(0);
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
                             </>
                         )}
                     </ModalContent>
@@ -976,7 +1059,7 @@ export default function EditSegment(props: {
                     isOpen={isOpenNewCaseStudy}
                     className="dark"
                     isDismissable={false}
-                    scrollBehavior="inside"
+                    scrollBehavior="outside"
                     onOpenChange={onOpenChangeNewCaseStudy}>
                     <ModalContent>
                         {(onClose) => (

@@ -32,7 +32,6 @@ export async function POST(request: Request) {
     const formattedDate = date.toISOString().replace(/:|\./g, "-");
     const formattedName =
         fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
-    console.log(type);
     switch (type) {
         case "THUMBNAIL":
         case "STUDY":

@@ -225,10 +225,43 @@ export default function DashboardView(props: { hidden: boolean }) {
                         </p>
                     </AccordionItem>
                 </Accordion>
+
+                {/* CHANGE LOG HERE */}
                 <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
                     Change Log
                 </div>
                 <Accordion variant="splitted">
+                    <AccordionItem
+                        className="dark"
+                        key={5}
+                        aria-label="1/3/2024"
+                        title={
+                            <div className="flex border-b pb-2 mb-2 gap-4">
+                                <div className="text-lg text-orange-600 font-bold">
+                                    1/3/2024
+                                </div>
+                                <div className="text-lg text-green-400 font-bold">
+                                    NEW!
+                                </div>
+                            </div>
+                        }>
+                        <div className="text-lg">
+                            <ul>
+                                <li>- Client side ordering of Logos.</li>
+                                <li>- Streamlined API routes.</li>
+                                <li>- Unsaved changes notifications.</li>
+                                <li>
+                                    - Case Study unsaved changes warning when
+                                    closing modal.
+                                </li>
+                                <li>
+                                    - Segment unsaved changes now visible on
+                                    banner when closed.
+                                </li>
+                                <li>- Mobile fix for editing segments.</li>
+                            </ul>
+                        </div>
+                    </AccordionItem>
                     <AccordionItem
                         className="dark"
                         key={4}
@@ -237,9 +270,6 @@ export default function DashboardView(props: { hidden: boolean }) {
                             <div className="flex border-b pb-2 mb-2 gap-4">
                                 <div className="text-lg text-orange-600 font-bold">
                                     28/2/2024
-                                </div>
-                                <div className="text-lg text-green-400 font-bold">
-                                    NEW!
                                 </div>
                             </div>
                         }>

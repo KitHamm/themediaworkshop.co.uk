@@ -974,7 +974,6 @@ export async function POST(request: Request) {
             status: 201,
         });
     } catch (error) {
-        console.log(error);
         return new NextResponse(
             JSON.stringify({ message: "Could not send message" }),
             { status: 201 }

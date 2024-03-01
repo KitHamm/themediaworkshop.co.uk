@@ -403,6 +403,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     <div className="my-auto">Settings</div>
                 </Link>
             </div>
+
             {/* Modal for uploading new avatar */}
             <Modal
                 backdrop="blur"

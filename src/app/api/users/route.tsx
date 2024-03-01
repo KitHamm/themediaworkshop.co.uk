@@ -1197,7 +1197,6 @@ export async function POST(request: Request) {
                     }
                 );
             } catch (error) {
-                console.log(error);
                 return new NextResponse(
                     JSON.stringify({
                         message: "User Created",
@@ -2199,7 +2198,6 @@ export async function POST(request: Request) {
                         }
                     );
                 } catch (error) {
-                    console.log(error);
                     return new NextResponse(
                         JSON.stringify({
                             message: "User Created",
@@ -2223,7 +2221,6 @@ export async function POST(request: Request) {
                 throw e;
             }
         default:
-            console.log(json);
             return new NextResponse(
                 JSON.stringify({ error: "No Action Specified" }),
                 {

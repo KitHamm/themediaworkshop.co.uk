@@ -22,7 +22,25 @@ select {
     width: 100%;
     /* height: -webkit-fill-available; */
 }
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
 
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.fade {
+    background: rgb(38, 38, 38);
+    background: linear-gradient(
+        180deg,
+        rgba(38, 38, 38, 1) 0%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+}
 img {
     max-width: none;
 }
@@ -130,7 +148,6 @@ video {
 .slide-in-left {
     opacity: 100%;
     transform: translateX(0%);
-
     animation: slideInLeft 1.5s ease-out;
 }
 @keyframes slideInLeft {
@@ -149,6 +166,35 @@ video {
         transform: translateX(0%);
     }
 }
+
+.notification-in {
+    transform: translateX(0%);
+    animation: notificationIn 0.33s ease-in-out;
+}
+
+@keyframes notificationIn {
+    0% {
+        transform: translateX(-150%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+.notification-out {
+    transform: translateX(-150%);
+    animation: notificationOut 0.5s ease-in-out;
+}
+
+@keyframes notificationOut {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-150%);
+    }
+}
+
 .chevron:nth-child(1) {
     opacity: 1;
     animation: pulse 1s alternate-reverse linear infinite;
