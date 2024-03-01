@@ -25,7 +25,6 @@ export default function TickerTape(props: { logoImages: Logos[] }) {
             return a - b;
         });
         setLogos(tempArray);
-        console.log(tempArray);
     }, [props.logoImages]);
     const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (

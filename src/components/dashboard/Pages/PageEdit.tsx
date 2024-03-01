@@ -302,7 +302,6 @@ export default function PageEdit(props: {
     function toggleAccordion(index: number) {
         for (let i = 0; i < accordionItem.current.length; i++) {
             if (accordionItem.current[i].id === "accordion-" + index) {
-                console.log("Match");
                 if (
                     accordionItem.current[i].style.height ===
                     accordionBaseHeight
