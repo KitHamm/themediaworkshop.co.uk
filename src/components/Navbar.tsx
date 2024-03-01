@@ -7,15 +7,20 @@ import Link from "next/link";
 import { CircularProgress } from "@nextui-org/react";
 
 // React Imports
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar(props: { active: string }) {
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        document.body.style.overflowY = "auto";
+    }, []);
 
     function loadWait(target: string) {
         if (props.active !== target) {
             setTimeout(() => {
                 setLoading(true);
+                document.body.style.overflow = "hidden";
             }, 1000);
         }
     }

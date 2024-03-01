@@ -106,7 +106,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                                 id="bg-video"
                                 className={`${
                                     !loading ? "fade-in" : "opacity-0"
-                                } h-screen w-auto xl:w-full xl:h-auto z-20`}
+                                } h-screen w-auto xl:w-full z-20`}
                                 autoPlay={true}
                                 muted
                                 onCanPlayThrough={() => setLoading(false)}
