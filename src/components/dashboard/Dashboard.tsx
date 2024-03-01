@@ -247,6 +247,10 @@ export default function DashboardView(props: { hidden: boolean }) {
                         }>
                         <div className="text-lg">
                             <ul>
+                                <li>
+                                    - You can now report problems by clicking
+                                    the menu next to your avatar
+                                </li>
                                 <li>- Client side ordering of Logos.</li>
                                 <li>- Streamlined API routes.</li>
                                 <li>- Unsaved changes notifications.</li>

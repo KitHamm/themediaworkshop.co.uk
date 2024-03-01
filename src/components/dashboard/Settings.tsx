@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 
 // Next Components
 import { signOut } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 // Types
 type FormValues = {
@@ -48,6 +49,12 @@ export default function Settings(props: {
     emailHost: emailHost;
     revalidateDashboard: any;
 }) {
+    // Search params for if modal open from side panel click
+    const searchParams = useSearchParams();
+    const modalOpen: string = searchParams.get("open")
+        ? searchParams.get("open")!
+        : "false";
+
     // Initial Users
     const [users, setUsers] = useState<User>([]);
 
@@ -143,10 +150,26 @@ export default function Settings(props: {
     const { register, handleSubmit, formState, reset } = form;
     const { errors } = formState;
 
-    // Get initial users
+    // Get initial users and check if modal should open
     useEffect(() => {
         getUsers();
     }, []);
+
+    useEffect(() => {
+        if (modalOpen === "true") {
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].id === props.session.user.id) {
+                    setNewName(users[i].name);
+                    setNewEmail(users[i].email);
+                    setNewRole(users[i].role);
+                    setNewPosition(users[i].position);
+                    setUserId(users[i].id);
+                    setUserResetId(users[i].id);
+                    OnOpenEditUser();
+                }
+            }
+        }
+    }, [users]);
 
     async function getUsers() {
         axios
@@ -307,7 +330,7 @@ export default function Settings(props: {
                 },
             })
             .then((res) => {
-                if (res.status === 201) {
+                if (res.data.message === 201) {
                     setUserId("");
                     setNewName("");
                     setNewEmail("");

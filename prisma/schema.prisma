@@ -91,6 +91,16 @@ model Message {
     updatedAt DateTime @updatedAt
 }
 
+model Tickets {
+    id String @unique @default(cuid())
+    from String?
+    dashboard Boolean?
+    reproducible Boolean?
+    description String?
+    resolved Boolean @default(false)
+    createdAt DateTime @default(now())
+}
+
 model Images {
     name String @unique
     createdAt DateTime @default(now())

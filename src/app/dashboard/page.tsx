@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import SidePanel from "@/components/dashboard/SidePanel";
 import DashboardMain from "@/components/dashboard/DashboardMain";
 //  Types
-import { Message, Page, emailHost } from "@prisma/client";
+import { Message, Page, Tickets, emailHost } from "@prisma/client";
 //  Functions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";

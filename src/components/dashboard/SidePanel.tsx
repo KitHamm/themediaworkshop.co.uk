@@ -3,6 +3,8 @@
 // Library Components
 import {
     Avatar,
+    Accordion,
+    AccordionItem,
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
@@ -18,6 +20,7 @@ import {
     CircularProgress,
     Badge,
     User,
+    Switch,
 } from "@nextui-org/react";
 
 //  React Components
@@ -32,7 +35,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 //  Functions
-import { Message } from "@prisma/client";
+import { Message, Tickets } from "@prisma/client";
 import axios from "axios";
 
 export default function SidePanel(props: { session: any; messages: Message }) {
@@ -53,13 +56,68 @@ export default function SidePanel(props: { session: any; messages: Message }) {
     const [uploadProgress, setUploadProgress] = useState(0);
     // Not Image Error
     const [notImageError, setNotImageError] = useState(false);
+    // Problem Ticket Info
+    const [isDashboardTicket, setIsDashboardTicket] = useState(false);
+    const [reproducible, setReproducible] = useState(false);
+    const [ticketDescription, setTicketDescription] = useState("");
+    const [ticketSuccess, setTicketSuccess] = useState(false);
+
+    // Tickets State
+    const [tickets, setTickets] = useState<Tickets[]>([]);
+
     // Modal states
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const {
+        isOpen: isOpenReport,
+        onOpen: onOpenReport,
+        onOpenChange: onOpenChangeReport,
+    } = useDisclosure();
+    const {
+        isOpen: isOpenTickets,
+        onOpen: onOpenTickets,
+        onOpenChange: onOpenChangeTickets,
+    } = useDisclosure();
 
     // First render get current avatar from DB
     useEffect(() => {
         getAvatar();
+        if (props.session.user.name === "Kit Hamm") {
+            getTickets();
+        }
     }, []);
+
+    async function getTickets() {
+        axios
+            .get("/api/tickets")
+            .then((res) => {
+                if (res.status === 201) {
+                    setTickets(res.data);
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
+    async function updateTicket(id: string, value: boolean) {
+        axios
+            .post("/api/tickets", { action: "update", id: id, value: value })
+            .then((res) => {
+                if (res.status === 201) {
+                    getTickets();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
+    async function deleteTicket(id: string) {
+        axios
+            .post("/api/tickets", { action: "delete", id: id })
+            .then((res) => {
+                if (res.status === 201) {
+                    getTickets();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
 
     useEffect(() => {
         handleMessageCount(props.messages);
@@ -141,6 +199,29 @@ export default function SidePanel(props: { session: any; messages: Message }) {
         }
     }
 
+    function submitTicket() {
+        const dashboard = isDashboardTicket ? "true" : "false";
+        const isReproducible = reproducible ? "true" : "false";
+        axios
+            .post("/api/users", {
+                action: "submitTicket",
+                from: props.session.user.name,
+                dashboard: dashboard,
+                reproducible: isReproducible,
+                description: ticketDescription,
+            })
+            .then((res) => {
+                if (res.data.message === "Ticket Submitted") {
+                    console.log(res.data);
+                    setIsDashboardTicket(false);
+                    setReproducible(false);
+                    setTicketDescription("");
+                    setTicketSuccess(true);
+                }
+            })
+            .catch((err) => console.log(err));
+    }
+
     return (
         <>
             {/* Mobile Navigation Bar */}
@@ -167,12 +248,38 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                         <DropdownMenu aria-label="Static Actions">
                             <DropdownSection showDivider>
                                 <DropdownItem
+                                    textValue="Edit Profile"
+                                    key="edit-profile">
+                                    <a
+                                        href={
+                                            "dashboard?view=settings&open=true"
+                                        }>
+                                        Edit Profile
+                                    </a>
+                                </DropdownItem>
+                                <DropdownItem
                                     onClick={() => onOpen()}
                                     key="new-avatar">
                                     Change Avatar
                                 </DropdownItem>
                             </DropdownSection>
-
+                            {props.session.user.name === "Kit Hamm" ? (
+                                <DropdownSection showDivider>
+                                    <DropdownItem
+                                        onClick={() => onOpenTickets()}
+                                        key="view-tickets">
+                                        View Tickets
+                                    </DropdownItem>
+                                </DropdownSection>
+                            ) : (
+                                <DropdownSection showDivider>
+                                    <DropdownItem
+                                        onClick={() => onOpenReport()}
+                                        key="report-problem">
+                                        Report Problem
+                                    </DropdownItem>
+                                </DropdownSection>
+                            )}
                             <DropdownSection>
                                 <DropdownItem
                                     onClick={() =>
@@ -245,7 +352,6 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                         </Badge>
                         <div className="mt-1">Msg</div>
                     </Link>
-
                     <Link
                         href={"?view=settings"}
                         className={`mt-auto transition-all text-center text-xs`}>
@@ -314,12 +420,38 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                             <DropdownMenu aria-label="Static Actions">
                                 <DropdownSection showDivider>
                                     <DropdownItem
+                                        textValue="Edit Profile"
+                                        key="edit-profile">
+                                        <a
+                                            href={
+                                                "dashboard?view=settings&open=true"
+                                            }>
+                                            Edit Profile
+                                        </a>
+                                    </DropdownItem>
+                                    <DropdownItem
                                         onClick={() => onOpen()}
                                         key="new-avatar">
                                         Change Avatar
                                     </DropdownItem>
                                 </DropdownSection>
-
+                                {props.session.user.name === "Kit Hamm" ? (
+                                    <DropdownSection showDivider>
+                                        <DropdownItem
+                                            onClick={() => onOpenTickets()}
+                                            key="view-tickets">
+                                            View Tickets
+                                        </DropdownItem>
+                                    </DropdownSection>
+                                ) : (
+                                    <DropdownSection showDivider>
+                                        <DropdownItem
+                                            onClick={() => onOpenReport()}
+                                            key="report-problem">
+                                            Report Problem
+                                        </DropdownItem>
+                                    </DropdownSection>
+                                )}
                                 <DropdownSection>
                                     <DropdownItem
                                         onClick={() =>
@@ -403,7 +535,242 @@ export default function SidePanel(props: { session: any; messages: Message }) {
                     <div className="my-auto">Settings</div>
                 </Link>
             </div>
-
+            {/* Report a Problem Modal */}
+            <Modal
+                backdrop="blur"
+                isDismissable={false}
+                isOpen={isOpenReport}
+                className="dark"
+                onOpenChange={onOpenChangeReport}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>Ticket Submission</ModalHeader>
+                            <ModalBody>
+                                {ticketSuccess ? (
+                                    <div className="w-full text-xl text-green-400 text-center">
+                                        Ticket Successfully Submitted!
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="text-lg">
+                                            Where is the problem?
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div
+                                                className={`
+                                            ${
+                                                isDashboardTicket
+                                                    ? ""
+                                                    : "text-orange-600"
+                                            }
+                                        transition-all`}>
+                                                Main Site
+                                            </div>
+                                            <Switch
+                                                color="default"
+                                                isSelected={isDashboardTicket}
+                                                onValueChange={
+                                                    setIsDashboardTicket
+                                                }>
+                                                <div
+                                                    className={`
+                                            ${
+                                                isDashboardTicket
+                                                    ? "text-orange-600"
+                                                    : ""
+                                            }
+                                        transition-all`}>
+                                                    Dashboard
+                                                </div>
+                                            </Switch>
+                                        </div>
+                                        <div className="text-lg">
+                                            Is it easily reproducible?
+                                        </div>
+                                        <Switch
+                                            color="success"
+                                            isSelected={reproducible}
+                                            onValueChange={setReproducible}>
+                                            <div>
+                                                {reproducible ? "Yes" : "No"}
+                                            </div>
+                                        </Switch>
+                                        <div className="text-lg">
+                                            Describe the problem...
+                                        </div>
+                                        <textarea
+                                            value={ticketDescription}
+                                            onChange={(e) =>
+                                                setTicketDescription(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="min-h-52"></textarea>
+                                    </>
+                                )}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    onPress={() => {
+                                        onClose();
+                                        setTicketSuccess(false);
+                                        setIsDashboardTicket(false);
+                                        setReproducible(false);
+                                        setTicketDescription("");
+                                    }}
+                                    color="danger"
+                                    variant="light">
+                                    Close
+                                </Button>
+                                {!ticketSuccess && (
+                                    <Button
+                                        onPress={submitTicket}
+                                        className="bg-orange-600">
+                                        Submit Ticket
+                                    </Button>
+                                )}
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/* Tickets Modal */}
+            <Modal
+                size="5xl"
+                backdrop="blur"
+                isDismissable={false}
+                isOpen={isOpenTickets}
+                className="dark"
+                onOpenChange={onOpenChangeTickets}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="flex w-full gap-4">
+                                    <div>Tickets</div>
+                                    <div>
+                                        <i
+                                            onClick={() => getTickets()}
+                                            aria-hidden
+                                            className="cursor-pointer fa-solid my-auto fa-xl fa-arrows-rotate"
+                                        />
+                                    </div>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                {tickets.length > 0 ? (
+                                    <Accordion variant="splitted">
+                                        {tickets.map(
+                                            (
+                                                ticket: Tickets,
+                                                index: number
+                                            ) => {
+                                                return (
+                                                    <AccordionItem
+                                                        key={"ticket-" + index}
+                                                        aria-label="Accordion 1"
+                                                        title={
+                                                            <div className="flex gap-4">
+                                                                <div>
+                                                                    {
+                                                                        ticket.from
+                                                                    }
+                                                                </div>
+                                                                <div>
+                                                                    {" | "}
+                                                                </div>
+                                                                <div>
+                                                                    {ticket.dashboard
+                                                                        ? "Dashboard"
+                                                                        : "Main Page"}
+                                                                </div>
+                                                                <div>
+                                                                    {" | "}
+                                                                </div>
+                                                                <div>
+                                                                    {ticket.reproducible
+                                                                        ? "Reproducible"
+                                                                        : "Not Reproducible"}
+                                                                </div>
+                                                                <div>
+                                                                    {" | "}
+                                                                </div>
+                                                                <div
+                                                                    className={
+                                                                        ticket.resolved
+                                                                            ? "text-green-400"
+                                                                            : "text-red-400"
+                                                                    }>
+                                                                    {ticket.resolved
+                                                                        ? "Closed"
+                                                                        : "Open"}
+                                                                </div>
+                                                            </div>
+                                                        }>
+                                                        <div>
+                                                            <div className="font-bold text-xl mb-4">
+                                                                The Problem:
+                                                            </div>
+                                                            <div>
+                                                                {
+                                                                    ticket.description
+                                                                }
+                                                            </div>
+                                                            <div className="flex justify-end gap-4">
+                                                                <Button
+                                                                    onPress={() =>
+                                                                        deleteTicket(
+                                                                            ticket.id
+                                                                        )
+                                                                    }
+                                                                    color="danger"
+                                                                    variant="light">
+                                                                    Delete
+                                                                </Button>
+                                                                <Button
+                                                                    onPress={() =>
+                                                                        updateTicket(
+                                                                            ticket.id,
+                                                                            !ticket.resolved
+                                                                        )
+                                                                    }
+                                                                    color={
+                                                                        ticket.resolved
+                                                                            ? "danger"
+                                                                            : "success"
+                                                                    }>
+                                                                    {ticket.resolved
+                                                                        ? "Open Ticket"
+                                                                        : "Close Ticket"}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionItem>
+                                                );
+                                            }
+                                        )}
+                                    </Accordion>
+                                ) : (
+                                    <div className="text-2xl font-bold w-full text-center">
+                                        No Tickets!
+                                    </div>
+                                )}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    onPress={() => {
+                                        onClose();
+                                    }}
+                                    color="danger"
+                                    variant="light">
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
             {/* Modal for uploading new avatar */}
             <Modal
                 backdrop="blur"
