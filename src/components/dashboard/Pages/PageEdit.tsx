@@ -266,6 +266,14 @@ export default function PageEdit(props: {
 
     // Pre populate data with update Page information
     function handleUpdate() {
+        let _temp = [];
+        for (let i = 0; i < notifications.length; i++) {
+            if (notifications[i].title !== props.data.title) {
+                _temp.push(notifications[i]);
+            }
+        }
+        setNotifications(_temp);
+        setChanges(false);
         const json = {
             subTitle: subTitle,
             description: description,
