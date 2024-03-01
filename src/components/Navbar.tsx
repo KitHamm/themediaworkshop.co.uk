@@ -20,7 +20,7 @@ export default function Navbar(props: { active: string }) {
         if (props.active !== target) {
             setTimeout(() => {
                 setLoading(true);
-                document.body.style.overflow = "hidden";
+                // document.body.style.overflow = "hidden";
             }, 1000);
         }
     }
