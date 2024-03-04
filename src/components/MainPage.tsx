@@ -146,6 +146,12 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                     />
                 </section>
             </header>
+            {/* Top Ticker Tape */}
+            {props.logoImages.length > 0 && (
+                <div className="mt-8">
+                    <TickerTape logoImages={props.logoImages} />
+                </div>
+            )}
             {/* Iterate over segments and display in sequence */}
             {props.data?.segment.map((segment: Segment, index: number) => {
                 return (
@@ -154,6 +160,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                     </div>
                 );
             })}
+            {/* Bottom Ticker Tape */}
             {props.logoImages.length > 0 && (
                 <TickerTape logoImages={props.logoImages} />
             )}

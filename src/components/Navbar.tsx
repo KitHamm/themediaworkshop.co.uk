@@ -100,7 +100,7 @@ export default function Navbar(props: { active: string }) {
             <div
                 className={`${
                     loading ? "flex" : "hidden"
-                } fade-in h-screen w-screen overflow-none absolute top-0 left-0 bg-black bg-opacity-75 z-40 justify-center`}>
+                } fade-in h-screen w-screen overflow-none fixed top-0 left-0 bg-black bg-opacity-75 z-40 justify-center`}>
                 <CircularProgress
                     classNames={{
                         track: "text-orange-600",

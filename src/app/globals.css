@@ -243,6 +243,7 @@ video {
     overflow: hidden;
 }
 .embla__container {
+    /* max-height: 117px; */
     backface-visibility: hidden;
     display: flex;
     touch-action: pan-y;
@@ -255,9 +256,9 @@ video {
     position: relative;
 }
 .embla__slide_2 {
-    flex: 0 0 30%;
+    flex: 0 0 35%;
     /* min-width: 0; */
-    width: 10rem;
+    width: 15rem;
     /* padding-left: 2rem; */
     position: relative;
 }
@@ -273,7 +274,7 @@ video {
     height: var(--slide-height);
     width: auto;
     height: 5rem;
-
+    margin: auto;
     object-fit: cover;
 }
 .embla__button {
@@ -360,12 +361,14 @@ video {
         display: block;
         height: var(--slide-height);
         width: 75%;
-        height: auto;
+        height: 75%;
+        margin: auto;
         object-fit: cover;
     }
     .embla__slide_2 {
         flex: 0 0 10%;
         min-width: 0;
+        height: fit-content;
         padding-left: var(--slide-spacing);
         position: relative;
     }

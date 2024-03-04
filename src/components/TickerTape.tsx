@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function TickerTape(props: { logoImages: Logos[] }) {
+    const [emblaHeight, setEmblaHeight] = useState("auto");
     const OPTIONS: EmblaOptionsType = {
         align: "start",
         loop: true,
@@ -26,16 +27,31 @@ export default function TickerTape(props: { logoImages: Logos[] }) {
         });
         setLogos(tempArray);
     }, [props.logoImages]);
+
     const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (
-        <div className="w-full overflow-hidden bg-neutral-800">
-            <div className="embla my-5 xl:my-10">
+        <div className="w-full h-fit overflow-hidden bg-neutral-800">
+            <div className="embla my-5 h-fit xl:my-6">
                 <div className="embla__viewport" ref={emblaRef}>
-                    <div className="embla__container">
+                    <div
+                        style={{ height: emblaHeight }}
+                        className="embla__container">
                         {logos.map((image: string, index: number) => (
-                            <div className="embla__slide_2" key={index}>
+                            <div className="embla__slide_2 my-0" key={index}>
                                 <Image
-                                    className="embla__slide__img_2"
+                                    onLoad={(e) => {
+                                        if (emblaHeight === "auto") {
+                                            setEmblaHeight(
+                                                e.currentTarget.scrollHeight +
+                                                    "px"
+                                            );
+                                            console.log(
+                                                e.currentTarget.scrollHeight +
+                                                    "px"
+                                            );
+                                        }
+                                    }}
+                                    className=" h-fit embla__slide__img_2"
                                     width={250}
                                     height={250}
                                     src={
