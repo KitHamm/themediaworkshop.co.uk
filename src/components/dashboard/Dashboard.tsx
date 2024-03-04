@@ -1,9 +1,9 @@
 "use client";
 // Library Components
 import { Accordion, AccordionItem } from "@nextui-org/react";
-// import PageStats from "./StatBoxes/PageStats";
-// import DataStats from "./StatBoxes/DataStats";
-// import StorageStats from "./StatBoxes/StorageStats";
+import PageStats from "./StatBoxes/PageStats";
+import DataStats from "./StatBoxes/DataStats";
+import StorageStats from "./StatBoxes/StorageStats";
 import { useSearchParams } from "next/navigation";
 
 export default function DashboardView(props: { hidden: boolean }) {
@@ -16,7 +16,7 @@ export default function DashboardView(props: { hidden: boolean }) {
             className={`${
                 props.hidden ? "hidden" : ""
             } xl:mx-20 mx-4 pb-20 xl:pb-0 fade-in`}>
-            {/* {statBoxes === "yes" && (
+            {statBoxes === "yes" && (
                 <div
                     className={
                         "w-full grid xl:grid-cols-3 grid-cols-1 gap-4 pt-8"
@@ -31,7 +31,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                         <DataStats />
                     </div>
                 </div>
-            )} */}
+            )}
             <div className="grid xl:grid-cols-2 grid-cols-1 xl:gap-10">
                 <div id="left">
                     <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
