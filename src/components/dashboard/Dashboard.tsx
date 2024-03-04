@@ -5,6 +5,7 @@ import PageStats from "./StatBoxes/PageStats";
 import DataStats from "./StatBoxes/DataStats";
 import StorageStats from "./StatBoxes/StorageStats";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export default function DashboardView(props: { hidden: boolean }) {
     const searchParams = useSearchParams();
@@ -16,23 +17,43 @@ export default function DashboardView(props: { hidden: boolean }) {
             className={`${
                 props.hidden ? "hidden" : ""
             } xl:mx-20 mx-4 pb-20 xl:pb-0 fade-in`}>
-            {statBoxes === "yes" && (
-                <div
-                    className={
-                        "w-full grid xl:grid-cols-3 grid-cols-1 gap-4 pt-8"
-                    }>
-                    <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                        <PageStats />
+            {statBoxes === "yes" ? (
+                <>
+                    <div
+                        className={
+                            "fade-in w-full grid xl:grid-cols-3 grid-cols-1 gap-4 pt-8"
+                        }>
+                        <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                            <PageStats />
+                        </div>
+                        <div className="min-h-72 flex bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                            <StorageStats />
+                        </div>
+                        <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                            <DataStats />
+                        </div>
                     </div>
-                    <div className="min-h-72 flex bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                        <StorageStats />
+                    <div className="w-full flex gap-4 pt-8">
+                        <Link
+                            className="px-4 py-2 bg-orange-600 rounded-lg"
+                            href={"/dashboard?view=dashboard"}>
+                            Turn Off Stat Boxes
+                        </Link>
                     </div>
-                    <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                        <DataStats />
+                </>
+            ) : (
+                <div className="w-full flex gap-4 pt-8">
+                    <Link
+                        className="px-4 py-2 bg-orange-600 rounded-lg"
+                        href={"/dashboard?view=dashboard&statBoxes=yes"}>
+                        Turn On Stat Boxes
+                    </Link>
+                    <div className="font-bold text-green-400 my-auto text-2xl">
+                        NEW!
                     </div>
                 </div>
             )}
-            <div className="grid xl:grid-cols-2 grid-cols-1 xl:gap-10">
+            <div className="grid xl:mb-10 xl:grid-cols-2 grid-cols-1 xl:gap-10">
                 <div id="left">
                     <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
                         Information

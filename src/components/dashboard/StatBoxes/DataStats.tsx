@@ -24,16 +24,29 @@ export default function DataStats() {
                 setUnreadMessages(count);
             })
             .catch((err) => console.log(err));
-
+        let _imageCount = 0;
         axios
             .get("/api/image")
-            .then((res) => setImageCount(res.data.length))
+            .then((res) => {
+                _imageCount = _imageCount + res.data.length;
+                setImageCount(_imageCount);
+            })
+            .catch((err) => console.log(err));
+
+        axios
+            .get("/api/logos")
+            .then((res) => {
+                _imageCount = _imageCount + res.data.length;
+                setImageCount(_imageCount);
+            })
             .catch((err) => console.log(err));
 
         axios
             .get("/api/video")
             .then((res) => setVideoCount(res.data.length))
             .catch((err) => console.log(err));
+
+        setImageCount(_imageCount);
     }, []);
 
     return (
