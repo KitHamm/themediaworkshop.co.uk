@@ -1,4 +1,5 @@
 "use client";
+
 import axios from "axios";
 import {
     Chart as ChartJS,

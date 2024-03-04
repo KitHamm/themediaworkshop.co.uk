@@ -1,3 +1,5 @@
+"use client";
+
 import { Message } from "@prisma/client";
 import axios from "axios";
 import { useEffect, useState } from "react";
