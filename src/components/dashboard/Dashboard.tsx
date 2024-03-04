@@ -1,6 +1,6 @@
 "use client";
 // Library Components
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { Accordion, AccordionItem, Tooltip } from "@nextui-org/react";
 import PageStats from "./StatBoxes/PageStats";
 import DataStats from "./StatBoxes/DataStats";
 import StorageStats from "./StatBoxes/StorageStats";
@@ -23,15 +23,72 @@ export default function DashboardView(props: { hidden: boolean }) {
                         className={
                             "fade-in w-full grid xl:grid-cols-3 grid-cols-1 gap-4 pt-8"
                         }>
-                        <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                            <PageStats />
-                        </div>
-                        <div className="min-h-72 flex bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                            <StorageStats />
-                        </div>
-                        <div className="min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                            <DataStats />
-                        </div>
+                        <Tooltip
+                            offset={-20}
+                            closeDelay={0}
+                            className="dark"
+                            content={
+                                <div className="max-w-72">
+                                    <div className="text-xl w-full border-b pb-2 mb-2">
+                                        Page Views
+                                    </div>
+                                    <div>
+                                        Here you can see how many times each
+                                        page has been loaded. This does not work
+                                        as a tracker and does not use cookies.
+                                        It is an anonymous click event that is
+                                        saved to the database. Data shown is
+                                        over a 7 day period.
+                                    </div>
+                                </div>
+                            }>
+                            <div className="cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                                <PageStats />
+                            </div>
+                        </Tooltip>
+                        <Tooltip
+                            offset={-20}
+                            closeDelay={0}
+                            className="dark"
+                            content={
+                                <div className="max-w-72">
+                                    <div className="text-xl w-full border-b pb-2 mb-2">
+                                        Server Usage
+                                    </div>
+                                    <div>
+                                        Here you can see how much disk space is
+                                        available on the server, as well as how
+                                        much space is currently being used.
+                                        Helpful for large media dumping.
+                                    </div>
+                                </div>
+                            }>
+                            <div className="cursor-help min-h-72 flex bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                                <StorageStats />
+                            </div>
+                        </Tooltip>
+                        <Tooltip
+                            offset={-20}
+                            closeDelay={0}
+                            className="dark"
+                            content={
+                                <div className="max-w-72">
+                                    <div className="text-xl w-full border-b pb-2 mb-2">
+                                        General Stats
+                                    </div>
+                                    <div>
+                                        Here you can see a quick view of how
+                                        many messages you have received and how
+                                        many of them are unread. You can also
+                                        see the total amount of media uploaded
+                                        to the server.
+                                    </div>
+                                </div>
+                            }>
+                            <div className="cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+                                <DataStats />
+                            </div>
+                        </Tooltip>
                     </div>
                     <div className="w-full flex gap-4 pt-8">
                         <Link

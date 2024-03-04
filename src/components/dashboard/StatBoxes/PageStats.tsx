@@ -41,6 +41,9 @@ export const options = {
             },
         },
         y: {
+            ticks: {
+                stepSize: 1,
+            },
             grid: {
                 color: "rgba(255, 255, 255, 0.25)",
             },
