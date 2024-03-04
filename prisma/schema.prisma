@@ -119,3 +119,10 @@ model Logos {
 model emailHost {
     emailHost String @unique @default("kit@themediaworkshop.co.uk")
 }
+
+model serviceRequest {
+    id String @unique @default(cuid())
+    page String?
+    response Int @default(200)
+    createdAt DateTime @default(now())
+}

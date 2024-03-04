@@ -58,6 +58,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
             setLoading(false);
         }
         window.scrollTo({ top: 0, behavior: "smooth" });
+        axios.post("/api/service", { page: props.data.title });
     }, []);
 
     // Showing sending and success states
