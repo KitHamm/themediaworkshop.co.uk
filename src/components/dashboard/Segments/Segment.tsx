@@ -131,7 +131,6 @@ export default function EditSegment(props: {
         }
         return false;
     }
-
     // Constant check for unsaved changes
     useEffect(() => {
         if (
@@ -295,9 +294,10 @@ export default function EditSegment(props: {
             inputElm.value = "";
         }
     }
-    async function getImages() {
+
+    function getImages() {
         axios
-            .get("/")
+            .get("/api/image")
             .then((res) => {
                 setAvailableImages(res.data);
             })
