@@ -150,7 +150,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
             {/* Top Ticker Tape */}
             {props.logoImages.length > 0 && (
                 <div className="mt-8">
-                    <TickerTape logoImages={props.logoImages} />
+                    <TickerTape top={true} logoImages={props.logoImages} />
                 </div>
             )}
             {/* Iterate over segments and display in sequence */}
@@ -163,7 +163,7 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
             })}
             {/* Bottom Ticker Tape */}
             {props.logoImages.length > 0 && (
-                <TickerTape logoImages={props.logoImages} />
+                <TickerTape top={false} logoImages={props.logoImages} />
             )}
             <Footer openContactModal={onOpenContact} />
             {/* Contact modal */}

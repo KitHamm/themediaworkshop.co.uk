@@ -9,7 +9,10 @@ import { Logos } from "@prisma/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function TickerTape(props: { logoImages: Logos[] }) {
+export default function TickerTape(props: {
+    top: boolean;
+    logoImages: Logos[];
+}) {
     const [emblaHeight, setEmblaHeight] = useState("auto");
     const OPTIONS: EmblaOptionsType = {
         align: "start",
@@ -30,7 +33,10 @@ export default function TickerTape(props: { logoImages: Logos[] }) {
 
     const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (
-        <div className="w-full h-fit overflow-hidden bg-neutral-800">
+        <div
+            className={` ${
+                props.top ? "mb-8" : ""
+            } w-full h-fit overflow-hidden bg-neutral-800`}>
             <div className="embla my-5 h-fit xl:my-6">
                 <div className="embla__viewport" ref={emblaRef}>
                     <div
