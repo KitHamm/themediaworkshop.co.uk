@@ -39,6 +39,7 @@ import axios from "axios";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
+import Link from "next/link";
 
 const accordionBaseHeight = "3.5rem";
 
@@ -341,8 +342,24 @@ export default function PageEdit(props: {
                 props.hidden ? "hidden" : ""
             } xl:mx-20 fade-in mb-10  xl:pb-0 pb-16`}>
             <div className="my-10 border-b py-4 flex justify-between">
-                <div className="text-3xl font-bold capitalize">
-                    {props.data.title}
+                <div className="hover:text-orange-600 transition-all font-bold capitalize">
+                    <Link
+                        className="text-3xl"
+                        target="_blank"
+                        rel="noreferrer"
+                        href={
+                            props.data.title === "home"
+                                ? "/"
+                                : "/" + props.data.title
+                        }>
+                        {props.data.title}
+                    </Link>
+                    <i
+                        aria-hidden
+                        className={
+                            "ms-2 text-orange-600 fa-solid fa-arrow-up-right-from-square fa-sm"
+                        }
+                    />
                 </div>
                 {changes ? (
                     <div className="fade-in my-auto font-bold text-red-400">
