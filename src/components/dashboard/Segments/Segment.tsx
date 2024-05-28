@@ -28,6 +28,9 @@ import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 // Types
 import { CaseStudy, Images, Segment } from "@prisma/client";
 import { toLink } from "@prisma/client";
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
 
 // Functions
 import Markdown from "react-markdown";
@@ -37,7 +40,7 @@ import axios from "axios";
 import { NotificationsContext } from "../DashboardMain";
 
 export default function EditSegment(props: {
-    segment: Segment;
+    segment: ExtendedSegment;
     index: number;
     title: string;
     revalidateDashboard: any;
@@ -138,14 +141,14 @@ export default function EditSegment(props: {
             copy !== props.segment.copy ||
             JSON.stringify(images) !== JSON.stringify(props.segment.image) ||
             headerImage !== props.segment.headerimage ||
-            order !== parseInt(props.segment.order) ||
+            order !== props.segment.order ||
             buttonText !== props.segment.buttonText ||
             linkTo !== props.segment.linkTo
         ) {
             if (
                 !checkNotifications({
                     component: "Segment",
-                    title: props.segment.title,
+                    title: props.segment.title!,
                 })
             ) {
                 setNotifications([
@@ -183,12 +186,12 @@ export default function EditSegment(props: {
 
     function discardChanges() {
         setLinkTo(props.segment.linkTo);
-        setButtonText(props.segment.buttonText);
-        setOrder(props.segment.order);
-        setTitle(props.segment.title);
-        setCopy(props.segment.copy);
+        setButtonText(props.segment.buttonText!);
+        setOrder(props.segment.order!);
+        setTitle(props.segment.title!);
+        setCopy(props.segment.copy!);
         setImages(props.segment.image);
-        setHeaderImage(props.segment.headerimage);
+        setHeaderImage(props.segment.headerimage!);
     }
 
     // Check naming conventions for uploads
@@ -443,7 +446,7 @@ export default function EditSegment(props: {
                                     </div>
                                     <div className="w-1/2 text-center">
                                         <i
-                                            onClick={() => setHeaderImage(null)}
+                                            onClick={() => setHeaderImage("")}
                                             aria-hidden
                                             className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
                                         />
@@ -556,7 +559,9 @@ export default function EditSegment(props: {
                         </div>
                         <div className="mt-2">
                             <Select
-                                onChange={(e) => setLinkTo(e.target.value)}
+                                onChange={(e) =>
+                                    setLinkTo(e.target.value as toLink)
+                                }
                                 defaultSelectedKeys={[linkTo]}
                                 className="dark"
                                 variant="bordered"

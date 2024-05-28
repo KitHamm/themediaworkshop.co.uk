@@ -3,11 +3,17 @@ import prisma from "@/lib/prisma";
 // Components
 import MainPage from "@/components/MainPage";
 // Types
-import { Logos, Page } from "@prisma/client";
-
+import { Page, Segment, CaseStudy } from "@prisma/client";
+interface ExtendedPage extends Page {
+    segment: ExtendedSegment[];
+}
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
 export default async function Home() {
     // Collect page data for specified page
-    const data: Page = await prisma.page.findUnique({
+    var pageData: ExtendedPage = null as any;
+    const data = await prisma.page.findUnique({
         where: {
             title: "light",
         },
@@ -24,9 +30,12 @@ export default async function Home() {
             },
         },
     });
-    const logoImages: Logos = await prisma.logos.findMany({
+    const logoImages = await prisma.logos.findMany({
         orderBy: { name: "asc" },
     });
+    if (data !== null) {
+        pageData = data as ExtendedPage;
+    }
     // Main page component
-    return <MainPage data={data} logoImages={logoImages} />;
+    return <MainPage data={pageData} logoImages={logoImages} />;
 }

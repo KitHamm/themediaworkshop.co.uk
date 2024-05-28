@@ -26,7 +26,7 @@ import {
 import { CaseStudy } from "@prisma/client";
 import { useState, useRef, useEffect } from "react";
 
-export default function SegmentModal(props: { caseStudy: CaseStudy }) {
+export default function SegmentModal(props: { caseStudy: CaseStudy[] }) {
     // States for selected video and image to view
     const [caseIndex, setCaseIndex] = useState(0);
     const [selectedVideo, setSelectedVideo] = useState("");
@@ -135,14 +135,14 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                             height={500}
                                             src={
                                                 process.env
-                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                    .NEXT_PUBLIC_BASE_IMAGE_URL! +
                                                 casestudy.image
                                             }
                                             alt="Placeholder"
                                             className="w-full h-auto cursor-pointer"
                                         />
                                     )}
-                                    {casestudy.video.length > 0 && (
+                                    {casestudy.video!.length > 0 && (
                                         <div className="relative">
                                             <video
                                                 playsInline
@@ -154,7 +154,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                                 loop
                                                 src={
                                                     process.env
-                                                        .NEXT_PUBLIC_BASE_VIDEO_URL +
+                                                        .NEXT_PUBLIC_BASE_VIDEO_URL! +
                                                     casestudy.video
                                                 }
                                             />
@@ -162,7 +162,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                                 <div
                                                     onClick={() => {
                                                         setSelectedVideo(
-                                                            casestudy.video
+                                                            casestudy.video!
                                                         );
                                                         onOpenChangeVideo();
                                                     }}
@@ -185,7 +185,7 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                             <div
                                                 onClick={() => {
                                                     setSelectedVideo(
-                                                        casestudy.video
+                                                        casestudy.video!
                                                     );
                                                     onOpenChangeVideo();
                                                 }}
@@ -264,10 +264,10 @@ export default function SegmentModal(props: { caseStudy: CaseStudy }) {
                                         height={500}
                                         src={
                                             process.env
-                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                .NEXT_PUBLIC_BASE_IMAGE_URL! +
                                             props.caseStudy[caseIndex].image
                                         }
-                                        alt={props.caseStudy[caseIndex].image}
+                                        alt={`${props.caseStudy[caseIndex].image}`}
                                         className="w-full h-auto"
                                     />
                                 )}

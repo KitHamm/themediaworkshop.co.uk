@@ -38,15 +38,23 @@ type PasswordFormValues = {
     confirmPassword: string;
     currentPassword: string;
 };
-
+import { User } from "@prisma/client";
+type UserWithoutPassword = {
+    id: string;
+    name: string;
+    email: string;
+    position: string;
+    image: string;
+    activated: boolean;
+    role: string;
+};
 // Function
-import { User, emailHost } from "@prisma/client";
 import axios from "axios";
 
 export default function Settings(props: {
     hidden: boolean;
     session: any;
-    emailHost: emailHost;
+    emailHost: string;
     revalidateDashboard: any;
 }) {
     // Search params for if modal open from side panel click
@@ -56,7 +64,7 @@ export default function Settings(props: {
         : "false";
 
     // Initial Users
-    const [users, setUsers] = useState<User>([]);
+    const [users, setUsers] = useState<UserWithoutPassword[]>([]);
 
     // User created or error state boolean
     const [userCreated, setUserCreated] = useState(false);
@@ -162,7 +170,7 @@ export default function Settings(props: {
                     setNewName(users[i].name);
                     setNewEmail(users[i].email);
                     setNewRole(users[i].role);
-                    setNewPosition(users[i].position);
+                    setNewPosition(users[i].position!);
                     setUserId(users[i].id);
                     setUserResetId(users[i].id);
                     OnOpenEditUser();

@@ -10,8 +10,6 @@ import {
     Button,
     useDisclosure,
     CircularProgress,
-    Accordion,
-    AccordionItem,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -28,8 +26,13 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 // Types
-import { Page, Segment, Videos } from "@prisma/client";
-
+import { CaseStudy, Page, Segment, Videos } from "@prisma/client";
+interface ExtendedPage extends Page {
+    segment: ExtendedSegment[];
+}
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
@@ -40,7 +43,7 @@ import { NotificationsContext } from "../DashboardMain";
 const accordionBaseHeight = "3.5rem";
 
 export default function PageEdit(props: {
-    data: Page;
+    data: ExtendedPage;
     hidden: boolean;
     revalidateDashboard: any;
 }) {
@@ -206,9 +209,9 @@ export default function PageEdit(props: {
     ]);
 
     function discardChanges() {
-        setSubTitle(props.data.subTitle);
-        setDescription(props.data.description);
-        setHeader(props.data.header);
+        setSubTitle(props.data.subTitle ? props.data.subTitle : "");
+        setDescription(props.data.description ? props.data.description : "");
+        setHeader(props.data.header ? props.data.header : "");
         setVideoOne(props.data.video);
         setVideoTwo(props.data.showreel);
         setVideoOneButtonText(props.data.videoOneButtonText);
@@ -531,7 +534,7 @@ export default function PageEdit(props: {
                                     Video One Button Text <em>(Left)</em>
                                 </div>
                                 <input
-                                    value={videoOneButtonText}
+                                    value={videoOneButtonText as string}
                                     onChange={(e) =>
                                         setVideoOneButtonText(e.target.value)
                                     }
@@ -545,7 +548,7 @@ export default function PageEdit(props: {
                                     Video Two Button Text <em>(Middle)</em>
                                 </div>
                                 <input
-                                    value={videoTwoButtonText}
+                                    value={videoTwoButtonText as string}
                                     onChange={(e) =>
                                         setVideoTwoButtonText(e.target.value)
                                     }
@@ -669,7 +672,7 @@ export default function PageEdit(props: {
                         </button>
                     </div>
                     {props.data.segment.map(
-                        (segment: Segment, index: number) => {
+                        (segment: ExtendedSegment, index: number) => {
                             return (
                                 <div
                                     id={"accordion-" + index}
@@ -700,7 +703,9 @@ export default function PageEdit(props: {
                                                     : "Untitled Segment"}
                                             </div>
                                         </div>
-                                        {checkChanges(segment.title) && (
+                                        {checkChanges(
+                                            segment.title ? segment.title : ""
+                                        ) && (
                                             <>
                                                 <div className="fade-in hidden xl:block text-red-400 font-bold my-auto text-base xl:text-base">
                                                     Unsaved Changes
@@ -874,7 +879,8 @@ export default function PageEdit(props: {
                                     id="bg-video"
                                     controls={true}
                                     src={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        process.env
+                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
                                         videoOne
                                     }
                                 />
@@ -917,7 +923,8 @@ export default function PageEdit(props: {
                                     id="bg-video"
                                     controls={true}
                                     src={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        process.env
+                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
                                         videoOne
                                     }
                                 />
@@ -960,8 +967,8 @@ export default function PageEdit(props: {
                                     id="bg-video"
                                     controls={true}
                                     src={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                        year
+                                        process.env
+                                            .NEXT_PUBLIC_BASE_VIDEO_URL! + year
                                     }
                                 />
                             </ModalBody>

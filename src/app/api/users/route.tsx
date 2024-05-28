@@ -108,7 +108,7 @@ export async function POST(request: Request) {
 
             const changeIsPasswordValid = await compare(
                 json.currentPassword,
-                changeUser.password
+                changeUser!.password!
             );
 
             if (!changeIsPasswordValid) {
@@ -1209,7 +1209,7 @@ export async function POST(request: Request) {
             });
             const isPasswordValid = await compare(
                 json.adminPassword,
-                adminUser.password
+                adminUser!.password!
             );
 
             if (!isPasswordValid) {
@@ -1231,8 +1231,8 @@ export async function POST(request: Request) {
             try {
                 const mail = await transporter.sendMail({
                     from: "TMW Website",
-                    to: resetUser.email,
-                    replyTo: resetEmailHost.emailHost,
+                    to: resetUser!.email,
+                    replyTo: resetEmailHost!.emailHost,
                     subject: `Password Reset`,
                     html: `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -2285,7 +2285,7 @@ export async function POST(request: Request) {
                     const mail = await transporter.sendMail({
                         from: "TMW Website",
                         to: json.email,
-                        replyTo: emailHost.emailHost,
+                        replyTo: emailHost!.emailHost,
                         subject: `New Account Created!`,
                         html: `
                 

@@ -26,13 +26,16 @@ import { useEffect, useState, useRef } from "react";
 
 // Next Components
 import Image from "next/image";
-
-// Types
-import { Segment } from "@prisma/client";
 import Link from "next/link";
 
+// Types
+import { Segment, CaseStudy } from "@prisma/client";
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
+
 export default function PageSegment(props: {
-    segment: Segment;
+    segment: ExtendedSegment;
     index: number;
 }) {
     // InView declarations

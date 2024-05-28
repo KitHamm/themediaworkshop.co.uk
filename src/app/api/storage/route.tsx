@@ -13,12 +13,6 @@ export async function GET() {
 
     await checkDiskSpace(_path).then((diskSpace) => {
         _diskSpace = diskSpace;
-        // {
-        //     diskPath: 'C:',
-        //     free: 12345678,
-        //     size: 98756432
-        // }
-        // Note: `free` and `size` are in bytes
     });
     return new NextResponse(JSON.stringify({ response: _diskSpace }), {
         status: 201,

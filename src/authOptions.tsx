@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
                 if (!credentials?.email || !credentials.password) {
                     return null;
                 }
-                const user: User = await prisma.user.findUnique({
+                const user = await prisma.user.findUnique({
                     where: {
                         email: credentials.email,
                     },
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
                 }
                 const isPasswordValid = await compare(
                     credentials.password,
-                    user.password
+                    user!.password!
                 );
                 if (!isPasswordValid) {
                     return null;

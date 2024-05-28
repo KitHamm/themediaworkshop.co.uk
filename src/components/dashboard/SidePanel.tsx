@@ -38,7 +38,10 @@ import { useSearchParams } from "next/navigation";
 import { Message, Tickets } from "@prisma/client";
 import axios from "axios";
 
-export default function SidePanel(props: { session: any; messages: Message }) {
+export default function SidePanel(props: {
+    session: any;
+    messages: Message[];
+}) {
     // Search params for which view is active
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
@@ -133,7 +136,7 @@ export default function SidePanel(props: { session: any; messages: Message }) {
             .catch((err) => console.log(err));
     }
 
-    function handleMessageCount(messages: Message) {
+    function handleMessageCount(messages: Message[]) {
         var count = 0;
         messages.forEach((message: any) => {
             if (!message.read) {

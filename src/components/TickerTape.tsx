@@ -25,7 +25,7 @@ export default function TickerTape(props: {
         for (let i = 0; i < props.logoImages.length; i++) {
             tempArray.push(props.logoImages[i].name);
         }
-        tempArray.sort(function (a, b) {
+        tempArray.sort(function (a: any, b: any) {
             return a - b;
         });
         setLogos(tempArray);

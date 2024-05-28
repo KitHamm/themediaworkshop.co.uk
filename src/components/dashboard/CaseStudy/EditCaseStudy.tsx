@@ -39,8 +39,8 @@ export default function EditCaseStudy(props: {
     );
     const [copy, setCopy] = useState(props.caseStudy.copy);
     const [images, setImages] = useState(props.caseStudy.image);
-    const [video, setVideo] = useState<string>(props.caseStudy.video);
-    const [videoThumbnail, setVideoThumbnail] = useState<string>(
+    const [video, setVideo] = useState(props.caseStudy.video);
+    const [videoThumbnail, setVideoThumbnail] = useState(
         props.caseStudy.videoThumbnail ? props.caseStudy.videoThumbnail : ""
     );
     const [tags, setTags] = useState(props.caseStudy.tags);
@@ -140,13 +140,17 @@ export default function EditCaseStudy(props: {
 
     function discardChanges() {
         setTitle(props.caseStudy.title);
-        setDateLocation(props.caseStudy.dateLocation);
+        setDateLocation(
+            props.caseStudy.dateLocation ? props.caseStudy.dateLocation : ""
+        );
         setCopy(props.caseStudy.copy);
         setImages(props.caseStudy.image);
         setVideo(props.caseStudy.video);
         setTags(props.caseStudy.tags);
         setOrder(props.caseStudy.order);
-        setVideoThumbnail(props.caseStudy.videoThumbnail);
+        setVideoThumbnail(
+            props.caseStudy.videoThumbnail ? props.caseStudy.videoThumbnail : ""
+        );
     }
 
     // Check naming conventions for uploads
@@ -464,7 +468,7 @@ export default function EditCaseStudy(props: {
                                             <div
                                                 onClick={() => {
                                                     setSelectedPreviewVideo(
-                                                        video
+                                                        video ? video : ""
                                                     );
                                                     onOpenChangeVideoPreview();
                                                 }}
@@ -478,7 +482,9 @@ export default function EditCaseStudy(props: {
                                                 />
                                             </div>
                                             <div className="text-center">
-                                                {video.split("-")[0]}
+                                                {video
+                                                    ? video.split("-")[0]
+                                                    : ""}
                                             </div>
                                             <div className="text-center mt-2 mt-2">
                                                 <button
@@ -690,7 +696,11 @@ export default function EditCaseStudy(props: {
                                 <input
                                     type="number"
                                     placeholder="0"
-                                    value={!Number.isNaN(order) ? order : ""}
+                                    value={
+                                        !Number.isNaN(order)
+                                            ? (order as number)
+                                            : ""
+                                    }
                                     onChange={(e) => {
                                         setOrder(parseInt(e.target.value));
                                     }}
@@ -795,7 +805,7 @@ export default function EditCaseStudy(props: {
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                         {availableVideos.map(
-                                            (video: Videos, index: number) => {
+                                            (video: any, index: number) => {
                                                 if (
                                                     video.name.split("_")[0] ===
                                                     "VIDEO"
@@ -988,7 +998,7 @@ export default function EditCaseStudy(props: {
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                         {availableImages.map(
-                                            (image: Images, index: number) => {
+                                            (image: any, index: number) => {
                                                 if (
                                                     image.name.split("_")[0] ===
                                                     "STUDY"
@@ -1136,7 +1146,7 @@ export default function EditCaseStudy(props: {
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                         {availableImages.map(
-                                            (image: Images, index: number) => {
+                                            (image: any, index: number) => {
                                                 if (
                                                     image.name.split("_")[0] ===
                                                     "THUMBNAIL"

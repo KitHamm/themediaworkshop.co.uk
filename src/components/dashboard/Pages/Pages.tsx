@@ -11,16 +11,19 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Page, Videos } from "@prisma/client";
-import axios from "axios";
-
+import { Page, Segment, CaseStudy } from "@prisma/client";
+interface ExtendedPage extends Page {
+    segment: ExtendedSegment[];
+}
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
 export default function Pages(props: {
     hidden: boolean;
-    data: Page;
+    data: ExtendedPage[];
     revalidateDashboard: any;
 }) {
     // State list of background videos
-    const [bgVideos, setBgVideos] = useState<Videos>([]);
     // Search params for which page edit to display
     const searchParams = useSearchParams();
     const pageEdit: string = searchParams.get("pageEdit")
@@ -92,7 +95,7 @@ export default function Pages(props: {
                     </Link>
                 </div>
                 {/* Pre load all page edits and hide non selected */}
-                {props.data.map((page: Page, index: number) => {
+                {props.data.map((page: ExtendedPage, index: number) => {
                     return (
                         <div key={index}>
                             <PageEdit

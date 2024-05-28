@@ -26,9 +26,15 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, createContext, useRef } from "react";
 
 // Types
-import { Message, Page, emailHost } from "@prisma/client";
+import { Message, Page, Segment, CaseStudy, emailHost } from "@prisma/client";
 import axios from "axios";
 import NotificationCard from "./NotificationCard";
+interface ExtendedPage extends Page {
+    segment: ExtendedSegment[];
+}
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
 
 type notification = {
     component: string;
@@ -38,10 +44,10 @@ type notification = {
 export const NotificationsContext = createContext<any>([]);
 
 export default function DashboardMain(props: {
-    data: Page;
+    data: ExtendedPage[];
     revalidateDashboard: any;
     session: any;
-    messages: Message;
+    messages: Message[];
     emailHost: emailHost;
 }) {
     // Use search params to display correct view (requires use client)
@@ -128,7 +134,7 @@ export default function DashboardMain(props: {
                 {/* Settings view */}
                 <Settings
                     revalidateDashboard={props.revalidateDashboard}
-                    emailHost={props.emailHost}
+                    emailHost={props.emailHost.emailHost}
                     session={props.session}
                     hidden={view === "settings" ? false : true}
                 />

@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState, useRef } from "react";
 
 // Types
-import { Logos, Page, Segment } from "@prisma/client";
+import { CaseStudy, Logos, Page, Segment } from "@prisma/client";
 import axios from "axios";
 type FormTypes = {
     name: string;
@@ -30,7 +30,16 @@ type FormTypes = {
     message: string;
 };
 
-export default function MainPage(props: { data: Page; logoImages?: Logos }) {
+interface ExtendedPage extends Page {
+    segment: ExtendedSegment[];
+}
+interface ExtendedSegment extends Segment {
+    casestudy: CaseStudy[];
+}
+export default function MainPage(props: {
+    data: ExtendedPage;
+    logoImages: Logos[];
+}) {
     // Video ref
     const video = useRef<HTMLVideoElement>(null);
     // Video loading
@@ -136,14 +145,28 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                     {/* Header section with content over full size video */}
                     <Header
                         openContactModal={onOpenContact}
-                        subTitle={props.data.subTitle}
+                        subTitle={
+                            props.data.subTitle ? props.data.subTitle : ""
+                        }
                         home={props.data.title === "home" ? true : false}
-                        header={props.data.header}
-                        description={props.data.description}
-                        showreel={props.data.showreel}
-                        year={props.data.year}
-                        videoOneButtonText={props.data.videoOneButtonText}
-                        videoTwoButtonText={props.data.videoTwoButtonText}
+                        header={props.data.header ? props.data.header : ""}
+                        description={
+                            props.data.description ? props.data.description : ""
+                        }
+                        showreel={
+                            props.data.showreel ? props.data.showreel : ""
+                        }
+                        year={props.data.year ? props.data.year : ""}
+                        videoOneButtonText={
+                            props.data.videoOneButtonText
+                                ? props.data.videoOneButtonText
+                                : ""
+                        }
+                        videoTwoButtonText={
+                            props.data.videoTwoButtonText
+                                ? props.data.videoTwoButtonText
+                                : ""
+                        }
                     />
                 </section>
             </header>
@@ -154,13 +177,15 @@ export default function MainPage(props: { data: Page; logoImages?: Logos }) {
                 </div>
             )}
             {/* Iterate over segments and display in sequence */}
-            {props.data?.segment.map((segment: Segment, index: number) => {
-                return (
-                    <div key={segment.title}>
-                        <PageSegment segment={segment} index={index} />
-                    </div>
-                );
-            })}
+            {props.data?.segment.map(
+                (segment: ExtendedSegment, index: number) => {
+                    return (
+                        <div key={segment.title}>
+                            <PageSegment segment={segment} index={index} />
+                        </div>
+                    );
+                }
+            )}
             {/* Bottom Ticker Tape */}
             {props.logoImages.length > 0 && (
                 <TickerTape top={false} logoImages={props.logoImages} />

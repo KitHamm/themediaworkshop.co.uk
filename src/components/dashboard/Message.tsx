@@ -22,7 +22,7 @@ import axios from "axios";
 export default function Messages(props: {
     hidden: boolean;
     revalidateDashboard: any;
-    messages: Message;
+    messages: Message[];
 }) {
     // State for all messages once received
     const [messages, setMessages] = useState<Message[]>([]);

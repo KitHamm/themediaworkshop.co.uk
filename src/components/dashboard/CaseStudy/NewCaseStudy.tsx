@@ -659,7 +659,7 @@ export default function NewCaseStudy(props: {
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
                                     {availableVideos.map(
-                                        (video: Videos, index: number) => {
+                                        (video: any, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
                                                 "VIDEO"
@@ -848,7 +848,7 @@ export default function NewCaseStudy(props: {
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                     {availableImages.map(
-                                        (image: Images, index: number) => {
+                                        (image: any, index: number) => {
                                             if (
                                                 image.name.split("_")[0] ===
                                                 "STUDY"
@@ -991,7 +991,7 @@ export default function NewCaseStudy(props: {
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                     {availableImages.map(
-                                        (image: Images, index: number) => {
+                                        (image: any, index: number) => {
                                             if (
                                                 image.name.split("_")[0] ===
                                                 "THUMBNAIL"
