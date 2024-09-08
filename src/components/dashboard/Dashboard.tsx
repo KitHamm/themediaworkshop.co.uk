@@ -6,8 +6,16 @@ import DataStats from "./StatBoxes/DataStats";
 import StorageStats from "./StatBoxes/StorageStats";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Images, Logos, Message, serviceRequest, Videos } from "@prisma/client";
 
-export default function DashboardView(props: { hidden: boolean }) {
+export default function DashboardView(props: {
+    hidden: boolean;
+    images: Images[];
+    videos: Videos[];
+    logos: Logos[];
+    messages: Message[];
+    requests: serviceRequest[];
+}) {
     const searchParams = useSearchParams();
     const statBoxes: string = searchParams.get("statBoxes")
         ? searchParams.get("statBoxes")!
@@ -43,7 +51,7 @@ export default function DashboardView(props: { hidden: boolean }) {
                                 </div>
                             }>
                             <div className="cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                                <PageStats />
+                                <PageStats requests={props.requests} />
                             </div>
                         </Tooltip>
                         <Tooltip
@@ -86,7 +94,12 @@ export default function DashboardView(props: { hidden: boolean }) {
                                 </div>
                             }>
                             <div className="cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-                                <DataStats />
+                                <DataStats
+                                    images={props.images}
+                                    videos={props.videos}
+                                    logos={props.logos}
+                                    messages={props.messages}
+                                />
                             </div>
                         </Tooltip>
                     </div>

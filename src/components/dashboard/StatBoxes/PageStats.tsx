@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import { serviceRequest } from "@prisma/client";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -51,7 +51,7 @@ export const options = {
     },
 };
 
-export default function PageStats() {
+export default function PageStats(props: { requests: serviceRequest[] }) {
     const [sevenDays, setSevenDays] = useState<any>([]);
     const [homeVisits, setHomeVisits] = useState<any>([]);
     const [filmVisits, setFilmVisits] = useState<any>([]);
@@ -69,58 +69,53 @@ export default function PageStats() {
         }
         setSevenDays(week);
 
-        axios
-            .get("/api/service")
-            .then((res) => {
-                var _homeVisits = [];
-                var _filmVisits = [];
-                var _digitalVisits = [];
-                var _lightVisits = [];
-                var _eventsVisits = [];
-                var _artVisits = [];
+        var _homeVisits = [];
+        var _filmVisits = [];
+        var _digitalVisits = [];
+        var _lightVisits = [];
+        var _eventsVisits = [];
+        var _artVisits = [];
 
-                for (let i = 0; i < 7; i++) {
-                    var homeCount = 0;
-                    var filmCount = 0;
-                    var digitalCount = 0;
-                    var lightCount = 0;
-                    var eventsCount = 0;
-                    var artCount = 0;
-                    var date = new Date();
-                    date.setDate(date.getDate() - (6 - i));
-                    for (let j = 0; j < res.data.data.length; j++) {
-                        const visitDate = new Date(res.data.data[j].createdAt);
-                        if (visitDate.getDate() === date.getDate()) {
-                            if (res.data.data[j].page === "home") {
-                                homeCount = homeCount + 1;
-                            } else if (res.data.data[j].page === "film") {
-                                filmCount = filmCount + 1;
-                            } else if (res.data.data[j].page === "digital") {
-                                digitalCount = digitalCount + 1;
-                            } else if (res.data.data[j].page === "light") {
-                                lightCount = lightCount + 1;
-                            } else if (res.data.data[j].page === "events") {
-                                eventsCount = eventsCount + 1;
-                            } else if (res.data.data[j].page === "art") {
-                                artCount = artCount + 1;
-                            }
-                        }
+        for (let i = 0; i < 7; i++) {
+            var homeCount = 0;
+            var filmCount = 0;
+            var digitalCount = 0;
+            var lightCount = 0;
+            var eventsCount = 0;
+            var artCount = 0;
+            var date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            for (let j = 0; j < props.requests.length; j++) {
+                const visitDate = new Date(props.requests[j].createdAt);
+                if (visitDate.getDate() === date.getDate()) {
+                    if (props.requests[j].page === "home") {
+                        homeCount = homeCount + 1;
+                    } else if (props.requests[j].page === "film") {
+                        filmCount = filmCount + 1;
+                    } else if (props.requests[j].page === "digital") {
+                        digitalCount = digitalCount + 1;
+                    } else if (props.requests[j].page === "light") {
+                        lightCount = lightCount + 1;
+                    } else if (props.requests[j].page === "events") {
+                        eventsCount = eventsCount + 1;
+                    } else if (props.requests[j].page === "art") {
+                        artCount = artCount + 1;
                     }
-                    _homeVisits.push(homeCount);
-                    _filmVisits.push(filmCount);
-                    _digitalVisits.push(digitalCount);
-                    _lightVisits.push(lightCount);
-                    _eventsVisits.push(eventsCount);
-                    _artVisits.push(artCount);
                 }
-                setHomeVisits(_homeVisits);
-                setFilmVisits(_filmVisits);
-                setDigitalVisits(_digitalVisits);
-                setLightVisits(_lightVisits);
-                setEventsVisits(_eventsVisits);
-                setArtVisits(_artVisits);
-            })
-            .catch((err) => console.log(err));
+            }
+            _homeVisits.push(homeCount);
+            _filmVisits.push(filmCount);
+            _digitalVisits.push(digitalCount);
+            _lightVisits.push(lightCount);
+            _eventsVisits.push(eventsCount);
+            _artVisits.push(artCount);
+        }
+        setHomeVisits(_homeVisits);
+        setFilmVisits(_filmVisits);
+        setDigitalVisits(_digitalVisits);
+        setLightVisits(_lightVisits);
+        setEventsVisits(_eventsVisits);
+        setArtVisits(_artVisits);
     }, []);
 
     const chartData = {

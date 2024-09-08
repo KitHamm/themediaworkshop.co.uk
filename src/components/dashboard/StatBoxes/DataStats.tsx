@@ -1,52 +1,24 @@
 "use client";
 
-import { Message } from "@prisma/client";
-import axios from "axios";
+import { Images, Logos, Message, Videos } from "@prisma/client";
 import { useEffect, useState } from "react";
 
-export default function DataStats() {
+export default function DataStats(props: {
+    images: Images[];
+    videos: Videos[];
+    logos: Logos[];
+    messages: Message[];
+}) {
     const [unreadMessage, setUnreadMessages] = useState(0);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [videoCount, setVideoCount] = useState(0);
-    const [imageCount, setImageCount] = useState(0);
 
     useEffect(() => {
-        axios
-            .get("/api/message")
-            .then((res) => {
-                setMessages(res.data);
-                let count = 0;
-                for (let i = 0; i < res.data.length; i++) {
-                    if (res.data[i].read === false) {
-                        count = count + 1;
-                    }
-                }
-                setUnreadMessages(count);
-            })
-            .catch((err) => console.log(err));
-        let _imageCount = 0;
-        axios
-            .get("/api/image")
-            .then((res) => {
-                _imageCount = _imageCount + res.data.length;
-                setImageCount(_imageCount);
-            })
-            .catch((err) => console.log(err));
-
-        axios
-            .get("/api/logos")
-            .then((res) => {
-                _imageCount = _imageCount + res.data.length;
-                setImageCount(_imageCount);
-            })
-            .catch((err) => console.log(err));
-
-        axios
-            .get("/api/video")
-            .then((res) => setVideoCount(res.data.length))
-            .catch((err) => console.log(err));
-
-        setImageCount(_imageCount);
+        let count = 0;
+        for (let i = 0; i < props.messages.length; i++) {
+            if (props.messages[i].read === false) {
+                count = count + 1;
+            }
+        }
+        setUnreadMessages(count);
     }, []);
 
     return (
@@ -72,7 +44,9 @@ export default function DataStats() {
                                 } font-bold`}>
                                 {unreadMessage}
                             </div>
-                            <div className="font-bold">{messages.length}</div>
+                            <div className="font-bold">
+                                {props.messages.length}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,8 +66,12 @@ export default function DataStats() {
                         id="right"
                         className="grid grid-cols-1 text-center gap-8">
                         <div className="text-xl my-auto ">
-                            <div className="font-bold">{videoCount}</div>
-                            <div className="font-bold">{imageCount}</div>
+                            <div className="font-bold">
+                                {props.videos.length}
+                            </div>
+                            <div className="font-bold">
+                                {props.images.length + props.logos.length}
+                            </div>
                         </div>
                     </div>
                 </div>

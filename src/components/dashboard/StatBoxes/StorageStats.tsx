@@ -1,8 +1,8 @@
 "use client";
 
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@nextui-org/react";
+import { GetStorageStats } from "@/components/server/storageStats";
 
 type diskSpaceType = {
     diskPath: string;
@@ -18,13 +18,11 @@ export default function StorageStats() {
     });
     const [usage, setUsage] = useState<number>(0.0);
     useEffect(() => {
-        axios
-            .get("/api/storage")
+        GetStorageStats()
             .then((res) => {
-                setDiskSpace(res.data.response);
-                const _usage =
-                    100.0 -
-                    (res.data.response.free / res.data.response.size) * 100.0;
+                const data: diskSpaceType = res.response as diskSpaceType;
+                setDiskSpace(data);
+                const _usage = 100.0 - (data.free / data.size) * 100.0;
                 setUsage(Math.round((_usage + Number.EPSILON) * 100) / 100);
             })
             .catch((err) => console.log(err));

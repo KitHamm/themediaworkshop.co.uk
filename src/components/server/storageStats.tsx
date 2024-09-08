@@ -1,8 +1,9 @@
+"use server";
+
 import checkDiskSpace from "check-disk-space";
-import { NextResponse } from "next/server";
 import os from "os";
 
-export async function GET() {
+export async function GetStorageStats() {
     var _diskSpace = {};
     var _path = "";
     if (os.platform() === "win32") {
@@ -14,7 +15,5 @@ export async function GET() {
     await checkDiskSpace(_path).then((diskSpace) => {
         _diskSpace = diskSpace;
     });
-    return new NextResponse(JSON.stringify({ response: _diskSpace }), {
-        status: 201,
-    });
+    return Promise.resolve({ status: 200, response: _diskSpace });
 }

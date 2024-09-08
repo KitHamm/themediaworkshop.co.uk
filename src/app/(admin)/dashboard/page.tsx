@@ -42,7 +42,14 @@ export default async function Dashboard() {
             { name: "asc" },
         ],
     });
-
+    const videos = await prisma.videos.findMany();
+    const images = await prisma.images.findMany();
+    const logos = await prisma.logos.findMany();
+    const requests = await prisma.serviceRequest.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
     return (
         <>
             {/* Main dashboard panel with all views available */}
@@ -52,6 +59,10 @@ export default async function Dashboard() {
                 revalidateDashboard={revalidateDashboard}
                 session={session}
                 data={data}
+                videos={videos}
+                images={images}
+                logos={logos}
+                requests={requests}
             />
         </>
     );

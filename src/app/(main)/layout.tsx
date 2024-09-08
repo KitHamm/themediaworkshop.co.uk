@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Lato } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/Navbar";

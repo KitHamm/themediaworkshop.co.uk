@@ -2,9 +2,9 @@
 
 import { CircularProgress } from "@nextui-org/react";
 import { CaseStudy, Logos, Page, Segment } from "@prisma/client";
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import Header from "./header";
+import { ServiceRequest } from "./server/serviceRequest";
 
 interface ExtendedPage extends Page {
     segment: ExtendedSegment[];
@@ -30,7 +30,7 @@ export default function MainHeader(props: {
             setLoading(false);
         }
         window.scrollTo({ top: 0, behavior: "smooth" });
-        // axios.post("/api/service", { page: props.data.title });
+        ServiceRequest(props.data.title);
     }, []);
 
     return (

@@ -26,8 +26,17 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, createContext, useRef } from "react";
 
 // Types
-import { Message, Page, Segment, CaseStudy, emailHost } from "@prisma/client";
-import axios from "axios";
+import {
+    Message,
+    Page,
+    Segment,
+    CaseStudy,
+    emailHost,
+    Videos,
+    Images,
+    Logos,
+    serviceRequest,
+} from "@prisma/client";
 import NotificationCard from "./NotificationCard";
 import {
     CheckUserActivation,
@@ -53,6 +62,10 @@ export default function DashboardMain(props: {
     session: any;
     messages: Message[];
     emailHost: emailHost;
+    videos: Videos[];
+    images: Images[];
+    logos: Logos[];
+    requests: serviceRequest[];
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -104,7 +117,14 @@ export default function DashboardMain(props: {
                     </div>
                     <div className="absolute fade w-full h-14 left-0 top-0" />
                 </div>
-                <DashboardView hidden={view === "dashboard" ? false : true} />
+                <DashboardView
+                    hidden={view === "dashboard" ? false : true}
+                    images={props.images}
+                    videos={props.videos}
+                    logos={props.logos}
+                    messages={props.messages}
+                    requests={props.requests}
+                />
                 {/* Main CMS pages view */}
                 <Pages
                     hidden={view === "pages" ? false : true}
