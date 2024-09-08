@@ -5,7 +5,7 @@ import SidePanel from "@/components/dashboard/SidePanel";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import prisma from "@/lib/prisma";
-import { Message } from "@prisma/client";
+import { Message, Tickets, User } from "@prisma/client";
 
 const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
@@ -38,6 +38,19 @@ export default async function RootLayout({
             { name: "asc" },
         ],
     });
+    const tickets: Tickets[] = await prisma.tickets.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    var user: User | null = null;
+    if (session) {
+        user = await prisma.user.findUnique({
+            where: {
+                id: session.user.id as string,
+            },
+        });
+    }
     return (
         <html lang="en">
             <body
@@ -48,7 +61,18 @@ export default async function RootLayout({
                 <main className="xl:flex xl:h-auto min-h-screen">
                     <div className="relative xl:h-auto xl:basis-1/6">
                         {/* Side panel for dashboard showing user information */}
-                        <SidePanel messages={messages} session={session} />
+                        <SidePanel
+                            messages={messages}
+                            session={session}
+                            tickets={tickets}
+                            avatar={
+                                user !== null
+                                    ? user.image
+                                        ? user.image
+                                        : undefined
+                                    : undefined
+                            }
+                        />
                     </div>
                     <div className="xl:basis-5/6 min-h-screen">
                         {/* Main dashboard panel with all views available */}

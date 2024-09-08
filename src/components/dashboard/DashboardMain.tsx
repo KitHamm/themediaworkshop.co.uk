@@ -29,6 +29,10 @@ import { useState, useEffect, createContext, useRef } from "react";
 import { Message, Page, Segment, CaseStudy, emailHost } from "@prisma/client";
 import axios from "axios";
 import NotificationCard from "./NotificationCard";
+import {
+    CheckUserActivation,
+    UpdateUserActivation,
+} from "../server/userActions/userActivation";
 interface ExtendedPage extends Page {
     segment: ExtendedSegment[];
 }
@@ -69,15 +73,14 @@ export default function DashboardMain(props: {
 
     // Initial pop up if this is the first log in
     useEffect(() => {
-        axios
-            .post("/api/users", {
-                action: "checkActivation",
-                id: props.session.user.id,
-            })
-
+        CheckUserActivation(props.session.user.id)
             .then((res) => {
-                if (!res.data.activated) {
-                    onOpenChange();
+                if (res.status === 200) {
+                    if (res.message === false) {
+                        onOpenChange();
+                    }
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -85,18 +88,7 @@ export default function DashboardMain(props: {
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
-        axios
-            .post("/api/users", {
-                action: "update",
-                id: props.session.user.id,
-                data: { activated: true },
-            })
-            .then((res) => {
-                if (res.status === 201) {
-                    props.revalidateDashboard("/api/users");
-                }
-            })
-            .catch((err) => console.log(err));
+        UpdateUserActivation(props.session.user.id);
     }
 
     return (

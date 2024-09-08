@@ -3,24 +3,14 @@
 // Library Components
 import {
     Avatar,
-    Accordion,
-    AccordionItem,
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
     DropdownItem,
     DropdownSection,
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Button,
     useDisclosure,
-    CircularProgress,
     Badge,
     User,
-    Switch,
 } from "@nextui-org/react";
 
 //  React Components
@@ -36,40 +26,27 @@ import { useSearchParams } from "next/navigation";
 
 //  Functions
 import { Message, Tickets } from "@prisma/client";
-import axios from "axios";
+import CreateTicketModal from "./modals/CreateTicketModal";
+import ViewTicketsModal from "./modals/ViewTicketsModal";
+import UploadAvatarModal from "./modals/uploadAvatarModal";
 
 export default function SidePanel(props: {
     session: any;
     messages: Message[];
+    tickets: Tickets[];
+    avatar: string | undefined;
 }) {
     // Search params for which view is active
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
         ? searchParams.get("view")!
         : "dashboard";
-    // Current avatar and possible new avatar for user
-    const [avatar, setAvatar] = useState("");
-    const [newAvatar, setNewAvatar] = useState("");
+
     // The count of unread messages
     const [unreadMessages, setUnreadMessages] = useState(0);
-    // Change avatar success state
-    const [changeSuccess, setChangeSuccess] = useState(false);
-    // Uploading avatar state
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    // Not Image Error
-    const [notImageError, setNotImageError] = useState(false);
-    // Problem Ticket Info
-    const [isDashboardTicket, setIsDashboardTicket] = useState(false);
-    const [reproducible, setReproducible] = useState(false);
-    const [ticketDescription, setTicketDescription] = useState("");
-    const [ticketSuccess, setTicketSuccess] = useState(false);
-
-    // Tickets State
-    const [tickets, setTickets] = useState<Tickets[]>([]);
-
     // Modal states
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     const {
         isOpen: isOpenReport,
         onOpen: onOpenReport,
@@ -81,149 +58,15 @@ export default function SidePanel(props: {
         onOpenChange: onOpenChangeTickets,
     } = useDisclosure();
 
-    // First render get current avatar from DB
     useEffect(() => {
-        getAvatar();
-        if (props.session.user.name === "Kit Hamm") {
-            getTickets();
-        }
-    }, []);
-
-    async function getTickets() {
-        axios
-            .get("/api/tickets")
-            .then((res) => {
-                if (res.status === 201) {
-                    setTickets(res.data);
-                }
-            })
-            .catch((err) => console.log(err));
-    }
-
-    async function updateTicket(id: string, value: boolean) {
-        axios
-            .post("/api/tickets", { action: "update", id: id, value: value })
-            .then((res) => {
-                if (res.status === 201) {
-                    getTickets();
-                }
-            })
-            .catch((err) => console.log(err));
-    }
-
-    async function deleteTicket(id: string) {
-        axios
-            .post("/api/tickets", { action: "delete", id: id })
-            .then((res) => {
-                if (res.status === 201) {
-                    getTickets();
-                }
-            })
-            .catch((err) => console.log(err));
-    }
-
-    useEffect(() => {
-        handleMessageCount(props.messages);
-    }, [props.messages]);
-
-    async function getAvatar() {
-        axios
-            .post("/api/users", {
-                action: "getAvatar",
-                id: props.session.user.id,
-            })
-            .then((res) => setAvatar(res.data.avatar))
-            .catch((err) => console.log(err));
-    }
-
-    function handleMessageCount(messages: Message[]) {
         var count = 0;
-        messages.forEach((message: any) => {
+        props.messages.forEach((message: any) => {
             if (!message.read) {
                 count++;
             }
             setUnreadMessages(count);
         });
-    }
-
-    // Handler for uploading avatar
-    // Uses the upload handler returning a promise
-    async function uploadAvatar(file: File) {
-        setUploadProgress(0);
-        const formData = new FormData();
-        formData.append("file", file);
-        axios
-            .post("/api/image", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                onUploadProgress: (ProgressEvent) => {
-                    if (ProgressEvent.bytes) {
-                        let percent = Math.round(
-                            (ProgressEvent.loaded / ProgressEvent.total!) * 100
-                        );
-                        setUploadProgress(percent);
-                    }
-                },
-            })
-            .then((res) => {
-                if (res.data.message) {
-                    setUploading(false);
-                    setNewAvatar(res.data.message);
-                    clearFileInput();
-                }
-            })
-            .catch((err) => console.log(err));
-    }
-
-    // After the avatar has been uploaded the success message is displayed
-    // The user can then save the avatar to their profile with this function
-    async function updateAvatar() {
-        axios
-            .post("/api/users", {
-                action: "update",
-                id: props.session.user.id,
-                data: { image: newAvatar },
-            })
-            .then((res) => {
-                if (res.status === 201) {
-                    getAvatar();
-                    setNewAvatar("");
-                    onOpenChange();
-                }
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function clearFileInput() {
-        const inputElm = document.getElementById(
-            "new-avatar"
-        ) as HTMLInputElement;
-        if (inputElm) {
-            inputElm.value = "";
-        }
-    }
-
-    function submitTicket() {
-        const dashboard = isDashboardTicket ? "true" : "false";
-        const isReproducible = reproducible ? "true" : "false";
-        axios
-            .post("/api/users", {
-                action: "submitTicket",
-                from: props.session.user.name,
-                dashboard: dashboard,
-                reproducible: isReproducible,
-                description: ticketDescription,
-            })
-            .then((res) => {
-                if (res.data.message === "Ticket Submitted") {
-                    console.log(res.data);
-                    setIsDashboardTicket(false);
-                    setReproducible(false);
-                    setTicketDescription("");
-                    setTicketSuccess(true);
-                }
-            })
-            .catch((err) => console.log(err));
-    }
+    }, [props.messages]);
 
     return (
         <>
@@ -240,10 +83,10 @@ export default function SidePanel(props: {
                                     )[0] as string
                                 }
                                 src={
-                                    avatar
+                                    props.avatar !== undefined
                                         ? process.env
                                               .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                          avatar
+                                          props.avatar
                                         : undefined
                                 }
                             />
@@ -400,10 +243,12 @@ export default function SidePanel(props: {
                                 </div>
                             }
                             avatarProps={{
-                                src: avatar
-                                    ? process.env.NEXT_PUBLIC_BASE_AVATAR_URL +
-                                      avatar
-                                    : undefined,
+                                src:
+                                    props.avatar !== undefined
+                                        ? process.env
+                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                          props.avatar
+                                        : undefined,
                                 name: Array.from(
                                     props.session.user.name
                                 )[0] as string,
@@ -539,397 +384,26 @@ export default function SidePanel(props: {
                 </Link>
             </div>
             {/* Report a Problem Modal */}
-            <Modal
-                backdrop="blur"
-                isDismissable={false}
-                isOpen={isOpenReport}
-                className="dark"
-                onOpenChange={onOpenChangeReport}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>Ticket Submission</ModalHeader>
-                            <ModalBody>
-                                {ticketSuccess ? (
-                                    <div className="w-full text-xl text-green-400 text-center">
-                                        Ticket Successfully Submitted!
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="text-lg">
-                                            Where is the problem?
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <div
-                                                className={`
-                                            ${
-                                                isDashboardTicket
-                                                    ? ""
-                                                    : "text-orange-600"
-                                            }
-                                        transition-all`}>
-                                                Main Site
-                                            </div>
-                                            <Switch
-                                                color="default"
-                                                isSelected={isDashboardTicket}
-                                                onValueChange={
-                                                    setIsDashboardTicket
-                                                }>
-                                                <div
-                                                    className={`
-                                            ${
-                                                isDashboardTicket
-                                                    ? "text-orange-600"
-                                                    : ""
-                                            }
-                                        transition-all`}>
-                                                    Dashboard
-                                                </div>
-                                            </Switch>
-                                        </div>
-                                        <div className="text-lg">
-                                            Is it easily reproducible?
-                                        </div>
-                                        <Switch
-                                            color="success"
-                                            isSelected={reproducible}
-                                            onValueChange={setReproducible}>
-                                            <div>
-                                                {reproducible ? "Yes" : "No"}
-                                            </div>
-                                        </Switch>
-                                        <div className="text-lg">
-                                            Describe the problem...
-                                        </div>
-                                        <textarea
-                                            value={ticketDescription}
-                                            onChange={(e) =>
-                                                setTicketDescription(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className="min-h-52"></textarea>
-                                    </>
-                                )}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    onPress={() => {
-                                        onClose();
-                                        setTicketSuccess(false);
-                                        setIsDashboardTicket(false);
-                                        setReproducible(false);
-                                        setTicketDescription("");
-                                    }}
-                                    color="danger"
-                                    variant="light">
-                                    Close
-                                </Button>
-                                {!ticketSuccess && (
-                                    <Button
-                                        onPress={submitTicket}
-                                        className="bg-orange-600">
-                                        Submit Ticket
-                                    </Button>
-                                )}
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <CreateTicketModal
+                onOpenChangeReport={onOpenChangeReport}
+                isOpenReport={isOpenReport}
+                name={props.session.user.name}
+            />
+
             {/* Tickets Modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isDismissable={false}
-                isOpen={isOpenTickets}
-                className="dark"
-                onOpenChange={onOpenChangeTickets}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="flex w-full gap-4">
-                                    <div>Tickets</div>
-                                    <div>
-                                        <i
-                                            onClick={() => getTickets()}
-                                            aria-hidden
-                                            className="cursor-pointer fa-solid my-auto fa-xl fa-arrows-rotate"
-                                        />
-                                    </div>
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                {tickets.length > 0 ? (
-                                    <Accordion variant="splitted">
-                                        {tickets.map(
-                                            (
-                                                ticket: Tickets,
-                                                index: number
-                                            ) => {
-                                                return (
-                                                    <AccordionItem
-                                                        key={"ticket-" + index}
-                                                        aria-label="Accordion 1"
-                                                        title={
-                                                            <div className="flex gap-4">
-                                                                <div>
-                                                                    {
-                                                                        ticket.from
-                                                                    }
-                                                                </div>
-                                                                <div>
-                                                                    {" | "}
-                                                                </div>
-                                                                <div>
-                                                                    {ticket.dashboard
-                                                                        ? "Dashboard"
-                                                                        : "Main Page"}
-                                                                </div>
-                                                                <div>
-                                                                    {" | "}
-                                                                </div>
-                                                                <div>
-                                                                    {ticket.reproducible
-                                                                        ? "Reproducible"
-                                                                        : "Not Reproducible"}
-                                                                </div>
-                                                                <div>
-                                                                    {" | "}
-                                                                </div>
-                                                                <div
-                                                                    className={
-                                                                        ticket.resolved
-                                                                            ? "text-green-400"
-                                                                            : "text-red-400"
-                                                                    }>
-                                                                    {ticket.resolved
-                                                                        ? "Closed"
-                                                                        : "Open"}
-                                                                </div>
-                                                            </div>
-                                                        }>
-                                                        <div>
-                                                            <div className="font-bold text-xl mb-4">
-                                                                The Problem:
-                                                            </div>
-                                                            <div>
-                                                                {
-                                                                    ticket.description
-                                                                }
-                                                            </div>
-                                                            <div className="flex justify-end gap-4">
-                                                                <Button
-                                                                    onPress={() =>
-                                                                        deleteTicket(
-                                                                            ticket.id
-                                                                        )
-                                                                    }
-                                                                    color="danger"
-                                                                    variant="light">
-                                                                    Delete
-                                                                </Button>
-                                                                <Button
-                                                                    onPress={() =>
-                                                                        updateTicket(
-                                                                            ticket.id,
-                                                                            !ticket.resolved
-                                                                        )
-                                                                    }
-                                                                    color={
-                                                                        ticket.resolved
-                                                                            ? "danger"
-                                                                            : "success"
-                                                                    }>
-                                                                    {ticket.resolved
-                                                                        ? "Open Ticket"
-                                                                        : "Close Ticket"}
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </AccordionItem>
-                                                );
-                                            }
-                                        )}
-                                    </Accordion>
-                                ) : (
-                                    <div className="text-2xl font-bold w-full text-center">
-                                        No Tickets!
-                                    </div>
-                                )}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    onPress={() => {
-                                        onClose();
-                                    }}
-                                    color="danger"
-                                    variant="light">
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <ViewTicketsModal
+                tickets={props.tickets}
+                onOpenChangeTickets={onOpenChangeTickets}
+                isOpenTickets={isOpenTickets}
+            />
+
             {/* Modal for uploading new avatar */}
-            <Modal
-                backdrop="blur"
+            <UploadAvatarModal
                 isOpen={isOpen}
-                className="dark"
-                onOpenChange={onOpenChange}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>Update Avatar</ModalHeader>
-                            <ModalBody>
-                                {/* Show success message on successful upload of avatar */}
-                                {changeSuccess ? (
-                                    <>
-                                        <div className="text-center text-2xl font-bold">
-                                            Success!
-                                        </div>
-                                        <div className="flex justify-end">
-                                            <Button
-                                                color="danger"
-                                                onPress={() => {
-                                                    onClose();
-                                                    setNewAvatar("");
-                                                    setChangeSuccess(false);
-                                                }}>
-                                                Close
-                                            </Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        {notImageError && (
-                                            <div className="w-full flex justify-center text-red-400">
-                                                File is not an image
-                                            </div>
-                                        )}
-                                        <div className="flex">
-                                            {newAvatar === "" ? (
-                                                uploading ? (
-                                                    <div className="w-full flex justify-center">
-                                                        <CircularProgress
-                                                            classNames={{
-                                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                                                value: "text-xl",
-                                                            }}
-                                                            className="m-auto"
-                                                            showValueLabel={
-                                                                true
-                                                            }
-                                                            value={
-                                                                uploadProgress
-                                                            }
-                                                            color="warning"
-                                                            aria-label="Loading..."
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="file-input flex w-full justify-center">
-                                                        <input
-                                                            id="new-avatar"
-                                                            className="inputFile mx-auto"
-                                                            onChange={(e) => {
-                                                                if (
-                                                                    e.target
-                                                                        .files
-                                                                ) {
-                                                                    if (
-                                                                        e.target.files[0].type.split(
-                                                                            "/"
-                                                                        )[0] ===
-                                                                        "image"
-                                                                    ) {
-                                                                        setNotImageError(
-                                                                            false
-                                                                        );
-                                                                        setUploading(
-                                                                            true
-                                                                        );
-                                                                        uploadAvatar(
-                                                                            e
-                                                                                .target
-                                                                                .files[0]
-                                                                        );
-                                                                    } else {
-                                                                        setNotImageError(
-                                                                            true
-                                                                        );
-                                                                    }
-                                                                }
-                                                            }}
-                                                            type="file"
-                                                        />
-                                                        <label htmlFor="new-avatar">
-                                                            {newAvatar !== ""
-                                                                ? newAvatar
-                                                                : "Select file"}
-                                                        </label>
-                                                    </div>
-                                                )
-                                            ) : (
-                                                <div className="w-full flex justify-center">
-                                                    <Avatar
-                                                        className="w-20 h-20 text-large"
-                                                        showFallback
-                                                        name={
-                                                            Array.from(
-                                                                props.session
-                                                                    .user.name
-                                                            )[0] as string
-                                                        }
-                                                        src={
-                                                            newAvatar
-                                                                ? process.env
-                                                                      .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                                                  newAvatar
-                                                                : undefined
-                                                        }
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex justify-between mt-2">
-                                            <div>
-                                                <Button
-                                                    color="danger"
-                                                    onPress={() => {
-                                                        setNotImageError(false);
-                                                        onClose();
-                                                        setNewAvatar("");
-                                                    }}>
-                                                    Close
-                                                </Button>
-                                            </div>
-                                            <div>
-                                                <button
-                                                    onClick={() => {
-                                                        updateAvatar();
-                                                    }}
-                                                    disabled={
-                                                        newAvatar === ""
-                                                            ? true
-                                                            : false
-                                                    }
-                                                    className="disabled:bg-neutral-600 disabled:cursor-not-allowed bg-orange-600 px-4 py-2 rounded-lg">
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </div>{" "}
-                                    </>
-                                )}
-                            </ModalBody>
-                            <ModalFooter></ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+                onOpenChange={onOpenChange}
+                userId={props.session.user.id}
+                userName={Array.from(props.session.user.name)[0] as string}
+            />
         </>
     );
 }
