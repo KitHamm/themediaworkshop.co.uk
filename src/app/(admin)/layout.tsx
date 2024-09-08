@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Lato } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
 const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
@@ -27,11 +26,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <Script
-                src="https://kit.fontawesome.com/9923e52d96.js"
-                crossOrigin="anonymous"
-                async
-            />
             <body
                 className={
                     lato.className +

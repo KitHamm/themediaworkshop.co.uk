@@ -8,22 +8,23 @@ import { CircularProgress } from "@nextui-org/react";
 
 // React Imports
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar(props: { active: string }) {
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
+    const pathname = usePathname();
+    // useEffect(() => {
+    //     document.body.style.overflowY = "auto";
+    // }, []);
 
-    useEffect(() => {
-        document.body.style.overflowY = "auto";
-    }, []);
-
-    function loadWait(target: string) {
-        if (props.active !== target) {
-            setTimeout(() => {
-                setLoading(true);
-                // document.body.style.overflow = "hidden";
-            }, 1000);
-        }
-    }
+    // function loadWait(target: string) {
+    //     if (props.active !== target) {
+    //         setTimeout(() => {
+    //             setLoading(true);
+    //             // document.body.style.overflow = "hidden";
+    //         }, 1000);
+    //     }
+    // }
 
     return (
         <>
@@ -31,10 +32,10 @@ export default function Navbar(props: { active: string }) {
                 <ul className="flex justify-evenly xl:w-4/6 mx-auto uppercase font-bold xl:font-normal xl:py-3 pt-3 pb-4 text-base xl:text-2xl">
                     <li
                         className={`${
-                            props.active === "home" ? "text-orange-600" : ""
+                            pathname === "/" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("home")}
+                            // onClick={() => loadWait("home")}
                             scroll={false}
                             href={"/"}>
                             Home
@@ -42,10 +43,10 @@ export default function Navbar(props: { active: string }) {
                     </li>
                     <li
                         className={`${
-                            props.active === "film" ? "text-orange-600" : ""
+                            pathname === "/film" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("film")}
+                            // onClick={() => loadWait("film")}
                             scroll={false}
                             href={"/film"}>
                             Film
@@ -53,10 +54,10 @@ export default function Navbar(props: { active: string }) {
                     </li>
                     <li
                         className={`${
-                            props.active === "digital" ? "text-orange-600" : ""
+                            pathname === "/digital" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("digital")}
+                            // onClick={() => loadWait("digital")}
                             scroll={false}
                             href={"/digital"}>
                             Digital
@@ -64,10 +65,10 @@ export default function Navbar(props: { active: string }) {
                     </li>
                     <li
                         className={`${
-                            props.active === "light" ? "text-orange-600" : ""
+                            pathname === "/light" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("light")}
+                            // onClick={() => loadWait("light")}
                             scroll={false}
                             href={"/light"}>
                             Light
@@ -75,10 +76,10 @@ export default function Navbar(props: { active: string }) {
                     </li>
                     <li
                         className={`${
-                            props.active === "events" ? "text-orange-600" : ""
+                            pathname === "/events" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("events")}
+                            // onClick={() => loadWait("events")}
                             scroll={false}
                             href={"/events"}>
                             Events
@@ -86,10 +87,10 @@ export default function Navbar(props: { active: string }) {
                     </li>
                     <li
                         className={`${
-                            props.active === "art" ? "text-orange-600" : ""
+                            pathname === "/art" ? "text-orange-600" : ""
                         } xl:hover:text-orange-600 cursor-pointer xl:transition-all`}>
                         <Link
-                            onClick={() => loadWait("art")}
+                            // onClick={() => loadWait("art")}
                             scroll={false}
                             href={"/art"}>
                             Art
@@ -97,7 +98,7 @@ export default function Navbar(props: { active: string }) {
                     </li>
                 </ul>
             </nav>
-            <div
+            {/* <div
                 className={`${
                     loading ? "flex" : "hidden"
                 } fade-in h-screen w-screen overflow-none fixed top-0 left-0 bg-black bg-opacity-75 z-40 justify-center`}>
@@ -108,7 +109,7 @@ export default function Navbar(props: { active: string }) {
                     }}
                     aria-label="Loading..."
                 />
-            </div>
+            </div> */}
         </>
     );
 }

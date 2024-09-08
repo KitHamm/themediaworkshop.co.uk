@@ -1,0 +1,26 @@
+input[type="text"],
+input[type="date"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    box-sizing: border-box !important;
+    display: inline-block !important;
+    margin: 8px 0 !important;
+    padding: 12px 20px !important;
+    resize: none !important;
+    width: 100%;
+    /* height: -webkit-fill-available; */
+}
+input[type="text"]:focus-visible,
+input[type="date"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="number"]:focus-visible,
+input[type="password"]:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: none !important;
+}

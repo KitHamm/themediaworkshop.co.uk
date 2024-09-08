@@ -1,5 +1,11 @@
-export default function Footer(props: { openContactModal: any }) {
+"use client";
+
+import { useDisclosure } from "@nextui-org/react";
+import ContactModal from "./ContactModal";
+
+export default function Footer() {
     const date = new Date();
+    const { onClose, isOpen, onOpenChange } = useDisclosure();
     return (
         <div className="w-full">
             <div className="flex justify-center bg-neutral-900 py-10">
@@ -27,7 +33,7 @@ export default function Footer(props: { openContactModal: any }) {
                         </a>
                     </div>
                     <div className="cursor-pointer hover:text-orange-600 transition-all">
-                        <div onClick={() => props.openContactModal()}>
+                        <div onClick={() => onOpenChange()}>
                             <i
                                 aria-hidden
                                 className="fa-solid fa-envelope fa-2xl"
@@ -61,6 +67,11 @@ export default function Footer(props: { openContactModal: any }) {
             <div className="pb-20 xl:pb-5 text-center bg-black py-4">
                 &copy; {date.getFullYear()} The Media Workshop
             </div>
+            <ContactModal
+                isOpen={isOpen}
+                onClose={onClose}
+                onOpenChange={onOpenChange}
+            />
         </div>
     );
 }

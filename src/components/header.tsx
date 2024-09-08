@@ -9,6 +9,7 @@ import Image from "next/image";
 
 // React Components
 import { useRef, useEffect } from "react";
+import ContactModal from "./ContactModal";
 
 export default function Header(props: {
     description: String;
@@ -17,16 +18,14 @@ export default function Header(props: {
     showreel: string;
     year: string;
     subTitle: string;
-    openContactModal: any;
     videoOneButtonText: string;
     videoTwoButtonText: string;
 }) {
     const chevron = useRef<HTMLDivElement>(null);
     const copyText = useRef<HTMLDivElement>(null);
-    // Contact form states
+    const { onClose, isOpen, onOpenChange } = useDisclosure();
     const { isOpen: isOpenShowreel, onOpenChange: onOpenChangeShowreel } =
         useDisclosure();
-    // Year review modal declaration
     const { isOpen: isOpenYear, onOpenChange: onOpenChangeYear } =
         useDisclosure();
 
@@ -122,7 +121,7 @@ export default function Header(props: {
                             )}
                             <div className="">
                                 <button
-                                    onClick={() => props.openContactModal()}
+                                    onClick={() => onOpenChange()}
                                     className="transition-all hover:bg-opacity-0 hover:text-white border border-white bg-opacity-90 font-bold bg-white max-w-52 w-full xl:w-auto text-sm py-2 xl:px-8 xl:py-3 text-black">
                                     CONTACT
                                 </button>
@@ -222,6 +221,11 @@ export default function Header(props: {
                     )}
                 </ModalContent>
             </Modal>
+            <ContactModal
+                onClose={onClose}
+                onOpenChange={onOpenChange}
+                isOpen={isOpen}
+            />
         </>
     );
 }
