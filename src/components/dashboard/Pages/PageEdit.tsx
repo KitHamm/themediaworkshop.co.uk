@@ -688,6 +688,7 @@ export default function PageEdit(props: {
                                             segment={segment}
                                             index={index}
                                             images={props.images}
+                                            videos={props.videos}
                                             caseStudies={props.caseStudies}
                                         />
                                     </div>

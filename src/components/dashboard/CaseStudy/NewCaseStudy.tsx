@@ -22,17 +22,78 @@ import { useState, useEffect } from "react";
 import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import axios from "axios";
+import { useFieldArray, useForm } from "react-hook-form";
+import { CreateCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
 
-export default function NewCaseStudy(props: { segmentId: number }) {
-    // States for initial case study content
-    const [title, setTitle] = useState("");
-    const [dateLocation, setDateLocation] = useState("");
-    const [copy, setCopy] = useState("");
-    const [images, setImages] = useState<string[]>([]);
-    const [video, setVideo] = useState<string>("");
-    const [videoThumbnail, setVideoThumbnail] = useState<string>("");
-    const [tags, setTags] = useState<string[]>([]);
-    const [order, setOrder] = useState(0);
+export type CaseStudyImageType = {
+    url: string;
+};
+
+export type CaseStudyTagType = {
+    text: string;
+};
+
+export type CaseStudyFromType = {
+    title: string;
+    dateLocation: string;
+    copy: string;
+    image: CaseStudyImageType[];
+    video: string;
+    videoThumbnail: string;
+    segmentId: number;
+    tags: CaseStudyTagType[];
+    order: number;
+    published: boolean;
+};
+
+export default function NewCaseStudy(props: {
+    segmentId: number;
+    studyCount: number;
+    videos: Videos[];
+    images: Images[];
+}) {
+    const newCaseStudyForm = useForm<CaseStudyFromType>({
+        defaultValues: {
+            title: "",
+            dateLocation: "",
+            copy: "",
+            image: [],
+            video: "",
+            videoThumbnail: "",
+            segmentId: props.segmentId,
+            tags: [],
+            order: props.studyCount + 1,
+            published: false,
+        },
+    });
+
+    const {
+        register,
+        reset,
+        handleSubmit,
+        getValues,
+        setValue,
+        control,
+        formState: { isDirty, errors, dirtyFields },
+    } = newCaseStudyForm;
+
+    const {
+        fields: imageFields,
+        append: imageAppend,
+        remove: imageRemove,
+    } = useFieldArray({
+        control: control,
+        name: "image",
+    });
+    const {
+        fields: tagsFields,
+        append: tagsAppend,
+        remove: tagsRemove,
+    } = useFieldArray({
+        control: control,
+        name: "tags",
+    });
+
     // New Tag State
     const [newTag, setNewTag] = useState("");
 
@@ -40,13 +101,13 @@ export default function NewCaseStudy(props: { segmentId: number }) {
     const [selectedPreviewVideo, setSelectedPreviewVideo] = useState("");
 
     // States for image and video pools
-    const [availableImages, setAvailableImages] = useState<string[]>([]);
-    const [availableVideos, setAvailableVideos] = useState<string[]>([]);
+    // const [availableImages, setAvailableImages] = useState<string[]>([]);
+    // const [availableVideos, setAvailableVideos] = useState<string[]>([]);
 
     // State for preview description text
     const [previewText, setPreviewText] = useState(false);
     // State for if there are unsaved changes
-    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [isValid, setIsValid] = useState(false);
 
     // Submit success state
     const [success, setSuccess] = useState(false);
@@ -86,12 +147,12 @@ export default function NewCaseStudy(props: { segmentId: number }) {
 
     // Constant check for unsaved changes
     useEffect(() => {
-        if (title !== "" && copy !== "" && images.length > 0) {
-            setUnsavedChanges(true);
+        if (dirtyFields.copy && dirtyFields.title && dirtyFields.image) {
+            setIsValid(true);
         } else {
-            setUnsavedChanges(false);
+            setIsValid(false);
         }
-    }, [title, copy, images, video, tags, order]);
+    }, [dirtyFields.title, dirtyFields.copy, dirtyFields.image]);
 
     // Check naming conventions for uploads
     function namingConventionCheck(fileName: string, check: string) {
@@ -100,36 +161,6 @@ export default function NewCaseStudy(props: { segmentId: number }) {
         } else {
             return true;
         }
-    }
-
-    async function getImages() {
-        axios
-            .get("/api/image")
-            .then((res) => {
-                setAvailableImages(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    async function getVideos() {
-        axios
-            .get("/api/video")
-            .then((res) => {
-                setAvailableVideos(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function removeImage(index: number) {
-        setImages(
-            images.filter((_image: string, _index: number) => _index !== index)
-        );
-    }
-
-    function removeTag(index: number) {
-        setTags(
-            tags.filter((_tag: string, _index: number) => _index !== index)
-        );
     }
 
     function clearFileInput(target: string) {
@@ -142,30 +173,14 @@ export default function NewCaseStudy(props: { segmentId: number }) {
     }
 
     // Update segment with pre populated data
-    async function addCaseStudy(json: any) {
-        axios
-            .post("/api/casestudy", {
-                action: "create",
-                data: {
-                    title: title,
-                    copy: copy,
-                    image: images,
-                    video: video,
-                    tags: tags,
-                    order: order,
-                    videoThumbnail: videoThumbnail,
-                    segment: { connect: { id: props.segmentId } },
-                },
-            })
+    async function addCaseStudy(data: CaseStudyFromType) {
+        console.log(data);
+        CreateCaseStudy(data)
             .then((res) => {
-                if (res.status === 201) {
+                if (res.status === 200) {
                     setSuccess(true);
-                    setTitle("");
-                    setCopy("");
-                    setImages([]);
-                    setVideo("");
-                    setTags([]);
-                    setOrder(0);
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -197,7 +212,6 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        getImages();
                         clearFileInput("image");
                     }
                 })
@@ -230,7 +244,6 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        getVideos();
                         clearFileInput("video");
                     }
                 })
@@ -251,14 +264,14 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                     </div>
                 </>
             ) : (
-                <>
-                    {unsavedChanges && (
+                <form onSubmit={handleSubmit(addCaseStudy)}>
+                    {isValid && (
                         <div className="flex justify-between">
                             <div className="my-auto text-sm xl:text-xl font-bold text-red-400 fade-in mb-4">
                                 Case Study can be saved
                             </div>
                             <button
-                                onClick={addCaseStudy}
+                                type="submit"
                                 className="my-auto bg-orange-600 xl:px-4 xl:py-2 px-2 py-1 rounded">
                                 Submit
                             </button>
@@ -271,11 +284,16 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     Images:
                                 </div>
                                 <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
-                                    {images.map(
-                                        (image: string, index: number) => {
+                                    {imageFields.map(
+                                        (
+                                            image: CaseStudyImageType,
+                                            index: number
+                                        ) => {
                                             return (
                                                 <div
-                                                    key={image + "-" + index}
+                                                    key={
+                                                        image.url + "-" + index
+                                                    }
                                                     className="relative">
                                                     <Image
                                                         height={100}
@@ -283,16 +301,16 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                         src={
                                                             process.env
                                                                 .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                            image
+                                                            image.url
                                                         }
-                                                        alt={image}
+                                                        alt={image.url}
                                                         className="w-full h-auto"
                                                     />
                                                     <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
                                                         <div className="text-red-400 h-full flex justify-center">
                                                             <i
                                                                 onClick={() =>
-                                                                    removeImage(
+                                                                    imageRemove(
                                                                         index
                                                                     )
                                                                 }
@@ -308,7 +326,6 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     <div
                                         onClick={() => {
                                             onOpenChangeImageSelect();
-                                            getImages();
                                         }}
                                         className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
                                         <div className="flex h-full justify-center">
@@ -325,12 +342,12 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
                                         Video:
                                     </div>
-                                    {video !== "" ? (
+                                    {getValues("video") ? (
                                         <>
                                             <div
                                                 onClick={() => {
                                                     setSelectedPreviewVideo(
-                                                        video
+                                                        getValues("video")
                                                     );
                                                     onOpenChangeVideoPreview();
                                                 }}
@@ -344,13 +361,17 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                 />
                                             </div>
                                             <div className="text-center">
-                                                {video.split("-")[0]}
+                                                {
+                                                    getValues("video").split(
+                                                        "-"
+                                                    )[0]
+                                                }
                                             </div>
                                             <div className="text-center mt-2 mt-2">
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
                                                         onOpenVideoSelect();
-                                                        getVideos();
                                                     }}
                                                     className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                     Change
@@ -364,9 +385,9 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                             </div>
                                             <div className="text-center mt-2 h-full">
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
                                                         onOpenVideoSelect();
-                                                        getVideos();
                                                     }}
                                                     className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                     Select
@@ -380,7 +401,7 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                         Thumbnail:
                                     </div>
                                     <div className="grid grid-cols-1">
-                                        {videoThumbnail !== "" ? (
+                                        {getValues("videoThumbnail") ? (
                                             <div className="relative">
                                                 <Image
                                                     height={300}
@@ -388,17 +409,26 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                     src={
                                                         process.env
                                                             .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                        videoThumbnail
+                                                        getValues(
+                                                            "videoThumbnail"
+                                                        )
                                                     }
-                                                    alt={videoThumbnail}
+                                                    alt={getValues(
+                                                        "videoThumbnail"
+                                                    )}
                                                     className="w-full h-auto"
                                                 />
                                                 <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
                                                     <div className="text-red-400 h-full flex justify-center">
                                                         <i
                                                             onClick={() =>
-                                                                setVideoThumbnail(
-                                                                    ""
+                                                                setValue(
+                                                                    "videoThumbnail",
+                                                                    "",
+                                                                    {
+                                                                        shouldDirty:
+                                                                            true,
+                                                                    }
                                                                 )
                                                             }
                                                             aria-hidden
@@ -411,7 +441,6 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                             <div
                                                 onClick={() => {
                                                     onOpenChangeThumbnailSelect();
-                                                    getImages();
                                                 }}
                                                 className="min-h-28 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
                                                 <div className="flex h-full justify-center">
@@ -430,20 +459,30 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                             <div className="font-bold text-2xl">Title:</div>
                             <input
                                 type="text"
-                                value={title}
-                                onChange={(e) => {
-                                    setTitle(e.target.value);
-                                }}
+                                {...register("title", {
+                                    required: {
+                                        value: true,
+                                        message: "Title is required.",
+                                    },
+                                })}
+                                placeholder={
+                                    errors.title
+                                        ? errors.title.message
+                                        : "Title"
+                                }
+                                className={
+                                    errors.title
+                                        ? "placeholder:text-red-400"
+                                        : ""
+                                }
                             />
                             <div className="font-bold text-2xl mt-2">
                                 Date/Location:
                             </div>
                             <input
                                 type="text"
-                                value={dateLocation}
-                                onChange={(e) => {
-                                    setDateLocation(e.target.value);
-                                }}
+                                {...register("dateLocation")}
+                                placeholder="Date/Location"
                             />
                             <div>
                                 <div className="flex gap-4 w-full mt-2">
@@ -484,6 +523,7 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                         </PopoverContent>
                                     </Popover>
                                     <button
+                                        type="button"
                                         onClick={() =>
                                             setPreviewText(!previewText)
                                         }
@@ -493,15 +533,26 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                 </div>
                                 {previewText ? (
                                     <div className="min-h-80">
-                                        <Markdown>{copy}</Markdown>
+                                        <Markdown>{getValues("copy")}</Markdown>
                                     </div>
                                 ) : (
                                     <textarea
-                                        className="h-80"
-                                        value={copy}
-                                        onChange={(e) => {
-                                            setCopy(e.target.value);
-                                        }}
+                                        {...register("copy", {
+                                            required: {
+                                                value: true,
+                                                message: "Detail is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errors.copy
+                                                ? errors.copy.message
+                                                : "Detail"
+                                        }
+                                        className={`${
+                                            errors.copy
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        } h-80`}
                                     />
                                 )}
                             </div>
@@ -514,16 +565,20 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                 </em>
                             </div>
                             <div className="flex flex-wrap gap-4 mt-2">
-                                {tags.map((tag: string, index: number) => {
-                                    return (
-                                        <Chip
-                                            onClick={() => removeTag(index)}
-                                            className="cursor-pointer"
-                                            key={tag + "-" + index}>
-                                            {tag}
-                                        </Chip>
-                                    );
-                                })}
+                                {tagsFields.map(
+                                    (tag: CaseStudyTagType, index: number) => {
+                                        return (
+                                            <Chip
+                                                onClick={() =>
+                                                    tagsRemove(index)
+                                                }
+                                                className="cursor-pointer"
+                                                key={tag.text + "-" + index}>
+                                                {tag.text}
+                                            </Chip>
+                                        );
+                                    }
+                                )}
                             </div>
                             <div className="font-bold text-2xl mt-5">
                                 New Tag:
@@ -539,9 +594,11 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                 />
 
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         if (newTag !== "") {
-                                            setTags([...tags, newTag]);
+                                            tagsAppend({ text: newTag });
+
                                             setNewTag("");
                                         }
                                     }}
@@ -553,18 +610,11 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                 Order:
                             </div>
                             <div className="w-1/4">
-                                <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={!Number.isNaN(order) ? order : ""}
-                                    onChange={(e) => {
-                                        setOrder(parseInt(e.target.value));
-                                    }}
-                                />
+                                <input type="number" {...register("order")} />
                             </div>
                         </div>
                     </div>
-                </>
+                </form>
             )}
 
             {/* Change video modal */}
@@ -654,7 +704,7 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {availableVideos.map(
+                                    {props.videos.map(
                                         (video: any, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
@@ -687,21 +737,23 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                         </div>
                                                         <div className="text-center truncate">
                                                             {
-                                                                video.name
-                                                                    .split(
-                                                                        "_"
-                                                                    )[1]
-                                                                    .split(
-                                                                        "-"
-                                                                    )[0]
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setVideo(
-                                                                        video.name
+                                                                    setValue(
+                                                                        "video",
+                                                                        video.name,
+                                                                        {
+                                                                            shouldDirty:
+                                                                                true,
+                                                                        }
                                                                     );
+
                                                                     onClose();
                                                                     setVideoNamingError(
                                                                         false
@@ -722,10 +774,13 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {video ? (
+                                {getValues("video") ? (
                                     <button
                                         onClick={() => {
-                                            setVideo("");
+                                            setValue("video", "", {
+                                                shouldDirty: true,
+                                            });
+
                                             onClose();
                                             setNotVideoError(false);
                                             setVideoNamingError(false);
@@ -843,7 +898,7 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                    {availableImages.map(
+                                    {props.images.map(
                                         (image: any, index: number) => {
                                             if (
                                                 image.name.split("_")[0] ===
@@ -858,10 +913,10 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                         }
                                                         className="flex cursor-pointer"
                                                         onClick={() => {
-                                                            setImages([
-                                                                ...images,
-                                                                image.name,
-                                                            ]);
+                                                            imageAppend({
+                                                                url: image.name,
+                                                            });
+
                                                             onClose();
                                                         }}>
                                                         <Image
@@ -986,7 +1041,7 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                    {availableImages.map(
+                                    {props.images.map(
                                         (image: any, index: number) => {
                                             if (
                                                 image.name.split("_")[0] ===
@@ -1001,9 +1056,15 @@ export default function NewCaseStudy(props: { segmentId: number }) {
                                                         }
                                                         className="flex cursor-pointer"
                                                         onClick={() => {
-                                                            setVideoThumbnail(
-                                                                image.name
+                                                            setValue(
+                                                                "videoThumbnail",
+                                                                image.name,
+                                                                {
+                                                                    shouldDirty:
+                                                                        true,
+                                                                }
                                                             );
+
                                                             onClose();
                                                         }}>
                                                         <Image

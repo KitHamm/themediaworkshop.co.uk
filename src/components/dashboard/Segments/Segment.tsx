@@ -26,7 +26,7 @@ import EditCaseStudy from "../CaseStudy/EditCaseStudy";
 import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 
 // Types
-import { CaseStudy, Images, Segment } from "@prisma/client";
+import { CaseStudy, Images, Segment, Videos } from "@prisma/client";
 import { toLink } from "@prisma/client";
 
 export type ImageFormType = {
@@ -67,6 +67,7 @@ export default function EditSegment(props: {
     title: string;
     images: Images[];
     caseStudies: CaseStudy[];
+    videos: Videos[];
 }) {
     // Form
     const segmentForm = useForm<SegmentFormType>();
@@ -1114,6 +1115,18 @@ export default function EditSegment(props: {
                                 </ModalHeader>
                                 <ModalBody>
                                     <NewCaseStudy
+                                        images={props.images}
+                                        videos={props.videos}
+                                        studyCount={
+                                            props.caseStudies.filter(function (
+                                                caseStudy: CaseStudy
+                                            ) {
+                                                return (
+                                                    caseStudy.segmentId ===
+                                                    props.segment.id
+                                                );
+                                            }).length
+                                        }
                                         segmentId={props.segment.id as number}
                                     />
                                 </ModalBody>
