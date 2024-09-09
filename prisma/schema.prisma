@@ -42,9 +42,9 @@ model Page {
     subTitle String?
     header String?
     description String?
-    video String?
-    showreel String?
-    year String?
+    backgroundVideo String?
+    video1 String?
+    video2 String?
     segment Segment[]
     videoOneButtonText String? @default("")
     videoTwoButtonText String? @default("")

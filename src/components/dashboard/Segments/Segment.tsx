@@ -43,7 +43,6 @@ export default function EditSegment(props: {
     segment: ExtendedSegment;
     index: number;
     title: string;
-    revalidateDashboard: any;
 }) {
     // Pre populate state for title and c opy if present
     const [title, setTitle] = useState(
@@ -234,11 +233,6 @@ export default function EditSegment(props: {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    if (props.title === "home") {
-                        props.revalidateDashboard("/");
-                    } else {
-                        props.revalidateDashboard("/" + props.title);
-                    }
                 }
             })
             .catch((err) => console.log(err));
@@ -314,11 +308,7 @@ export default function EditSegment(props: {
                 id: props.segment.id,
                 value: value,
             })
-            .then((res) => {
-                if (res.status === 201) {
-                    props.revalidateDashboard("/");
-                }
-            })
+            .then((res) => {})
             .catch((err) => console.log(err));
     }
 
@@ -329,11 +319,6 @@ export default function EditSegment(props: {
                 if (res.data.message) {
                     setDeleteError(false);
                     setDeleteSuccess(true);
-                    if (props.title === "home") {
-                        props.revalidateDashboard("/");
-                    } else {
-                        props.revalidateDashboard("/" + props.title);
-                    }
                 } else if (res.data.error) {
                     setDeleteError(true);
                     setDeleteSuccess(false);
@@ -1043,9 +1028,6 @@ export default function EditSegment(props: {
                                         onOpenChangeEditCaseStudy={
                                             onOpenChangeEditCaseStudy
                                         }
-                                        revalidateDashboard={
-                                            props.revalidateDashboard
-                                        }
                                         caseStudy={
                                             props.segment.casestudy[
                                                 selectedCaseStudy
@@ -1077,9 +1059,6 @@ export default function EditSegment(props: {
                                 <ModalBody>
                                     <NewCaseStudy
                                         segmentId={props.segment.id as number}
-                                        revalidateDashboard={
-                                            props.revalidateDashboard
-                                        }
                                     />
                                 </ModalBody>
                                 <ModalFooter>

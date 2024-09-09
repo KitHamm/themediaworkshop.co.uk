@@ -25,11 +25,7 @@ import { Images } from "@prisma/client";
 // Functions
 import axios from "axios";
 
-export default function NewSegment(props: {
-    revalidateDashboard: any;
-    title: string;
-    pageID: number;
-}) {
+export default function NewSegment(props: { title: string; pageID: number }) {
     // States for title, copy and order of segment
     const [title, setTitle] = useState("");
     const [copy, setCopy] = useState("");
@@ -154,11 +150,6 @@ export default function NewSegment(props: {
                     setCopy("");
                     setHeaderImage("");
                     setImages([]);
-                    if (props.title === "home") {
-                        props.revalidateDashboard("/");
-                    } else {
-                        props.revalidateDashboard("/" + props.title);
-                    }
                 }
             })
             .catch((err) => console.log(err));

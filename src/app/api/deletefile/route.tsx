@@ -23,13 +23,13 @@ export async function POST(request: Request) {
         where: { videoThumbnail: fileName },
     });
     const pageBackground: Page[] = await prisma.page.findMany({
-        where: { video: fileName },
+        where: { backgroundVideo: fileName },
     });
     const pageShowreel: Page[] = await prisma.page.findMany({
-        where: { showreel: fileName },
+        where: { video1: fileName },
     });
     const pageYear: Page[] = await prisma.page.findMany({
-        where: { year: fileName },
+        where: { video2: fileName },
     });
     const segmentVideos: Segment[] = await prisma.segment.findMany({
         where: { video: { has: fileName } },

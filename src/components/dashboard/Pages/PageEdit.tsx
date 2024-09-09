@@ -14,6 +14,7 @@ import {
     PopoverTrigger,
     PopoverContent,
 } from "@nextui-org/react";
+import { useForm } from "react-hook-form";
 
 // Components
 import EditSegment from "../Segments/Segment";
@@ -33,6 +34,18 @@ interface ExtendedPage extends Page {
 interface ExtendedSegment extends Segment {
     casestudy: CaseStudy[];
 }
+export type PageFormType = {
+    page: string;
+    subTitle: string;
+    description: string;
+    header: string;
+    video1: string;
+    video2: string;
+    backgroundVideo: string;
+    videoOneButtonText: string;
+    videoTwoButtonText: string;
+};
+
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
@@ -40,36 +53,16 @@ import axios from "axios";
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
 import Link from "next/link";
+import { UpdatePage } from "@/components/server/pageActions/updatePage";
 
+// Constants
 const accordionBaseHeight = "3.5rem";
 
 export default function PageEdit(props: {
     data: ExtendedPage;
     hidden: boolean;
-    revalidateDashboard: any;
+    videos: Videos[];
 }) {
-    // If page has description and header set initial state of description and header
-    const [description, setDescription] = useState(
-        props.data.description ? props.data.description : ""
-    );
-    const [header, setHeader] = useState(
-        props.data.header ? props.data.header : ""
-    );
-    const [subTitle, setSubTitle] = useState(
-        props.data.subTitle ? props.data.subTitle : ""
-    );
-    // States of background video and showreel
-    const [videoOne, setVideoOne] = useState(props.data.video);
-    const [videoTwo, setVideoTwo] = useState(props.data.showreel);
-    const [videoOneButtonText, setVideoOneButtonText] = useState(
-        props.data.videoOneButtonText
-    );
-    const [videoTwoButtonText, setVideoTwoButtonText] = useState(
-        props.data.videoTwoButtonText
-    );
-
-    const [year, setYear] = useState(props.data.year);
-
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
     const [notVideoError, setNotVideoError] = useState(false);
@@ -84,13 +77,37 @@ export default function PageEdit(props: {
     // Notification Settings
     const [notifications, setNotifications] = useContext(NotificationsContext);
     // State to hold available videos and video selected for video view modal
-    const [videos, setVideos] = useState<Videos[]>([]);
     const [previewVideo, setPreviewVideo] = useState("");
 
     // Upload Progress
     const [uploadProgress, setUploadProgress] = useState(0);
 
+    // Segment Accordion Ref
     const accordionItem = useRef<HTMLDivElement[]>([]);
+
+    // Form Declarations
+    const pageForm = useForm<PageFormType>({
+        defaultValues: {
+            page: props.data.title,
+            subTitle: props.data.subTitle ? props.data.subTitle : "",
+            description: props.data.description ? props.data.description : "",
+            header: props.data.header ? props.data.header : "",
+            video1: props.data.video1 ? props.data.video1 : "",
+            video2: props.data.video2 ? props.data.video2 : "",
+            backgroundVideo: props.data.backgroundVideo
+                ? props.data.backgroundVideo
+                : "",
+            videoOneButtonText: props.data.videoOneButtonText
+                ? props.data.videoOneButtonText
+                : "",
+            videoTwoButtonText: props.data.videoTwoButtonText
+                ? props.data.videoTwoButtonText
+                : "",
+        },
+    });
+    const { register, handleSubmit, formState, getValues, setValue, reset } =
+        pageForm;
+    const { isDirty } = formState;
 
     // New segment modal declaration
     const {
@@ -99,23 +116,16 @@ export default function PageEdit(props: {
         onOpenChange: onOpenChangeAddSegment,
     } = useDisclosure();
     // Background video preview modal declaration
-    const {
-        isOpen: isOpenVideoModal,
-        onOpen: onOpenVideoModal,
-        onOpenChange: onOpenChangeVideoModal,
-    } = useDisclosure();
+    const { isOpen: isOpenVideoModal, onOpenChange: onOpenChangeVideoModal } =
+        useDisclosure();
     // Showreel preview modal declaration
     const {
         isOpen: isOpenShowreelModal,
-        onOpen: onOpenShowreelModal,
         onOpenChange: onOpenChangeShowreelModal,
     } = useDisclosure();
     // Year In Review preview modal declaration
-    const {
-        isOpen: isOpenYearModal,
-        onOpen: onOpenYearModal,
-        onOpenChange: onOpenChangeYearModal,
-    } = useDisclosure();
+    const { isOpen: isOpenYearModal, onOpenChange: onOpenChangeYearModal } =
+        useDisclosure();
     // Video pool modal for selecting background video declaration
     const {
         isOpen: isOpenSelectVideo,
@@ -137,7 +147,6 @@ export default function PageEdit(props: {
     // View already selected video modal
     const {
         isOpen: isOpenPreviewVideo,
-        onOpen: onOpenPreviewVideo,
         onOpenChange: onOpenChangePreviewVideo,
     } = useDisclosure();
 
@@ -156,18 +165,9 @@ export default function PageEdit(props: {
         return false;
     }
 
-    // Constant check for changes on the page
+    // Check for form changes
     useEffect(() => {
-        if (
-            subTitle !== props.data.subTitle ||
-            description !== props.data.description ||
-            header !== props.data.header ||
-            videoOne !== props.data.video ||
-            videoTwo !== props.data.showreel ||
-            videoOneButtonText !== props.data.videoOneButtonText ||
-            videoTwoButtonText !== props.data.videoTwoButtonText ||
-            year !== props.data.year
-        ) {
+        if (isDirty) {
             if (
                 !checkNotifications({
                     component: "Page",
@@ -190,35 +190,7 @@ export default function PageEdit(props: {
             setNotifications(_temp);
             setChanges(false);
         }
-    }, [
-        subTitle,
-        description,
-        header,
-        videoOne,
-        videoTwo,
-        videoOneButtonText,
-        videoTwoButtonText,
-        year,
-        props.data.subTitle,
-        props.data.description,
-        props.data.header,
-        props.data.video,
-        props.data.showreel,
-        props.data.videoOneButtonText,
-        props.data.videoTwoButtonText,
-        props.data.year,
-    ]);
-
-    function discardChanges() {
-        setSubTitle(props.data.subTitle ? props.data.subTitle : "");
-        setDescription(props.data.description ? props.data.description : "");
-        setHeader(props.data.header ? props.data.header : "");
-        setVideoOne(props.data.video);
-        setVideoTwo(props.data.showreel);
-        setVideoOneButtonText(props.data.videoOneButtonText);
-        setVideoTwoButtonText(props.data.videoTwoButtonText);
-        setYear(props.data.year);
-    }
+    }, [isDirty]);
 
     function namingErrorCheck(fileName: string, check: string) {
         if (fileName.split("_")[0] === check) {
@@ -253,60 +225,34 @@ export default function PageEdit(props: {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        getVideos();
                     }
                 })
                 .catch((err) => console.log(err));
         }
     }
 
-    async function getVideos() {
-        props.revalidateDashboard("/");
-        axios
-            .get("/api/video")
-            .then((res) => setVideos(res.data))
-            .catch((err) => console.log(err));
-    }
-
     // Pre populate data with update Page information
-    function handleUpdate() {
-        let _temp = [];
-        for (let i = 0; i < notifications.length; i++) {
-            if (notifications[i].title !== props.data.title) {
-                _temp.push(notifications[i]);
-            }
-        }
-        setNotifications(_temp);
-        setChanges(false);
-        const json = {
-            subTitle: subTitle,
-            description: description,
-            header: header,
-            video: videoOne,
-            showreel: videoTwo,
-            year: year,
-            videoOneButtonText: videoOneButtonText,
-            videoTwoButtonText: videoTwoButtonText,
-        };
-        updatePage(json);
-    }
-
-    // Update page information with pre populated data
-    async function updatePage(json: any) {
-        axios
-            .post("/api/page", {
-                action: "update",
-                id: props.data.id as number,
-                data: json,
-            })
+    function handleUpdate(data: PageFormType) {
+        UpdatePage(data)
             .then((res) => {
-                if (res.status === 201) {
-                    if (props.data.title === "home") {
-                        props.revalidateDashboard("/");
-                    } else {
-                        props.revalidateDashboard("/" + props.data.title);
-                    }
-                }
+                const json: Page = JSON.parse(res.message);
+                reset({
+                    page: props.data.title,
+                    subTitle: json.subTitle ? json.subTitle : "",
+                    description: json.description ? json.description : "",
+                    header: json.header ? json.header : "",
+                    video1: json.video1 ? json.video1 : "",
+                    video2: json.video2 ? json.video2 : "",
+                    backgroundVideo: json.backgroundVideo
+                        ? json.backgroundVideo
+                        : "",
+                    videoOneButtonText: json.videoOneButtonText
+                        ? json.videoOneButtonText
+                        : "",
+                    videoTwoButtonText: json.videoTwoButtonText
+                        ? json.videoTwoButtonText
+                        : "",
+                });
             })
             .catch((err) => console.log(err));
     }
@@ -370,12 +316,15 @@ export default function PageEdit(props: {
                 )}
             </div>
             <div className="">
-                <div id="top" className="xl:grid xl:grid-cols-2 xl:gap-10">
+                <form
+                    onSubmit={handleSubmit(handleUpdate)}
+                    id="top"
+                    className="xl:grid xl:grid-cols-2 xl:gap-10">
                     <div id="left-column">
                         <div className="border-b pb-2 mb-4">Page Videos</div>
                         <div className="grid xl:grid-cols-3 grid-cols-2 grid-cols-1 gap-4 xl:gap-10 min-h-20 xl:mb-0 mb-4">
                             <div>
-                                {videoTwo ? (
+                                {getValues("video1") ? (
                                     <>
                                         <div className="text-center">
                                             Video 1
@@ -394,17 +343,13 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center truncate">
-                                            {
-                                                videoTwo
-                                                    .split("_")[1]
-                                                    .split("-")[0]
-                                            }
+                                            {getValues("video1").split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectShowreel();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -421,9 +366,9 @@ export default function PageEdit(props: {
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectShowreel();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -433,7 +378,7 @@ export default function PageEdit(props: {
                                 )}
                             </div>
                             <div>
-                                {year ? (
+                                {getValues("video2") ? (
                                     <>
                                         <div className="text-center">
                                             Video 2
@@ -452,13 +397,13 @@ export default function PageEdit(props: {
                                             />
                                         </div>
                                         <div className="text-center truncate">
-                                            {year.split("_")[1].split("-")[0]}
+                                            {getValues("video2").split("-")[0]}
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectYear();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -475,9 +420,9 @@ export default function PageEdit(props: {
                                         </div>
                                         <div className="text-center mt-2">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectYear();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -487,7 +432,7 @@ export default function PageEdit(props: {
                                 )}
                             </div>
                             <div className="">
-                                {videoOne ? (
+                                {getValues("backgroundVideo") ? (
                                     <>
                                         <div className="text-center">
                                             Background
@@ -507,16 +452,16 @@ export default function PageEdit(props: {
                                         </div>
                                         <div className="text-center truncate">
                                             {
-                                                videoOne
-                                                    .split("_")[1]
-                                                    .split("-")[0]
+                                                getValues(
+                                                    "backgroundVideo"
+                                                ).split("-")[0]
                                             }
                                         </div>
                                         <div className="text-center mt-2 mt-2">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectVideo();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -533,9 +478,9 @@ export default function PageEdit(props: {
                                         </div>
                                         <div className="text-center mt-2 h-full">
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     onOpenSelectVideo();
-                                                    getVideos();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -551,10 +496,7 @@ export default function PageEdit(props: {
                                     Video One Button Text <em>(Left)</em>
                                 </div>
                                 <input
-                                    value={videoOneButtonText as string}
-                                    onChange={(e) =>
-                                        setVideoOneButtonText(e.target.value)
-                                    }
+                                    {...register("videoOneButtonText")}
                                     className="text-black"
                                     type="text"
                                     placeholder="SHOWREEL"
@@ -565,10 +507,7 @@ export default function PageEdit(props: {
                                     Video Two Button Text <em>(Middle)</em>
                                 </div>
                                 <input
-                                    value={videoTwoButtonText as string}
-                                    onChange={(e) =>
-                                        setVideoTwoButtonText(e.target.value)
-                                    }
+                                    {...register("videoTwoButtonText")}
                                     className="text-black"
                                     placeholder="YEAR REVIEW"
                                     type="text"
@@ -582,10 +521,7 @@ export default function PageEdit(props: {
                                 <div className="border-b pb-2 mb-2">Header</div>
                                 <input
                                     placeholder="Title"
-                                    value={header}
-                                    onChange={(e) => setHeader(e.target.value)}
-                                    id={"header-" + props.data.title}
-                                    name={"header-" + props.data.title}
+                                    {...register("header")}
                                     type="text"
                                     className="text-black"
                                 />
@@ -597,8 +533,7 @@ export default function PageEdit(props: {
                             </div>
                             <input
                                 className="text-black"
-                                value={subTitle}
-                                onChange={(e) => setSubTitle(e.target.value)}
+                                {...register("subTitle")}
                                 type="text"
                             />
                         </div>
@@ -637,23 +572,23 @@ export default function PageEdit(props: {
                                     </PopoverContent>
                                 </Popover>
                                 <button
-                                    onClick={() => setPreviewText(!previewText)}
+                                    type="button"
+                                    onClick={() => {
+                                        setPreviewText(!previewText);
+                                    }}
                                     className="text-orange-600 cursor-pointer">
                                     {previewText ? "Edit" : "Preview"}
                                 </button>
                             </div>
                             {previewText ? (
                                 <div className="h-52">
-                                    <Markdown>{description}</Markdown>
+                                    <Markdown>
+                                        {getValues("description")}
+                                    </Markdown>
                                 </div>
                             ) : (
                                 <textarea
-                                    value={description ? description : ""}
-                                    onChange={(e) => {
-                                        setDescription(e.target.value);
-                                    }}
-                                    name={"description-" + props.data.title}
-                                    id={"description-" + props.data.title}
+                                    {...register("description")}
                                     className="text-black h-52"
                                 />
                             )}
@@ -661,16 +596,16 @@ export default function PageEdit(props: {
                             <div className="flex justify-end gap-4">
                                 {changes && (
                                     <button
-                                        onClick={() => discardChanges()}
+                                        type="button"
+                                        onClick={() => {
+                                            reset();
+                                        }}
                                         className="px-2 text-orange-400 hover:text-red-400">
                                         Discard
                                     </button>
                                 )}
                                 <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleUpdate();
-                                    }}
+                                    type="submit"
                                     disabled={!changes}
                                     className="disabled:cursor-not-allowed disabled:bg-neutral-400 bg-green-400 disabled:text-black rounded-md xl:px-4 xl:py-2 px-2 py-1">
                                     Update
@@ -678,7 +613,7 @@ export default function PageEdit(props: {
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
                 <div id="segments">
                     <div className="flex gap-5 border-b pb-2 mt-10 mb-2">
                         <div className="font-bold text-2xl">Segments</div>
@@ -738,9 +673,6 @@ export default function PageEdit(props: {
                                     </div>
                                     <div className="px-4">
                                         <EditSegment
-                                            revalidateDashboard={
-                                                props.revalidateDashboard
-                                            }
                                             title={props.data.title}
                                             segment={segment}
                                             index={index}
@@ -750,48 +682,6 @@ export default function PageEdit(props: {
                             );
                         }
                     )}
-
-                    {/* <Accordion selectionMode="single" variant="splitted">
-                        {props.data.segment.map(
-                            (segment: Segment, index: number) => {
-                                return (
-                                    <AccordionItem
-                                        className="dark"
-                                        startContent={
-                                            segment.published ? (
-                                                <div className="text-green-600 font-bold">
-                                                    LIVE
-                                                </div>
-                                            ) : (
-                                                <div className="text-red-400 font-bold">
-                                                    DRAFT
-                                                </div>
-                                            )
-                                        }
-                                        key={index}
-                                        aria-label={segment.title}
-                                        title={
-                                            <div className="text-sm xl:text-base">
-                                                {segment.title
-                                                    ? segment.title
-                                                    : "Untitled Segment"}
-                                            </div>
-                                        }>
-                                        <div key={segment.title + "-" + index}>
-                                            <EditSegment
-                                                revalidateDashboard={
-                                                    props.revalidateDashboard
-                                                }
-                                                title={props.data.title}
-                                                segment={segment}
-                                                index={index}
-                                            />
-                                        </div>
-                                    </AccordionItem>
-                                );
-                            }
-                        )}
-                    </Accordion> */}
                 </div>
             </div>
             {/* Add segment modal */}
@@ -812,9 +702,6 @@ export default function PageEdit(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <NewSegment
-                                    revalidateDashboard={
-                                        props.revalidateDashboard
-                                    }
                                     title={props.data.title}
                                     pageID={props.data.id}
                                 />
@@ -898,7 +785,7 @@ export default function PageEdit(props: {
                                     src={
                                         process.env
                                             .NEXT_PUBLIC_BASE_VIDEO_URL! +
-                                        videoOne
+                                        getValues("backgroundVideo")
                                     }
                                 />
                             </ModalBody>
@@ -917,7 +804,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Preview showreel modal */}
+            {/* Preview video 1 modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -930,7 +817,7 @@ export default function PageEdit(props: {
                         <>
                             <ModalHeader>
                                 <div className="w-full text-center font-bold text-3xl">
-                                    Showreel
+                                    Video 1
                                 </div>
                             </ModalHeader>
                             <ModalBody>
@@ -942,7 +829,7 @@ export default function PageEdit(props: {
                                     src={
                                         process.env
                                             .NEXT_PUBLIC_BASE_VIDEO_URL! +
-                                        videoOne
+                                        getValues("video1")
                                     }
                                 />
                             </ModalBody>
@@ -961,7 +848,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Preview Year Video Modal */}
+            {/* Preview Video 2 Modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -974,7 +861,7 @@ export default function PageEdit(props: {
                         <>
                             <ModalHeader>
                                 <div className="w-full text-center font-bold text-3xl">
-                                    Year In Review
+                                    Video 2
                                 </div>
                             </ModalHeader>
                             <ModalBody>
@@ -985,7 +872,8 @@ export default function PageEdit(props: {
                                     controls={true}
                                     src={
                                         process.env
-                                            .NEXT_PUBLIC_BASE_VIDEO_URL! + year
+                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
+                                        getValues("video2")
                                     }
                                 />
                             </ModalBody>
@@ -1085,7 +973,7 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {videos.map(
+                                    {props.videos.map(
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
@@ -1118,20 +1006,21 @@ export default function PageEdit(props: {
                                                         </div>
                                                         <div className="text-center truncate">
                                                             {
-                                                                video.name
-                                                                    .split(
-                                                                        "_"
-                                                                    )[1]
-                                                                    .split(
-                                                                        "-"
-                                                                    )[0]
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setVideoOne(
-                                                                        video.name
+                                                                    setValue(
+                                                                        "backgroundVideo",
+                                                                        video.name,
+                                                                        {
+                                                                            shouldDirty:
+                                                                                true,
+                                                                        }
                                                                     );
                                                                     onClose();
                                                                     setBackgroundNamingError(
@@ -1150,10 +1039,12 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {videoOne ? (
+                                {getValues("backgroundVideo") ? (
                                     <button
                                         onClick={() => {
-                                            setVideoOne("");
+                                            setValue("backgroundVideo", "", {
+                                                shouldDirty: true,
+                                            });
                                             onClose();
                                             setNotVideoError(false);
                                             setBackgroundNamingError(false);
@@ -1179,7 +1070,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Change showreel video modal */}
+            {/* Change Video 1 video modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -1259,7 +1150,7 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {videos.map(
+                                    {props.videos.map(
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
@@ -1292,21 +1183,23 @@ export default function PageEdit(props: {
                                                         </div>
                                                         <div className="text-center truncate">
                                                             {
-                                                                video.name
-                                                                    .split(
-                                                                        "_"
-                                                                    )[1]
-                                                                    .split(
-                                                                        "-"
-                                                                    )[0]
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setVideoTwo(
-                                                                        video.name
+                                                                    setValue(
+                                                                        "video1",
+                                                                        video.name,
+                                                                        {
+                                                                            shouldDirty:
+                                                                                true,
+                                                                        }
                                                                     );
+
                                                                     onClose();
                                                                     setShowreelNamingError(
                                                                         false
@@ -1327,10 +1220,12 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {videoTwo ? (
+                                {getValues("video1") ? (
                                     <button
                                         onClick={() => {
-                                            setVideoTwo("");
+                                            setValue("video1", "", {
+                                                shouldDirty: true,
+                                            });
                                             onClose();
                                             setNotVideoError(false);
                                             setShowreelNamingError(false);
@@ -1356,7 +1251,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Change year in review video modal */}
+            {/* Change video 2 modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -1436,7 +1331,7 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {videos.map(
+                                    {props.videos.map(
                                         (video: Videos, index: number) => {
                                             if (
                                                 video.name.split("_")[0] ===
@@ -1469,19 +1364,16 @@ export default function PageEdit(props: {
                                                         </div>
                                                         <div className="text-center truncate">
                                                             {
-                                                                video.name
-                                                                    .split(
-                                                                        "_"
-                                                                    )[1]
-                                                                    .split(
-                                                                        "-"
-                                                                    )[0]
+                                                                video.name.split(
+                                                                    "-"
+                                                                )[0]
                                                             }
                                                         </div>
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setYear(
+                                                                    setValue(
+                                                                        "video2",
                                                                         video.name
                                                                     );
                                                                     onClose();
@@ -1504,10 +1396,12 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                {year ? (
+                                {getValues("video2") ? (
                                     <button
                                         onClick={() => {
-                                            setYear("");
+                                            setValue("video2", "", {
+                                                shouldDirty: true,
+                                            });
                                             onClose();
                                             setNotVideoError(false);
                                             setYearNamingError(false);

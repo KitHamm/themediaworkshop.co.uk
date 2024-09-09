@@ -25,7 +25,6 @@ import axios from "axios";
 
 export default function EditCaseStudy(props: {
     caseStudy: CaseStudy;
-    revalidateDashboard: any;
     onOpenChangeEditCaseStudy: any;
     onClose: any;
     setSelectedCaseStudy: any;
@@ -223,11 +222,7 @@ export default function EditCaseStudy(props: {
                 id: props.caseStudy.id as number,
                 data: json,
             })
-            .then((res) => {
-                if (res.status === 201) {
-                    props.revalidateDashboard("/");
-                }
-            })
+            .then((res) => {})
             .catch((err) => console.log(err));
     }
     async function deleteCaseStudy() {
@@ -238,7 +233,6 @@ export default function EditCaseStudy(props: {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/");
                     onOpenChangeDelete();
                     props.onOpenChangeEditCaseStudy();
                 }
@@ -286,11 +280,7 @@ export default function EditCaseStudy(props: {
                 id: props.caseStudy.id,
                 value: value,
             })
-            .then((res) => {
-                if (res.status === 201) {
-                    props.revalidateDashboard("/");
-                }
-            })
+            .then((res) => {})
             .catch((err) => console.log(err));
     }
 

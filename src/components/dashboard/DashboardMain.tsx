@@ -129,7 +129,7 @@ export default function DashboardMain(props: {
                 <Pages
                     hidden={view === "pages" ? false : true}
                     data={props.data}
-                    revalidateDashboard={props.revalidateDashboard}
+                    videos={props.videos}
                 />
                 {/* Media pool view */}
                 <Media

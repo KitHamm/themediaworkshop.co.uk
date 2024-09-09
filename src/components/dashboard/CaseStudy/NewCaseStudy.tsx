@@ -23,10 +23,7 @@ import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import axios from "axios";
 
-export default function NewCaseStudy(props: {
-    revalidateDashboard: any;
-    segmentId: number;
-}) {
+export default function NewCaseStudy(props: { segmentId: number }) {
     // States for initial case study content
     const [title, setTitle] = useState("");
     const [dateLocation, setDateLocation] = useState("");
@@ -169,7 +166,6 @@ export default function NewCaseStudy(props: {
                     setVideo("");
                     setTags([]);
                     setOrder(0);
-                    props.revalidateDashboard("/");
                 }
             })
             .catch((err) => console.log(err));

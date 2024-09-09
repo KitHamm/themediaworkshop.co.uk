@@ -38,7 +38,7 @@ export default function MainHeader(props: {
             <section
                 id="bg-video-container"
                 className="relative top-0 left-0 w-full h-screen overflow-hidden">
-                {props.data.video ? (
+                {props.data.backgroundVideo ? (
                     <>
                         <video
                             ref={video}
@@ -54,7 +54,7 @@ export default function MainHeader(props: {
                             loop
                             src={
                                 process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                props.data?.video
+                                props.data.backgroundVideo
                             }
                         />
                         <div
@@ -81,8 +81,8 @@ export default function MainHeader(props: {
                     description={
                         props.data.description ? props.data.description : ""
                     }
-                    showreel={props.data.showreel ? props.data.showreel : ""}
-                    year={props.data.year ? props.data.year : ""}
+                    showreel={props.data.video1 ? props.data.video1 : ""}
+                    year={props.data.video2 ? props.data.video2 : ""}
                     videoOneButtonText={
                         props.data.videoOneButtonText
                             ? props.data.videoOneButtonText

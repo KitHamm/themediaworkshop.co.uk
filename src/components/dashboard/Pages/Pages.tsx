@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Page, Segment, CaseStudy } from "@prisma/client";
+import { Page, Segment, CaseStudy, Videos } from "@prisma/client";
 interface ExtendedPage extends Page {
     segment: ExtendedSegment[];
 }
@@ -21,7 +21,7 @@ interface ExtendedSegment extends Segment {
 export default function Pages(props: {
     hidden: boolean;
     data: ExtendedPage[];
-    revalidateDashboard: any;
+    videos: Videos[];
 }) {
     // State list of background videos
     // Search params for which page edit to display
@@ -94,19 +94,31 @@ export default function Pages(props: {
                         Art
                     </Link>
                 </div>
-                {/* Pre load all page edits and hide non selected */}
-                {props.data.map((page: ExtendedPage, index: number) => {
-                    return (
-                        <div key={index}>
-                            <PageEdit
-                                revalidateDashboard={props.revalidateDashboard}
-                                data={page}
-                                hidden={pageEdit === page.title ? false : true}
-                            />
-                        </div>
-                    );
-                })}
+                {/* Render the correct edit page depending on selection */}
+                <PageEditConditionRender
+                    pageEdit={pageEdit}
+                    pages={props.data}
+                    videos={props.videos}
+                />
             </div>
         </>
     );
+}
+
+function PageEditConditionRender(props: {
+    pageEdit: string;
+    pages: ExtendedPage[];
+    videos: Videos[];
+}) {
+    const [pageData, setPageData] = useState<ExtendedPage>(props.pages[0]);
+
+    useEffect(() => {
+        for (let i = 0; i < props.pages.length; i++) {
+            if (props.pages[i].title === props.pageEdit) {
+                setPageData(props.pages[i]);
+            }
+        }
+    }, [props.pageEdit]);
+
+    return <PageEdit data={pageData} hidden={false} videos={props.videos} />;
 }
