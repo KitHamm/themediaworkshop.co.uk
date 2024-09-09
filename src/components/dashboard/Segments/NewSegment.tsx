@@ -13,30 +13,68 @@ import {
     PopoverContent,
 } from "@nextui-org/react";
 import Markdown from "react-markdown";
+import { useFieldArray, useForm } from "react-hook-form";
+
 // React Components
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Next Components
 import Image from "next/image";
 
 // Types
-import { Images } from "@prisma/client";
+import { Images, toLink } from "@prisma/client";
+import { ImageFormType, SegmentFormType } from "./Segment";
 
 // Functions
 import axios from "axios";
+import { CreateSegment } from "@/components/server/segmentActions/createSegment";
 
-export default function NewSegment(props: { title: string; pageID: number }) {
-    // States for title, copy and order of segment
-    const [title, setTitle] = useState("");
-    const [copy, setCopy] = useState("");
-    const [order, setOrder] = useState(0);
+export default function NewSegment(props: {
+    title: string;
+    pageID: number;
+    images: Images[];
+    segmentCount: number;
+}) {
+    const newSegmentForm = useForm<SegmentFormType>({
+        defaultValues: {
+            title: "",
+            copy: "",
+            image: [],
+            video: [],
+            headerImage: "",
+            order: props.segmentCount + 1,
+            buttonText: "",
+            linkTo: toLink.NONE,
+        },
+    });
+    const {
+        register,
+        reset,
+        handleSubmit,
+        formState: { errors, isDirty },
+        control,
+        getValues,
+        setValue,
+    } = newSegmentForm;
+
+    const {
+        fields: imageFields,
+        append: imageAppend,
+        remove: imageRemove,
+    } = useFieldArray({
+        control: control,
+        name: "image",
+    });
+    const {
+        fields: videoFields,
+        append: videoAppend,
+        remove: videoRemove,
+    } = useFieldArray({
+        control: control,
+        name: "video",
+    });
 
     // State for images selected and header image for segment
-    const [images, setImages] = useState<string[]>([]);
-    const [headerImage, setHeaderImage] = useState("");
-
-    // State for images from image media pool
-    const [availableImages, setAvailableImages] = useState<Images[]>([]);
 
     // State for naming convention errors on upload
     const [topImageNamingError, setTopImageNamingError] = useState(false);
@@ -57,20 +95,6 @@ export default function NewSegment(props: { title: string; pageID: number }) {
     const { isOpen: isOpenAddImage, onOpenChange: onOpenChangeAddImage } =
         useDisclosure();
 
-    async function getImages() {
-        axios
-            .get("/api/image")
-            .then((res) => {
-                setAvailableImages(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function removeImage(index: number) {
-        setImages(
-            images.filter((_image: string, _index: number) => _index !== index)
-        );
-    }
     function clearFileInput(target: string) {
         var id = target === "header" ? "top-image-input" : "image-input";
         const inputElm = document.getElementById(id) as HTMLInputElement;
@@ -114,10 +138,11 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                     if (res.data.message) {
                         setUploading(false);
                         if (target === "header") {
-                            setHeaderImage(res.data.message);
+                            setValue("headerImage", res.data.message, {
+                                shouldDirty: true,
+                            });
                             clearFileInput(target);
                         } else {
-                            getImages();
                             clearFileInput(target);
                         }
                     }
@@ -126,30 +151,13 @@ export default function NewSegment(props: { title: string; pageID: number }) {
         }
     }
 
-    async function addSegment() {
-        axios
-            .post("/api/segment", {
-                action: "create",
-                data: {
-                    title: title,
-                    copy: copy,
-                    headerimage: headerImage,
-                    image: images,
-                    order: order,
-                    page: {
-                        connect: {
-                            id: props.pageID,
-                        },
-                    },
-                },
-            })
+    function addSegment(data: SegmentFormType) {
+        CreateSegment(data, props.pageID)
             .then((res) => {
-                if (res.status === 201) {
+                if (res.status === 200) {
                     setSuccess(true);
-                    setTitle("");
-                    setCopy("");
-                    setHeaderImage("");
-                    setImages([]);
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -163,282 +171,325 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                 </div>
             ) : (
                 <div className="light rounded-md xl:px-5 mb-4 py-4">
-                    <div className="flex justify-between border-b pb-2">
-                        <div className="">Top Image</div>
-                    </div>
-                    <div className="relative my-2">
-                        {headerImage !== "" ? (
-                            <div>
-                                <Image
-                                    height={2000}
-                                    width={1000}
-                                    src={
-                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                                        headerImage
-                                    }
-                                    alt={headerImage}
-                                    className="w-full h-auto m-auto"
-                                />
-                                <div className="hover:opacity-100 flex justify-center transition-opacity opacity-0 absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-                                    <div className="m-auto flex w-1/2 justify-evenly">
-                                        <div className="w-1/2 text-center">
-                                            <i
-                                                onClick={() => {
-                                                    onOpenChangeTopImage();
-                                                    getImages();
-                                                }}
-                                                aria-hidden
-                                                className="fa-solid cursor-pointer fa-pen-to-square fa-2xl"
-                                            />
-                                        </div>
-                                        <div className="w-1/2 text-center">
-                                            <i
-                                                onClick={() =>
-                                                    setHeaderImage("")
-                                                }
-                                                aria-hidden
-                                                className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="w-full grid xl:grid-cols-2 xl:gap-0 gap-4 my-10">
-                                {uploading ? (
-                                    <CircularProgress
-                                        classNames={{
-                                            svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                            value: "text-xl",
-                                        }}
-                                        className="m-auto"
-                                        showValueLabel={true}
-                                        value={uploadProgress}
-                                        color="warning"
-                                        aria-label="Loading..."
-                                    />
-                                ) : (
-                                    <>
-                                        <div>
-                                            {topImageNamingError && (
-                                                <div className="text-center text-red-400">
-                                                    File name should be prefixed
-                                                    with SEGHEAD_
-                                                </div>
-                                            )}
-                                            <div className="file-input">
-                                                <input
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            if (
-                                                                namingConventionCheck(
-                                                                    e.target
-                                                                        .files[0]
-                                                                        .name,
-                                                                    "SEGHEAD"
-                                                                )
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                setTopImageNamingError(
-                                                                    false
-                                                                );
-                                                                uploadImage(
-                                                                    e.target
-                                                                        .files[0],
-                                                                    "header"
-                                                                );
-                                                            } else {
-                                                                setTopImageNamingError(
-                                                                    true
-                                                                );
-                                                                clearFileInput(
-                                                                    "header"
-                                                                );
-                                                            }
-                                                        }
-                                                    }}
-                                                    id={"top-image-input"}
-                                                    type="file"
-                                                    className="inputFile"
-                                                />
-                                                <label
-                                                    className="mx-auto"
-                                                    htmlFor={"top-image-input"}>
-                                                    Upload New
-                                                </label>
-                                            </div>
-                                            <div className="w-full text-center text-red-400">
-                                                {notImageError
-                                                    ? "Please upload media in Image format"
-                                                    : ""}
-                                            </div>
-                                        </div>
-                                        <div className="text-center">
-                                            <button
-                                                onClick={() => {
-                                                    onOpenChangeTopImage();
-                                                    getImages();
-                                                }}
-                                                className="bg-orange-600 py-3 px-20 rounded shadow-xl">
-                                                Select
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                    <div className="xl:grid xl:grid-cols-2 xl:gap-10 ">
-                        <div id={"left-segment-column"}>
-                            <div>
-                                <div className="border-b pb-2 mb-2">Title</div>
-                                <input
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    type="text"
-                                    className="text-black"
-                                />
-                            </div>
-                            <div>
-                                <div className="flex gap-4 w-full border-b pb-2 mb-2">
-                                    <div>Description</div>
-                                    <Popover
-                                        className="dark"
-                                        placement="right-end">
-                                        <PopoverTrigger>
-                                            <i
-                                                aria-hidden
-                                                className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
-                                            />
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <div className="text-left p-2 xl:w-96">
-                                                <div className="font-bold text-xl border-b pb-2 mb-2">
-                                                    Text Info
-                                                </div>
-                                                <p className="mb-2">
-                                                    The text is rendered using
-                                                    Markdown. This means that
-                                                    you can add headers, links,
-                                                    and line breaks
-                                                </p>
-                                                <p className="mb-2">
-                                                    **Header** (bold text)
-                                                </p>
-                                                <p className="mb-2">
-                                                    [Link Text
-                                                    Here](https://link-here.com/)
-                                                </p>
-                                                <p>New line\</p>
-                                                <p>\</p>
-                                                <p>New Paragraph</p>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <button
-                                        onClick={() =>
-                                            setPreviewText(!previewText)
-                                        }
-                                        className="text-orange-600 cursor-pointer">
-                                        {previewText ? "Edit" : "Preview"}
-                                    </button>
-                                </div>
-                                {previewText ? (
-                                    <div className="min-h-52">
-                                        <Markdown>{copy}</Markdown>
-                                    </div>
-                                ) : (
-                                    <textarea
-                                        value={copy}
-                                        onChange={(e) =>
-                                            setCopy(e.target.value)
-                                        }
-                                        className="text-black h-52"
-                                        name=""
-                                        id=""
-                                    />
-                                )}
-                            </div>
-                            <div>
-                                <div className="border-b pb-2 mb-2">Order</div>
-                                <div className="xl:w-1/6 w-1/2">
-                                    <input
-                                        value={
-                                            !Number.isNaN(order) ? order : ""
-                                        }
-                                        onChange={(e) =>
-                                            setOrder(parseInt(e.target.value))
-                                        }
-                                        className="text-black"
-                                        type="number"
-                                    />
-                                </div>
-                            </div>
+                    <form onSubmit={handleSubmit(addSegment)}>
+                        <div className="flex justify-between border-b pb-2">
+                            <div className="">Top Image</div>
                         </div>
-                        <div className={"right-segment-column"}>
-                            <div className="">
-                                <div className="border-b pb-2">Images</div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
-                                    {images.map(
-                                        (image: string, index: number) => {
-                                            return (
-                                                <div
-                                                    key={image + "-" + index}
-                                                    className="relative">
-                                                    <Image
-                                                        height={100}
-                                                        width={100}
-                                                        src={
-                                                            process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                            image
-                                                        }
-                                                        alt={image}
-                                                        className="w-full h-auto"
-                                                    />
-                                                    <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-                                                        <div className="text-red-400 h-full flex justify-center">
-                                                            <i
-                                                                onClick={() =>
-                                                                    removeImage(
-                                                                        index
+                        <div className="relative my-2">
+                            {getValues("headerImage") ? (
+                                <div>
+                                    <Image
+                                        height={2000}
+                                        width={1000}
+                                        src={
+                                            process.env
+                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                            getValues("headerImage")
+                                        }
+                                        alt={getValues("headerImage")}
+                                        className="w-full h-auto m-auto"
+                                    />
+                                    <div className="hover:opacity-100 flex justify-center transition-opacity opacity-0 absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                        <div className="m-auto flex w-1/2 justify-evenly">
+                                            <div className="w-1/2 text-center">
+                                                <i
+                                                    onClick={() => {
+                                                        onOpenChangeTopImage();
+                                                    }}
+                                                    aria-hidden
+                                                    className="fa-solid cursor-pointer fa-pen-to-square fa-2xl"
+                                                />
+                                            </div>
+                                            <div className="w-1/2 text-center">
+                                                <i
+                                                    onClick={() => {
+                                                        setValue(
+                                                            "headerImage",
+                                                            "",
+                                                            {
+                                                                shouldDirty:
+                                                                    true,
+                                                            }
+                                                        );
+                                                    }}
+                                                    aria-hidden
+                                                    className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="w-full grid xl:grid-cols-2 xl:gap-0 gap-4 my-10">
+                                    {uploading ? (
+                                        <CircularProgress
+                                            classNames={{
+                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
+                                                value: "text-xl",
+                                            }}
+                                            className="m-auto"
+                                            showValueLabel={true}
+                                            value={uploadProgress}
+                                            color="warning"
+                                            aria-label="Loading..."
+                                        />
+                                    ) : (
+                                        <>
+                                            <div>
+                                                {topImageNamingError && (
+                                                    <div className="text-center text-red-400">
+                                                        File name should be
+                                                        prefixed with SEGHEAD_
+                                                    </div>
+                                                )}
+                                                <div className="file-input">
+                                                    <input
+                                                        onChange={(e) => {
+                                                            if (
+                                                                e.target.files
+                                                            ) {
+                                                                if (
+                                                                    namingConventionCheck(
+                                                                        e.target
+                                                                            .files[0]
+                                                                            .name,
+                                                                        "SEGHEAD"
                                                                     )
+                                                                ) {
+                                                                    setUploading(
+                                                                        true
+                                                                    );
+                                                                    setTopImageNamingError(
+                                                                        false
+                                                                    );
+                                                                    uploadImage(
+                                                                        e.target
+                                                                            .files[0],
+                                                                        "header"
+                                                                    );
+                                                                } else {
+                                                                    setTopImageNamingError(
+                                                                        true
+                                                                    );
+                                                                    clearFileInput(
+                                                                        "header"
+                                                                    );
                                                                 }
-                                                                aria-hidden
-                                                                className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-                                                            />
+                                                            }
+                                                        }}
+                                                        id={"top-image-input"}
+                                                        type="file"
+                                                        className="inputFile"
+                                                    />
+                                                    <label
+                                                        className="mx-auto"
+                                                        htmlFor={
+                                                            "top-image-input"
+                                                        }>
+                                                        Upload New
+                                                    </label>
+                                                </div>
+                                                <div className="w-full text-center text-red-400">
+                                                    {notImageError
+                                                        ? "Please upload media in Image format"
+                                                        : ""}
+                                                </div>
+                                            </div>
+                                            <div className="text-center">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        onOpenChangeTopImage();
+                                                    }}
+                                                    className="bg-orange-600 py-3 px-20 rounded shadow-xl">
+                                                    Select
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div className="xl:grid xl:grid-cols-2 xl:gap-10 ">
+                            <div id={"left-segment-column"}>
+                                <div>
+                                    <div className="border-b pb-2 mb-2">
+                                        Title
+                                    </div>
+                                    <input
+                                        {...register("title", {
+                                            required: {
+                                                value: true,
+                                                message: "Title is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errors.title
+                                                ? errors.title.message
+                                                : "Title"
+                                        }
+                                        type="text"
+                                        className={`${
+                                            errors.title
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        } text-black`}
+                                    />
+                                </div>
+                                <div>
+                                    <div className="flex gap-4 w-full border-b pb-2 mb-2">
+                                        <div>Description</div>
+                                        <Popover
+                                            className="dark"
+                                            placement="right-end">
+                                            <PopoverTrigger>
+                                                <i
+                                                    aria-hidden
+                                                    className="fa-solid fa-circle-info fa-xl cursor-pointer my-auto"
+                                                />
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <div className="text-left p-2 xl:w-96">
+                                                    <div className="font-bold text-xl border-b pb-2 mb-2">
+                                                        Text Info
+                                                    </div>
+                                                    <p className="mb-2">
+                                                        The text is rendered
+                                                        using Markdown. This
+                                                        means that you can add
+                                                        headers, links, and line
+                                                        breaks
+                                                    </p>
+                                                    <p className="mb-2">
+                                                        **Header** (bold text)
+                                                    </p>
+                                                    <p className="mb-2">
+                                                        [Link Text
+                                                        Here](https://link-here.com/)
+                                                    </p>
+                                                    <p>New line\</p>
+                                                    <p>\</p>
+                                                    <p>New Paragraph</p>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setPreviewText(!previewText)
+                                            }
+                                            className="text-orange-600 cursor-pointer">
+                                            {previewText ? "Edit" : "Preview"}
+                                        </button>
+                                    </div>
+                                    {previewText ? (
+                                        <div className="min-h-52">
+                                            <Markdown>
+                                                {getValues("copy")}
+                                            </Markdown>
+                                        </div>
+                                    ) : (
+                                        <textarea
+                                            {...register("copy", {
+                                                required: {
+                                                    value: true,
+                                                    message:
+                                                        "Description is required.",
+                                                },
+                                            })}
+                                            placeholder={
+                                                errors.copy
+                                                    ? errors.copy.message
+                                                    : "Description"
+                                            }
+                                            className={`${
+                                                errors.copy
+                                                    ? "placeholder:text-red-400"
+                                                    : ""
+                                            } text-black h-52`}
+                                        />
+                                    )}
+                                </div>
+                                <div>
+                                    <div className="border-b pb-2 mb-2">
+                                        Order
+                                    </div>
+                                    <div className="xl:w-1/6 w-1/2">
+                                        <input
+                                            {...register("order")}
+                                            className="text-black"
+                                            type="number"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={"right-segment-column"}>
+                                <div className="">
+                                    <div className="border-b pb-2">Images</div>
+                                    <div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
+                                        {imageFields.map(
+                                            (
+                                                image: ImageFormType,
+                                                index: number
+                                            ) => {
+                                                return (
+                                                    <div
+                                                        key={
+                                                            image + "-" + index
+                                                        }
+                                                        className="relative">
+                                                        <Image
+                                                            height={100}
+                                                            width={100}
+                                                            src={
+                                                                process.env
+                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                image.url
+                                                            }
+                                                            alt={image.url}
+                                                            className="w-full h-auto"
+                                                        />
+                                                        <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+                                                            <div className="text-red-400 h-full flex justify-center">
+                                                                <i
+                                                                    onClick={() =>
+                                                                        imageRemove(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                    aria-hidden
+                                                                    className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-                                    <div
-                                        onClick={() => {
-                                            onOpenChangeAddImage();
-                                            getImages();
-                                        }}
-                                        className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
-                                        <div className="flex h-full justify-center">
-                                            <i
-                                                aria-hidden
-                                                className="m-auto fa-solid fa-plus fa-2xl"
-                                            />
+                                                );
+                                            }
+                                        )}
+                                        <div
+                                            onClick={() => {
+                                                onOpenChangeAddImage();
+                                            }}
+                                            className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
+                                            <div className="flex h-full justify-center">
+                                                <i
+                                                    aria-hidden
+                                                    className="m-auto fa-solid fa-plus fa-2xl"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <button
-                            onClick={addSegment}
-                            className="px-4 py-2 bg-orange-600 rounded">
-                            Submit
-                        </button>
-                    </div>
+                        <div className="flex justify-end">
+                            <Button
+                                type="submit"
+                                className="disabled:bg-neutral-400 px-4 py-2 bg-orange-600 rounded text-white">
+                                Submit
+                            </Button>
+                        </div>
+                    </form>
                     {/* Top Image modal */}
                     <Modal
                         size="5xl"
@@ -453,16 +504,21 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                     <ModalHeader>{"Top Image"}</ModalHeader>
                                     <ModalBody>
                                         <div className="grid xl:grid-cols-4 grid-cols-1 gap-5">
-                                            {availableImages.map(
-                                                (
-                                                    image: Images,
-                                                    index: number
-                                                ) => {
-                                                    if (
+                                            {props.images
+                                                .filter(function (
+                                                    image: Images
+                                                ) {
+                                                    return (
                                                         image.name.split(
                                                             "_"
                                                         )[0] === "SEGHEAD"
-                                                    )
+                                                    );
+                                                })
+                                                .map(
+                                                    (
+                                                        image: Images,
+                                                        index: number
+                                                    ) => {
                                                         return (
                                                             <div
                                                                 key={
@@ -471,11 +527,17 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                                                     index
                                                                 }
                                                                 className="flex cursor-pointer"
-                                                                onClick={() =>
-                                                                    setHeaderImage(
-                                                                        image.name
-                                                                    )
-                                                                }>
+                                                                onClick={() => {
+                                                                    setValue(
+                                                                        "headerImage",
+                                                                        image.name,
+                                                                        {
+                                                                            shouldDirty:
+                                                                                true,
+                                                                        }
+                                                                    );
+                                                                    onClose();
+                                                                }}>
                                                                 <Image
                                                                     height={300}
                                                                     width={300}
@@ -492,8 +554,8 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                                                 />
                                                             </div>
                                                         );
-                                                }
-                                            )}
+                                                    }
+                                                )}
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>
@@ -592,16 +654,21 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                             )}
                                         </div>
                                         <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                            {availableImages.map(
-                                                (
-                                                    image: Images,
-                                                    index: number
-                                                ) => {
-                                                    if (
+                                            {props.images
+                                                .filter(function (
+                                                    image: Images
+                                                ) {
+                                                    return (
                                                         image.name.split(
                                                             "_"
                                                         )[0] === "SEGMENT"
-                                                    )
+                                                    );
+                                                })
+                                                .map(
+                                                    (
+                                                        image: Images,
+                                                        index: number
+                                                    ) => {
                                                         return (
                                                             <div
                                                                 key={
@@ -611,10 +678,11 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                                                 }
                                                                 className="flex cursor-pointer"
                                                                 onClick={() => {
-                                                                    setImages([
-                                                                        ...images,
-                                                                        image.name,
-                                                                    ]);
+                                                                    imageAppend(
+                                                                        {
+                                                                            url: image.name,
+                                                                        }
+                                                                    );
                                                                     onClose();
                                                                 }}>
                                                                 <Image
@@ -633,8 +701,8 @@ export default function NewSegment(props: { title: string; pageID: number }) {
                                                                 />
                                                             </div>
                                                         );
-                                                }
-                                            )}
+                                                    }
+                                                )}
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>

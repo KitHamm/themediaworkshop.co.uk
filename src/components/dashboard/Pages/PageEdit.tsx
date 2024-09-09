@@ -714,6 +714,16 @@ export default function PageEdit(props: {
                             </ModalHeader>
                             <ModalBody>
                                 <NewSegment
+                                    segmentCount={
+                                        props.segments.filter(function (
+                                            segment: Segment
+                                        ) {
+                                            return (
+                                                segment.pageId === props.data.id
+                                            );
+                                        }).length
+                                    }
+                                    images={props.images}
                                     title={props.data.title}
                                     pageID={props.data.id}
                                 />

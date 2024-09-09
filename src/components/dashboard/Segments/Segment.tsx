@@ -29,11 +29,11 @@ import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 import { CaseStudy, Images, Segment } from "@prisma/client";
 import { toLink } from "@prisma/client";
 
-type ImageFormType = {
+export type ImageFormType = {
     url: string;
 };
 
-type VideoFormType = {
+export type VideoFormType = {
     url: string;
 };
 export type SegmentFormType = {
@@ -59,7 +59,7 @@ import {
     UpdateSegment,
     UpdateSegmentPublish,
 } from "@/components/server/segmentActions/updateSegment";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
+import { DeleteSegment } from "@/components/server/segmentActions/deleteSegment";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -319,19 +319,16 @@ export default function EditSegment(props: {
     }
 
     async function deleteSegment() {
-        //  TODO
-        axios
-            .post("/api/segment", { action: "delete", id: props.segment.id })
-            .then((res) => {
-                if (res.data.message) {
-                    setDeleteError(false);
-                    setDeleteSuccess(true);
-                } else if (res.data.error) {
-                    setDeleteError(true);
-                    setDeleteSuccess(false);
-                }
-            })
-            .catch((err) => console.log(err));
+        DeleteSegment(props.segment.id).then((res) => {
+            if (res.status === 200) {
+                setDeleteError(false);
+                setDeleteSuccess(true);
+            } else {
+                setDeleteError(true);
+                setDeleteSuccess(false);
+                console.log(res.message);
+            }
+        });
     }
 
     return (
