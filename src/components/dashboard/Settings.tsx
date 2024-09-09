@@ -55,7 +55,6 @@ export default function Settings(props: {
     hidden: boolean;
     session: any;
     emailHost: string;
-    revalidateDashboard: any;
 }) {
     // Search params for if modal open from side panel click
     const searchParams = useSearchParams();
@@ -250,9 +249,9 @@ export default function Settings(props: {
                 },
             })
             .then((res) => {
-                if (res.status === 201) {
-                    props.revalidateDashboard("/api/settings");
-                }
+                // if (res.status === 201) {
+                //     props.revalidateDashboard("/api/settings");
+                // }
             })
             .catch((err) => console.log(err));
     }

@@ -27,7 +27,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 // Types
-import { CaseStudy, Page, Segment, Videos } from "@prisma/client";
+import { CaseStudy, Images, Page, Segment, Videos } from "@prisma/client";
 interface ExtendedPage extends Page {
     segment: ExtendedSegment[];
 }
@@ -59,9 +59,11 @@ import { UpdatePage } from "@/components/server/pageActions/updatePage";
 const accordionBaseHeight = "3.5rem";
 
 export default function PageEdit(props: {
-    data: ExtendedPage;
-    hidden: boolean;
+    data: Page;
     videos: Videos[];
+    images: Images[];
+    segments: Segment[];
+    caseStudies: CaseStudy[];
 }) {
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
@@ -258,6 +260,14 @@ export default function PageEdit(props: {
     }
 
     function toggleAccordion(index: number) {
+        // const accordion = document.getElementById("accordion-" + index);
+        // if (accordion) {
+        //     if (accordion.style.height === accordionBaseHeight) {
+        //         accordion.style.height = accordion?.scrollHeight + "px";
+        //     } else {
+        //         accordion.style.height = accordionBaseHeight;
+        //     }
+        // }
         for (let i = 0; i < accordionItem.current.length; i++) {
             if (accordionItem.current[i].id === "accordion-" + index) {
                 if (
@@ -283,10 +293,7 @@ export default function PageEdit(props: {
     }
 
     return (
-        <div
-            className={`${
-                props.hidden ? "hidden" : ""
-            } xl:mx-20 fade-in mb-10  xl:pb-0 pb-16`}>
+        <div className={`xl:mx-20 fade-in mb-10  xl:pb-0 pb-16`}>
             <div className="my-10 border-b py-4 flex justify-between">
                 <div className="hover:text-orange-600 transition-all font-bold capitalize">
                     <Link
@@ -623,8 +630,11 @@ export default function PageEdit(props: {
                             Add Segment
                         </button>
                     </div>
-                    {props.data.segment.map(
-                        (segment: ExtendedSegment, index: number) => {
+                    {props.segments
+                        .filter(function (segment: Segment) {
+                            return segment.pageId === props.data.id;
+                        })
+                        .map((segment: Segment, index: number) => {
                             return (
                                 <div
                                     id={"accordion-" + index}
@@ -635,7 +645,8 @@ export default function PageEdit(props: {
                                     style={{ height: accordionBaseHeight }}
                                     className={`drop-shadow-kg overflow-hidden transition-all rounded-lg mx-2 mb-2 bg-zinc-800`}>
                                     <div
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             toggleAccordion(index);
                                         }}
                                         className="xl:hover:bg-neutral-700 truncate transition-all w-full h-14 cursor-pointer flex px-4 gap-4">
@@ -676,12 +687,13 @@ export default function PageEdit(props: {
                                             title={props.data.title}
                                             segment={segment}
                                             index={index}
+                                            images={props.images}
+                                            caseStudies={props.caseStudies}
                                         />
                                     </div>
                                 </div>
                             );
-                        }
-                    )}
+                        })}
                 </div>
             </div>
             {/* Add segment modal */}

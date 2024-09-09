@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Page, Segment, CaseStudy, Videos } from "@prisma/client";
+import { Page, Segment, CaseStudy, Videos, Images } from "@prisma/client";
 interface ExtendedPage extends Page {
     segment: ExtendedSegment[];
 }
@@ -20,8 +20,11 @@ interface ExtendedSegment extends Segment {
 }
 export default function Pages(props: {
     hidden: boolean;
-    data: ExtendedPage[];
+    data: Page[];
     videos: Videos[];
+    images: Images[];
+    segments: Segment[];
+    caseStudies: CaseStudy[];
 }) {
     // State list of background videos
     // Search params for which page edit to display
@@ -99,6 +102,9 @@ export default function Pages(props: {
                     pageEdit={pageEdit}
                     pages={props.data}
                     videos={props.videos}
+                    images={props.images}
+                    segments={props.segments}
+                    caseStudies={props.caseStudies}
                 />
             </div>
         </>
@@ -107,11 +113,13 @@ export default function Pages(props: {
 
 function PageEditConditionRender(props: {
     pageEdit: string;
-    pages: ExtendedPage[];
+    pages: Page[];
     videos: Videos[];
+    images: Images[];
+    segments: Segment[];
+    caseStudies: CaseStudy[];
 }) {
-    const [pageData, setPageData] = useState<ExtendedPage>(props.pages[0]);
-
+    const [pageData, setPageData] = useState<Page>(props.pages[0]);
     useEffect(() => {
         for (let i = 0; i < props.pages.length; i++) {
             if (props.pages[i].title === props.pageEdit) {
@@ -120,5 +128,13 @@ function PageEditConditionRender(props: {
         }
     }, [props.pageEdit]);
 
-    return <PageEdit data={pageData} hidden={false} videos={props.videos} />;
+    return (
+        <PageEdit
+            segments={props.segments}
+            images={props.images}
+            data={pageData}
+            videos={props.videos}
+            caseStudies={props.caseStudies}
+        />
+    );
 }

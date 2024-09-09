@@ -57,8 +57,7 @@ type notification = {
 export const NotificationsContext = createContext<any>([]);
 
 export default function DashboardMain(props: {
-    data: ExtendedPage[];
-    revalidateDashboard: any;
+    data: Page[];
     session: any;
     messages: Message[];
     emailHost: emailHost;
@@ -66,6 +65,8 @@ export default function DashboardMain(props: {
     images: Images[];
     logos: Logos[];
     requests: serviceRequest[];
+    segments: Segment[];
+    caseStudies: CaseStudy[];
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -130,22 +131,22 @@ export default function DashboardMain(props: {
                     hidden={view === "pages" ? false : true}
                     data={props.data}
                     videos={props.videos}
+                    images={props.images}
+                    segments={props.segments}
+                    caseStudies={props.caseStudies}
                 />
                 {/* Media pool view */}
                 <Media
                     session={props.session}
-                    revalidateDashboard={props.revalidateDashboard}
                     hidden={view === "media" ? false : true}
                 />
                 {/* Messages view */}
                 <Messages
                     messages={props.messages}
-                    revalidateDashboard={props.revalidateDashboard}
                     hidden={view === "messages" ? false : true}
                 />
                 {/* Settings view */}
                 <Settings
-                    revalidateDashboard={props.revalidateDashboard}
                     emailHost={props.emailHost.emailHost}
                     session={props.session}
                     hidden={view === "settings" ? false : true}

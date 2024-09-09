@@ -21,7 +21,6 @@ import axios from "axios";
 
 export default function Messages(props: {
     hidden: boolean;
-    revalidateDashboard: any;
     messages: Message[];
 }) {
     // State for all messages once received
@@ -50,7 +49,6 @@ export default function Messages(props: {
             .post("/api/message", { action: "delete", id: multipleMessages })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/dashboard");
                     setSelectedMessage(-1);
                     setMultipleMessages([]);
                 }
@@ -63,7 +61,6 @@ export default function Messages(props: {
             .post("/api/message", { action: "delete", id: [id] })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/dashboard");
                     setSelectedMessage(-1);
                     setMultipleMessages([]);
                 }
@@ -80,7 +77,6 @@ export default function Messages(props: {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/");
                     setMultipleMessages([]);
                 }
             })
@@ -92,7 +88,6 @@ export default function Messages(props: {
             .post("/api/message", { action: "update", id: [id], value: value })
             .then((res) => {
                 if (res.status === 201) {
-                    props.revalidateDashboard("/");
                     setMultipleMessages([]);
                 }
             })
@@ -120,9 +115,9 @@ export default function Messages(props: {
                 <div className="border-b flex gap-10 w-full py-4">
                     <div className="flex gap-4">
                         <i
-                            onClick={() =>
-                                props.revalidateDashboard("/dashboard")
-                            }
+                            // onClick={() =>
+                            //     props.revalidateDashboard("/dashboard")
+                            // }
                             aria-hidden
                             className="cursor-pointer fa-solid my-auto fa-2xl fa-arrows-rotate"
                         />

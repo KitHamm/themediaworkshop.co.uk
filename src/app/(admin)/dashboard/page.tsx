@@ -1,3 +1,5 @@
+"use server";
+
 //  Prisma
 import prisma from "@/lib/prisma";
 //  Components
@@ -8,30 +10,23 @@ import { Message, emailHost } from "@prisma/client";
 //  Functions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
-import { revalidatePath } from "next/cache";
 
 export default async function Dashboard() {
     // Function for revalidating the dashboard route as well as the page route that the content relates to
-    async function revalidateDashboard(route: string) {
-        "use server";
-        revalidatePath("/dashboard", "page");
-        revalidatePath(route, "page");
-    }
+
     //  Collect session data
     const session = await getServerSession(authOptions);
     //  Collect all page data including segments and case studies for CMS
     const data = await prisma.page.findMany({
-        orderBy: [
-            {
-                id: "asc",
-            },
-        ],
-        include: {
-            segment: {
-                orderBy: { order: "asc" },
-                include: { casestudy: { orderBy: { order: "asc" } } },
-            },
+        orderBy: {
+            id: "asc",
         },
+    });
+    const segments = await prisma.segment.findMany({
+        orderBy: { order: "asc" },
+    });
+    const caseStudies = await prisma.caseStudy.findMany({
+        orderBy: { order: "asc" },
     });
     const emailHost = await prisma.emailHost.findFirst();
     const messages: Message[] = await prisma.message.findMany({
@@ -56,13 +51,14 @@ export default async function Dashboard() {
             <DashboardMain
                 emailHost={emailHost as emailHost}
                 messages={messages}
-                revalidateDashboard={revalidateDashboard}
                 session={session}
                 data={data}
                 videos={videos}
                 images={images}
                 logos={logos}
                 requests={requests}
+                segments={segments}
+                caseStudies={caseStudies}
             />
         </>
     );

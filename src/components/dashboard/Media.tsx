@@ -39,11 +39,7 @@ const filePrefixList = [
     "THUMBNAIL",
 ];
 
-export default function Media(props: {
-    hidden: boolean;
-    revalidateDashboard: any;
-    session: any;
-}) {
+export default function Media(props: { hidden: boolean; session: any }) {
     // Search Param state to set which videos or images to view
     const searchParams = useSearchParams();
     const videoView: string = searchParams.get("video")
@@ -106,7 +102,6 @@ export default function Media(props: {
     }, []);
 
     async function getVideos() {
-        props.revalidateDashboard("/");
         axios
             .get("/api/video")
             .then((res) => {
@@ -116,8 +111,6 @@ export default function Media(props: {
     }
 
     async function getImages() {
-        props.revalidateDashboard("/");
-
         var images: [] = [];
         var logos: [] = [];
         var temp;
