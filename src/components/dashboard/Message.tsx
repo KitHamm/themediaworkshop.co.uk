@@ -18,13 +18,21 @@ import { useEffect, useState } from "react";
 // Types
 import { Message } from "@prisma/client";
 import axios from "axios";
+import {
+    UpdateMessage,
+    UpdateMultipleMessages,
+} from "../server/messageActions/updateMessage";
+import {
+    DeleteMessage,
+    DeleteMultipleMessages,
+} from "../server/messageActions/deleteMessage";
+import { DateRender } from "../server/functions/dateRender";
 
 export default function Messages(props: {
     hidden: boolean;
     messages: Message[];
 }) {
     // State for all messages once received
-    const [messages, setMessages] = useState<Message[]>([]);
     // State for the selected message to view in modal
     const [selectedMessage, setSelectedMessage] = useState(-1);
     // State for multiple selected messages for actions
@@ -41,54 +49,29 @@ export default function Messages(props: {
 
     // Collect initial messages
     useEffect(() => {
-        setMessages(props.messages);
+        // setMessages(props.messages);
     }, [props.messages]);
 
     async function deleteMultipleMessage() {
-        axios
-            .post("/api/message", { action: "delete", id: multipleMessages })
+        DeleteMultipleMessages(multipleMessages)
             .then((res) => {
-                if (res.status === 201) {
+                if (res.status === 200) {
                     setSelectedMessage(-1);
                     setMultipleMessages([]);
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }
-
-    async function deleteMessage(id: string) {
-        axios
-            .post("/api/message", { action: "delete", id: [id] })
-            .then((res) => {
-                if (res.status === 201) {
-                    setSelectedMessage(-1);
-                    setMultipleMessages([]);
-                }
-            })
-            .catch((err: any) => console.log(err));
-    }
-
-    async function updateMultipleMessage(value: boolean) {
-        axios
-            .post("/api/message", {
-                action: "update",
-                id: multipleMessages,
-                value: value,
-            })
-            .then((res) => {
-                if (res.status === 201) {
-                    setMultipleMessages([]);
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
     }
 
-    async function updateMessage(id: string, value: boolean) {
-        axios
-            .post("/api/message", { action: "update", id: [id], value: value })
+    async function updateMultipleMessage(value: boolean) {
+        UpdateMultipleMessages(multipleMessages, value)
             .then((res) => {
-                if (res.status === 201) {
+                if (res.status === 200) {
                     setMultipleMessages([]);
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -161,23 +144,25 @@ export default function Messages(props: {
                     color="success"
                     onChange={() => selectAll()}
                     isSelected={
+                        multipleMessages.length > 0 &&
                         multipleMessages.length === props.messages.length
                     }
                     className="dark mb-2 ms-2">
-                    {multipleMessages.length === props.messages.length
+                    {multipleMessages.length > 0 &&
+                    multipleMessages.length === props.messages.length
                         ? "Unselect All"
                         : "Select All"}
                 </Checkbox>
             </div>
             <div className="hidden h-full overflow-hidden xl:flex border-2 border-neutral-800 rounded mb-6">
                 <div className="basis-2/6 overflow-y-scroll dark">
-                    {messages.map((message: Message, index: number) => {
+                    {props.messages.map((message: Message, index: number) => {
                         return (
                             <div
                                 key={index}
                                 onClick={() => {
                                     setSelectedMessage(index);
-                                    updateMessage(message.id, true);
+                                    UpdateMessage(message.id, true);
                                 }}
                                 className={`${
                                     index === selectedMessage
@@ -240,7 +225,7 @@ export default function Messages(props: {
                                             ? "text-white"
                                             : "text-neutral-400"
                                     } flex grow justify-end transition-all`}>
-                                    {message.createdAt.toLocaleDateString()}
+                                    {DateRender(message.createdAt)}
                                 </div>
                             </div>
                         );
@@ -260,10 +245,11 @@ export default function Messages(props: {
                                 </div>
                                 <div
                                     onClick={() => {
-                                        updateMessage(
-                                            messages[selectedMessage].id,
+                                        UpdateMessage(
+                                            props.messages[selectedMessage].id,
                                             false
                                         );
+
                                         setSelectedMessage(-1);
                                     }}
                                     className="text-orange-600 cursor-pointer">
@@ -272,7 +258,7 @@ export default function Messages(props: {
                                 <a
                                     href={
                                         "mailto:" +
-                                        messages[selectedMessage].email
+                                        props.messages[selectedMessage].email
                                     }
                                     className="text-green-400">
                                     Reply
@@ -294,7 +280,7 @@ export default function Messages(props: {
                                         From:
                                     </div>
                                     <div className="text-base">
-                                        {messages[selectedMessage].name}
+                                        {props.messages[selectedMessage].name}
                                     </div>
                                 </div>
                                 <div className="flex w-full gap-2 px-4">
@@ -302,12 +288,12 @@ export default function Messages(props: {
                                         Email:
                                     </div>
                                     <div className="text-base">
-                                        {messages[selectedMessage].email}
+                                        {props.messages[selectedMessage].email}
                                     </div>
                                 </div>
                             </div>
                             <div className="mx-4 mt-4 bg-white text-black rounded-lg p-4">
-                                {messages[selectedMessage].message}
+                                {props.messages[selectedMessage].message}
                             </div>
                         </>
                     ) : (
@@ -320,14 +306,14 @@ export default function Messages(props: {
                 </div>
             </div>
             <div className="grid xl:hidden xl:grid-cols-4 xl:gap-10 gap-4 xl:mt-0 mt-4">
-                {messages.map((message: Message, index: number) => {
+                {props.messages.map((message: Message, index: number) => {
                     return (
                         <div
                             onClick={() => {
                                 onOpenChangeMessageModal();
                                 setSelectedMessage(index);
                                 if (!message.read) {
-                                    updateMessage(message.id, true);
+                                    UpdateMessage(message.id, true);
                                 }
                             }}
                             className="cursor-pointer"
@@ -349,9 +335,7 @@ export default function Messages(props: {
                                 </div>
                                 <div>
                                     <strong>Received: </strong>
-                                    {new Date(
-                                        message.createdAt
-                                    ).toLocaleDateString("en-US")}
+                                    {DateRender(message.createdAt)}
                                 </div>
                             </div>
                         </div>
@@ -377,21 +361,24 @@ export default function Messages(props: {
                             <ModalBody>
                                 <div>
                                     <strong>From: </strong>
-                                    {messages[selectedMessage].name}
+                                    {props.messages[selectedMessage].name}
                                 </div>
                                 <div>
                                     <strong>Email: </strong>
-                                    {messages[selectedMessage].email}
+                                    {props.messages[selectedMessage].email}
                                 </div>
                                 <div>
                                     <strong>Message: </strong>
                                 </div>
-                                <div>{messages[selectedMessage].message}</div>
+                                <div>
+                                    {props.messages[selectedMessage].message}
+                                </div>
                                 <div className="mt-4">
                                     <strong>Received: </strong>
-                                    {new Date(
-                                        messages[selectedMessage].createdAt
-                                    ).toLocaleDateString("en-US")}
+                                    {DateRender(
+                                        props.messages[selectedMessage]
+                                            .createdAt
+                                    )}
                                 </div>
                             </ModalBody>
                             <ModalFooter>
@@ -406,8 +393,8 @@ export default function Messages(props: {
                                 </Button>
                                 <Button
                                     onClick={() => {
-                                        updateMessage(
-                                            messages[selectedMessage].id,
+                                        UpdateMessage(
+                                            props.messages[selectedMessage].id,
                                             false
                                         );
                                         onClose();
@@ -457,8 +444,8 @@ export default function Messages(props: {
                                 <Button
                                     onClick={() => {
                                         onClose();
-                                        deleteMessage(
-                                            messages[selectedMessage].id
+                                        DeleteMessage(
+                                            props.messages[selectedMessage].id
                                         );
                                     }}
                                     color="danger"

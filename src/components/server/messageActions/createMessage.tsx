@@ -2,6 +2,7 @@
 
 import { ContactFormTypes } from "@/components/ContactModal";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -978,6 +979,8 @@ export async function CreateMessage(data: ContactFormTypes) {
     </html>
                 `,
             });
+            console.log("validate");
+            revalidatePath("/dashboard", "layout");
             return Promise.resolve({ status: 200, message: "success" });
         } catch (error) {
             return Promise.resolve({

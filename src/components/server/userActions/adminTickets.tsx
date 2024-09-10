@@ -18,7 +18,7 @@ export async function CreateTicket(data: TicketFormType) {
     } catch (err: any) {
         return Promise.resolve({ status: 201, message: err });
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard", "layout");
     }
 }
 
@@ -36,7 +36,7 @@ export async function ResolveTicket(id: string, resolved: boolean) {
     } catch (err: any) {
         return Promise.resolve({ status: 201, message: err });
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard", "layout");
     }
 }
 
@@ -51,6 +51,6 @@ export async function DeleteTicket(id: string) {
     } catch (err: any) {
         return Promise.resolve({ status: 201, message: err });
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard", "layout");
     }
 }

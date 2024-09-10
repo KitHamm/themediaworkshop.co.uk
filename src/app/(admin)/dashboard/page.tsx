@@ -45,6 +45,18 @@ export default async function Dashboard() {
             createdAt: "desc",
         },
     });
+    const users = await prisma.user.findMany({
+        select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+            position: true,
+            image: true,
+            activated: true,
+            role: true,
+        },
+    });
     return (
         <>
             {/* Main dashboard panel with all views available */}
@@ -59,6 +71,7 @@ export default async function Dashboard() {
                 requests={requests}
                 segments={segments}
                 caseStudies={caseStudies}
+                users={users}
             />
         </>
     );

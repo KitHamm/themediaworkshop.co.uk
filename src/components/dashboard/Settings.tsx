@@ -25,7 +25,7 @@ import { signOut } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
 // Types
-type FormValues = {
+export type UserFormTypes = {
     email: string;
     firstName: string;
     lastName: string;
@@ -33,28 +33,23 @@ type FormValues = {
     image: string;
     password: string;
 };
-type PasswordFormValues = {
+export type UserPasswordFormTypes = {
     password: string;
     confirmPassword: string;
     currentPassword: string;
 };
-import { User } from "@prisma/client";
-type UserWithoutPassword = {
-    id: string;
-    name: string;
-    email: string;
-    position: string;
-    image: string;
-    activated: boolean;
-    role: string;
-};
+//  TODO create form for changing password and editing user
 // Function
 import axios from "axios";
+import { UserWithoutPassword } from "../types/customTypes";
+import { CreateUser } from "../server/userActions/createUser";
+import { UpdateEmailHost } from "../server/userActions/updateEmailHost";
 
 export default function Settings(props: {
     hidden: boolean;
     session: any;
     emailHost: string;
+    users: UserWithoutPassword[];
 }) {
     // Search params for if modal open from side panel click
     const searchParams = useSearchParams();
@@ -63,7 +58,7 @@ export default function Settings(props: {
         : "false";
 
     // Initial Users
-    const [users, setUsers] = useState<UserWithoutPassword[]>([]);
+    // const [users, setUsers] = useState<UserWithoutPassword[]>([]);
 
     // User created or error state boolean
     const [userCreated, setUserCreated] = useState(false);
@@ -86,7 +81,7 @@ export default function Settings(props: {
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
 
-    const [avatar, setAvatar] = useState("");
+    // const [avatar, setAvatar] = useState("");
 
     // Password hidden State
     const [passwordHidden, setPasswordHidden] = useState(true);
@@ -132,7 +127,7 @@ export default function Settings(props: {
     } = useDisclosure();
 
     // Form for creating user
-    const form = useForm<FormValues>({
+    const form = useForm<UserFormTypes>({
         defaultValues: {
             email: "",
             firstName: "",
@@ -143,7 +138,7 @@ export default function Settings(props: {
         },
     });
 
-    const passwordChangeForm = useForm<PasswordFormValues>();
+    const passwordChangeForm = useForm<UserPasswordFormTypes>();
     const {
         getValues,
         register: newPassRegister,
@@ -154,36 +149,15 @@ export default function Settings(props: {
     const { errors: newPassErrors } = newPassFormState;
 
     // React Hook Form declarations
-    const { register, handleSubmit, formState, reset } = form;
+    const {
+        register,
+        handleSubmit,
+        formState,
+        reset,
+        setValue,
+        getValues: getValueNewUser,
+    } = form;
     const { errors } = formState;
-
-    // Get initial users and check if modal should open
-    useEffect(() => {
-        getUsers();
-    }, []);
-
-    useEffect(() => {
-        if (modalOpen === "true") {
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].id === props.session.user.id) {
-                    setNewName(users[i].name);
-                    setNewEmail(users[i].email);
-                    setNewRole(users[i].role);
-                    setNewPosition(users[i].position!);
-                    setUserId(users[i].id);
-                    setUserResetId(users[i].id);
-                    OnOpenEditUser();
-                }
-            }
-        }
-    }, [users]);
-
-    async function getUsers() {
-        axios
-            .get("/api/users")
-            .then((res) => setUsers(res.data))
-            .catch((err) => console.log(err));
-    }
 
     async function deleteUser() {
         axios
@@ -194,7 +168,6 @@ export default function Settings(props: {
             .then((res) => {
                 if (res.status === 201) {
                     setUserId("");
-                    getUsers();
                 }
             })
             .catch((err) => {
@@ -222,7 +195,7 @@ export default function Settings(props: {
             .then((res) => {
                 if (res.data.message) {
                     setUploading(false);
-                    setAvatar(res.data.message);
+                    setValue("image", res.data.message);
                     clearFileInput();
                 }
             })
@@ -240,49 +213,30 @@ export default function Settings(props: {
 
     // Update the email host
     async function updateEmailHost() {
-        axios
-            .post("/api/settings", {
-                action: "emailHost",
-                old: props.emailHost,
-                data: {
-                    emailHost: emailHost,
-                },
-            })
-            .then((res) => {
-                // if (res.status === 201) {
-                //     props.revalidateDashboard("/api/settings");
-                // }
-            })
-            .catch((err) => console.log(err));
+        UpdateEmailHost(props.emailHost, emailHost);
     }
 
     // Submit user to database and retrieve password to display one time
-    async function onSubmit(data: FormValues) {
-        axios
-            .post("/api/users", {
-                action: "create",
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                position: data.position,
-                image: avatar,
-                password: randomPassword(10),
-            })
+    async function onSubmit(data: UserFormTypes) {
+        data.password = randomPassword(10);
+        CreateUser(data)
             .then((res) => {
-                if (res.data.message) {
-                    setPassword(res.data.password);
+                if (res.status === 200) {
+                    console.log(res.message);
+                    setPassword(res.message);
                     setUserCreated(true);
-                    getUsers();
                     setError(false);
-                    setAvatar("");
+                    setValue("image", "");
                 } else {
                     setError(true);
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
     }
 
-    async function onSubmitNewPassword(data: PasswordFormValues) {
+    // TODO server action fro changing password
+    async function onSubmitNewPassword(data: UserPasswordFormTypes) {
         axios
             .post("/api/users", {
                 action: "changePassword",
@@ -302,6 +256,7 @@ export default function Settings(props: {
             .catch((err) => console.log(err));
     }
 
+    // TODO server action for resetting password
     async function resetPassword() {
         axios
             .post("/api/users", {
@@ -323,6 +278,7 @@ export default function Settings(props: {
             .catch((err) => console.log(err));
     }
 
+    // TODO server action for updating user
     async function updateUser() {
         axios
             .post("/api/users", {
@@ -342,7 +298,7 @@ export default function Settings(props: {
                     setNewName("");
                     setNewEmail("");
                     setNewRole("");
-                    getUsers();
+                    // getUsers();
                 }
             })
             .catch((err) => console.log(err));
@@ -407,88 +363,101 @@ export default function Settings(props: {
                 {/* Mobile Accordion */}
                 <div className="xl:hidden">
                     <Accordion className="dark" variant="splitted">
-                        {users.map((user: any, index: number) => {
-                            return (
-                                <AccordionItem
-                                    key={index}
-                                    aria-label={user.name}
-                                    startContent={
-                                        <Avatar
-                                            radius="lg"
-                                            src={
-                                                user.image
-                                                    ? process.env
-                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                                      user.image
-                                                    : undefined
-                                            }
-                                        />
-                                    }
-                                    subtitle={
-                                        <div
-                                            className={`${
-                                                user.activated
-                                                    ? "text-green-600"
-                                                    : "text-neutral-600"
-                                            }`}>
-                                            {user.activated
-                                                ? "Activated"
-                                                : "Not Activated"}
+                        {props.users.map(
+                            (user: UserWithoutPassword, index: number) => {
+                                return (
+                                    <AccordionItem
+                                        key={index}
+                                        aria-label={
+                                            user.firstname + " " + user.lastname
+                                        }
+                                        startContent={
+                                            <Avatar
+                                                radius="lg"
+                                                src={
+                                                    user.image
+                                                        ? process.env
+                                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                          user.image
+                                                        : undefined
+                                                }
+                                            />
+                                        }
+                                        subtitle={
+                                            <div
+                                                className={`${
+                                                    user.activated
+                                                        ? "text-green-600"
+                                                        : "text-neutral-600"
+                                                }`}>
+                                                {user.activated
+                                                    ? "Activated"
+                                                    : "Not Activated"}
+                                            </div>
+                                        }
+                                        title={
+                                            user.firstname + " " + user.lastname
+                                        }>
+                                        <div className="px-6 py-2">
+                                            <div className="font-bold text-lg">
+                                                Email:
+                                            </div>
+                                            {user.email}
                                         </div>
-                                    }
-                                    title={user.name}>
-                                    <div className="px-6 py-2">
-                                        <div className="font-bold text-lg">
-                                            Email:
+                                        <div className="px-6 py-2">
+                                            <div className="font-bold text-lg">
+                                                Position:
+                                            </div>
+                                            {user.position}
                                         </div>
-                                        {user.email}
-                                    </div>
-                                    <div className="px-6 py-2">
-                                        <div className="font-bold text-lg">
-                                            Position:
+                                        <div className="px-6 py-2">
+                                            <div className="font-bold text-lg">
+                                                Role:
+                                            </div>
+                                            {user.role}
                                         </div>
-                                        {user.position}
-                                    </div>
-                                    <div className="px-6 py-2">
-                                        <div className="font-bold text-lg">
-                                            Role:
-                                        </div>
-                                        {user.role}
-                                    </div>
-                                    {props.session.user.role === "ADMIN" && (
-                                        <div className="flex justify-end gap-2 my-2">
-                                            <Button
-                                                onPress={() => {
-                                                    setNewName(user.name);
-                                                    setNewEmail(user.email);
-                                                    setNewRole(user.role);
-                                                    setNewPosition(
-                                                        user.position
-                                                    );
-                                                    setUserId(user.id);
-                                                    setUserResetId(user.id);
-                                                    OnOpenEditUser();
-                                                }}
-                                                className="bg-orange-600">
-                                                Edit
-                                            </Button>
-                                            {user.id !==
-                                                props.session.user.id && (
+                                        {props.session.user.role ===
+                                            "ADMIN" && (
+                                            <div className="flex justify-end gap-2 my-2">
                                                 <Button
                                                     onPress={() => {
+                                                        setNewName(
+                                                            user.firstname +
+                                                                " " +
+                                                                user.lastname
+                                                        );
+                                                        setNewEmail(user.email);
+                                                        setNewRole(user.role);
+                                                        setNewPosition(
+                                                            user.position
+                                                                ? user.position
+                                                                : ""
+                                                        );
                                                         setUserId(user.id);
-                                                        deleteOnOpen();
+                                                        setUserResetId(user.id);
+                                                        OnOpenEditUser();
                                                     }}
-                                                    color="danger"
-                                                    variant="light">
-                                                    Delete
+                                                    className="bg-orange-600">
+                                                    Edit
                                                 </Button>
-                                            )}
-                                        </div>
-                                    )}
-                                </AccordionItem>
-                            );
-                        })}
+                                                {user.id !==
+                                                    props.session.user.id && (
+                                                    <Button
+                                                        onPress={() => {
+                                                            setUserId(user.id);
+                                                            deleteOnOpen();
+                                                        }}
+                                                        color="danger"
+                                                        variant="light">
+                                                        Delete
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </AccordionItem>
+                                );
+                            }
+                        )}
                     </Accordion>
                 </div>
                 {/* Desktop Table */}
@@ -524,85 +493,97 @@ export default function Settings(props: {
                         </tr>
                     </thead>
                     <tbody className="text-left bg-neutral-800">
-                        {users.map((user: any, index: number) => {
-                            return (
-                                <tr key={index}>
-                                    <td
-                                        scope="col"
-                                        className={`${
-                                            user.activated
-                                                ? "text-green-600"
-                                                : "text-neutral-600"
-                                        } px-6 py-4`}>
-                                        {user.activated
-                                            ? "Activated"
-                                            : "Not Activated"}
-                                    </td>
-                                    <td
-                                        scope="col"
-                                        className="px-6 py-4 flex gap-2">
-                                        <Avatar
-                                            src={
-                                                user.image
-                                                    ? process.env
-                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                                      user.image
-                                                    : undefined
-                                            }
-                                            size="md"
-                                        />
-                                        <div className="my-auto">
-                                            {user.name}
-                                        </div>
-                                    </td>
-                                    <td scope="col" className="px-6 py-4">
-                                        {user.email}
-                                    </td>
-                                    <td scope="col" className="px-6 py-4">
-                                        {user.position}
-                                    </td>
-                                    <td scope="col" className="px-6 py-4">
-                                        {user.role}
-                                    </td>
+                        {props.users.map(
+                            (user: UserWithoutPassword, index: number) => {
+                                return (
+                                    <tr key={index}>
+                                        <td
+                                            scope="col"
+                                            className={`${
+                                                user.activated
+                                                    ? "text-green-600"
+                                                    : "text-neutral-600"
+                                            } px-6 py-4`}>
+                                            {user.activated
+                                                ? "Activated"
+                                                : "Not Activated"}
+                                        </td>
+                                        <td
+                                            scope="col"
+                                            className="px-6 py-4 flex gap-2">
+                                            <Avatar
+                                                src={
+                                                    user.image
+                                                        ? process.env
+                                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                          user.image
+                                                        : undefined
+                                                }
+                                                size="md"
+                                            />
+                                            <div className="my-auto">
+                                                {user.firstname +
+                                                    " " +
+                                                    user.lastname}
+                                            </div>
+                                        </td>
+                                        <td scope="col" className="px-6 py-4">
+                                            {user.email}
+                                        </td>
+                                        <td scope="col" className="px-6 py-4">
+                                            {user.position}
+                                        </td>
+                                        <td scope="col" className="px-6 py-4">
+                                            {user.role}
+                                        </td>
 
-                                    <td scope="col">
-                                        {props.session.user.role ===
-                                            "ADMIN" && (
-                                            <div
-                                                onClick={() => {
-                                                    setNewName(user.name);
-                                                    setNewEmail(user.email);
-                                                    setNewRole(user.role);
-                                                    setNewPosition(
-                                                        user.position
-                                                    );
-                                                    setUserId(user.id);
-                                                    setUserResetId(user.id);
-                                                    OnOpenEditUser();
-                                                }}
-                                                className="px-6 py-2 text-orange-600 cursor-pointer">
-                                                Edit
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td scope="col">
-                                        {props.session.user.role === "ADMIN" &&
-                                        user.id !== props.session.user.id ? (
-                                            <div
-                                                onClick={() => {
-                                                    setUserId(user.id);
-                                                    deleteOnOpen();
-                                                }}
-                                                className="px-6 py-4 text-red-400 cursor-pointer">
-                                                Delete
-                                            </div>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                                        <td scope="col">
+                                            {props.session.user.role ===
+                                                "ADMIN" && (
+                                                <div
+                                                    onClick={() => {
+                                                        setNewName(
+                                                            user.firstname +
+                                                                " " +
+                                                                user.lastname
+                                                        );
+                                                        setNewEmail(user.email);
+                                                        setNewRole(user.role);
+                                                        setNewPosition(
+                                                            user.position
+                                                                ? user.position
+                                                                : ""
+                                                        );
+                                                        setUserId(user.id);
+                                                        setUserResetId(user.id);
+                                                        OnOpenEditUser();
+                                                    }}
+                                                    className="px-6 py-2 text-orange-600 cursor-pointer">
+                                                    Edit
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td scope="col">
+                                            {props.session.user.role ===
+                                                "ADMIN" &&
+                                            user.id !==
+                                                props.session.user.id ? (
+                                                <div
+                                                    onClick={() => {
+                                                        setUserId(user.id);
+                                                        deleteOnOpen();
+                                                    }}
+                                                    className="px-6 py-4 text-red-400 cursor-pointer">
+                                                    Delete
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            }
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -727,7 +708,8 @@ export default function Settings(props: {
                                                 </div>
                                             )}
                                             <div className="w-full flex justify-center">
-                                                {avatar === "" ? (
+                                                {getValueNewUser("image") ===
+                                                "profile_placeholder.jpg" ? (
                                                     uploading ? (
                                                         <CircularProgress
                                                             classNames={{
@@ -783,8 +765,13 @@ export default function Settings(props: {
                                                                 id="new-avatar"
                                                             />
                                                             <label htmlFor="new-avatar">
-                                                                {avatar !== ""
-                                                                    ? avatar
+                                                                {getValueNewUser(
+                                                                    "image"
+                                                                ) !==
+                                                                "profile_placeholder.jpg"
+                                                                    ? getValueNewUser(
+                                                                          "image"
+                                                                      )
                                                                     : "Select file"}
                                                             </label>
                                                         </div>
@@ -803,11 +790,15 @@ export default function Settings(props: {
                                                                 )[0] as string
                                                             }
                                                             src={
-                                                                avatar
+                                                                getValueNewUser(
+                                                                    "image"
+                                                                )
                                                                     ? process
                                                                           .env
                                                                           .NEXT_PUBLIC_BASE_AVATAR_URL +
-                                                                      avatar
+                                                                      getValueNewUser(
+                                                                          "image"
+                                                                      )
                                                                     : undefined
                                                             }
                                                         />
@@ -823,7 +814,6 @@ export default function Settings(props: {
                                                         onClose();
                                                         reset();
                                                         setPassword("");
-                                                        setAvatar("");
                                                         setUserCreated(false);
                                                     }}>
                                                     Close

@@ -74,10 +74,7 @@ export default async function RootLayout({
                             }
                         />
                     </div>
-                    <div className="xl:basis-5/6 min-h-screen">
-                        {/* Main dashboard panel with all views available */}
-                        {children}
-                    </div>
+                    <div className="xl:basis-5/6 min-h-screen">{children}</div>
                 </main>
             </body>
         </html>

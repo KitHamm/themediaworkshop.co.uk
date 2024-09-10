@@ -36,18 +36,14 @@ import {
     Images,
     Logos,
     serviceRequest,
+    User,
 } from "@prisma/client";
 import NotificationCard from "./NotificationCard";
 import {
     CheckUserActivation,
     UpdateUserActivation,
 } from "../server/userActions/userActivation";
-interface ExtendedPage extends Page {
-    segment: ExtendedSegment[];
-}
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
+import { UserWithoutPassword } from "../types/customTypes";
 
 type notification = {
     component: string;
@@ -67,6 +63,7 @@ export default function DashboardMain(props: {
     requests: serviceRequest[];
     segments: Segment[];
     caseStudies: CaseStudy[];
+    users: UserWithoutPassword[];
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -130,6 +127,7 @@ export default function DashboardMain(props: {
                     requests={props.requests}
                     segments={props.segments}
                     caseStudies={props.caseStudies}
+                    users={props.users}
                 />
                 <Modal
                     isDismissable={false}
@@ -185,6 +183,7 @@ function DashboardSwitchView(props: {
     requests: serviceRequest[];
     segments: Segment[];
     caseStudies: CaseStudy[];
+    users: UserWithoutPassword[];
     view: string;
 }) {
     switch (props.view) {
@@ -226,6 +225,7 @@ function DashboardSwitchView(props: {
                 <Settings
                     emailHost={props.emailHost.emailHost}
                     session={props.session}
+                    users={props.users}
                     hidden={false}
                 />
             );
