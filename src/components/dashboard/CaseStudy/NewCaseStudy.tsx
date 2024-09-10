@@ -100,10 +100,6 @@ export default function NewCaseStudy(props: {
     // States for preview media
     const [selectedPreviewVideo, setSelectedPreviewVideo] = useState("");
 
-    // States for image and video pools
-    // const [availableImages, setAvailableImages] = useState<string[]>([]);
-    // const [availableVideos, setAvailableVideos] = useState<string[]>([]);
-
     // State for preview description text
     const [previewText, setPreviewText] = useState(false);
     // State for if there are unsaved changes

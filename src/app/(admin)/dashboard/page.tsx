@@ -26,7 +26,7 @@ export default async function Dashboard() {
         orderBy: { order: "asc" },
     });
     const caseStudies = await prisma.caseStudy.findMany({
-        orderBy: { order: "asc" },
+        orderBy: { id: "asc" },
     });
     const emailHost = await prisma.emailHost.findFirst();
     const messages: Message[] = await prisma.message.findMany({

@@ -766,19 +766,13 @@ export default function EditSegment(props: {
                                 PUBLISHED
                             </div>
                             <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-black xl:mt-2 rounded-lg px-2 min-h-10">
-                                {props.caseStudies
-                                    .filter(function (caseStudy: CaseStudy) {
-                                        return (
+                                {props.caseStudies.map(
+                                    (caseStudy: CaseStudy, index: number) => {
+                                        if (
                                             caseStudy.segmentId ===
                                                 props.segment.id &&
                                             caseStudy.published
-                                        );
-                                    })
-                                    .map(
-                                        (
-                                            caseStudy: CaseStudy,
-                                            index: number
-                                        ) => {
+                                        )
                                             return (
                                                 <button
                                                     type="button"
@@ -797,26 +791,20 @@ export default function EditSegment(props: {
                                                     {caseStudy.title}
                                                 </button>
                                             );
-                                        }
-                                    )}
+                                    }
+                                )}
                             </div>
                             <div className="text-red-400 font-bold text-lg my-4">
                                 DRAFTS
                             </div>
                             <div className="flex flex-wrap xl:gap-4 py-2 xl:py-3 gap-2 bg-black xl:mt-2 rounded-lg px-2 min-h-10">
-                                {props.caseStudies
-                                    .filter(function (caseStudy: CaseStudy) {
-                                        return (
+                                {props.caseStudies.map(
+                                    (caseStudy: CaseStudy, index: number) => {
+                                        if (
                                             caseStudy.segmentId ===
                                                 props.segment.id &&
                                             !caseStudy.published
-                                        );
-                                    })
-                                    .map(
-                                        (
-                                            caseStudy: CaseStudy,
-                                            index: number
-                                        ) => {
+                                        )
                                             return (
                                                 <button
                                                     type="button"
@@ -835,8 +823,8 @@ export default function EditSegment(props: {
                                                     {caseStudy.title}
                                                 </button>
                                             );
-                                        }
-                                    )}
+                                    }
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1063,7 +1051,7 @@ export default function EditSegment(props: {
                     </ModalContent>
                 </Modal>
                 {/* Edit Case Study modal */}
-                {/* <Modal
+                <Modal
                     size="5xl"
                     backdrop="blur"
                     hideCloseButton
@@ -1078,6 +1066,18 @@ export default function EditSegment(props: {
                                 <ModalHeader></ModalHeader>
                                 <ModalBody>
                                     <EditCaseStudy
+                                        caseStudyCount={
+                                            props.caseStudies.filter(function (
+                                                caseStudy: CaseStudy
+                                            ) {
+                                                return (
+                                                    caseStudy.segmentId ===
+                                                    props.segment.id
+                                                );
+                                            }).length
+                                        }
+                                        videos={props.videos}
+                                        images={props.images}
                                         onClose={onClose}
                                         setSelectedCaseStudy={
                                             setSelectedCaseStudy
@@ -1086,16 +1086,14 @@ export default function EditSegment(props: {
                                             onOpenChangeEditCaseStudy
                                         }
                                         caseStudy={
-                                            props.segment.casestudy[
-                                                selectedCaseStudy
-                                            ]
+                                            props.caseStudies[selectedCaseStudy]
                                         }
                                     />
                                 </ModalBody>
                             </>
                         )}
                     </ModalContent>
-                </Modal> */}
+                </Modal>
                 {/* New Case Study modal */}
                 <Modal
                     size="5xl"

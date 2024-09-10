@@ -22,37 +22,114 @@ import { useState, useEffect } from "react";
 import { CaseStudy, Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import axios from "axios";
+import { useFieldArray, useForm } from "react-hook-form";
+import {
+    CaseStudyFromType,
+    CaseStudyImageType,
+    CaseStudyTagType,
+} from "./NewCaseStudy";
+import {
+    UpdateCaseStudy,
+    UpdateCaseStudyPublished,
+} from "@/components/server/caseStudyActions/updateCaseStudy";
+import { DeleteCaseStudy } from "@/components/server/caseStudyActions/deleteCaseStudy";
 
 export default function EditCaseStudy(props: {
     caseStudy: CaseStudy;
     onOpenChangeEditCaseStudy: any;
     onClose: any;
     setSelectedCaseStudy: any;
+    videos: Videos[];
+    images: Images[];
+    caseStudyCount: number;
 }) {
-    // States for initial case study content
-    const [title, setTitle] = useState(
-        props.caseStudy.title ? props.caseStudy.title : ""
-    );
-    const [dateLocation, setDateLocation] = useState(
-        props.caseStudy.dateLocation ? props.caseStudy.dateLocation : ""
-    );
-    const [copy, setCopy] = useState(props.caseStudy.copy);
-    const [images, setImages] = useState(props.caseStudy.image);
-    const [video, setVideo] = useState(props.caseStudy.video);
-    const [videoThumbnail, setVideoThumbnail] = useState(
-        props.caseStudy.videoThumbnail ? props.caseStudy.videoThumbnail : ""
-    );
-    const [tags, setTags] = useState(props.caseStudy.tags);
-    const [order, setOrder] = useState(props.caseStudy.order);
+    const caseStudyForm = useForm<CaseStudyFromType>({
+        defaultValues: {
+            title: props.caseStudy.title,
+            dateLocation: props.caseStudy.dateLocation
+                ? props.caseStudy.dateLocation
+                : "",
+            copy: props.caseStudy.copy,
+            image: [],
+            video: props.caseStudy.video ? props.caseStudy.video : "",
+            videoThumbnail: props.caseStudy.videoThumbnail
+                ? props.caseStudy.videoThumbnail
+                : "",
+            tags: [],
+            order: props.caseStudy.order
+                ? props.caseStudy.order
+                : props.caseStudyCount + 1,
+            segmentId: props.caseStudy.segmentId,
+            published: props.caseStudy.published,
+        },
+    });
+    const {
+        register,
+        reset,
+        handleSubmit,
+        getValues,
+        setValue,
+        formState: { errors, isDirty },
+        control,
+    } = caseStudyForm;
+
+    const {
+        fields: imageFields,
+        append: imageAppend,
+        remove: imageRemove,
+    } = useFieldArray({
+        control: control,
+        name: "image",
+    });
+    const {
+        fields: tagsFields,
+        append: tagsAppend,
+        remove: tagsRemove,
+    } = useFieldArray({
+        control: control,
+        name: "tags",
+    });
+
+    function resetCaseStudyForm() {
+        var images: CaseStudyImageType[] = [];
+        var tags: CaseStudyTagType[] = [];
+
+        for (let i = 0; i < props.caseStudy.image.length; i++) {
+            images.push({ url: props.caseStudy.image[i] });
+        }
+        for (let i = 0; i < props.caseStudy.tags.length; i++) {
+            tags.push({ text: props.caseStudy.tags[i] });
+        }
+
+        reset({
+            title: props.caseStudy.title,
+            dateLocation: props.caseStudy.dateLocation
+                ? props.caseStudy.dateLocation
+                : "",
+            copy: props.caseStudy.copy,
+            image: images,
+            video: props.caseStudy.video ? props.caseStudy.video : "",
+            videoThumbnail: props.caseStudy.videoThumbnail
+                ? props.caseStudy.videoThumbnail
+                : "",
+            tags: tags,
+            order: props.caseStudy.order
+                ? props.caseStudy.order
+                : props.caseStudyCount + 1,
+            segmentId: props.caseStudy.segmentId,
+            published: props.caseStudy.published,
+        });
+    }
+
+    useEffect(() => {
+        resetCaseStudyForm();
+    }, [props.caseStudy]);
+
     // New Tag State
     const [newTag, setNewTag] = useState("");
 
     // States for preview media
     const [selectedPreviewVideo, setSelectedPreviewVideo] = useState("");
-
-    // States for image and video pools
-    const [availableImages, setAvailableImages] = useState<string[]>([]);
-    const [availableVideos, setAvailableVideos] = useState<string[]>([]);
 
     // State for preview description text
     const [previewText, setPreviewText] = useState(false);
@@ -102,55 +179,13 @@ export default function EditCaseStudy(props: {
     const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
         useDisclosure();
 
-    // Constant check for unsaved changes
     useEffect(() => {
-        if (
-            title !== props.caseStudy.title ||
-            dateLocation !== props.caseStudy.dateLocation ||
-            copy !== props.caseStudy.copy ||
-            JSON.stringify(images) !== JSON.stringify(props.caseStudy.image) ||
-            video !== props.caseStudy.video ||
-            JSON.stringify(tags) !== JSON.stringify(props.caseStudy.tags) ||
-            order !== props.caseStudy.order ||
-            videoThumbnail !== props.caseStudy.videoThumbnail
-        ) {
+        if (isDirty) {
             setUnsavedChanges(true);
         } else {
             setUnsavedChanges(false);
         }
-    }, [
-        title,
-        dateLocation,
-        copy,
-        images,
-        video,
-        tags,
-        order,
-        videoThumbnail,
-        props.caseStudy.dateLocation,
-        props.caseStudy.title,
-        props.caseStudy.copy,
-        props.caseStudy.image,
-        props.caseStudy.video,
-        props.caseStudy.tags,
-        props.caseStudy.order,
-        props.caseStudy.videoThumbnail,
-    ]);
-
-    function discardChanges() {
-        setTitle(props.caseStudy.title);
-        setDateLocation(
-            props.caseStudy.dateLocation ? props.caseStudy.dateLocation : ""
-        );
-        setCopy(props.caseStudy.copy);
-        setImages(props.caseStudy.image);
-        setVideo(props.caseStudy.video);
-        setTags(props.caseStudy.tags);
-        setOrder(props.caseStudy.order);
-        setVideoThumbnail(
-            props.caseStudy.videoThumbnail ? props.caseStudy.videoThumbnail : ""
-        );
-    }
+    }, [isDirty]);
 
     // Check naming conventions for uploads
     function namingConventionCheck(fileName: string, check: string) {
@@ -159,36 +194,6 @@ export default function EditCaseStudy(props: {
         } else {
             return true;
         }
-    }
-
-    async function getImages() {
-        axios
-            .get("/api/image")
-            .then((res) => {
-                setAvailableImages(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    async function getVideos() {
-        axios
-            .get("/api/video")
-            .then((res) => {
-                setAvailableVideos(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function removeImage(index: number) {
-        setImages(
-            images.filter((_image: string, _index: number) => _index !== index)
-        );
-    }
-
-    function removeTag(index: number) {
-        setTags(
-            tags.filter((_tag: string, _index: number) => _index !== index)
-        );
     }
 
     function clearFileInput(target: string) {
@@ -201,40 +206,12 @@ export default function EditCaseStudy(props: {
     }
 
     // Pre populate information for segment update
-    function handleUpdate() {
-        const json = {
-            title: title,
-            dateLocation: dateLocation,
-            copy: copy,
-            image: images,
-            video: video,
-            tags: tags,
-            order: order as number,
-            videoThumbnail: videoThumbnail,
-        };
-        updateCaseStudy(json);
-    }
-    // Update segment with pre populated data
-    async function updateCaseStudy(json: any) {
-        axios
-            .post("/api/casestudy", {
-                action: "update",
-                id: props.caseStudy.id as number,
-                data: json,
-            })
-            .then((res) => {})
-            .catch((err) => console.log(err));
-    }
-    async function deleteCaseStudy() {
-        axios
-            .post("/api/casestudy", {
-                action: "delete",
-                id: props.caseStudy.id,
-            })
+    function handleUpdate(data: CaseStudyFromType) {
+        UpdateCaseStudy(data, props.caseStudy.id)
             .then((res) => {
-                if (res.status === 201) {
-                    onOpenChangeDelete();
-                    props.onOpenChangeEditCaseStudy();
+                if (res.status === 200) {
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -265,23 +242,11 @@ export default function EditCaseStudy(props: {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        getImages();
                         clearFileInput("image");
                     }
                 })
                 .catch((err) => console.log(err));
         }
-    }
-
-    async function updatePublished(value: boolean) {
-        axios
-            .post("/api/casestudy", {
-                action: "publish",
-                id: props.caseStudy.id,
-                value: value,
-            })
-            .then((res) => {})
-            .catch((err) => console.log(err));
     }
 
     async function uploadVideo(file: File, target: string) {
@@ -308,7 +273,6 @@ export default function EditCaseStudy(props: {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        getVideos();
                         clearFileInput("video");
                     }
                 })
@@ -329,10 +293,9 @@ export default function EditCaseStudy(props: {
         <>
             <div className="xl:px-10">
                 <div className="w-full mb-4 text-center text-3xl font-bold text-orange-600">
-                    {title}
+                    {props.caseStudy.title}
                 </div>
-
-                <>
+                <form onSubmit={handleSubmit(handleUpdate)}>
                     <div className="flex justify-between mt-4 xl:mt-0">
                         <div className="flex gap-4">
                             <div
@@ -354,41 +317,40 @@ export default function EditCaseStudy(props: {
                                 <div className="fade-in flex">
                                     <div>
                                         <button
-                                            onClick={discardChanges}
+                                            type="button"
+                                            onClick={resetCaseStudyForm}
                                             className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base text-orange-600 hover:text-red-400 rounded">
                                             Discard
                                         </button>
                                     </div>
                                     <div>
                                         <button
-                                            onClick={handleUpdate}
+                                            type="submit"
                                             className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-orange-600 rounded">
                                             Update
                                         </button>
                                     </div>
                                 </div>
                             )}
-                            {props.caseStudy.published ? (
-                                <div>
-                                    <button
-                                        onClick={() => {
-                                            updatePublished(false);
-                                        }}
-                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-red-400 rounded">
-                                        UNPUBLISH
-                                    </button>
-                                </div>
-                            ) : (
-                                <div>
-                                    <button
-                                        onClick={() => {
-                                            updatePublished(true);
-                                        }}
-                                        className="xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base bg-green-600 rounded">
-                                        PUBLISH
-                                    </button>
-                                </div>
-                            )}
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        UpdateCaseStudyPublished(
+                                            props.caseStudy.id,
+                                            !props.caseStudy.published
+                                        );
+                                    }}
+                                    className={`${
+                                        props.caseStudy.published
+                                            ? "bg-red-400 "
+                                            : "bg-green-600"
+                                    } xl:px-4 xl:py-2 px-2 py-1 text-sm xl:text-base rounded`}>
+                                    {props.caseStudy.published
+                                        ? "UNPUBLISH"
+                                        : "PUBLISH"}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -399,11 +361,16 @@ export default function EditCaseStudy(props: {
                                     Images:
                                 </div>
                                 <div className="grid xl:grid-cols-3 grid-cols-2 gap-4 p-2">
-                                    {images.map(
-                                        (image: string, index: number) => {
+                                    {imageFields.map(
+                                        (
+                                            image: CaseStudyImageType,
+                                            index: number
+                                        ) => {
                                             return (
                                                 <div
-                                                    key={image + "-" + index}
+                                                    key={
+                                                        image.url + "-" + index
+                                                    }
                                                     className="relative">
                                                     <Image
                                                         height={100}
@@ -411,16 +378,16 @@ export default function EditCaseStudy(props: {
                                                         src={
                                                             process.env
                                                                 .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                            image
+                                                            image.url
                                                         }
-                                                        alt={image}
+                                                        alt={image.url}
                                                         className="w-full h-auto"
                                                     />
                                                     <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
                                                         <div className="text-red-400 h-full flex justify-center">
                                                             <i
                                                                 onClick={() =>
-                                                                    removeImage(
+                                                                    imageRemove(
                                                                         index
                                                                     )
                                                                 }
@@ -436,7 +403,6 @@ export default function EditCaseStudy(props: {
                                     <div
                                         onClick={() => {
                                             onOpenChangeImageSelect();
-                                            getImages();
                                         }}
                                         className="min-h-16 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
                                         <div className="flex h-full justify-center">
@@ -453,12 +419,12 @@ export default function EditCaseStudy(props: {
                                     <div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
                                         Video:
                                     </div>
-                                    {video !== "" ? (
+                                    {getValues("video") ? (
                                         <>
                                             <div
                                                 onClick={() => {
                                                     setSelectedPreviewVideo(
-                                                        video ? video : ""
+                                                        getValues("video")
                                                     );
                                                     onOpenChangeVideoPreview();
                                                 }}
@@ -472,15 +438,17 @@ export default function EditCaseStudy(props: {
                                                 />
                                             </div>
                                             <div className="text-center">
-                                                {video
-                                                    ? video.split("-")[0]
-                                                    : ""}
+                                                {
+                                                    getValues("video").split(
+                                                        "-"
+                                                    )[0]
+                                                }
                                             </div>
                                             <div className="text-center mt-2 mt-2">
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
                                                         onOpenVideoSelect();
-                                                        getVideos();
                                                     }}
                                                     className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                     Change
@@ -494,9 +462,9 @@ export default function EditCaseStudy(props: {
                                             </div>
                                             <div className="text-center mt-2 h-full">
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
                                                         onOpenVideoSelect();
-                                                        getVideos();
                                                     }}
                                                     className="px-10 py-2 bg-orange-600 rounded m-auto">
                                                     Select
@@ -510,7 +478,7 @@ export default function EditCaseStudy(props: {
                                         Thumbnail:
                                     </div>
                                     <div className="grid grid-cols-1">
-                                        {videoThumbnail !== "" ? (
+                                        {getValues("videoThumbnail") ? (
                                             <div className="relative">
                                                 <Image
                                                     height={300}
@@ -518,17 +486,26 @@ export default function EditCaseStudy(props: {
                                                     src={
                                                         process.env
                                                             .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                        videoThumbnail
+                                                        getValues(
+                                                            "videoThumbnail"
+                                                        )
                                                     }
-                                                    alt={videoThumbnail}
+                                                    alt={getValues(
+                                                        "videoThumbnail"
+                                                    )}
                                                     className="w-full h-auto"
                                                 />
                                                 <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
                                                     <div className="text-red-400 h-full flex justify-center">
                                                         <i
                                                             onClick={() =>
-                                                                setVideoThumbnail(
-                                                                    ""
+                                                                setValue(
+                                                                    "videoThumbnail",
+                                                                    "",
+                                                                    {
+                                                                        shouldDirty:
+                                                                            true,
+                                                                    }
                                                                 )
                                                             }
                                                             aria-hidden
@@ -541,7 +518,6 @@ export default function EditCaseStudy(props: {
                                             <div
                                                 onClick={() => {
                                                     onOpenChangeThumbnailSelect();
-                                                    getImages();
                                                 }}
                                                 className="min-h-28 cursor-pointer w-full h-full bg-black hover:bg-opacity-25 transition-all bg-opacity-75 top-0 left-0">
                                                 <div className="flex h-full justify-center">
@@ -560,21 +536,27 @@ export default function EditCaseStudy(props: {
                             <div className="font-bold text-2xl">Title:</div>
                             <input
                                 type="text"
-                                value={title}
-                                onChange={(e) => {
-                                    setTitle(e.target.value);
-                                }}
+                                {...register("title", {
+                                    required: {
+                                        value: true,
+                                        message: "Title is requited.",
+                                    },
+                                })}
+                                placeholder={
+                                    errors.title
+                                        ? errors.title.message
+                                        : "Title"
+                                }
+                                className={
+                                    errors.title
+                                        ? "placeholder:text-red-400"
+                                        : ""
+                                }
                             />
                             <div className="font-bold text-2xl mt-2">
                                 Date/Location:
                             </div>
-                            <input
-                                type="text"
-                                value={dateLocation}
-                                onChange={(e) => {
-                                    setDateLocation(e.target.value);
-                                }}
-                            />
+                            <input type="text" {...register("dateLocation")} />
                             <div>
                                 <div className="flex gap-4 w-full mt-2">
                                     <div className="font-bold text-2xl">
@@ -614,6 +596,7 @@ export default function EditCaseStudy(props: {
                                         </PopoverContent>
                                     </Popover>
                                     <button
+                                        type="button"
                                         onClick={() =>
                                             setPreviewText(!previewText)
                                         }
@@ -623,15 +606,26 @@ export default function EditCaseStudy(props: {
                                 </div>
                                 {previewText ? (
                                     <div className="min-h-80">
-                                        <Markdown>{copy}</Markdown>
+                                        <Markdown>{getValues("copy")}</Markdown>
                                     </div>
                                 ) : (
                                     <textarea
-                                        className="h-80"
-                                        value={copy}
-                                        onChange={(e) => {
-                                            setCopy(e.target.value);
-                                        }}
+                                        {...register("copy", {
+                                            required: {
+                                                value: true,
+                                                message: "Details is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errors.copy
+                                                ? errors.copy.message
+                                                : "Details..."
+                                        }
+                                        className={`${
+                                            errors.copy
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        } h-80`}
                                     />
                                 )}
                             </div>
@@ -644,16 +638,20 @@ export default function EditCaseStudy(props: {
                                 </em>
                             </div>
                             <div className="flex flex-wrap gap-4 mt-2">
-                                {tags.map((tag: string, index: number) => {
-                                    return (
-                                        <Chip
-                                            onClick={() => removeTag(index)}
-                                            className="cursor-pointer"
-                                            key={tag + "-" + index}>
-                                            {tag}
-                                        </Chip>
-                                    );
-                                })}
+                                {tagsFields.map(
+                                    (tag: CaseStudyTagType, index: number) => {
+                                        return (
+                                            <Chip
+                                                onClick={() =>
+                                                    tagsRemove(index)
+                                                }
+                                                className="cursor-pointer"
+                                                key={tag.text + "-" + index}>
+                                                {tag.text}
+                                            </Chip>
+                                        );
+                                    }
+                                )}
                             </div>
                             <div className="font-bold text-2xl mt-5">
                                 New Tag:
@@ -669,9 +667,10 @@ export default function EditCaseStudy(props: {
                                 />
 
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         if (newTag !== "") {
-                                            setTags([...tags, newTag]);
+                                            tagsAppend({ text: newTag });
                                             setNewTag("");
                                         }
                                     }}
@@ -683,23 +682,12 @@ export default function EditCaseStudy(props: {
                                 Order:
                             </div>
                             <div className="w-1/4">
-                                <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={
-                                        !Number.isNaN(order)
-                                            ? (order as number)
-                                            : ""
-                                    }
-                                    onChange={(e) => {
-                                        setOrder(parseInt(e.target.value));
-                                    }}
-                                />
+                                <input type="number" {...register("order")} />
                             </div>
                         </div>
                         <div></div>
                     </div>
-                </>
+                </form>
 
                 {/* Change video modal */}
                 <Modal
@@ -794,7 +782,7 @@ export default function EditCaseStudy(props: {
                                         )}
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                        {availableVideos.map(
+                                        {props.videos.map(
                                             (video: any, index: number) => {
                                                 if (
                                                     video.name.split("_")[0] ===
@@ -827,21 +815,23 @@ export default function EditCaseStudy(props: {
                                                             </div>
                                                             <div className="text-center truncate">
                                                                 {
-                                                                    video.name
-                                                                        .split(
-                                                                            "_"
-                                                                        )[1]
-                                                                        .split(
-                                                                            "-"
-                                                                        )[0]
+                                                                    video.name.split(
+                                                                        "-"
+                                                                    )[0]
                                                                 }
                                                             </div>
                                                             <div className="flex justify-center mt-2">
                                                                 <button
                                                                     onClick={() => {
-                                                                        setVideo(
-                                                                            video.name
+                                                                        setValue(
+                                                                            "video",
+                                                                            video.name,
+                                                                            {
+                                                                                shouldDirty:
+                                                                                    true,
+                                                                            }
                                                                         );
+
                                                                         onClose();
                                                                         setVideoNamingError(
                                                                             false
@@ -862,10 +852,12 @@ export default function EditCaseStudy(props: {
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
-                                    {video ? (
+                                    {getValues("video") ? (
                                         <button
                                             onClick={() => {
-                                                setVideo("");
+                                                setValue("video", "", {
+                                                    shouldDirty: true,
+                                                });
                                                 onClose();
                                                 setNotVideoError(false);
                                                 setVideoNamingError(false);
@@ -987,7 +979,7 @@ export default function EditCaseStudy(props: {
                                         )}
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                        {availableImages.map(
+                                        {props.images.map(
                                             (image: any, index: number) => {
                                                 if (
                                                     image.name.split("_")[0] ===
@@ -1002,10 +994,10 @@ export default function EditCaseStudy(props: {
                                                             }
                                                             className="flex cursor-pointer"
                                                             onClick={() => {
-                                                                setImages([
-                                                                    ...images,
-                                                                    image.name,
-                                                                ]);
+                                                                imageAppend({
+                                                                    url: image.name,
+                                                                });
+
                                                                 onClose();
                                                             }}>
                                                             <Image
@@ -1135,7 +1127,7 @@ export default function EditCaseStudy(props: {
                                         )}
                                     </div>
                                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                        {availableImages.map(
+                                        {props.images.map(
                                             (image: any, index: number) => {
                                                 if (
                                                     image.name.split("_")[0] ===
@@ -1150,8 +1142,13 @@ export default function EditCaseStudy(props: {
                                                             }
                                                             className="flex cursor-pointer"
                                                             onClick={() => {
-                                                                setVideoThumbnail(
-                                                                    image.name
+                                                                setValue(
+                                                                    "videoThumbnail",
+                                                                    image.name,
+                                                                    {
+                                                                        shouldDirty:
+                                                                            true,
+                                                                    }
                                                                 );
                                                                 onClose();
                                                             }}>
@@ -1259,7 +1256,10 @@ export default function EditCaseStudy(props: {
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
-                                            deleteCaseStudy();
+                                            onClose();
+                                            props.setSelectedCaseStudy(0);
+                                            props.onClose();
+                                            DeleteCaseStudy(props.caseStudy.id);
                                         }}>
                                         Delete
                                     </Button>
