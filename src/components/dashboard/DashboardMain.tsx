@@ -118,38 +118,18 @@ export default function DashboardMain(props: {
                     </div>
                     <div className="absolute fade w-full h-14 left-0 top-0" />
                 </div>
-                <DashboardView
-                    hidden={view === "dashboard" ? false : true}
-                    images={props.images}
-                    videos={props.videos}
-                    logos={props.logos}
-                    messages={props.messages}
-                    requests={props.requests}
-                />
-                {/* Main CMS pages view */}
-                <Pages
-                    hidden={view === "pages" ? false : true}
+                <DashboardSwitchView
+                    view={view}
                     data={props.data}
+                    session={props.session}
+                    messages={props.messages}
+                    emailHost={props.emailHost}
                     videos={props.videos}
                     images={props.images}
+                    logos={props.logos}
+                    requests={props.requests}
                     segments={props.segments}
                     caseStudies={props.caseStudies}
-                />
-                {/* Media pool view */}
-                <Media
-                    session={props.session}
-                    hidden={view === "media" ? false : true}
-                />
-                {/* Messages view */}
-                <Messages
-                    messages={props.messages}
-                    hidden={view === "messages" ? false : true}
-                />
-                {/* Settings view */}
-                <Settings
-                    emailHost={props.emailHost.emailHost}
-                    session={props.session}
-                    hidden={view === "settings" ? false : true}
                 />
                 <Modal
                     isDismissable={false}
@@ -192,4 +172,62 @@ export default function DashboardMain(props: {
             </NotificationsContext.Provider>
         </NextUIProvider>
     );
+}
+
+function DashboardSwitchView(props: {
+    data: Page[];
+    session: any;
+    messages: Message[];
+    emailHost: emailHost;
+    videos: Videos[];
+    images: Images[];
+    logos: Logos[];
+    requests: serviceRequest[];
+    segments: Segment[];
+    caseStudies: CaseStudy[];
+    view: string;
+}) {
+    switch (props.view) {
+        case "dashboard":
+            return (
+                <DashboardView
+                    hidden={false}
+                    images={props.images}
+                    videos={props.videos}
+                    logos={props.logos}
+                    messages={props.messages}
+                    requests={props.requests}
+                />
+            );
+        case "pages":
+            return (
+                <Pages
+                    hidden={false}
+                    data={props.data}
+                    videos={props.videos}
+                    images={props.images}
+                    segments={props.segments}
+                    caseStudies={props.caseStudies}
+                />
+            );
+        case "media":
+            return (
+                <Media
+                    session={props.session}
+                    images={props.images}
+                    logos={props.logos}
+                    videos={props.videos}
+                />
+            );
+        case "messages":
+            return <Messages messages={props.messages} hidden={false} />;
+        case "settings":
+            return (
+                <Settings
+                    emailHost={props.emailHost.emailHost}
+                    session={props.session}
+                    hidden={false}
+                />
+            );
+    }
 }

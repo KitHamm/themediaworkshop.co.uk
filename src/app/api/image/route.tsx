@@ -60,6 +60,8 @@ export async function POST(request: Request) {
                         JSON.stringify({ error: "An Error Occurred" }),
                         { status: 500 }
                     );
+                } finally {
+                    revalidatePath("/");
                 }
             } catch (error) {
                 return new NextResponse(
@@ -91,6 +93,8 @@ export async function POST(request: Request) {
                         JSON.stringify({ error: "An Error Occurred" }),
                         { status: 500 }
                     );
+                } finally {
+                    revalidatePath("/");
                 }
             } catch (error) {
                 return new NextResponse(

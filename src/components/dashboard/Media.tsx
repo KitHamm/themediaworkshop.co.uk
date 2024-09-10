@@ -14,18 +14,19 @@ import {
 } from "@nextui-org/react";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // Next Components
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
 // Types
-import { Images, Videos } from "@prisma/client";
+import { Images, Logos, Videos } from "@prisma/client";
 
 // Functions
 import Link from "next/link";
 import axios from "axios";
+import { DeleteFile, errorResponse } from "../server/mediaActions/deleteFile";
 
 // File Prefix Values
 
@@ -39,7 +40,12 @@ const filePrefixList = [
     "THUMBNAIL",
 ];
 
-export default function Media(props: { hidden: boolean; session: any }) {
+export default function Media(props: {
+    session: any;
+    images: Images[];
+    logos: Logos[];
+    videos: Videos[];
+}) {
     // Search Param state to set which videos or images to view
     const searchParams = useSearchParams();
     const videoView: string = searchParams.get("video")
@@ -48,10 +54,6 @@ export default function Media(props: { hidden: boolean; session: any }) {
     const imageView: string = searchParams.get("image")
         ? searchParams.get("image")!
         : "header";
-
-    // States of videos and Images to display
-    const [videos, setVideos] = useState<Videos[]>([]);
-    const [images, setImages] = useState<any[]>([]);
 
     // State for file to upload
     const [newUpload, setNewUpload] = useState<File>();
@@ -70,8 +72,9 @@ export default function Media(props: { hidden: boolean; session: any }) {
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
 
     // Delete Errors
-    const [deleteError, setDeleteError] = useState("");
-    const [deleteErrorArray, setDeleteErrorArray] = useState([]);
+    const [deleteErrorArray, setDeleteErrorArray] = useState<errorResponse[]>(
+        []
+    );
 
     // Upload Progress State
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -95,47 +98,11 @@ export default function Media(props: { hidden: boolean; session: any }) {
     const { isOpen: isOpenUpload, onOpenChange: onOpenChangeUpload } =
         useDisclosure();
 
-    // Get initial videos and images to populate pool
-    useEffect(() => {
-        getVideos();
-        getImages();
-    }, []);
-
-    async function getVideos() {
-        axios
-            .get("/api/video")
-            .then((res) => {
-                setVideos(res.data);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    async function getImages() {
-        var images: [] = [];
-        var logos: [] = [];
-        var temp;
-        axios
-            .get("/api/image")
-            .then((res) => {
-                images = res.data;
-                axios
-                    .get("/api/logos")
-                    .then((res) => {
-                        logos = res.data;
-                        temp = images.concat(logos);
-                        setImages(temp);
-                    })
-                    .catch((err) => console.log(err));
-            })
-            .catch((err) => console.log(err));
-    }
-
     // Delete media depending on file type
     async function uploadMedia() {
         setUploadProgress(0);
         if (newUpload) {
             var type = newUpload.type.split("/")[0];
-
             const formData = new FormData();
             formData.append("file", newUpload);
             axios
@@ -155,8 +122,6 @@ export default function Media(props: { hidden: boolean; session: any }) {
                     if (res.data.message) {
                         setUploading(false);
                         clearFileInput();
-                        getVideos();
-                        getImages();
                         onOpenChangeUpload();
                     }
                 })
@@ -165,29 +130,12 @@ export default function Media(props: { hidden: boolean; session: any }) {
     }
 
     async function deleteFile(type: string, file: string) {
-        var dir;
-        if (file.split("_")[0] === "LOGO") {
-            dir = process.env.NEXT_PUBLIC_DELETE_LOGO_DIR;
-        } else if (type === "image") {
-            dir = process.env.NEXT_PUBLIC_DELETE_IMAGE_DIR;
-        } else {
-            dir = process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR;
-        }
-
-        axios
-            .post("api/deletefile", {
-                name: file,
-                file: dir + file,
-                type: type,
-            })
+        DeleteFile(file, type)
             .then((res) => {
-                if (res.data.message) {
-                    getImages();
-                    getVideos();
+                if (res.status === 200) {
                     onOpenChangeDelete();
-                } else if (res.data.error) {
-                    setDeleteError(res.data.where);
-                    setDeleteErrorArray(res.data.error);
+                } else {
+                    setDeleteErrorArray(JSON.parse(res.message));
                 }
             })
             .catch((err) => console.log(err));
@@ -209,10 +157,7 @@ export default function Media(props: { hidden: boolean; session: any }) {
     }
 
     return (
-        <div
-            className={`${
-                props.hidden ? "hidden" : ""
-            } xl:mx-20 mx-4 fade-in xl:pb-0 pb-20`}>
+        <div className={`xl:mx-20 mx-4 fade-in xl:pb-0 pb-20`}>
             <div className="xl:my-10 border-b py-4 mb-10 text-3xl font-bold capitalize">
                 Media
             </div>
@@ -228,7 +173,7 @@ export default function Media(props: { hidden: boolean; session: any }) {
                     <div className="flex justify-between border-b mb-5">
                         <div className="font-bold text-xl">Videos</div>
                         <i
-                            onClick={() => getVideos()}
+                            // onClick={() => getVideos()}
                             aria-hidden
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
@@ -258,14 +203,23 @@ export default function Media(props: { hidden: boolean; session: any }) {
                     </div>
                     {/* Videos section */}
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                        {videos.map((video: Videos, index: number) => {
-                            if (
-                                (videoView === "background" &&
-                                    video.name.split("_")[0] === "HEADER") ||
-                                (videoView === "video" &&
-                                    video.name.split("_")[0] === "VIDEO") ||
-                                videoView === "all"
-                            ) {
+                        {props.videos
+                            .filter(function (video: Videos) {
+                                switch (videoView) {
+                                    case "background":
+                                        return (
+                                            video.name.split("_")[0] ===
+                                            "HEADER"
+                                        );
+                                    case "video":
+                                        return (
+                                            video.name.split("_")[0] === "VIDEO"
+                                        );
+                                    case "all":
+                                        return true;
+                                }
+                            })
+                            .map((video: Videos, index: number) => {
                                 return (
                                     <Tooltip
                                         delay={1000}
@@ -292,30 +246,17 @@ export default function Media(props: { hidden: boolean; session: any }) {
                                             </div>
                                             <div className="bg-neutral-800 bg-opacity-25">
                                                 <div className="text-center truncate p-2 h-full">
-                                                    {video.name.includes("_")
-                                                        ? video.name.includes(
-                                                              "-"
-                                                          )
-                                                            ? video.name
-                                                                  .split("_")[1]
-                                                                  .split("-")[0]
-                                                            : video.name.split(
-                                                                  "_"
-                                                              )[1]
-                                                        : video.name.includes(
-                                                              "-"
-                                                          )
-                                                        ? video.name.split(
-                                                              "-"
-                                                          )[0]
-                                                        : video.name}
+                                                    {
+                                                        video.name
+                                                            .split("-")[0]
+                                                            .split("_")[1]
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
                                     </Tooltip>
                                 );
-                            }
-                        })}
+                            })}
                     </div>
                 </div>
                 {/* Images section */}
@@ -323,7 +264,7 @@ export default function Media(props: { hidden: boolean; session: any }) {
                     <div className="flex justify-between border-b mb-5 xl:mt-0 mt-6">
                         <div className="font-bold text-xl">Images</div>
                         <i
-                            onClick={() => getImages()}
+                            // onClick={() => getImages()}
                             aria-hidden
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
@@ -396,20 +337,38 @@ export default function Media(props: { hidden: boolean; session: any }) {
                         </Link>
                     </div>
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-2">
-                        {images.map((image: Images, index: number) => {
-                            if (
-                                (imageView === "header" &&
-                                    image.name.split("_")[0] === "SEGHEAD") ||
-                                (imageView === "segment" &&
-                                    image.name.split("_")[0] === "SEGMENT") ||
-                                (imageView === "study" &&
-                                    image.name.split("_")[0] === "CASESTUDY") ||
-                                (imageView === "logos" &&
-                                    image.name.split("_")[0] === "LOGO") ||
-                                (imageView === "thumbnails" &&
-                                    image.name.split("_")[0] === "THUMBNAIL") ||
-                                imageView === "all"
-                            ) {
+                        {props.images
+                            .concat(props.logos)
+                            .filter(function (image: Images | Logos) {
+                                switch (imageView) {
+                                    case "header":
+                                        return (
+                                            image.name.split("_")[0] ===
+                                            "SEGHEAD"
+                                        );
+                                    case "segment":
+                                        return (
+                                            image.name.split("_")[0] ===
+                                            "SEGMENT"
+                                        );
+                                    case "study":
+                                        return (
+                                            image.name.split("_")[0] === "STUDY"
+                                        );
+                                    case "logos":
+                                        return (
+                                            image.name.split("_")[0] === "LOGO"
+                                        );
+                                    case "thumbnails":
+                                        return (
+                                            image.name.split("_")[0] ===
+                                            "THUMBNAIL"
+                                        );
+                                    case "all":
+                                        return true;
+                                }
+                            })
+                            .map((image: Images | Logos, index: number) => {
                                 return (
                                     <Tooltip
                                         delay={1000}
@@ -448,30 +407,17 @@ export default function Media(props: { hidden: boolean; session: any }) {
                                                 <div
                                                     id={image.name}
                                                     className="text-center truncate p-2">
-                                                    {image.name.includes("_")
-                                                        ? image.name.includes(
-                                                              "-"
-                                                          )
-                                                            ? image.name
-                                                                  .split("_")[1]
-                                                                  .split("-")[0]
-                                                            : image.name.split(
-                                                                  "_"
-                                                              )[1]
-                                                        : image.name.includes(
-                                                              "-"
-                                                          )
-                                                        ? image.name.split(
-                                                              "-"
-                                                          )[0]
-                                                        : image.name}
+                                                    {
+                                                        image.name
+                                                            .split("-")[0]
+                                                            .split("_")[1]
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
                                     </Tooltip>
                                 );
-                            }
-                        })}
+                            })}
                     </div>
                 </div>
             </div>
@@ -495,26 +441,69 @@ export default function Media(props: { hidden: boolean; session: any }) {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
-                                {deleteError !== "" &&
-                                deleteErrorArray.length > 0 ? (
+                                {deleteErrorArray.length > 0 ? (
                                     <>
                                         <div className="w-full text-center">
                                             <div className="font-bold text-red-400 text-xl">
                                                 This file is being used!
                                             </div>
                                         </div>
+
                                         <div className="font-bold text-xl">
-                                            Used As:
-                                        </div>
-                                        <div>{deleteError}</div>
-                                        <div className="font-bold text-xl">
-                                            Where:
+                                            Details:
                                         </div>
                                         {deleteErrorArray.map(
-                                            (error: any, index: number) => {
+                                            (
+                                                error: errorResponse,
+                                                index: number
+                                            ) => {
                                                 return (
-                                                    <div key={index}>
-                                                        {error.title}
+                                                    <div
+                                                        className="flex flex-col"
+                                                        key={"error-" + index}>
+                                                        <div>
+                                                            <strong>
+                                                                Used as:{" "}
+                                                            </strong>
+                                                            {error.type}
+                                                        </div>
+                                                        {error.caseTitle && (
+                                                            <>
+                                                                <div>
+                                                                    <strong>
+                                                                        Case
+                                                                        Study:{" "}
+                                                                    </strong>
+                                                                    {
+                                                                        error.caseTitle
+                                                                    }
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                        {error.segmentTitle && (
+                                                            <>
+                                                                <div>
+                                                                    <strong>
+                                                                        Segment:{" "}
+                                                                    </strong>
+                                                                    {
+                                                                        error.segmentTitle
+                                                                    }
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                        {error.pageTitle && (
+                                                            <>
+                                                                <div>
+                                                                    <strong>
+                                                                        Page:{" "}
+                                                                    </strong>
+                                                                    {
+                                                                        error.pageTitle
+                                                                    }
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 );
                                             }
@@ -530,25 +519,24 @@ export default function Media(props: { hidden: boolean; session: any }) {
                                 )}
                             </ModalBody>
                             <ModalFooter>
-                                {deleteError === "" &&
-                                    deleteErrorArray.length === 0 && (
-                                        <Button
-                                            color="danger"
-                                            variant="light"
-                                            onPress={() => {
-                                                deleteFile(
-                                                    toDelete.type,
-                                                    toDelete.file
-                                                );
-                                            }}>
-                                            Delete
-                                        </Button>
-                                    )}
+                                {deleteErrorArray.length === 0 && (
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            deleteFile(
+                                                toDelete.type,
+                                                toDelete.file
+                                            );
+                                        }}>
+                                        Delete
+                                    </Button>
+                                )}
                                 <Button
                                     color="danger"
                                     onPress={() => {
                                         onClose();
-                                        setDeleteError("");
+
                                         setDeleteErrorArray([]);
                                     }}>
                                     Close
