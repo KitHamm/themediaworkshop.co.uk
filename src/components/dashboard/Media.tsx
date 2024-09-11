@@ -27,6 +27,7 @@ import { Images, Logos, Videos } from "@prisma/client";
 import Link from "next/link";
 import axios from "axios";
 import { DeleteFile, errorResponse } from "../server/mediaActions/deleteFile";
+import { revalidateDashboard } from "../server/revalidateDashboard";
 
 // File Prefix Values
 
@@ -123,6 +124,7 @@ export default function Media(props: {
                         setUploading(false);
                         clearFileInput();
                         onOpenChangeUpload();
+                        revalidateDashboard();
                     }
                 })
                 .catch((err) => console.log(err));
@@ -173,7 +175,7 @@ export default function Media(props: {
                     <div className="flex justify-between border-b mb-5">
                         <div className="font-bold text-xl">Videos</div>
                         <i
-                            // onClick={() => getVideos()}
+                            onClick={() => revalidateDashboard()}
                             aria-hidden
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />
@@ -264,7 +266,7 @@ export default function Media(props: {
                     <div className="flex justify-between border-b mb-5 xl:mt-0 mt-6">
                         <div className="font-bold text-xl">Images</div>
                         <i
-                            // onClick={() => getImages()}
+                            onClick={() => revalidateDashboard()}
                             aria-hidden
                             className="cursor-pointer fa-solid fa-arrows-rotate"
                         />

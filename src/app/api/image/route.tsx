@@ -1,3 +1,5 @@
+"yse server";
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -6,14 +8,6 @@ import { writeFile } from "fs/promises";
 
 interface ArrayFile extends File {
     arrayBuffer: () => Promise<ArrayBuffer>;
-}
-
-export async function GET(request: Request) {
-    revalidatePath("/api/image");
-    const result = await prisma.images.findMany({
-        orderBy: { createdAt: "desc" },
-    });
-    return new NextResponse(JSON.stringify(result), { status: 201 });
 }
 
 export async function POST(request: Request) {
@@ -61,13 +55,15 @@ export async function POST(request: Request) {
                         { status: 500 }
                     );
                 } finally {
-                    revalidatePath("/");
+                    revalidatePath("/dashboard");
                 }
             } catch (error) {
                 return new NextResponse(
                     JSON.stringify({ error: "An Error Occurred" }),
                     { status: 500 }
                 );
+            } finally {
+                revalidatePath("/dashboard");
             }
         case "LOGO":
             try {
@@ -94,13 +90,15 @@ export async function POST(request: Request) {
                         { status: 500 }
                     );
                 } finally {
-                    revalidatePath("/");
+                    revalidatePath("/dashboard");
                 }
             } catch (error) {
                 return new NextResponse(
                     JSON.stringify({ error: "An Error Occurred" }),
                     { status: 500 }
                 );
+            } finally {
+                revalidatePath("/dashboard");
             }
         default:
             const formattedFileName = file.name.replace(" ", "_");
@@ -123,6 +121,8 @@ export async function POST(request: Request) {
                     JSON.stringify({ error: "An Error Occurred" }),
                     { status: 500 }
                 );
+            } finally {
+                revalidatePath("/dashboard");
             }
     }
 }

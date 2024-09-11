@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import fs from "fs";
 import { CaseStudy, Page, Segment } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export type errorResponse = {
     type: string;
@@ -227,5 +228,7 @@ export async function DeleteFile(name: string, type: string) {
         return Promise.resolve({ status: 200, message: "success" });
     } catch (err: any) {
         return Promise.resolve({ status: 201, message: err });
+    } finally {
+        revalidatePath("/dashboard");
     }
 }
