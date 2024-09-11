@@ -49,6 +49,8 @@ public/avatars
 public/logos
 /images
 /videos
+/avatars
+/logos
 
 #vscode
 /.vscode
