@@ -28,12 +28,7 @@ import Image from "next/image";
 
 // Types
 import { CaseStudy, Images, Page, Segment, Videos } from "@prisma/client";
-interface ExtendedPage extends Page {
-    segment: ExtendedSegment[];
-}
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
+
 export type PageFormType = {
     page: string;
     subTitle: string;
@@ -64,6 +59,7 @@ export default function PageEdit(props: {
     images: Images[];
     segments: Segment[];
     caseStudies: CaseStudy[];
+    hidden: boolean;
 }) {
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
@@ -260,14 +256,6 @@ export default function PageEdit(props: {
     }
 
     function toggleAccordion(index: number) {
-        // const accordion = document.getElementById("accordion-" + index);
-        // if (accordion) {
-        //     if (accordion.style.height === accordionBaseHeight) {
-        //         accordion.style.height = accordion?.scrollHeight + "px";
-        //     } else {
-        //         accordion.style.height = accordionBaseHeight;
-        //     }
-        // }
         for (let i = 0; i < accordionItem.current.length; i++) {
             if (accordionItem.current[i].id === "accordion-" + index) {
                 if (
@@ -293,7 +281,10 @@ export default function PageEdit(props: {
     }
 
     return (
-        <div className={`xl:mx-20 fade-in mb-10  xl:pb-0 pb-16`}>
+        <div
+            className={`${
+                props.hidden ? "hidden" : "block"
+            } xl:mx-20 fade-in mb-10 xl:pb-0 pb-16`}>
             <div className="my-10 border-b py-4 flex justify-between">
                 <div className="hover:text-orange-600 transition-all font-bold capitalize">
                     <Link

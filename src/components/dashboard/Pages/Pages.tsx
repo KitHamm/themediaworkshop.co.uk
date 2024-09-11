@@ -97,44 +97,21 @@ export default function Pages(props: {
                         Art
                     </Link>
                 </div>
-                {/* Render the correct edit page depending on selection */}
-                <PageEditConditionRender
-                    pageEdit={pageEdit}
-                    pages={props.data}
-                    videos={props.videos}
-                    images={props.images}
-                    segments={props.segments}
-                    caseStudies={props.caseStudies}
-                />
+                {/* Pre render and hide unselected pages to preserve form states */}
+                {props.data.map((data: Page, index: number) => {
+                    return (
+                        <PageEdit
+                            key={"page-" + index}
+                            hidden={pageEdit !== data.title}
+                            segments={props.segments}
+                            images={props.images}
+                            data={data}
+                            videos={props.videos}
+                            caseStudies={props.caseStudies}
+                        />
+                    );
+                })}
             </div>
         </>
-    );
-}
-
-function PageEditConditionRender(props: {
-    pageEdit: string;
-    pages: Page[];
-    videos: Videos[];
-    images: Images[];
-    segments: Segment[];
-    caseStudies: CaseStudy[];
-}) {
-    const [pageData, setPageData] = useState<Page>(props.pages[0]);
-    useEffect(() => {
-        for (let i = 0; i < props.pages.length; i++) {
-            if (props.pages[i].title === props.pageEdit) {
-                setPageData(props.pages[i]);
-            }
-        }
-    }, [props.pageEdit]);
-
-    return (
-        <PageEdit
-            segments={props.segments}
-            images={props.images}
-            data={pageData}
-            videos={props.videos}
-            caseStudies={props.caseStudies}
-        />
     );
 }
