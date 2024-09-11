@@ -170,7 +170,6 @@ export default function NewCaseStudy(props: {
 
     // Update segment with pre populated data
     async function addCaseStudy(data: CaseStudyFromType) {
-        console.log(data);
         CreateCaseStudy(data)
             .then((res) => {
                 if (res.status === 200) {

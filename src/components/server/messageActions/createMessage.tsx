@@ -979,7 +979,6 @@ export async function CreateMessage(data: ContactFormTypes) {
     </html>
                 `,
             });
-            console.log("validate");
             revalidatePath("/dashboard", "layout");
             return Promise.resolve({ status: 200, message: "success" });
         } catch (error) {

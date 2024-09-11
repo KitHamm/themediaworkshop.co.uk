@@ -484,13 +484,22 @@ export default function Settings(props: {
                                     </th>
                                 </>
                             )}
+                            <th scope="col" className="px-6 py-2">
+                                <span className="sr-only">You</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="text-left bg-neutral-800">
                         {props.users.map(
                             (user: UserWithoutPassword, index: number) => {
                                 return (
-                                    <tr key={index}>
+                                    <tr
+                                        className={
+                                            user.id === props.session.user.id
+                                                ? "bg-neutral-700"
+                                                : ""
+                                        }
+                                        key={index}>
                                         <td
                                             scope="col"
                                             className={`${
@@ -572,6 +581,14 @@ export default function Settings(props: {
                                                 </div>
                                             ) : (
                                                 ""
+                                            )}
+                                        </td>
+                                        <td>
+                                            {user.id ===
+                                                props.session.user.id && (
+                                                <div className="text-orange-600">
+                                                    You
+                                                </div>
                                             )}
                                         </td>
                                     </tr>

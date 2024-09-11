@@ -9,7 +9,7 @@ export async function CheckUserActivation(id: string) {
             where: { id: id },
         });
         if (!user) {
-            return Promise.resolve({ status: 201, message: "user not found" });
+            return Promise.resolve({ status: 201, message: false });
         }
         return Promise.resolve({ status: 200, message: user.activated });
     } catch (err: any) {

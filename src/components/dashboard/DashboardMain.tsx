@@ -36,7 +36,6 @@ import {
     Images,
     Logos,
     serviceRequest,
-    User,
 } from "@prisma/client";
 import NotificationCard from "./NotificationCard";
 import {
@@ -44,6 +43,7 @@ import {
     UpdateUserActivation,
 } from "../server/userActions/userActivation";
 import { UserWithoutPassword } from "../types/customTypes";
+import { Session } from "next-auth";
 
 type notification = {
     component: string;
@@ -54,7 +54,7 @@ export const NotificationsContext = createContext<any>([]);
 
 export default function DashboardMain(props: {
     data: Page[];
-    session: any;
+    session: Session;
     messages: Message[];
     emailHost: emailHost;
     videos: Videos[];
@@ -64,6 +64,7 @@ export default function DashboardMain(props: {
     segments: Segment[];
     caseStudies: CaseStudy[];
     users: UserWithoutPassword[];
+    activated: boolean;
 }) {
     // Use search params to display correct view (requires use client)
     // Set hidden state of component base on search params
@@ -84,22 +85,14 @@ export default function DashboardMain(props: {
 
     // Initial pop up if this is the first log in
     useEffect(() => {
-        CheckUserActivation(props.session.user.id)
-            .then((res) => {
-                if (res.status === 200) {
-                    if (res.message === false) {
-                        onOpenChange();
-                    }
-                } else {
-                    console.log(res.message);
-                }
-            })
-            .catch((err) => console.log(err));
+        if (!props.activated) {
+            onOpenChange();
+        }
     }, []);
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
-        UpdateUserActivation(props.session.user.id);
+        UpdateUserActivation(props.session.user.id!);
     }
 
     return (

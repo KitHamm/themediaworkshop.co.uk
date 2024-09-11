@@ -8,7 +8,7 @@ import DashboardMain from "@/components/dashboard/DashboardMain";
 import { Message, emailHost } from "@prisma/client";
 
 //  Functions
-import { getServerSession } from "next-auth";
+import { getServerSession, Session } from "next-auth";
 import { authOptions } from "@/authOptions";
 
 export default async function Dashboard() {
@@ -57,13 +57,21 @@ export default async function Dashboard() {
             role: true,
         },
     });
+    const activated = await prisma.user.findUnique({
+        where: {
+            email: session!.user.email!,
+        },
+        select: {
+            activated: true,
+        },
+    });
     return (
         <>
             {/* Main dashboard panel with all views available */}
             <DashboardMain
                 emailHost={emailHost as emailHost}
                 messages={messages}
-                session={session}
+                session={session as Session}
                 data={data}
                 videos={videos}
                 images={images}
@@ -72,6 +80,7 @@ export default async function Dashboard() {
                 segments={segments}
                 caseStudies={caseStudies}
                 users={users}
+                activated={activated!.activated}
             />
         </>
     );

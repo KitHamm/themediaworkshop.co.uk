@@ -51,10 +51,6 @@ export default function TickerTape(props: {
                                                 e.currentTarget.scrollHeight +
                                                     "px"
                                             );
-                                            console.log(
-                                                e.currentTarget.scrollHeight +
-                                                    "px"
-                                            );
                                         }
                                     }}
                                     className=" h-fit embla__slide__img_2"

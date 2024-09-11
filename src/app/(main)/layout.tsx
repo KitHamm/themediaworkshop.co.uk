@@ -3,6 +3,8 @@ import { Lato } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/authOptions";
 
 const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
@@ -21,11 +23,12 @@ export const metadata: Metadata = {
         "The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const session = await getServerSession(authOptions);
     return (
         <html lang="en">
             <body
