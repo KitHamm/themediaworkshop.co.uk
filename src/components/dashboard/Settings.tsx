@@ -32,22 +32,36 @@ export type UserFormTypes = {
     position: string;
     image: string;
     password: string;
+    role: Role;
 };
 export type UserPasswordFormTypes = {
+    id: string;
     password: string;
     confirmPassword: string;
     currentPassword: string;
 };
-//  TODO create form for changing password and editing user
+export type ResetUserPasswordFormType = {
+    userId: string;
+    password: string;
+    adminId: string;
+    adminPassword: string;
+};
+
 // Function
 import axios from "axios";
 import { UserWithoutPassword } from "../types/customTypes";
 import { CreateUser } from "../server/userActions/createUser";
 import { UpdateEmailHost } from "../server/userActions/updateEmailHost";
+import { DeleteUser } from "../server/userActions/deleteUser";
+import { Role } from "@prisma/client";
+import { UpdateUser } from "../server/userActions/updateUser";
+import { Session } from "next-auth";
+import { ResetUserPassword } from "../server/userActions/resetUserPassword";
+import { ChangePassword } from "../server/userActions/changePassword";
 
 export default function Settings(props: {
     hidden: boolean;
-    session: any;
+    session: Session;
     emailHost: string;
     users: UserWithoutPassword[];
 }) {
@@ -56,9 +70,6 @@ export default function Settings(props: {
     const modalOpen: string = searchParams.get("open")
         ? searchParams.get("open")!
         : "false";
-
-    // Initial Users
-    // const [users, setUsers] = useState<UserWithoutPassword[]>([]);
 
     // User created or error state boolean
     const [userCreated, setUserCreated] = useState(false);
@@ -72,16 +83,10 @@ export default function Settings(props: {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [notImageError, setNotImageError] = useState(false);
 
-    // Reset Password Details
-    const [adminPassword, setAdminPassword] = useState("");
-    const [userResetId, setUserResetId] = useState("");
-
     // Update password states
     const [passwordError, setPasswordError] = useState(false);
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
-
-    // const [avatar, setAvatar] = useState("");
 
     // Password hidden State
     const [passwordHidden, setPasswordHidden] = useState(true);
@@ -93,10 +98,7 @@ export default function Settings(props: {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     // Edit user values
-    const [newName, setNewName] = useState("");
-    const [newEmail, setNewEmail] = useState("");
     const [newRole, setNewRole] = useState("");
-    const [newPosition, setNewPosition] = useState("");
 
     // Settings states
     const [emailHost, setEmailHost] = useState(props.emailHost);
@@ -135,8 +137,32 @@ export default function Settings(props: {
             position: "",
             image: "profile_placeholder.jpg",
             password: "",
+            role: Role.EDITOR,
         },
     });
+
+    const updateUserForm = useForm<UserFormTypes>();
+    const {
+        register: registerUpdateUser,
+        handleSubmit: handleSubmitUpdateUser,
+        reset: resetUpdateUser,
+        getValues: getValuesUpdateUser,
+        setValue: setValueUpdateUser,
+        formState: { errors: errorsUpdateUser },
+    } = updateUserForm;
+
+    const resetPasswordForm = useForm<ResetUserPasswordFormType>({
+        defaultValues: {
+            adminId: props.session.user.id!,
+        },
+    });
+    const {
+        register: registerResetPassword,
+        handleSubmit: handleSubmitResetPassword,
+        reset: resetResetPassword,
+        setValue: setValueResetPassword,
+        formState: { errors: errorsResetPassword },
+    } = resetPasswordForm;
 
     const passwordChangeForm = useForm<UserPasswordFormTypes>();
     const {
@@ -160,20 +186,13 @@ export default function Settings(props: {
     const { errors } = formState;
 
     async function deleteUser() {
-        axios
-            .post("/api/users", {
-                action: "delete",
-                id: userId,
-            })
+        DeleteUser(userId)
             .then((res) => {
-                if (res.status === 201) {
+                if (res.status === 200) {
                     setUserId("");
                 }
             })
-            .catch((err) => {
-                setUserId("");
-                console.log(err);
-            });
+            .catch((err) => console.log(err));
     }
 
     async function uploadAvatar(file: File) {
@@ -235,42 +254,30 @@ export default function Settings(props: {
             .catch((err) => console.log(err));
     }
 
-    // TODO server action fro changing password
-    async function onSubmitNewPassword(data: UserPasswordFormTypes) {
-        axios
-            .post("/api/users", {
-                action: "changePassword",
-                id: props.session.user.id,
-                password: data.password,
-                currentPassword: data.currentPassword,
-            })
-            .then((res) => {
-                if (res.data.message) {
-                    setPasswordSuccess(true);
-                    setPasswordError(false);
-                } else if (res.data.error) {
-                    setPasswordSuccess(false);
-                    setPasswordError(true);
-                }
-            })
-            .catch((err) => console.log(err));
+    function onSubmitNewPassword(data: UserPasswordFormTypes) {
+        data.id = props.session.user.id!;
+        ChangePassword(data).then((res) => {
+            if (res.status === 200) {
+                setPasswordSuccess(true);
+                setPasswordError(false);
+            } else {
+                console.log(res.message);
+                setPasswordSuccess(false);
+                setPasswordError(true);
+            }
+        });
     }
 
-    // TODO server action for resetting password
-    async function resetPassword() {
-        axios
-            .post("/api/users", {
-                action: "resetPassword",
-                id: userResetId,
-                password: randomPassword(10),
-                adminId: props.session.user.id,
-                adminPassword: adminPassword,
-            })
+    async function resetPassword(data: ResetUserPasswordFormType) {
+        data.userId = userId;
+        data.password = randomPassword(10);
+        ResetUserPassword(data)
             .then((res) => {
-                if (res.data.message) {
+                if (res.status === 200) {
                     setResetPasswordSuccess(true);
-                    setPassword(res.data.password);
+                    setPassword(res.message);
                 } else {
+                    console.log(res.message);
                     setResetPasswordSuccess(false);
                     setPasswordError(true);
                 }
@@ -278,27 +285,15 @@ export default function Settings(props: {
             .catch((err) => console.log(err));
     }
 
-    // TODO server action for updating user
-    async function updateUser() {
-        axios
-            .post("/api/users", {
-                action: "update",
-                id: userId,
-                data: {
-                    firstname: newName.split(" ")[0],
-                    lastname: newName.split(" ")[1],
-                    email: newEmail,
-                    position: newPosition,
-                    role: newRole,
-                },
-            })
+    function updateUser(data: UserFormTypes) {
+        UpdateUser(data, userId)
             .then((res) => {
-                if (res.data.message === 201) {
-                    setUserId("");
-                    setNewName("");
-                    setNewEmail("");
+                if (res.status === 200) {
                     setNewRole("");
-                    // getUsers();
+                    setUserId("");
+                    OnChangeEditUser();
+                } else {
+                    console.log(res.message);
                 }
             })
             .catch((err) => console.log(err));
@@ -421,20 +416,19 @@ export default function Settings(props: {
                                             <div className="flex justify-end gap-2 my-2">
                                                 <Button
                                                     onPress={() => {
-                                                        setNewName(
-                                                            user.firstname +
-                                                                " " +
-                                                                user.lastname
-                                                        );
-                                                        setNewEmail(user.email);
-                                                        setNewRole(user.role);
-                                                        setNewPosition(
-                                                            user.position
-                                                                ? user.position
-                                                                : ""
-                                                        );
+                                                        resetUpdateUser({
+                                                            firstName:
+                                                                user.firstname,
+                                                            lastName:
+                                                                user.lastname,
+                                                            email: user.email,
+                                                            role: user.role as Role,
+                                                            position:
+                                                                user.position
+                                                                    ? user.position
+                                                                    : "",
+                                                        });
                                                         setUserId(user.id);
-                                                        setUserResetId(user.id);
                                                         OnOpenEditUser();
                                                     }}
                                                     className="bg-orange-600">
@@ -542,20 +536,20 @@ export default function Settings(props: {
                                                 "ADMIN" && (
                                                 <div
                                                     onClick={() => {
-                                                        setNewName(
-                                                            user.firstname +
-                                                                " " +
-                                                                user.lastname
-                                                        );
-                                                        setNewEmail(user.email);
+                                                        resetUpdateUser({
+                                                            firstName:
+                                                                user.firstname,
+                                                            lastName:
+                                                                user.lastname,
+                                                            email: user.email,
+                                                            role: user.role as Role,
+                                                            position:
+                                                                user.position
+                                                                    ? user.position
+                                                                    : "",
+                                                        });
                                                         setNewRole(user.role);
-                                                        setNewPosition(
-                                                            user.position
-                                                                ? user.position
-                                                                : ""
-                                                        );
                                                         setUserId(user.id);
-                                                        setUserResetId(user.id);
                                                         OnOpenEditUser();
                                                     }}
                                                     className="px-6 py-2 text-orange-600 cursor-pointer">
@@ -782,12 +776,8 @@ export default function Settings(props: {
                                                             className="w-20 h-20 text-large"
                                                             showFallback
                                                             name={
-                                                                Array.from(
-                                                                    props
-                                                                        .session
-                                                                        .user
-                                                                        .name
-                                                                )[0] as string
+                                                                props.session
+                                                                    .user.name!
                                                             }
                                                             src={
                                                                 getValueNewUser(
@@ -843,94 +833,152 @@ export default function Settings(props: {
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1 text-orange-600">
-                                {newName}
+                                Edit User
                             </ModalHeader>
-                            <ModalBody>
-                                <div>Name:</div>
-                                <input
-                                    required
-                                    value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
-                                    type="text"
-                                />
-                                <div>Email:</div>
-                                <input
-                                    required
-                                    value={newEmail}
-                                    onChange={(e) =>
-                                        setNewEmail(e.target.value)
-                                    }
-                                    type="email"
-                                />
-                                <div>Position:</div>
-                                <input
-                                    required
-                                    value={newPosition}
-                                    onChange={(e) =>
-                                        setNewPosition(e.target.value)
-                                    }
-                                    type="text"
-                                />
-                                <Switch
-                                    onValueChange={() =>
-                                        setNewRole(
-                                            newRole === "ADMIN"
-                                                ? "EDITOR"
-                                                : "ADMIN"
-                                        )
-                                    }
-                                    isSelected={
-                                        newRole === "ADMIN" ? true : false
-                                    }
-                                    color="warning">
-                                    Admin
-                                </Switch>
-                                {userId === props.session.user.id ? (
-                                    <div className="mt-2">
-                                        <button
-                                            onClick={OnOpenNewPassword}
-                                            className="px-2 py-1 rounded bg-orange-600">
-                                            Change Password
-                                        </button>
-                                    </div>
-                                ) : props.session.user.role === "ADMIN" ? (
-                                    <div className="mt-2">
-                                        <button
-                                            onClick={OnOpenResetPassword}
-                                            className="px-2 py-1 rounded bg-orange-600">
-                                            Reset Password
-                                        </button>
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setUserId("");
-                                        setNewName("");
-                                        setNewEmail("");
-                                        setNewRole("");
-                                    }}>
-                                    Close
-                                </Button>
-                                <Button
-                                    className="bg-orange-600"
-                                    onPress={() => {
-                                        onClose();
-                                        updateUser();
-                                    }}>
-                                    Submit
-                                </Button>
-                            </ModalFooter>
+                            <form onSubmit={handleSubmitUpdateUser(updateUser)}>
+                                <ModalBody>
+                                    <div>First Name:</div>
+                                    <input
+                                        {...registerUpdateUser("firstName", {
+                                            required: {
+                                                value: true,
+                                                message:
+                                                    "First Name is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errorsUpdateUser.firstName
+                                                ? errorsUpdateUser.firstName
+                                                      .message
+                                                : "First Name"
+                                        }
+                                        className={
+                                            errorsUpdateUser.firstName
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        }
+                                        type="text"
+                                    />
+                                    <div>Last Name:</div>
+                                    <input
+                                        {...registerUpdateUser("lastName", {
+                                            required: {
+                                                value: true,
+                                                message:
+                                                    "Last Name is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errorsUpdateUser.lastName
+                                                ? errorsUpdateUser.lastName
+                                                      .message
+                                                : "Last Name"
+                                        }
+                                        className={
+                                            errorsUpdateUser.lastName
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        }
+                                        type="text"
+                                    />
+                                    <div>Email:</div>
+                                    <input
+                                        {...registerUpdateUser("email", {
+                                            required: {
+                                                value: true,
+                                                message: "Email is required.",
+                                            },
+                                        })}
+                                        placeholder={
+                                            errorsUpdateUser.email
+                                                ? errorsUpdateUser.email.message
+                                                : "Email"
+                                        }
+                                        className={
+                                            errorsUpdateUser.email
+                                                ? "placeholder:text-red-400"
+                                                : ""
+                                        }
+                                        type="email"
+                                    />
+                                    <div>Position:</div>
+                                    <input
+                                        {...registerUpdateUser("position")}
+                                        placeholder="Position"
+                                        type="text"
+                                    />
+                                    <Switch
+                                        onChange={() => {
+                                            if (newRole === "ADMIN") {
+                                                setNewRole("EDITOR");
+                                                setValueUpdateUser(
+                                                    "role",
+                                                    Role.EDITOR,
+                                                    { shouldDirty: true }
+                                                );
+                                            } else {
+                                                setNewRole("ADMIN");
+                                                setValueUpdateUser(
+                                                    "role",
+                                                    Role.ADMIN,
+                                                    { shouldDirty: true }
+                                                );
+                                            }
+                                        }}
+                                        isSelected={
+                                            newRole === "ADMIN" ? true : false
+                                        }
+                                        color="warning">
+                                        Admin
+                                    </Switch>
+                                    {userId === props.session.user.id ? (
+                                        <div className="mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={OnOpenNewPassword}
+                                                className="px-2 py-1 rounded bg-orange-600">
+                                                Change Password
+                                            </button>
+                                        </div>
+                                    ) : props.session.user.role === "ADMIN" ? (
+                                        <div className="mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    OnOpenResetPassword();
+                                                }}
+                                                className="px-2 py-1 rounded bg-orange-600">
+                                                Reset Password
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        type="button"
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            onClose();
+                                            setUserId("");
+                                            setNewRole("");
+                                        }}>
+                                        Close
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="bg-orange-600">
+                                        Submit
+                                    </Button>
+                                </ModalFooter>
+                            </form>
                         </>
                     )}
                 </ModalContent>
             </Modal>
+
             {/* change password modal */}
             <Modal
                 backdrop="blur"
@@ -1125,91 +1173,118 @@ export default function Settings(props: {
                             <ModalHeader className="text-center flex flex-col gap-1 text-red-400">
                                 Reset Password
                             </ModalHeader>
-                            <ModalBody>
-                                {resetPasswordSuccess ? (
-                                    <>
-                                        <div className="flex flex-col text-center text-2xl text-orange-600">
-                                            Success
-                                        </div>
-                                        <div className="flex flex-col text-center text-lg">
-                                            This users password has been
-                                            changed. They will receive an email
-                                            with their new password shortly.
-                                        </div>
-                                        <div className="text-center">
-                                            Or please send them their password
-                                        </div>
-                                        <div className="text-center bg-white text-black p-2 rounded-xl">
-                                            {password}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex flex-col text-center text-xl">
-                                            Are you sure you want to reset this
-                                            users password?
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <div className="mt-6">
-                                                Enter your password to continue.
+                            <form
+                                onSubmit={handleSubmitResetPassword(
+                                    resetPassword
+                                )}>
+                                <ModalBody>
+                                    {resetPasswordSuccess ? (
+                                        <>
+                                            <div className="flex flex-col text-center text-2xl text-orange-600">
+                                                Success
                                             </div>
-                                            <i
-                                                onClick={() =>
-                                                    setPasswordHidden(
-                                                        !passwordHidden
-                                                    )
+                                            <div className="flex flex-col text-center text-lg">
+                                                This users password has been
+                                                changed. They will receive an
+                                                email with their new password
+                                                shortly.
+                                            </div>
+                                            <div className="text-center">
+                                                Or please send them their
+                                                password
+                                            </div>
+                                            <div className="text-center bg-white text-black p-2 rounded-xl">
+                                                {password}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex flex-col text-center text-xl">
+                                                Are you sure you want to reset
+                                                this users password?
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <div className="mt-6">
+                                                    Enter your password to
+                                                    continue.
+                                                </div>
+                                                <i
+                                                    onClick={() =>
+                                                        setPasswordHidden(
+                                                            !passwordHidden
+                                                        )
+                                                    }
+                                                    aria-hidden
+                                                    className={`fa-solid my-auto cursor-pointer ${
+                                                        passwordHidden
+                                                            ? "fa-eye"
+                                                            : "fa-eye-slash"
+                                                    } fa-2xl`}
+                                                />
+                                            </div>
+                                            <input
+                                                className={`${
+                                                    errorsResetPassword.adminPassword
+                                                        ? "placeholder:text-red-400"
+                                                        : ""
+                                                } text-center`}
+                                                placeholder={
+                                                    errorsResetPassword.adminPassword
+                                                        ? errorsResetPassword
+                                                              .adminPassword
+                                                              .message
+                                                        : "Password"
                                                 }
-                                                aria-hidden
-                                                className={`fa-solid my-auto cursor-pointer ${
+                                                {...registerResetPassword(
+                                                    "adminPassword",
+                                                    {
+                                                        required: {
+                                                            value: true,
+                                                            message:
+                                                                "Password is required.",
+                                                        },
+                                                    }
+                                                )}
+                                                type={
                                                     passwordHidden
-                                                        ? "fa-eye"
-                                                        : "fa-eye-slash"
-                                                } fa-2xl`}
+                                                        ? "password"
+                                                        : "text"
+                                                }
                                             />
-                                        </div>
-                                        <input
-                                            className="text-center"
-                                            placeholder="Password"
-                                            value={adminPassword}
-                                            onChange={(e) =>
-                                                setAdminPassword(e.target.value)
-                                            }
-                                            type={
-                                                passwordHidden
-                                                    ? "password"
-                                                    : "text"
-                                            }
-                                        />
-                                        {passwordError && (
-                                            <p className="text-red-400">
-                                                Password is incorrect.
-                                            </p>
-                                        )}
-                                    </>
-                                )}
-                            </ModalBody>
-                            <ModalFooter>
-                                {resetPasswordSuccess ? (
-                                    ""
-                                ) : (
+                                            {passwordError && (
+                                                <p className="text-red-400">
+                                                    Password is incorrect.
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                </ModalBody>
+                                <ModalFooter>
                                     <Button
-                                        onClick={resetPassword}
+                                        type="button"
+                                        onClick={() => {
+                                            onClose();
+                                            setResetPasswordSuccess(false);
+                                            setPasswordError(false);
+                                            resetResetPassword({
+                                                adminId: props.session.user.id!,
+
+                                                adminPassword: "",
+                                            });
+                                        }}
                                         variant="light"
                                         color="danger">
-                                        Reset Password
+                                        Close
                                     </Button>
-                                )}
-                                <Button
-                                    onClick={() => {
-                                        onClose();
-                                        setAdminPassword("");
-                                        setUserResetId("");
-                                        setPassword("");
-                                    }}
-                                    className="bg-orange-600">
-                                    Close
-                                </Button>
-                            </ModalFooter>
+                                    {!resetPasswordSuccess && (
+                                        <Button
+                                            type="submit"
+                                            className="bg-orange-600">
+                                            Reset Password
+                                        </Button>
+                                    )}
+                                </ModalFooter>
+                            </form>
                         </>
                     )}
                 </ModalContent>
