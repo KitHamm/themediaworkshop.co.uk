@@ -56,10 +56,10 @@ import axios from "axios";
 import { NotificationsContext } from "../DashboardMain";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
-    UpdateSegment,
-    UpdateSegmentPublish,
+    updateSegment,
+    updateSegmentPublish,
 } from "@/components/server/segmentActions/updateSegment";
-import { DeleteSegment } from "@/components/server/segmentActions/deleteSegment";
+import { deleteSegment as deleteSegmentSA } from "@/components/server/segmentActions/deleteSegment";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -238,34 +238,29 @@ export default function EditSegment(props: {
     }
 
     // Pre populate information for segment update
-    function handleUpdate(data: SegmentFormType) {
-        UpdateSegment(data)
+    function handleUpdate(segmentData: SegmentFormType) {
+        updateSegment(segmentData)
             .then((res) => {
-                if (res.status === 200) {
-                    const json: Segment = JSON.parse(res.message);
-                    const images: ImageFormType[] = [];
-                    const videos: VideoFormType[] = [];
+                const updatedSegment = JSON.parse(res.message) as Segment;
 
-                    for (let i = 0; i < json.image.length; i++) {
-                        images.push({ url: json.image[i] });
-                    }
-                    for (let i = 0; i < json.video.length; i++) {
-                        videos.push({ url: json.video[i] });
-                    }
-                    reset({
-                        id: props.segment.id,
-                        title: json.title ? json.title : "",
-                        copy: json.copy ? json.copy : "",
-                        image: images,
-                        video: videos,
-                        headerImage: json.headerimage ? json.headerimage : "",
-                        order: json.order ? json.order : -1,
-                        buttonText: json.buttonText ? json.buttonText : "",
-                        linkTo: json.linkTo ? json.linkTo : toLink.NONE,
-                    });
-                } else {
-                    console.log(res.message);
-                }
+                const images = updatedSegment.image.map<ImageFormType>(
+                    (url) => ({ url })
+                );
+                const videos = updatedSegment.video.map<VideoFormType>(
+                    (url) => ({ url })
+                );
+
+                reset({
+                    id: updatedSegment.id,
+                    title: updatedSegment.title || "",
+                    copy: updatedSegment.copy || "",
+                    image: images,
+                    video: videos,
+                    headerImage: updatedSegment.headerimage || "",
+                    order: updatedSegment.order || -1,
+                    buttonText: updatedSegment.buttonText || "",
+                    linkTo: updatedSegment.linkTo || toLink.NONE,
+                });
             })
             .catch((err) => console.log(err));
     }
@@ -320,16 +315,16 @@ export default function EditSegment(props: {
     }
 
     async function deleteSegment() {
-        DeleteSegment(props.segment.id).then((res) => {
-            if (res.status === 200) {
+        deleteSegmentSA(props.segment.id)
+            .then(() => {
                 setDeleteError(false);
                 setDeleteSuccess(true);
-            } else {
+            })
+            .catch((err) => {
                 setDeleteError(true);
                 setDeleteSuccess(false);
-                console.log(res.message);
-            }
-        });
+                console.log(err.message);
+            });
     }
 
     return (
@@ -355,10 +350,10 @@ export default function EditSegment(props: {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    UpdateSegmentPublish(
+                                    updateSegmentPublish(
                                         props.segment.id,
                                         !props.segment.published
-                                    );
+                                    ).catch((err) => console.log(err));
                                 }}
                                 className={`${
                                     props.segment.published

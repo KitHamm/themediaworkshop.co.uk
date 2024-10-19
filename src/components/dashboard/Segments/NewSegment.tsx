@@ -27,7 +27,7 @@ import { ImageFormType, SegmentFormType } from "./Segment";
 
 // Functions
 import axios from "axios";
-import { CreateSegment } from "@/components/server/segmentActions/createSegment";
+import { createSegment } from "@/components/server/segmentActions/createSegment";
 
 export default function NewSegment(props: {
     title: string;
@@ -152,13 +152,9 @@ export default function NewSegment(props: {
     }
 
     function addSegment(data: SegmentFormType) {
-        CreateSegment(data, props.pageID)
-            .then((res) => {
-                if (res.status === 200) {
-                    setSuccess(true);
-                } else {
-                    console.log(res.message);
-                }
+        createSegment(data, props.pageID)
+            .then(() => {
+                setSuccess(true);
             })
             .catch((err) => console.log(err));
     }

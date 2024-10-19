@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-export async function DeleteSegment(id: number) {
+export async function deleteSegment(id: number) {
     try {
         await prisma.segment.delete({
             where: {
@@ -12,16 +12,15 @@ export async function DeleteSegment(id: number) {
             },
         });
         return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-            if (err.code === "P2003") {
-                return Promise.resolve({
-                    status: 201,
-                    message: "Segment has Case Studies",
-                });
+    } catch (error: any) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2003") {
+                return Promise.reject(new Error("Segment has Messages"));
             }
+        } else {
+            return Promise.reject(new Error(error));
         }
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
     } finally {
         revalidatePath("/");
     }
