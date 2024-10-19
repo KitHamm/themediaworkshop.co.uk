@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function DeleteMessage(id: string) {
+export async function deleteMessage(id: string) {
     try {
         await prisma.message.delete({
             where: {
@@ -11,14 +11,14 @@ export async function DeleteMessage(id: string) {
             },
         });
         return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }
 }
 
-export async function DeleteMultipleMessages(ids: string[]) {
+export async function deleteMultipleMessages(ids: string[]) {
     try {
         await prisma.message.deleteMany({
             where: {
@@ -27,9 +27,9 @@ export async function DeleteMultipleMessages(ids: string[]) {
                 },
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }

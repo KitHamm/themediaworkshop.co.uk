@@ -29,10 +29,10 @@ import {
     CaseStudyTagType,
 } from "./NewCaseStudy";
 import {
-    UpdateCaseStudy,
-    UpdateCaseStudyPublished,
+    updateCaseStudy,
+    updateCaseStudyPublished,
 } from "@/components/server/caseStudyActions/updateCaseStudy";
-import { DeleteCaseStudy } from "@/components/server/caseStudyActions/deleteCaseStudy";
+import { deleteCaseStudy } from "@/components/server/caseStudyActions/deleteCaseStudy";
 
 export default function EditCaseStudy(props: {
     caseStudy: CaseStudy;
@@ -207,14 +207,9 @@ export default function EditCaseStudy(props: {
 
     // Pre populate information for segment update
     function handleUpdate(data: CaseStudyFromType) {
-        UpdateCaseStudy(data, props.caseStudy.id)
-            .then((res) => {
-                if (res.status === 200) {
-                } else {
-                    console.log(res.message);
-                }
-            })
-            .catch((err) => console.log(err));
+        updateCaseStudy(data, props.caseStudy.id).catch((err) =>
+            console.log(err)
+        );
     }
 
     async function uploadImage(file: File, target: string) {
@@ -336,10 +331,10 @@ export default function EditCaseStudy(props: {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        UpdateCaseStudyPublished(
+                                        updateCaseStudyPublished(
                                             props.caseStudy.id,
                                             !props.caseStudy.published
-                                        );
+                                        ).catch((err) => console.log(err));
                                     }}
                                     className={`${
                                         props.caseStudy.published
@@ -1256,14 +1251,20 @@ export default function EditCaseStudy(props: {
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
-                                            onClose();
-                                            props.setSelectedCaseStudy(0);
-                                            props.onClose();
-                                            DeleteCaseStudy(props.caseStudy.id);
+                                            deleteCaseStudy(props.caseStudy.id)
+                                                .then(() => {
+                                                    onClose();
+                                                    props.setSelectedCaseStudy(
+                                                        0
+                                                    );
+                                                    props.onClose();
+                                                })
+                                                .catch((err) =>
+                                                    console.log(err)
+                                                );
                                         }}>
                                         Delete
                                     </Button>
-
                                     <Button
                                         color="danger"
                                         onPress={() => {

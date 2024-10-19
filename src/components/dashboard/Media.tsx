@@ -26,7 +26,10 @@ import { Images, Logos, Videos } from "@prisma/client";
 // Functions
 import Link from "next/link";
 import axios from "axios";
-import { DeleteFile, errorResponse } from "../server/mediaActions/deleteFile";
+import {
+    deleteFile as deleteFileSA,
+    errorResponse,
+} from "../server/mediaActions/deleteFile";
 import { revalidateDashboard } from "../server/revalidateDashboard";
 
 // File Prefix Values
@@ -132,15 +135,13 @@ export default function Media(props: {
     }
 
     async function deleteFile(type: string, file: string) {
-        DeleteFile(file, type)
-            .then((res) => {
-                if (res.status === 200) {
-                    onOpenChangeDelete();
-                } else {
-                    setDeleteErrorArray(JSON.parse(res.message));
-                }
+        deleteFileSA(file, type)
+            .then(() => {
+                onOpenChangeDelete();
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                setDeleteErrorArray(JSON.parse(err.message));
+            });
     }
 
     function clearFileInput() {

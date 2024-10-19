@@ -4,9 +4,9 @@ import { PageFormType } from "@/components/dashboard/Pages/PageEdit";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function UpdatePage(data: PageFormType) {
+export async function updatePage(data: PageFormType) {
     try {
-        const page = await prisma.page.update({
+        const updatedPage = await prisma.page.update({
             where: {
                 title: data.page,
             },
@@ -21,10 +21,10 @@ export async function UpdatePage(data: PageFormType) {
                 videoTwoButtonText: data.videoTwoButtonText,
             },
         });
-        return Promise.resolve({ status: 200, message: JSON.stringify(page) });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return { message: JSON.stringify(updatedPage) };
+    } catch (error: any) {
+        throw new Error(error);
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard", "layout");
     }
 }

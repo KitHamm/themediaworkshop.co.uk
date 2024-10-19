@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function CreateMessage(data: ContactFormTypes) {
+export async function createMessage(data: ContactFormTypes) {
     const emailHost = await prisma.emailHost.findFirst();
     const toEmail = emailHost!.emailHost;
     try {
@@ -30,16 +30,13 @@ export async function CreateMessage(data: ContactFormTypes) {
                 message: data.message,
             },
         });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
-    } finally {
-        try {
-            await transporter.sendMail({
-                from: "Website",
-                to: toEmail,
-                replyTo: toEmail,
-                subject: `New Contact Form Message`,
-                html: `
+
+        await transporter.sendMail({
+            from: "Website",
+            to: toEmail,
+            replyTo: toEmail,
+            subject: `New Contact Form Message`,
+            html: `
                             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html
         xmlns="http://www.w3.org/1999/xhtml"
@@ -978,14 +975,10 @@ export async function CreateMessage(data: ContactFormTypes) {
         </body>
     </html>
                 `,
-            });
-            revalidatePath("/dashboard", "layout");
-            return Promise.resolve({ status: 200, message: "success" });
-        } catch (error) {
-            return Promise.resolve({
-                status: 201,
-                message: "could not send email",
-            });
-        }
+        });
+        revalidatePath("/dashboard", "layout");
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     }
 }

@@ -12,33 +12,46 @@ export type errorResponse = {
     caseTitle?: string;
 };
 
-export async function DeleteFile(name: string, type: string) {
-    var dir = "";
+interface SegmentWithPage extends Segment {
+    page: Page;
+}
 
-    if (type === "image") {
-        if (name.split("_")[0] === "LOGO") {
-            dir = process.env.NEXT_PUBLIC_DELETE_LOGO_DIR!;
-        } else {
-            dir = process.env.NEXT_PUBLIC_DELETE_IMAGE_DIR!;
-        }
-    } else {
-        dir = process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR!;
-    }
+interface CaseStudyWithSegmentAndPage extends CaseStudy {
+    segment: SegmentWithPage;
+}
+
+export async function deleteFile(name: string, type: string) {
+    const dir =
+        type === "image" ? getImagesDirectory(name) : getVideosDirectory();
 
     var errorResponseArray: errorResponse[] = [];
 
-    const segmentHeader: Segment[] = await prisma.segment.findMany({
+    const segmentHeader: SegmentWithPage[] = await prisma.segment.findMany({
         where: { headerimage: name },
+        include: { page: true },
     });
-    const segmentImages: Segment[] = await prisma.segment.findMany({
+    const segmentImages: SegmentWithPage[] = await prisma.segment.findMany({
         where: { image: { has: name } },
+        include: { page: true },
     });
-    const caseStudyImages: CaseStudy[] = await prisma.caseStudy.findMany({
-        where: { image: { has: name } },
-    });
-    const caseStudyThumbnail: CaseStudy[] = await prisma.caseStudy.findMany({
-        where: { videoThumbnail: name },
-    });
+    const caseStudyImages: CaseStudyWithSegmentAndPage[] =
+        await prisma.caseStudy.findMany({
+            where: { image: { has: name } },
+            include: {
+                segment: {
+                    include: { page: true },
+                },
+            },
+        });
+    const caseStudyThumbnail: CaseStudyWithSegmentAndPage[] =
+        await prisma.caseStudy.findMany({
+            where: { videoThumbnail: name },
+            include: {
+                segment: {
+                    include: { page: true },
+                },
+            },
+        });
     const pageBackground: Page[] = await prisma.page.findMany({
         where: { backgroundVideo: name },
     });
@@ -48,166 +61,94 @@ export async function DeleteFile(name: string, type: string) {
     const pageYear: Page[] = await prisma.page.findMany({
         where: { video2: name },
     });
-    const segmentVideos: Segment[] = await prisma.segment.findMany({
+    const segmentVideos: SegmentWithPage[] = await prisma.segment.findMany({
         where: { video: { has: name } },
+        include: { page: true },
     });
-    const caseStudyVideo: CaseStudy[] = await prisma.caseStudy.findMany({
-        where: { video: name },
-    });
-
-    if (segmentHeader.length > 0) {
-        for (let i = 0; i < segmentHeader.length; i++) {
-            var locationType = "Segment Header";
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segmentHeader[i].pageId,
+    const caseStudyVideo: CaseStudyWithSegmentAndPage[] =
+        await prisma.caseStudy.findMany({
+            where: { video: name },
+            include: {
+                segment: {
+                    include: { page: true },
                 },
-            });
-            errorResponseArray.push({
-                type: locationType,
-                segmentTitle: segmentHeader[i].title!,
-                pageTitle: page!.title,
-            });
-        }
-    }
-    if (segmentImages.length > 0) {
-        for (let i = 0; i < segmentImages.length; i++) {
-            var locationType = "Segment Image";
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segmentImages[i].pageId,
-                },
-            });
-
-            errorResponseArray.push({
-                type: locationType,
-                segmentTitle: segmentImages[i].title
-                    ? segmentImages[i].title!
-                    : "Unnamed",
-                pageTitle: page!.title,
-            });
-        }
-    }
-
-    if (caseStudyImages.length > 0) {
-        for (let i = 0; i < caseStudyImages.length; i++) {
-            var locationType = "Case Study Image";
-            const segment = await prisma.segment.findUnique({
-                where: {
-                    id: caseStudyImages[i].segmentId,
-                },
-            });
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segment!.pageId,
-                },
-            });
-            errorResponseArray.push({
-                type: locationType,
-                caseTitle: caseStudyImages[i].title,
-                segmentTitle: segment!.title ? segment!.title! : "Unnamed",
-                pageTitle: page!.title,
-            });
-        }
-    }
-
-    if (caseStudyThumbnail.length > 0) {
-        for (let i = 0; i < caseStudyThumbnail.length; i++) {
-            var locationType = "Case Study Thumbnail";
-            const segment = await prisma.segment.findUnique({
-                where: {
-                    id: caseStudyThumbnail[i].segmentId,
-                },
-            });
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segment!.pageId,
-                },
-            });
-            errorResponseArray.push({
-                type: locationType,
-                caseTitle: caseStudyThumbnail[i].title,
-                segmentTitle: segment!.title ? segment!.title! : "Unnamed",
-                pageTitle: page!.title,
-            });
-        }
-    }
-
-    if (pageBackground.length > 0) {
-        for (let i = 0; i < pageBackground.length; i++) {
-            var locationType = "Page Background Video";
-
-            errorResponseArray.push({
-                type: locationType,
-                pageTitle: pageBackground[i].title,
-            });
-        }
-    }
-
-    if (pageShowreel.length > 0) {
-        for (let i = 0; i < pageShowreel.length; i++) {
-            var locationType = "Page Video";
-            errorResponseArray.push({
-                type: locationType,
-                pageTitle: pageShowreel[i].title,
-            });
-        }
-    }
-
-    if (pageYear.length > 0) {
-        for (let i = 0; i < pageYear.length; i++) {
-            var locationType = "Page Video";
-            errorResponseArray.push({
-                type: locationType,
-                pageTitle: pageYear[i].title,
-            });
-        }
-    }
-
-    if (segmentVideos.length > 0) {
-        for (let i = 0; i < segmentVideos.length; i++) {
-            var locationType = "Segment Video";
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segmentVideos[i].pageId,
-                },
-            });
-            errorResponseArray.push({
-                type: locationType,
-                segmentTitle: segmentVideos[i].title
-                    ? segmentVideos[i].title!
-                    : "Unnamed",
-                pageTitle: page!.title,
-            });
-        }
-    }
-
-    if (caseStudyVideo.length > 0) {
-        for (let i = 0; i < caseStudyVideo.length; i++) {
-            var locationType = "Case Study Video";
-            const segment = await prisma.segment.findUnique({
-                where: {
-                    id: caseStudyVideo[i].segmentId,
-                },
-            });
-            const page = await prisma.page.findUnique({
-                where: {
-                    id: segment!.pageId,
-                },
-            });
-            errorResponseArray.push({
-                type: locationType,
-                caseTitle: caseStudyVideo[i].title,
-                segmentTitle: segment!.title ? segment!.title! : "Unnamed",
-                pageTitle: page!.title,
-            });
-        }
-    }
-    if (errorResponseArray.length > 0) {
-        return Promise.resolve({
-            status: 201,
-            message: JSON.stringify(errorResponseArray),
+            },
         });
+
+    segmentHeader.forEach((segment: SegmentWithPage) => {
+        errorResponseArray.push({
+            type: "Segment Header",
+            segmentTitle: segment.title || "Unnamed",
+            pageTitle: segment.page!.title,
+        });
+    });
+
+    segmentImages.forEach((segment: SegmentWithPage) => {
+        errorResponseArray.push({
+            type: "Segment Image",
+            segmentTitle: segment.title || "Unnamed",
+            pageTitle: segment.page!.title,
+        });
+    });
+
+    caseStudyImages.forEach((caseStudy: CaseStudyWithSegmentAndPage) => {
+        errorResponseArray.push({
+            type: "Case Study Image",
+            caseTitle: caseStudy.title || "Unnamed",
+            segmentTitle: caseStudy.segment.title || "Unnamed",
+            pageTitle: caseStudy.segment.page!.title,
+        });
+    });
+
+    caseStudyThumbnail.forEach((caseStudy: CaseStudyWithSegmentAndPage) => {
+        errorResponseArray.push({
+            type: "Case Study Thumbnail",
+            caseTitle: caseStudy.title || "Unnamed",
+            segmentTitle: caseStudy.segment.title || "Unnamed",
+            pageTitle: caseStudy.segment.page!.title,
+        });
+    });
+
+    pageBackground.forEach((page: Page) => {
+        errorResponseArray.push({
+            type: "Page Background Video",
+            pageTitle: page.title,
+        });
+    });
+
+    pageShowreel.forEach((page: Page) => {
+        errorResponseArray.push({
+            type: "Page Video",
+            pageTitle: page.title,
+        });
+    });
+
+    pageYear.forEach((page: Page) => {
+        errorResponseArray.push({
+            type: "Page Video",
+            pageTitle: page.title,
+        });
+    });
+
+    segmentVideos.forEach((segment: SegmentWithPage) => {
+        errorResponseArray.push({
+            type: "Segment Video",
+            segmentTitle: segment.title || "Unnamed",
+            pageTitle: segment.page!.title,
+        });
+    });
+
+    caseStudyVideo.forEach((caseStudy: CaseStudyWithSegmentAndPage) => {
+        errorResponseArray.push({
+            type: "Case Study Video",
+            caseTitle: caseStudy.title || "Unnamed",
+            segmentTitle: caseStudy.segment.title || "Unnamed",
+            pageTitle: caseStudy.segment.page!.title,
+        });
+    });
+
+    if (errorResponseArray.length > 0) {
+        return Promise.reject(new Error(JSON.stringify(errorResponseArray)));
     }
 
     try {
@@ -225,10 +166,20 @@ export async function DeleteFile(name: string, type: string) {
             });
         }
         fs.unlinkSync(process.cwd() + "/" + dir + name);
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
     }
+}
+
+function getImagesDirectory(name: string): string {
+    return name.split("_")[0] === "LOGO"
+        ? process.env.NEXT_PUBLIC_DELETE_LOGO_DIR!
+        : process.env.NEXT_PUBLIC_DELETE_IMAGE_DIR!;
+}
+
+function getVideosDirectory(): string {
+    return process.env.NEXT_PUBLIC_DELETE_VIDEO_DIR!;
 }

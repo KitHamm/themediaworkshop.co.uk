@@ -48,7 +48,7 @@ import axios from "axios";
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
 import Link from "next/link";
-import { UpdatePage } from "@/components/server/pageActions/updatePage";
+import { updatePage } from "@/components/server/pageActions/updatePage";
 
 // Constants
 const accordionBaseHeight = "3.5rem";
@@ -229,30 +229,25 @@ export default function PageEdit(props: {
         }
     }
 
-    // Pre populate data with update Page information
-    function handleUpdate(data: PageFormType) {
-        UpdatePage(data)
-            .then((res) => {
-                const json: Page = JSON.parse(res.message);
-                reset({
-                    page: props.data.title,
-                    subTitle: json.subTitle ? json.subTitle : "",
-                    description: json.description ? json.description : "",
-                    header: json.header ? json.header : "",
-                    video1: json.video1 ? json.video1 : "",
-                    video2: json.video2 ? json.video2 : "",
-                    backgroundVideo: json.backgroundVideo
-                        ? json.backgroundVideo
-                        : "",
-                    videoOneButtonText: json.videoOneButtonText
-                        ? json.videoOneButtonText
-                        : "",
-                    videoTwoButtonText: json.videoTwoButtonText
-                        ? json.videoTwoButtonText
-                        : "",
-                });
-            })
-            .catch((err) => console.log(err));
+    // Pre-populate data with updated Page information
+    async function handleUpdate(data: PageFormType) {
+        try {
+            const response = await updatePage(data);
+            const updatedPage = JSON.parse(response.message) as Page;
+            reset({
+                page: props.data.title,
+                subTitle: updatedPage.subTitle || "",
+                description: updatedPage.description || "",
+                header: updatedPage.header || "",
+                video1: updatedPage.video1 || "",
+                video2: updatedPage.video2 || "",
+                backgroundVideo: updatedPage.backgroundVideo || "",
+                videoOneButtonText: updatedPage.videoOneButtonText || "",
+                videoTwoButtonText: updatedPage.videoTwoButtonText || "",
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     function toggleAccordion(index: number) {

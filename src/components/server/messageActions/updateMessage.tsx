@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function UpdateMessage(id: string, read: boolean) {
+export async function updateMessage(id: string, read: boolean) {
     try {
         await prisma.message.update({
             where: {
@@ -13,15 +13,15 @@ export async function UpdateMessage(id: string, read: boolean) {
                 read: read,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }
 }
 
-export async function UpdateMultipleMessages(ids: string[], read: boolean) {
+export async function updateMultipleMessages(ids: string[], read: boolean) {
     try {
         await prisma.message.updateMany({
             where: {
@@ -31,9 +31,9 @@ export async function UpdateMultipleMessages(ids: string[], read: boolean) {
                 read: read,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }

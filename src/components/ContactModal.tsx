@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { CreateMessage } from "./server/messageActions/createMessage";
+import { createMessage } from "./server/messageActions/createMessage";
 
 export type ContactFormTypes = {
     name: string;
@@ -48,11 +48,9 @@ export default function ContactModal(props: {
 
     const onSubmit = (data: ContactFormTypes) => {
         setSending(true);
-        CreateMessage(data)
-            .then((res) => {
-                if (res.status === 200) {
-                    setSuccess(true);
-                }
+        createMessage(data)
+            .then(() => {
+                setSuccess(true);
             })
             .catch((err) => console.log(err));
     };

@@ -23,7 +23,7 @@ import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import axios from "axios";
 import { useFieldArray, useForm } from "react-hook-form";
-import { CreateCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
+import { createCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
 
 export type CaseStudyImageType = {
     url: string;
@@ -170,13 +170,9 @@ export default function NewCaseStudy(props: {
 
     // Update segment with pre populated data
     async function addCaseStudy(data: CaseStudyFromType) {
-        CreateCaseStudy(data)
-            .then((res) => {
-                if (res.status === 200) {
-                    setSuccess(true);
-                } else {
-                    console.log(res.message);
-                }
+        createCaseStudy(data)
+            .then(() => {
+                setSuccess(true);
             })
             .catch((err) => console.log(err));
     }

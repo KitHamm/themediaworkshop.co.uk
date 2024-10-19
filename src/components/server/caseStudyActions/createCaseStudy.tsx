@@ -4,40 +4,29 @@ import { CaseStudyFromType } from "@/components/dashboard/CaseStudy/NewCaseStudy
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function CreateCaseStudy(data: CaseStudyFromType) {
-    var images: string[] = [];
-    var tags: string[] = [];
-
-    for (let i = 0; i < data.image.length; i++) {
-        images.push(data.image[i].url);
-    }
-    for (let i = 0; i < data.tags.length; i++) {
-        tags.push(data.tags[i].text);
-    }
+export async function createCaseStudy(caseStudyData: CaseStudyFromType) {
+    const imageUrls = caseStudyData.image.map((img) => img.url);
+    const tagTexts = caseStudyData.tags.map((tag) => tag.text);
 
     try {
         await prisma.caseStudy.create({
             data: {
-                title: data.title,
-                copy: data.copy,
-                dateLocation: data.dateLocation,
-                image: images,
-                video: data.video,
-                videoThumbnail: data.videoThumbnail,
-                tags: tags,
-                order: data.order,
-                published: data.published,
-                segment: {
-                    connect: {
-                        id: data.segmentId,
-                    },
-                },
+                title: caseStudyData.title,
+                copy: caseStudyData.copy,
+                dateLocation: caseStudyData.dateLocation,
+                image: imageUrls,
+                video: caseStudyData.video,
+                videoThumbnail: caseStudyData.videoThumbnail,
+                tags: tagTexts,
+                order: caseStudyData.order,
+                published: caseStudyData.published,
+                segmentId: caseStudyData.segmentId,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        Promise.reject(new Error(error));
     } finally {
-        revalidatePath("/");
+        revalidatePath("/", "layout");
     }
 }

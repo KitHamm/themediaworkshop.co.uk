@@ -17,14 +17,13 @@ import { useEffect, useState } from "react";
 
 // Types
 import { Message } from "@prisma/client";
-import axios from "axios";
 import {
-    UpdateMessage,
-    UpdateMultipleMessages,
+    updateMessage,
+    updateMultipleMessages,
 } from "../server/messageActions/updateMessage";
 import {
-    DeleteMessage,
-    DeleteMultipleMessages,
+    deleteMessage,
+    deleteMultipleMessages,
 } from "../server/messageActions/deleteMessage";
 import { DateRender } from "../server/functions/dateRender";
 
@@ -53,26 +52,18 @@ export default function Messages(props: {
     }, [props.messages]);
 
     async function deleteMultipleMessage() {
-        DeleteMultipleMessages(multipleMessages)
-            .then((res) => {
-                if (res.status === 200) {
-                    setSelectedMessage(-1);
-                    setMultipleMessages([]);
-                } else {
-                    console.log(res.message);
-                }
+        deleteMultipleMessages(multipleMessages)
+            .then(() => {
+                setSelectedMessage(-1);
+                setMultipleMessages([]);
             })
             .catch((err) => console.log(err));
     }
 
     async function updateMultipleMessage(value: boolean) {
-        UpdateMultipleMessages(multipleMessages, value)
-            .then((res) => {
-                if (res.status === 200) {
-                    setMultipleMessages([]);
-                } else {
-                    console.log(res.message);
-                }
+        updateMultipleMessages(multipleMessages, value)
+            .then(() => {
+                setMultipleMessages([]);
             })
             .catch((err) => console.log(err));
     }
@@ -161,8 +152,11 @@ export default function Messages(props: {
                             <div
                                 key={index}
                                 onClick={() => {
-                                    setSelectedMessage(index);
-                                    UpdateMessage(message.id, true);
+                                    updateMessage(message.id, true)
+                                        .then(() => {
+                                            setSelectedMessage(index);
+                                        })
+                                        .catch((err) => console.log(err));
                                 }}
                                 className={`${
                                     index === selectedMessage
@@ -245,12 +239,14 @@ export default function Messages(props: {
                                 </div>
                                 <div
                                     onClick={() => {
-                                        UpdateMessage(
+                                        updateMessage(
                                             props.messages[selectedMessage].id,
                                             false
-                                        );
-
-                                        setSelectedMessage(-1);
+                                        )
+                                            .then(() => {
+                                                setSelectedMessage(-1);
+                                            })
+                                            .catch((err) => console.log(err));
                                     }}
                                     className="text-orange-600 cursor-pointer">
                                     Mark as unread
@@ -313,7 +309,9 @@ export default function Messages(props: {
                                 onOpenChangeMessageModal();
                                 setSelectedMessage(index);
                                 if (!message.read) {
-                                    UpdateMessage(message.id, true);
+                                    updateMessage(message.id, true).catch(
+                                        (err) => console.log(err)
+                                    );
                                 }
                             }}
                             className="cursor-pointer"
@@ -393,12 +391,15 @@ export default function Messages(props: {
                                 </Button>
                                 <Button
                                     onClick={() => {
-                                        UpdateMessage(
+                                        updateMessage(
                                             props.messages[selectedMessage].id,
                                             false
-                                        );
-                                        onClose();
-                                        setSelectedMessage(-1);
+                                        )
+                                            .then(() => {
+                                                onClose();
+                                                setSelectedMessage(-1);
+                                            })
+                                            .catch((err) => console.log(err));
                                     }}
                                     className="bg-orange-600">
                                     Mark Unread
@@ -443,10 +444,13 @@ export default function Messages(props: {
                             <ModalFooter>
                                 <Button
                                     onClick={() => {
-                                        onClose();
-                                        DeleteMessage(
+                                        deleteMessage(
                                             props.messages[selectedMessage].id
-                                        );
+                                        )
+                                            .then(() => {
+                                                onClose();
+                                            })
+                                            .catch((err) => console.log(err));
                                     }}
                                     color="danger"
                                     variant="light">
