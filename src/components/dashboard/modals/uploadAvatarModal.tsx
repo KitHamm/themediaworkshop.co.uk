@@ -1,6 +1,6 @@
 "use client";
 
-import { UpdateAvatar } from "@/components/server/userActions/userAvatar";
+import { updateAvatar as updateAvatarSA } from "@/components/server/userActions/userAvatar";
 import {
     Avatar,
     Button,
@@ -37,14 +37,10 @@ export default function UploadAvatarModal(props: {
     }
 
     async function updateAvatar() {
-        UpdateAvatar(props.userId, newAvatar)
-            .then((res) => {
-                if (res.status === 200) {
-                    setNewAvatar("");
-                    props.onOpenChange();
-                } else {
-                    console.log(res.message);
-                }
+        updateAvatarSA(props.userId, newAvatar)
+            .then(() => {
+                setNewAvatar("");
+                props.onOpenChange();
             })
             .catch((err) => console.log(err));
     }

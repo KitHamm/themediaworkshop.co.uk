@@ -2,7 +2,6 @@
 
 import { ResetUserPasswordFormType } from "@/components/dashboard/Settings";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { compare, hash } from "bcrypt";
 import { revalidatePath } from "next/cache";
 const nodemailer = require("nodemailer");
@@ -21,7 +20,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function ResetUserPassword(data: ResetUserPasswordFormType) {
+export async function resetUserPassword(data: ResetUserPasswordFormType) {
     const hashedPassword = await hash(data.password, 12);
     const emailHost = await prisma.emailHost.findFirst();
 
@@ -44,15 +43,15 @@ export async function ResetUserPassword(data: ResetUserPasswordFormType) {
             id: data.userId,
         },
     });
-
-    const updated = await prisma.user.update({
-        where: {
-            id: data.userId,
-        },
-        data: { password: hashedPassword },
-    });
     try {
-        const mail = await transporter.sendMail({
+        await prisma.user.update({
+            where: {
+                id: data.userId,
+            },
+            data: { password: hashedPassword },
+        });
+
+        await transporter.sendMail({
             from: "TMW Website",
             to: user!.email,
             replyTo: emailHost!.emailHost,
@@ -1071,9 +1070,9 @@ style="
 
     `,
         });
-        return Promise.resolve({ status: 200, message: data.password });
-    } catch (error) {
-        return Promise.resolve({ status: 200, message: data.password });
+        return Promise.resolve({ message: data.password });
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
     }

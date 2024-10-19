@@ -39,8 +39,8 @@ import {
 } from "@prisma/client";
 import NotificationCard from "./NotificationCard";
 import {
-    CheckUserActivation,
-    UpdateUserActivation,
+    checkUserActivation,
+    updateUserActivation,
 } from "../server/userActions/userActivation";
 import { UserWithoutPassword } from "../types/customTypes";
 import { Session } from "next-auth";
@@ -92,7 +92,9 @@ export default function DashboardMain(props: {
 
     // Set user as active on dismissing the initial pop up
     async function updateUser() {
-        UpdateUserActivation(props.session.user.id!);
+        updateUserActivation(props.session.user.id!).catch((err) => {
+            console.log(err);
+        });
     }
 
     return (

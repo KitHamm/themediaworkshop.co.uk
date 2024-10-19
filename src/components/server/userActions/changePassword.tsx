@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { hash, compare } from "bcrypt";
 import { revalidatePath } from "next/cache";
 
-export async function ChangePassword(data: UserPasswordFormTypes) {
+export async function changePassword(data: UserPasswordFormTypes) {
     const changeHashedPassword = await hash(data.password, 12);
     const changeUser = await prisma.user.findUnique({
         where: {
@@ -31,10 +31,10 @@ export async function ChangePassword(data: UserPasswordFormTypes) {
             },
             data: { password: changeHashedPassword },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard", "layout");
     }
 }

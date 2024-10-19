@@ -4,7 +4,7 @@ import { UserFormTypes } from "@/components/dashboard/Settings";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function UpdateUser(data: UserFormTypes, id: string) {
+export async function updateUser(data: UserFormTypes, id: string) {
     try {
         await prisma.user.update({
             where: {
@@ -18,9 +18,9 @@ export async function UpdateUser(data: UserFormTypes, id: string) {
                 position: data.position,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
     }

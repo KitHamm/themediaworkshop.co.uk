@@ -3,7 +3,7 @@
 import checkDiskSpace from "check-disk-space";
 import os from "os";
 
-export async function GetStorageStats() {
+export async function getStorageStats() {
     var _diskSpace = {};
     var _path = "";
     if (os.platform() === "win32") {
@@ -15,5 +15,5 @@ export async function GetStorageStats() {
     await checkDiskSpace(_path).then((diskSpace) => {
         _diskSpace = diskSpace;
     });
-    return Promise.resolve({ status: 200, response: _diskSpace });
+    return Promise.resolve({ response: _diskSpace });
 }

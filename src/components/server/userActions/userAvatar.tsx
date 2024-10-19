@@ -3,24 +3,24 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function GetAvatar(id: string) {
+export async function getAvatar(id: string) {
     try {
         const user = await prisma.user.findUnique({
             where: { id: id },
         });
         if (user) {
-            return Promise.resolve({ status: 200, avatar: user.image });
+            return Promise.resolve({ avatar: user.image });
         } else {
-            return Promise.resolve({ status: 201, avatar: undefined });
+            return Promise.resolve({ avatar: undefined });
         }
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, avatar: err });
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
     }
 }
 
-export async function UpdateAvatar(id: string, imageUrl: string) {
+export async function updateAvatar(id: string, imageUrl: string) {
     try {
         await prisma.user.update({
             where: {
@@ -30,9 +30,9 @@ export async function UpdateAvatar(id: string, imageUrl: string) {
                 image: imageUrl,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
     }

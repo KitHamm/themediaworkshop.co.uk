@@ -50,14 +50,14 @@ export type ResetUserPasswordFormType = {
 // Function
 import axios from "axios";
 import { UserWithoutPassword } from "../types/customTypes";
-import { CreateUser } from "../server/userActions/createUser";
-import { UpdateEmailHost } from "../server/userActions/updateEmailHost";
-import { DeleteUser } from "../server/userActions/deleteUser";
+import { createUser } from "../server/userActions/createUser";
+import { updateEmailHost as updateEmailHostSA } from "../server/userActions/updateEmailHost";
+import { deleteUser as deleteUserSA } from "../server/userActions/deleteUser";
 import { Role } from "@prisma/client";
-import { UpdateUser } from "../server/userActions/updateUser";
+import { updateUser as updateUserSA } from "../server/userActions/updateUser";
 import { Session } from "next-auth";
-import { ResetUserPassword } from "../server/userActions/resetUserPassword";
-import { ChangePassword } from "../server/userActions/changePassword";
+import { resetUserPassword } from "../server/userActions/resetUserPassword";
+import { changePassword } from "../server/userActions/changePassword";
 
 export default function Settings(props: {
     hidden: boolean;
@@ -186,11 +186,9 @@ export default function Settings(props: {
     const { errors } = formState;
 
     async function deleteUser() {
-        DeleteUser(userId)
-            .then((res) => {
-                if (res.status === 200) {
-                    setUserId("");
-                }
+        deleteUserSA(userId)
+            .then(() => {
+                setUserId("");
             })
             .catch((err) => console.log(err));
     }
@@ -232,69 +230,63 @@ export default function Settings(props: {
 
     // Update the email host
     async function updateEmailHost() {
-        UpdateEmailHost(props.emailHost, emailHost);
+        updateEmailHostSA(props.emailHost, emailHost).catch((err) =>
+            console.log(err)
+        );
     }
 
     // Submit user to database and retrieve password to display one time
     async function onSubmit(data: UserFormTypes) {
         data.password = randomPassword(10);
-        CreateUser(data)
+        createUser(data)
             .then((res) => {
-                if (res.status === 200) {
-                    console.log(res.message);
-                    setPassword(res.message);
-                    setUserCreated(true);
-                    setError(false);
-                    setValue("image", "");
-                } else {
-                    setError(true);
-                    console.log(res.message);
-                }
+                console.log(res.message);
+                setPassword(res.message);
+                setUserCreated(true);
+                setError(false);
+                setValue("image", "");
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                setError(true);
+            });
     }
 
     function onSubmitNewPassword(data: UserPasswordFormTypes) {
         data.id = props.session.user.id!;
-        ChangePassword(data).then((res) => {
-            if (res.status === 200) {
+        changePassword(data)
+            .then(() => {
                 setPasswordSuccess(true);
                 setPasswordError(false);
-            } else {
-                console.log(res.message);
+            })
+            .catch((err) => {
+                console.log(err);
                 setPasswordSuccess(false);
                 setPasswordError(true);
-            }
-        });
+            });
     }
 
     async function resetPassword(data: ResetUserPasswordFormType) {
         data.userId = userId;
         data.password = randomPassword(10);
-        ResetUserPassword(data)
+        resetUserPassword(data)
             .then((res) => {
-                if (res.status === 200) {
-                    setResetPasswordSuccess(true);
-                    setPassword(res.message);
-                } else {
-                    console.log(res.message);
-                    setResetPasswordSuccess(false);
-                    setPasswordError(true);
-                }
+                setResetPasswordSuccess(true);
+                setPassword(res.message);
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                setResetPasswordSuccess(false);
+                setPasswordError(true);
+            });
     }
 
     function updateUser(data: UserFormTypes) {
-        UpdateUser(data, userId)
-            .then((res) => {
-                if (res.status === 200) {
-                    setNewRole("");
-                    setUserId("");
-                    OnChangeEditUser();
-                } else {
-                    console.log(res.message);
-                }
+        updateUserSA(data, userId)
+            .then(() => {
+                setNewRole("");
+                setUserId("");
+                OnChangeEditUser();
             })
             .catch((err) => console.log(err));
     }

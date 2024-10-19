@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function CreateUser(data: UserFormTypes) {
+export async function createUser(data: UserFormTypes) {
     const emailHost = await prisma.emailHost.findFirst();
     const hashedPassword = await hash(data.password, 12);
     try {
@@ -34,13 +34,13 @@ export async function CreateUser(data: UserFormTypes) {
                 password: hashedPassword,
             },
         });
-        try {
-            const mail = await transporter.sendMail({
-                from: "TMW Website",
-                to: data.email,
-                replyTo: emailHost!.emailHost,
-                subject: `New Account Created!`,
-                html: `
+
+        const mail = await transporter.sendMail({
+            from: "TMW Website",
+            to: data.email,
+            replyTo: emailHost!.emailHost,
+            subject: `New Account Created!`,
+            html: `
         
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
@@ -1001,29 +1001,17 @@ style="
 </html>
 
         `,
-            });
-            return Promise.resolve({ status: 200, message: data.password });
-        } catch (error) {
-            return Promise.resolve({ status: 200, message: data.password });
-        }
-    } catch (err: any) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-            if (err.code === "P2002") {
-                return Promise.resolve({
-                    status: 201,
-                    message: "Email already used.",
-                });
+        });
+        return Promise.resolve({ message: data.password });
+    } catch (error: any) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return Promise.reject(new Error("Email already in use"));
             } else {
-                return Promise.resolve({
-                    status: 201,
-                    message: err,
-                });
+                return Promise.reject(new Error(error.code));
             }
         } else {
-            return Promise.resolve({
-                status: 201,
-                message: err,
-            });
+            return Promise.reject(new Error(error));
         }
     } finally {
         revalidatePath("/dashboard", "layout");

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@nextui-org/react";
-import { GetStorageStats } from "@/components/server/storageStats";
+import { getStorageStats } from "@/components/server/storageStats";
 
 type diskSpaceType = {
     diskPath: string;
@@ -18,7 +18,7 @@ export default function StorageStats() {
     });
     const [usage, setUsage] = useState<number>(0.0);
     useEffect(() => {
-        GetStorageStats()
+        getStorageStats()
             .then((res) => {
                 const data: diskSpaceType = res.response as diskSpaceType;
                 setDiskSpace(data);
