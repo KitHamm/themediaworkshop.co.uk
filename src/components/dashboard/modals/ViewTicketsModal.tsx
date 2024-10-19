@@ -2,8 +2,8 @@
 
 import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 import {
-    DeleteTicket,
-    ResolveTicket,
+    deleteTicket,
+    resolveTicket,
 } from "@/components/server/userActions/adminTickets";
 import {
     Accordion,
@@ -94,8 +94,13 @@ export default function ViewTicketsModal(props: {
                                                         <div className="flex justify-end gap-4">
                                                             <Button
                                                                 onPress={() =>
-                                                                    DeleteTicket(
+                                                                    deleteTicket(
                                                                         ticket.id
+                                                                    ).catch(
+                                                                        (err) =>
+                                                                            console.log(
+                                                                                err
+                                                                            )
                                                                     )
                                                                 }
                                                                 color="danger"
@@ -104,9 +109,14 @@ export default function ViewTicketsModal(props: {
                                                             </Button>
                                                             <Button
                                                                 onPress={() =>
-                                                                    ResolveTicket(
+                                                                    resolveTicket(
                                                                         ticket.id,
                                                                         !ticket.resolved
+                                                                    ).then(
+                                                                        (res) =>
+                                                                            console.log(
+                                                                                res
+                                                                            )
                                                                     )
                                                                 }
                                                                 color={

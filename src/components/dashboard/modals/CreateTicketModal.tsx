@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateTicket } from "@/components/server/userActions/adminTickets";
+import { createTicket } from "@/components/server/userActions/adminTickets";
 import {
     Button,
     Modal,
@@ -40,21 +40,17 @@ export default function CreateTicketModal(props: {
     const { errors } = formState;
 
     function onSubmitTicket(data: TicketFormType) {
-        CreateTicket(data)
-            .then((res) => {
-                if (res.status === 200) {
-                    reset({
-                        dashboard: false,
-                        reproducible: false,
-                        problem: "",
-                        submittedBy: props.name,
-                    });
-                    setDashboard(false);
-                    setReproducible(false);
-                    setTicketSuccess(true);
-                } else {
-                    console.log(res.message);
-                }
+        createTicket(data)
+            .then(() => {
+                reset({
+                    dashboard: false,
+                    reproducible: false,
+                    problem: "",
+                    submittedBy: props.name,
+                });
+                setDashboard(false);
+                setReproducible(false);
+                setTicketSuccess(true);
             })
             .catch((err) => console.log(err));
     }

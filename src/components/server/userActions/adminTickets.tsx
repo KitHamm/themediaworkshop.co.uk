@@ -4,7 +4,7 @@ import { TicketFormType } from "@/components/dashboard/modals/CreateTicketModal"
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function CreateTicket(data: TicketFormType) {
+export async function createTicket(data: TicketFormType) {
     try {
         await prisma.tickets.create({
             data: {
@@ -14,15 +14,15 @@ export async function CreateTicket(data: TicketFormType) {
                 description: data.problem,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }
 }
 
-export async function ResolveTicket(id: string, resolved: boolean) {
+export async function resolveTicket(id: string, resolved: boolean) {
     try {
         await prisma.tickets.update({
             where: {
@@ -32,24 +32,24 @@ export async function ResolveTicket(id: string, resolved: boolean) {
                 resolved: resolved,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }
 }
 
-export async function DeleteTicket(id: string) {
+export async function deleteTicket(id: string) {
     try {
         await prisma.tickets.delete({
             where: {
                 id: id,
             },
         });
-        return Promise.resolve({ status: 200, message: "success" });
-    } catch (err: any) {
-        return Promise.resolve({ status: 201, message: err });
+        return Promise.resolve();
+    } catch (error: any) {
+        return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard", "layout");
     }
