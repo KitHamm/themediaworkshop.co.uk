@@ -1,16 +1,10 @@
 // Prisma
 import prisma from "@/lib/prisma";
 // Types
-import { Page, Segment, CaseStudy } from "@prisma/client";
 import MainHeader from "@/components/MainHeader";
 import TickerTape from "@/components/TickerTape";
 import PageSegment from "@/components/PageSegment";
-interface ExtendedPage extends Page {
-    segment: ExtendedSegment[];
-}
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
+import { ExtendedPage, ExtendedSegment } from "@/components/types/customTypes";
 export default async function Home() {
     // Collect data for specified page
 

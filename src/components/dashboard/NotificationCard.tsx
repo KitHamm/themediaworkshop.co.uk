@@ -9,7 +9,8 @@ type notification = {
 };
 
 export default function NotificationCard() {
-    const [notifications, setNotifications] = useContext(NotificationsContext);
+    const { notifications, setNotifications } =
+        useContext(NotificationsContext);
 
     return notifications.map((notification: notification, index: number) => {
         return (
@@ -34,16 +35,16 @@ export default function NotificationCard() {
                         </div>
                         <div className="flex">
                             <div
-                                onClick={() =>
+                                onClick={() => {
                                     setNotifications(
                                         notifications.filter(
                                             (
-                                                _notification: string,
+                                                _notification: notification,
                                                 _index: number
                                             ) => _index !== index
                                         )
-                                    )
-                                }
+                                    );
+                                }}
                                 className="transition-all m-auto hover:bg-neutral-800 rounded-full p-1">
                                 <i
                                     aria-hidden

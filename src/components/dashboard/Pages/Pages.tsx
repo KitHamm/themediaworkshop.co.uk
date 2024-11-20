@@ -12,12 +12,7 @@ import { useSearchParams } from "next/navigation";
 
 // Types
 import { Page, Segment, CaseStudy, Videos, Images } from "@prisma/client";
-interface ExtendedPage extends Page {
-    segment: ExtendedSegment[];
-}
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
+
 export default function Pages(props: {
     hidden: boolean;
     data: Page[];

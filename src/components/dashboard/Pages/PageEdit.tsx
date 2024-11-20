@@ -73,7 +73,8 @@ export default function PageEdit(props: {
     // State for unsaved changes
     const [changes, setChanges] = useState(false);
     // Notification Settings
-    const [notifications, setNotifications] = useContext(NotificationsContext);
+    const { notifications, setNotifications } =
+        useContext(NotificationsContext);
     // State to hold available videos and video selected for video view modal
     const [previewVideo, setPreviewVideo] = useState("");
 

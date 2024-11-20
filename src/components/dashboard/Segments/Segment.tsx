@@ -151,7 +151,8 @@ export default function EditSegment(props: {
     const [changes, setChanges] = useState(false);
 
     // Notification Settings
-    const [notifications, setNotifications] = useContext(NotificationsContext);
+    const { notifications, setNotifications } =
+        useContext(NotificationsContext);
 
     // State for selected case study to edit
     const [selectedCaseStudy, setSelectedCaseStudy] = useState(0);
@@ -212,7 +213,7 @@ export default function EditSegment(props: {
             ) {
                 setNotifications([
                     ...notifications,
-                    { component: "Segment", title: props.segment.title },
+                    { component: "Segment", title: props.segment.title! },
                 ]);
             }
             setChanges(true);

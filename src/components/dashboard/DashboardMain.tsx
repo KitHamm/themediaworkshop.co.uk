@@ -50,7 +50,14 @@ type notification = {
     title: string;
 };
 
-export const NotificationsContext = createContext<any>([]);
+type NotificationProviderType = {
+    notifications: notification[];
+    setNotifications: React.Dispatch<React.SetStateAction<notification[]>>;
+};
+
+export const NotificationsContext = createContext<NotificationProviderType>(
+    {} as any
+);
 
 export default function DashboardMain(props: {
     data: Page[];
@@ -78,6 +85,7 @@ export default function DashboardMain(props: {
     const notificationContainer = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        console.log(notifications);
         notificationContainer.current!.scrollTop =
             notificationContainer.current!.scrollHeight -
             notificationContainer.current!.clientHeight;
@@ -100,7 +108,7 @@ export default function DashboardMain(props: {
     return (
         <NextUIProvider>
             <NotificationsContext.Provider
-                value={[notifications, setNotifications]}>
+                value={{ notifications, setNotifications }}>
                 {/* Notification card for unsaved changes */}
                 <div className="w-1/6 xl:block no-scrollbar border-r border-orange-600 border-opacity-10 h-[22rem] overflow-y-scroll hidden fixed bottom-10 left-0 ">
                     <div
