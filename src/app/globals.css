@@ -53,12 +53,15 @@ video {
     object-fit: cover;
 }
 .copy-text a {
-    color: white;
+    color: rgb(251 146 60);
     transition: color 0.25s ease-in-out;
+    &:hover {
+        color: rgb(234 88 12);
+    }
 }
-.copy-text a:hover {
+/* .copy-text a:hover {
     color: rgb(234 88 12);
-}
+} */
 .inputFile {
     width: 0.1px;
     height: 0.1px;

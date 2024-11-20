@@ -115,32 +115,36 @@ export default function SegmentModal(props: { caseStudy: CaseStudy[] }) {
                                 <div
                                     id="images"
                                     className="my-auto carousel-embla">
-                                    {casestudy.image.length > 1 ? (
-                                        <div
-                                            onClick={() => {
-                                                setCaseIndex(caseIndex);
-                                                onOpenChangeImage();
-                                            }}>
-                                            <EmblaCarouselCaseStudyInner
-                                                slides={casestudy.image}
+                                    {casestudy.image.length > 0 ? (
+                                        casestudy.image.length > 1 ? (
+                                            <div
+                                                onClick={() => {
+                                                    setCaseIndex(caseIndex);
+                                                    onOpenChangeImage();
+                                                }}>
+                                                <EmblaCarouselCaseStudyInner
+                                                    slides={casestudy.image}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Image
+                                                onClick={() => {
+                                                    setCaseIndex(caseIndex);
+                                                    onOpenChangeImage();
+                                                }}
+                                                width={900}
+                                                height={500}
+                                                src={
+                                                    process.env
+                                                        .NEXT_PUBLIC_BASE_IMAGE_URL! +
+                                                    casestudy.image[0]
+                                                }
+                                                alt={casestudy.image[0]}
+                                                className="w-full h-auto cursor-pointer"
                                             />
-                                        </div>
+                                        )
                                     ) : (
-                                        <Image
-                                            onClick={() => {
-                                                setCaseIndex(caseIndex);
-                                                onOpenChangeImage();
-                                            }}
-                                            width={900}
-                                            height={500}
-                                            src={
-                                                process.env
-                                                    .NEXT_PUBLIC_BASE_IMAGE_URL! +
-                                                casestudy.image
-                                            }
-                                            alt="Placeholder"
-                                            className="w-full h-auto cursor-pointer"
-                                        />
+                                        ""
                                     )}
                                     {casestudy.video!.length > 0 && (
                                         <div className="relative">

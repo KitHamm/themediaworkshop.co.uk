@@ -224,7 +224,6 @@ export default function PageSegment(props: {
                         {props.segment.image.length > 1 ? (
                             <div
                                 className="embla"
-                                // dir="rtl"
                                 dir={props.index % 2 === 0 ? "ltr" : "rtl"}>
                                 <div
                                     className="embla__viewport"
@@ -266,7 +265,7 @@ export default function PageSegment(props: {
                                     process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
                                     props.segment.image[0]
                                 }
-                                alt="Placeholder"
+                                alt={props.segment.image[0]}
                                 className="w-full h-auto"
                             />
                         )}
