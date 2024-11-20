@@ -32,6 +32,7 @@ export async function updateCaseStudy(
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/", "layout");
     }
 }
@@ -50,6 +51,7 @@ export async function updateCaseStudyPublished(id: number, published: boolean) {
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/", "layout");
     }
 }

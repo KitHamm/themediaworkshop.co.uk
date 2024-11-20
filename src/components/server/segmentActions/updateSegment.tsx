@@ -28,6 +28,7 @@ export async function updateSegment(data: SegmentFormType) {
     } catch (error: any) {
         throw new Error(error);
     } finally {
+        revalidatePath("/", "layout");
         revalidatePath("/dashboard", "layout");
     }
 }
@@ -47,5 +48,6 @@ export async function updateSegmentPublish(id: number, published: boolean) {
         return Promise.reject(new Error(error));
     } finally {
         revalidatePath("/dashboard");
+        revalidatePath("/", "layout");
     }
 }
