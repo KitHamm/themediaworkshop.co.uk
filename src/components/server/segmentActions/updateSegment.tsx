@@ -1,6 +1,6 @@
 "use server";
 
-import { SegmentFormType } from "@/components/dashboard/Segments/Segment";
+import { SegmentFormType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

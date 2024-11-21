@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import MainHeader from "@/components/MainHeader";
 import TickerTape from "@/components/TickerTape";
 import PageSegment from "@/components/PageSegment";
-import { ExtendedPage, ExtendedSegment } from "../../lib/types";
+import { ExtendedPage, ExtendedSegment } from "@/lib/types";
 export default async function Home() {
     // Collect data for specified page
 

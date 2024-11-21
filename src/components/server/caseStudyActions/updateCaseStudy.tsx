@@ -1,6 +1,6 @@
 "use server";
 
-import { CaseStudyFromType } from "@/components/dashboard/CaseStudy/NewCaseStudy";
+import { CaseStudyFromType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

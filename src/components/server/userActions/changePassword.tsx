@@ -1,6 +1,6 @@
 "use server";
 
-import { UserPasswordFormTypes } from "@/components/dashboard/Settings";
+import { UserPasswordFormTypes } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { hash, compare } from "bcrypt";
 import { revalidatePath } from "next/cache";

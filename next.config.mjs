@@ -42,6 +42,9 @@ const nextConfig = {
     },
     experimental: {
         serverComponentsExternalPackages: ["@prisma/client", "bcrypt"],
+        serverActions: {
+            bodySizeLimit: "300mb",
+        },
     },
 };
 

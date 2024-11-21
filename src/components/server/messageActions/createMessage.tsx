@@ -1,6 +1,6 @@
 "use server";
 
-import { ContactFormTypes } from "@/components/ContactModal";
+import { ContactFormTypes } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 const nodemailer = require("nodemailer");

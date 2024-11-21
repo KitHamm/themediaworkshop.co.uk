@@ -1,6 +1,6 @@
 "use server";
 
-import { PageFormType } from "@/components/dashboard/Pages/PageEdit";
+import { PageFormType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

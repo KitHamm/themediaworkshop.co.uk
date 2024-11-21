@@ -1,6 +1,6 @@
 "use server";
 
-import { ResetUserPasswordFormType } from "@/components/dashboard/Settings";
+import { ResetUserPasswordFormType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { compare, hash } from "bcrypt";
 import { revalidatePath } from "next/cache";

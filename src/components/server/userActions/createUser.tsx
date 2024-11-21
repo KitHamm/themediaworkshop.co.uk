@@ -1,6 +1,6 @@
 "use server";
 
-import { UserFormTypes } from "@/components/dashboard/Settings";
+import { UserFormTypes } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { hash } from "bcrypt";

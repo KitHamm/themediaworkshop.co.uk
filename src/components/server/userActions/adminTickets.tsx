@@ -1,6 +1,6 @@
 "use server";
 
-import { TicketFormType } from "@/components/dashboard/modals/CreateTicketModal";
+import { TicketFormType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
