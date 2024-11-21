@@ -31,18 +31,7 @@ import {
     errorResponse,
 } from "../server/mediaActions/deleteFile";
 import { revalidateDashboard } from "../server/revalidateDashboard";
-
-// File Prefix Values
-
-const filePrefixList = [
-    "HEADER",
-    "VIDEO",
-    "SEGHEAD",
-    "SEGMENT",
-    "STUDY",
-    "LOGO",
-    "THUMBNAIL",
-];
+import { FilePrefixList } from "@/lib/constants";
 
 export default function Media(props: {
     session: any;
@@ -156,7 +145,7 @@ export default function Media(props: {
 
     function fileNamingCheck(fileName: string) {
         const filePrefix = fileName.split("_")[0];
-        return filePrefixList.includes(filePrefix);
+        return FilePrefixList.includes(filePrefix);
     }
 
     return (

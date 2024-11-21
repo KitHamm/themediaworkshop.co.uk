@@ -5,13 +5,8 @@ import { CaseStudy, Logos, Page, Segment } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import Header from "./header";
 import { serviceRequest } from "./server/serviceRequest";
+import { ExtendedPage } from "@/lib/types";
 
-interface ExtendedPage extends Page {
-    segment: ExtendedSegment[];
-}
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
 export default function MainHeader(props: {
     data: ExtendedPage;
     logoImages: Logos[];

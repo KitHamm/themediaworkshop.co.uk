@@ -25,7 +25,7 @@ import {
     deleteMessage,
     deleteMultipleMessages,
 } from "../server/messageActions/deleteMessage";
-import { DateRender } from "../server/functions/dateRender";
+import { DateRender } from "@/lib/functions";
 
 export default function Messages(props: {
     hidden: boolean;

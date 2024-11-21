@@ -24,28 +24,11 @@ import Image from "next/image";
 import axios from "axios";
 import { useFieldArray, useForm } from "react-hook-form";
 import { createCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
-
-export type CaseStudyImageType = {
-    url: string;
-};
-
-export type CaseStudyTagType = {
-    text: string;
-};
-
-export type CaseStudyFromType = {
-    title: string;
-    dateLocation: string;
-    copy: string;
-    image: CaseStudyImageType[];
-    video: string;
-    videoThumbnail: string;
-    segmentId: number;
-    tags: CaseStudyTagType[];
-    order: number;
-    published: boolean;
-};
-
+import {
+    CaseStudyImageType,
+    CaseStudyTagType,
+    CaseStudyFromType,
+} from "@/lib/types";
 export default function NewCaseStudy(props: {
     segmentId: number;
     studyCount: number;

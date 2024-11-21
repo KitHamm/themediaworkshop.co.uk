@@ -29,10 +29,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Types
-import { Segment, CaseStudy } from "@prisma/client";
-interface ExtendedSegment extends Segment {
-    casestudy: CaseStudy[];
-}
+import { ExtendedSegment } from "@/lib/types";
 
 export default function PageSegment(props: {
     segment: ExtendedSegment;

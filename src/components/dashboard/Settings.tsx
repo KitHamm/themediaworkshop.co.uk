@@ -24,32 +24,9 @@ import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
-// Types
-export type UserFormTypes = {
-    email: string;
-    firstName: string;
-    lastName: string;
-    position: string;
-    image: string;
-    password: string;
-    role: Role;
-};
-export type UserPasswordFormTypes = {
-    id: string;
-    password: string;
-    confirmPassword: string;
-    currentPassword: string;
-};
-export type ResetUserPasswordFormType = {
-    userId: string;
-    password: string;
-    adminId: string;
-    adminPassword: string;
-};
-
 // Function
 import axios from "axios";
-import { UserWithoutPassword } from "../types/customTypes";
+import { UserWithoutPassword } from "@/lib/types";
 import { createUser } from "../server/userActions/createUser";
 import { updateEmailHost as updateEmailHostSA } from "../server/userActions/updateEmailHost";
 import { deleteUser as deleteUserSA } from "../server/userActions/deleteUser";
@@ -58,6 +35,13 @@ import { updateUser as updateUserSA } from "../server/userActions/updateUser";
 import { Session } from "next-auth";
 import { resetUserPassword } from "../server/userActions/resetUserPassword";
 import { changePassword } from "../server/userActions/changePassword";
+
+// Types
+import {
+    UserFormTypes,
+    ResetUserPasswordFormType,
+    UserPasswordFormTypes,
+} from "@/lib/types";
 
 export default function Settings(props: {
     hidden: boolean;

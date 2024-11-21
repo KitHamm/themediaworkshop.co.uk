@@ -3,9 +3,6 @@
 // Components
 import PageEdit from "./PageEdit";
 
-// React Components
-import { useState, useEffect } from "react";
-
 // Next Components
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

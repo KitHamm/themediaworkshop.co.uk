@@ -3,15 +3,10 @@
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@nextui-org/react";
 import { getStorageStats } from "@/components/server/storageStats";
-
-type diskSpaceType = {
-    diskPath: string;
-    free: number;
-    size: number;
-};
+import { DiskSpaceType } from "@/lib/types";
 
 export default function StorageStats() {
-    const [diskSpace, setDiskSpace] = useState<diskSpaceType>({
+    const [diskSpace, setDiskSpace] = useState<DiskSpaceType>({
         diskPath: "",
         free: 0,
         size: 0,
@@ -20,7 +15,7 @@ export default function StorageStats() {
     useEffect(() => {
         getStorageStats()
             .then((res) => {
-                const data: diskSpaceType = res.response as diskSpaceType;
+                const data: DiskSpaceType = res.response as DiskSpaceType;
                 setDiskSpace(data);
                 const _usage = 100.0 - (data.free / data.size) * 100.0;
                 setUsage(Math.round((_usage + Number.EPSILON) * 100) / 100);

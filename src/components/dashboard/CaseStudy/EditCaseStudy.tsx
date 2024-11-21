@@ -27,7 +27,7 @@ import {
     CaseStudyFromType,
     CaseStudyImageType,
     CaseStudyTagType,
-} from "./NewCaseStudy";
+} from "@/lib/types";
 import {
     updateCaseStudy,
     updateCaseStudyPublished,

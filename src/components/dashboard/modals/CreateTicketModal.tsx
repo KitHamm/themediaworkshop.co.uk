@@ -12,13 +12,7 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-export type TicketFormType = {
-    dashboard: boolean;
-    reproducible: boolean;
-    problem: string;
-    submittedBy: string;
-};
+import { TicketFormType } from "@/lib/types";
 
 export default function CreateTicketModal(props: {
     name: string;

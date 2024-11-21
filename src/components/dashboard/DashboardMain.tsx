@@ -37,23 +37,12 @@ import {
     Logos,
     serviceRequest,
 } from "@prisma/client";
+import { Notification, NotificationProviderType } from "@/lib/types";
+
 import NotificationCard from "./NotificationCard";
-import {
-    checkUserActivation,
-    updateUserActivation,
-} from "../server/userActions/userActivation";
-import { UserWithoutPassword } from "../types/customTypes";
+import { updateUserActivation } from "../server/userActions/userActivation";
+import { UserWithoutPassword } from "@/lib/types";
 import { Session } from "next-auth";
-
-type notification = {
-    component: string;
-    title: string;
-};
-
-type NotificationProviderType = {
-    notifications: notification[];
-    setNotifications: React.Dispatch<React.SetStateAction<notification[]>>;
-};
 
 export const NotificationsContext = createContext<NotificationProviderType>(
     {} as any
@@ -80,7 +69,7 @@ export default function DashboardMain(props: {
         ? searchParams.get("view")!
         : "dashboard";
     const { isOpen, onOpenChange } = useDisclosure();
-    const [notifications, setNotifications] = useState<notification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
     const notificationContainer = useRef<HTMLDivElement>(null);
 

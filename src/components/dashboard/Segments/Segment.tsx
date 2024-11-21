@@ -28,25 +28,7 @@ import NewCaseStudy from "../CaseStudy/NewCaseStudy";
 // Types
 import { CaseStudy, Images, Segment, Videos } from "@prisma/client";
 import { toLink } from "@prisma/client";
-
-export type ImageFormType = {
-    url: string;
-};
-
-export type VideoFormType = {
-    url: string;
-};
-export type SegmentFormType = {
-    id: number;
-    title: string;
-    copy: string;
-    image: ImageFormType[];
-    video: VideoFormType[];
-    headerImage: string;
-    order: number;
-    buttonText: string;
-    linkTo: toLink;
-};
+import { SegmentFormType, ImageFormType, VideoFormType } from "@/lib/types";
 
 // Functions
 import Markdown from "react-markdown";

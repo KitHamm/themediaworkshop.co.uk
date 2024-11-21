@@ -12,12 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createMessage } from "./server/messageActions/createMessage";
-
-export type ContactFormTypes = {
-    name: string;
-    email: string;
-    message: string;
-};
+import { ContactFormTypes } from "@/lib/types";
 
 export default function ContactModal(props: {
     onOpenChange: any;

@@ -5,17 +5,23 @@ import prisma from "@/lib/prisma";
 //  Components
 import DashboardMain from "@/components/dashboard/DashboardMain";
 //  Types
-import { Message, emailHost } from "@prisma/client";
-
+import { Message, Tickets, User, emailHost } from "@prisma/client";
 //  Functions
 import { getServerSession, Session } from "next-auth";
 import { authOptions } from "@/authOptions";
+import SidePanel from "@/components/dashboard/SidePanel";
 
 export default async function Dashboard() {
-    // Function for revalidating the dashboard route as well as the page route that the content relates to
-
     //  Collect session data
     const session = await getServerSession(authOptions);
+    var user: User | null = null;
+    if (session) {
+        user = await prisma.user.findUnique({
+            where: {
+                id: session.user.id as string,
+            },
+        });
+    }
     //  Collect all page data including segments and case studies for CMS
     const data = await prisma.page.findMany({
         orderBy: {
@@ -65,23 +71,46 @@ export default async function Dashboard() {
             activated: true,
         },
     });
+    const tickets: Tickets[] = await prisma.tickets.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+
     return (
         <>
-            {/* Main dashboard panel with all views available */}
-            <DashboardMain
-                emailHost={emailHost as emailHost}
-                messages={messages}
-                session={session as Session}
-                data={data}
-                videos={videos}
-                images={images}
-                logos={logos}
-                requests={requests}
-                segments={segments}
-                caseStudies={caseStudies}
-                users={users}
-                activated={activated!.activated}
-            />
+            <div className="relative xl:h-auto xl:basis-1/6">
+                {/* Side panel for dashboard showing user information */}
+                <SidePanel
+                    messages={messages}
+                    session={session}
+                    tickets={tickets}
+                    avatar={
+                        user !== null
+                            ? user.image
+                                ? user.image
+                                : undefined
+                            : undefined
+                    }
+                />
+            </div>
+            <div className="xl:basis-5/6 min-h-screen">
+                {/* Main dashboard panel with all views available */}
+                <DashboardMain
+                    emailHost={emailHost as emailHost}
+                    messages={messages}
+                    session={session as Session}
+                    data={data}
+                    videos={videos}
+                    images={images}
+                    logos={logos}
+                    requests={requests}
+                    segments={segments}
+                    caseStudies={caseStudies}
+                    users={users}
+                    activated={activated!.activated}
+                />
+            </div>
         </>
     );
 }

@@ -11,7 +11,6 @@ import {
     ModalFooter,
     ModalHeader,
 } from "@nextui-org/react";
-import { User } from "@prisma/client";
 import axios from "axios";
 import { useState } from "react";
 

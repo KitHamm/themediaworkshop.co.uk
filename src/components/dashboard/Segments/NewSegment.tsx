@@ -23,7 +23,7 @@ import Image from "next/image";
 
 // Types
 import { Images, toLink } from "@prisma/client";
-import { ImageFormType, SegmentFormType } from "./Segment";
+import { ImageFormType, SegmentFormType } from "@/lib/types";
 
 // Functions
 import axios from "axios";

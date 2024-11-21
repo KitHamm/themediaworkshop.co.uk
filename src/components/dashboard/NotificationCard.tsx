@@ -3,16 +3,13 @@
 import { useContext, useEffect } from "react";
 import { Card, CardBody } from "@nextui-org/react";
 import { NotificationsContext } from "./DashboardMain";
-type notification = {
-    component: string;
-    title: string;
-};
+import { Notification } from "@/lib/types";
 
 export default function NotificationCard() {
     const { notifications, setNotifications } =
         useContext(NotificationsContext);
 
-    return notifications.map((notification: notification, index: number) => {
+    return notifications.map((notification: Notification, index: number) => {
         return (
             <Card
                 key={index}
@@ -39,7 +36,7 @@ export default function NotificationCard() {
                                     setNotifications(
                                         notifications.filter(
                                             (
-                                                _notification: notification,
+                                                _notification: Notification,
                                                 _index: number
                                             ) => _index !== index
                                         )

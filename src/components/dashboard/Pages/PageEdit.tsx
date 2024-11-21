@@ -28,19 +28,7 @@ import Image from "next/image";
 
 // Types
 import { CaseStudy, Images, Page, Segment, Videos } from "@prisma/client";
-
-export type PageFormType = {
-    page: string;
-    subTitle: string;
-    description: string;
-    header: string;
-    video1: string;
-    video2: string;
-    backgroundVideo: string;
-    videoOneButtonText: string;
-    videoTwoButtonText: string;
-};
-
+import { PageFormType } from "@/lib/types";
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
