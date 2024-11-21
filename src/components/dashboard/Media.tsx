@@ -11,10 +11,17 @@ import {
     useDisclosure,
     CircularProgress,
     Tooltip,
+    Pagination,
+    Select,
+    SelectItem,
+    Dropdown,
+    DropdownTrigger,
+    DropdownMenu,
+    DropdownItem,
 } from "@nextui-org/react";
 
 // React Components
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 
 // Next Components
 import Image from "next/image";
@@ -32,6 +39,8 @@ import {
 } from "../server/mediaActions/deleteFile";
 import { revalidateDashboard } from "../server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
+import { imageSort, videoSort } from "@/lib/functions";
+import { set } from "react-hook-form";
 
 export default function Media(props: {
     session: any;
@@ -47,6 +56,38 @@ export default function Media(props: {
     const imageView: string = searchParams.get("image")
         ? searchParams.get("image")!
         : "header";
+
+    // Image Collection
+    const [selectedImages, setSelectedImages] = useState<Images[]>(
+        imageSort(props.images, props.logos, "header")
+    );
+    const [selectedVideos, setSelectedVideos] = useState<Videos[]>(
+        videoSort(props.videos, "background")
+    );
+
+    useEffect(() => {
+        setSelectedImages(imageSort(props.images, props.logos, imageView));
+        setImagePage(1);
+    }, [props.images, imageView]);
+
+    useEffect(() => {
+        setSelectedVideos(videoSort(props.videos, videoView));
+        setVideoPage(1);
+    }, [props.videos, videoView]);
+
+    // Pagination Controls
+    const [videoPage, setVideoPage] = useState(1);
+    const [imagePage, setImagePage] = useState(1);
+    const [imagesPerPage, setImagesPerPage] = useState(12);
+    const [videosPerPage, setVideosPerPage] = useState(8);
+
+    useEffect(() => {
+        setVideoPage(1);
+    }, [videosPerPage]);
+
+    useEffect(() => {
+        setImagePage(1);
+    }, [imagesPerPage]);
 
     // State for file to upload
     const [newUpload, setNewUpload] = useState<File>();
@@ -193,25 +234,74 @@ export default function Media(props: {
                             Videos
                         </Link>
                     </div>
+                    <div className="flex flex-col xl:flex-row my-4 gap-12 xl:gap-0">
+                        <div className="hidden xl:block w-1/6" />
+                        <div className="flex justify-center grow">
+                            <Pagination
+                                className="dark mt-auto"
+                                classNames={{
+                                    cursor: "bg-orange-600",
+                                }}
+                                showControls
+                                total={Math.ceil(
+                                    selectedVideos.length / videosPerPage
+                                )}
+                                page={videoPage}
+                                onChange={setVideoPage}
+                            />
+                        </div>
+                        <div className="w-1/2 xl:w-1/6 mx-auto xl:mx-0">
+                            <Select
+                                className="dark ms-auto me-auto xl:me-0"
+                                classNames={{
+                                    popoverContent: "bg-neutral-600",
+                                }}
+                                variant="bordered"
+                                selectedKeys={[videosPerPage.toString()]}
+                                labelPlacement="outside"
+                                label={"Videos Per Page"}
+                                onChange={(e) =>
+                                    setVideosPerPage(parseInt(e.target.value))
+                                }>
+                                <SelectItem className="dark" key={8} value={8}>
+                                    8
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={12}
+                                    value={12}>
+                                    12
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={16}
+                                    value={16}>
+                                    16
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={20}
+                                    value={20}>
+                                    20
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={1000000}
+                                    value={1000000}>
+                                    All
+                                </SelectItem>
+                            </Select>
+                        </div>
+                    </div>
                     {/* Videos section */}
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                        {props.videos
-                            .filter(function (video: Videos) {
-                                switch (videoView) {
-                                    case "background":
-                                        return (
-                                            video.name.split("_")[0] ===
-                                            "HEADER"
-                                        );
-                                    case "video":
-                                        return (
-                                            video.name.split("_")[0] === "VIDEO"
-                                        );
-                                    case "all":
-                                        return true;
-                                }
-                            })
-                            .map((video: Videos, index: number) => {
+                        {selectedVideos.map((video: Videos, index: number) => {
+                            if (
+                                index >
+                                    videoPage * videosPerPage -
+                                        (videosPerPage + 1) &&
+                                index < videoPage * videosPerPage
+                            ) {
                                 return (
                                     <Tooltip
                                         delay={1000}
@@ -248,7 +338,8 @@ export default function Media(props: {
                                         </div>
                                     </Tooltip>
                                 );
-                            })}
+                            }
+                        })}
                     </div>
                 </div>
                 {/* Images section */}
@@ -328,88 +419,125 @@ export default function Media(props: {
                             Logos
                         </Link>
                     </div>
+                    <div className="flex flex-col xl:flex-row my-4 gap-12 xl:gap-0">
+                        <div className="hidden xl:block w-1/6" />
+                        <div className="flex justify-center grow">
+                            <Pagination
+                                className="dark mt-auto"
+                                classNames={{
+                                    cursor: "bg-orange-600",
+                                }}
+                                showControls
+                                total={Math.ceil(
+                                    selectedImages.length / imagesPerPage
+                                )}
+                                page={imagePage}
+                                onChange={setImagePage}
+                            />
+                        </div>
+                        <div className="w-1/2 xl:w-1/6 mx-auto xl:mx-0">
+                            <Select
+                                className="dark ms-auto me-auto xl:me-0"
+                                classNames={{
+                                    popoverContent: "bg-neutral-600",
+                                }}
+                                variant="bordered"
+                                selectedKeys={[imagesPerPage.toString()]}
+                                labelPlacement="outside"
+                                label={"Images Per Page"}
+                                onChange={(e) =>
+                                    setImagesPerPage(parseInt(e.target.value))
+                                }>
+                                <SelectItem className="dark" key={8} value={8}>
+                                    8
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={12}
+                                    value={12}>
+                                    12
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={16}
+                                    value={16}>
+                                    16
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={20}
+                                    value={20}>
+                                    20
+                                </SelectItem>
+                                <SelectItem
+                                    className="dark"
+                                    key={1000000}
+                                    value={1000000}>
+                                    All
+                                </SelectItem>
+                            </Select>
+                        </div>
+                    </div>
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-2">
-                        {props.images
-                            .concat(props.logos)
-                            .filter(function (image: Images | Logos) {
-                                switch (imageView) {
-                                    case "header":
-                                        return (
-                                            image.name.split("_")[0] ===
-                                            "SEGHEAD"
-                                        );
-                                    case "segment":
-                                        return (
-                                            image.name.split("_")[0] ===
-                                            "SEGMENT"
-                                        );
-                                    case "study":
-                                        return (
-                                            image.name.split("_")[0] === "STUDY"
-                                        );
-                                    case "logos":
-                                        return (
-                                            image.name.split("_")[0] === "LOGO"
-                                        );
-                                    case "thumbnails":
-                                        return (
-                                            image.name.split("_")[0] ===
-                                            "THUMBNAIL"
-                                        );
-                                    case "all":
-                                        return true;
-                                }
-                            })
-                            .map((image: Images | Logos, index: number) => {
-                                return (
-                                    <Tooltip
-                                        delay={1000}
-                                        placement="bottom"
-                                        className="dark"
-                                        key={image.name + "-" + index}
-                                        content={image.name}>
-                                        <div className="fade-in flex flex-col border rounded border-neutral-800">
-                                            <div
-                                                onClick={() => {
-                                                    setSelectedImage(
-                                                        image.name
-                                                    );
-                                                    onOpenImage();
-                                                }}
-                                                className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
-                                                <Image
-                                                    height={100}
-                                                    width={100}
-                                                    src={
-                                                        image.name.split(
-                                                            "_"
-                                                        )[0] === "LOGO"
-                                                            ? process.env
-                                                                  .NEXT_PUBLIC_BASE_LOGO_URL +
-                                                              image.name
-                                                            : process.env
-                                                                  .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                              image.name
-                                                    }
-                                                    alt={image.name}
-                                                    className="w-full h-auto m-auto"
-                                                />
-                                            </div>
-                                            <div className="bg-neutral-800 bg-opacity-25">
+                        {selectedImages.map(
+                            (image: Images | Logos, index: number) => {
+                                if (
+                                    index >
+                                        imagePage * imagesPerPage -
+                                            (imagesPerPage + 1) &&
+                                    index < imagePage * imagesPerPage
+                                ) {
+                                    return (
+                                        <Tooltip
+                                            delay={1000}
+                                            placement="bottom"
+                                            className="dark"
+                                            key={image.name + "-" + index}
+                                            content={image.name}>
+                                            <div className="fade-in flex flex-col border rounded border-neutral-800">
                                                 <div
-                                                    id={image.name}
-                                                    className="text-center truncate p-2">
-                                                    {
-                                                        image.name
-                                                            .split("-")[0]
-                                                            .split("_")[1]
-                                                    }
+                                                    onClick={() => {
+                                                        setSelectedImage(
+                                                            image.name
+                                                        );
+                                                        onOpenImage();
+                                                    }}
+                                                    className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full">
+                                                    <Image
+                                                        height={100}
+                                                        width={100}
+                                                        src={
+                                                            image.name.split(
+                                                                "_"
+                                                            )[0] === "LOGO"
+                                                                ? process.env
+                                                                      .NEXT_PUBLIC_BASE_LOGO_URL +
+                                                                  image.name
+                                                                : process.env
+                                                                      .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                  image.name
+                                                        }
+                                                        alt={image.name}
+                                                        className="w-full h-auto m-auto"
+                                                    />
+                                                </div>
+                                                <div className="bg-neutral-800 bg-opacity-25">
+                                                    <div
+                                                        id={image.name}
+                                                        className="text-center truncate p-2">
+                                                        {
+                                                            image.name
+                                                                .split("-")[0]
+                                                                .split("_")[1]
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </Tooltip>
-                                );
-                            })}
+                                        </Tooltip>
+                                    );
+                                }
+                            }
+                        )}
                     </div>
                 </div>
             </div>
