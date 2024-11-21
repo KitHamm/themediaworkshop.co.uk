@@ -224,7 +224,6 @@ export default function Settings(props: {
         data.password = randomPassword(10);
         createUser(data)
             .then((res) => {
-                console.log(res.message);
                 setPassword(res.message);
                 setUserCreated(true);
                 setError(false);

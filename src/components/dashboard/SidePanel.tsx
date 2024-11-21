@@ -217,16 +217,17 @@ export default function SidePanel(props: {
             {/* Side panel set to 1/6 width of the screen in a fixed position on the left */}
             <div className="hidden xl:block min-h-screen h-full fixed top-0 w-1/6 bg-neutral-800 border-r border-orange-600">
                 <div className="xl:flex xl:p-10 border-b border-neutral-400 mb-4">
-                    <Image
-                        onClick={() => (window.location.href = "/")}
-                        src={"/images/tmw-logo.png"}
-                        alt="TMW Logo"
-                        priority
-                        id="title-logo"
-                        height={75}
-                        width={720}
-                        className="cursor-pointer max-w-full"
-                    />
+                    <Link target="_blank" href="/">
+                        <Image
+                            src={"/images/tmw-logo.png"}
+                            alt="TMW Logo"
+                            priority
+                            id="title-logo"
+                            height={75}
+                            width={720}
+                            className="cursor-pointer max-w-full"
+                        />
+                    </Link>
                 </div>
                 {/* User information and avatar */}
                 <div className="xl:flex pb-5 border-b border-neutral-400 mb-20">

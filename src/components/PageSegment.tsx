@@ -297,7 +297,7 @@ export default function PageSegment(props: {
                         </div>
                         <div
                             ref={ref}
-                            className="text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
+                            className="copy-text text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
                             <Markdown>{props.segment.copy}</Markdown>
                         </div>
                         {props.segment.casestudy.length > 0 && (

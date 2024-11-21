@@ -14,14 +14,10 @@ import {
     Pagination,
     Select,
     SelectItem,
-    Dropdown,
-    DropdownTrigger,
-    DropdownMenu,
-    DropdownItem,
 } from "@nextui-org/react";
 
 // React Components
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Next Components
 import Image from "next/image";
@@ -40,7 +36,6 @@ import {
 import { revalidateDashboard } from "../server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
 import { imageSort, videoSort } from "@/lib/functions";
-import { set } from "react-hook-form";
 
 export default function Media(props: {
     session: any;

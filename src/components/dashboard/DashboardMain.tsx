@@ -74,7 +74,6 @@ export default function DashboardMain(props: {
     const notificationContainer = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log(notifications);
         notificationContainer.current!.scrollTop =
             notificationContainer.current!.scrollHeight -
             notificationContainer.current!.clientHeight;
