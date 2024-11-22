@@ -27,6 +27,10 @@ type DashboardContextType = {
     setImageNamingError: React.Dispatch<React.SetStateAction<boolean>>;
     videoNamingError: boolean;
     setVideoNamingError: React.Dispatch<React.SetStateAction<boolean>>;
+    previewVideo: string;
+    setPreviewVideo: React.Dispatch<React.SetStateAction<string>>;
+    videoModalTarget: string;
+    setVideoModalTarget: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const DashboardStateContext = createContext<DashboardContextType>(
@@ -51,6 +55,8 @@ export default function DashboardStateProvider({
         useState(false);
     const [imageNamingError, setImageNamingError] = useState(false);
     const [videoNamingError, setVideoNamingError] = useState(false);
+    const [previewVideo, setPreviewVideo] = useState("");
+    const [videoModalTarget, setVideoModalTarget] = useState("");
 
     return (
         <DashboardStateContext.Provider
@@ -79,6 +85,10 @@ export default function DashboardStateProvider({
                 setImageNamingError,
                 videoNamingError,
                 setVideoNamingError,
+                previewVideo,
+                setPreviewVideo,
+                videoModalTarget,
+                setVideoModalTarget,
             }}>
             {children}
         </DashboardStateContext.Provider>

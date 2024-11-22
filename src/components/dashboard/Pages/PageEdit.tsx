@@ -9,7 +9,6 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
-    CircularProgress,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -20,7 +19,6 @@ import { useForm } from "react-hook-form";
 // Components
 import EditSegment from "../Segments/Segment";
 import NewSegment from "../Segments/NewSegment";
-import PageVideoUploadButton from "../Uploads/PageVideoUploadButton";
 
 // React Components
 import { useContext, useEffect, useRef, useState } from "react";
@@ -39,7 +37,8 @@ import { updatePage } from "@/components/server/pageActions/updatePage";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
-import { DashboardStateContext } from "../DashboardStateProvider";
+import PreviewVideoModal from "./Modals/PreviewVideoModal";
+import ChangeVideoModal from "./Modals/ChangeVideoModal";
 
 // Constants
 const accordionBaseHeight = "3.5rem";
@@ -52,23 +51,6 @@ export default function PageEdit(props: {
     caseStudies: CaseStudy[];
     hidden: boolean;
 }) {
-    const {
-        uploading,
-        setUploading,
-        notVideoError,
-        setNotVideoError,
-        sizeError,
-        setSizeError,
-        backgroundNamingError,
-        setBackgroundNamingError,
-        video1NamingError,
-        setVideo1NamingError,
-        video2NamingError,
-        setVideo2NamingError,
-        uploadProgress,
-        setUploadProgress,
-    } = useContext(DashboardStateContext);
-
     // Preview Markdown text state
     const [previewText, setPreviewText] = useState(false);
     // State for unsaved changes
@@ -112,34 +94,20 @@ export default function PageEdit(props: {
         onOpen: onOpenAddSegment,
         onOpenChange: onOpenChangeAddSegment,
     } = useDisclosure();
-    // Background video preview modal declaration
-    const { isOpen: isOpenVideoModal, onOpenChange: onOpenChangeVideoModal } =
-        useDisclosure();
-    // Showreel preview modal declaration
+    // Video pool modal for selecting video declaration
     const {
-        isOpen: isOpenShowreelModal,
-        onOpenChange: onOpenChangeShowreelModal,
-    } = useDisclosure();
-    // Year In Review preview modal declaration
-    const { isOpen: isOpenYearModal, onOpenChange: onOpenChangeYearModal } =
-        useDisclosure();
-    // Video pool modal for selecting background video declaration
-    const {
-        isOpen: isOpenSelectVideo,
-        onOpen: onOpenSelectVideo,
-        onOpenChange: onOpenChangeSelectVideo,
+        isOpen: isOpenSelectBackgroundVideo,
+        onOpenChange: onOpenChangeSelectBackgroundVideo,
     } = useDisclosure();
     // Video pool modal for selecting background video declaration
     const {
-        isOpen: isOpenSelectShowreel,
-        onOpen: onOpenSelectShowreel,
-        onOpenChange: onOpenChangeSelectShowreel,
+        isOpen: isOpenSelectVideo1,
+        onOpenChange: onOpenChangeSelectVideo1,
     } = useDisclosure();
     // Video pool modal for selecting year review video declaration
     const {
-        isOpen: isOpenSelectYear,
-        onOpen: onOpenSelectYear,
-        onOpenChange: onOpenChangeSelectYear,
+        isOpen: isOpenSelectVideo2,
+        onOpenChange: onOpenChangeSelectVideo2,
     } = useDisclosure();
     // View already selected video modal
     const {
@@ -305,7 +273,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectShowreel();
+                                                    onOpenChangeSelectVideo1();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -324,7 +292,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectShowreel();
+                                                    onOpenChangeSelectVideo1();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -362,7 +330,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectYear();
+                                                    onOpenChangeSelectVideo2();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -381,7 +349,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectYear();
+                                                    onOpenChangeSelectVideo2();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -423,7 +391,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectVideo();
+                                                    onOpenChangeSelectBackgroundVideo();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Change
@@ -442,7 +410,7 @@ export default function PageEdit(props: {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenSelectVideo();
+                                                    onOpenChangeSelectBackgroundVideo();
                                                 }}
                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto">
                                                 Select
@@ -690,7 +658,6 @@ export default function PageEdit(props: {
                                     variant="light"
                                     onPress={() => {
                                         onClose();
-                                        setNotVideoError(false);
                                     }}>
                                     Close
                                 </Button>
@@ -700,541 +667,47 @@ export default function PageEdit(props: {
                 </ModalContent>
             </Modal>
             {/* Preview video modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenPreviewVideo}
-                className="dark"
-                scrollBehavior="inside"
-                onOpenChange={onOpenChangePreviewVideo}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    {previewVideo.split("-")[0].split("_")[1]}
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <video
-                                    playsInline
-                                    disablePictureInPicture
-                                    id="bg-video"
-                                    controls={true}
-                                    src={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                        previewVideo
-                                    }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <PreviewVideoModal
+                isOpenPreviewVideo={isOpenPreviewVideo}
+                onOpenChangePreviewVideo={onOpenChangePreviewVideo}
+                previewVideo={previewVideo}
+            />
             {/* Change background Video modal */}
-            <Modal
-                hideCloseButton
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenSelectVideo}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeSelectVideo}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Background Video
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div className="w-full text-center">
-                                    Max size: 100MB
-                                </div>
-                                {notVideoError && (
-                                    <div className="w-full text-center text-red-400">
-                                        Please Upload file in video format.
-                                    </div>
-                                )}
-                                {backgroundNamingError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with
-                                        HEADER_
-                                    </div>
-                                )}
-                                {sizeError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File size too large.
-                                    </div>
-                                )}
-                                <div className="flex justify-evenly w-full">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <div className="file-input shadow-xl">
-                                            <PageVideoUploadButton
-                                                check="HEADER"
-                                                format="video"
-                                                target="background"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {props.videos.map(
-                                        (video: Videos, index: number) => {
-                                            if (
-                                                video.name.split("_")[0] ===
-                                                "HEADER"
-                                            ) {
-                                                return (
-                                                    <div
-                                                        key={
-                                                            video.name +
-                                                            "-" +
-                                                            index
-                                                        }>
-                                                        <div
-                                                            onClick={() => {
-                                                                setPreviewVideo(
-                                                                    video.name
-                                                                );
-                                                                onOpenChangePreviewVideo();
-                                                            }}
-                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                            <Image
-                                                                height={100}
-                                                                width={100}
-                                                                src={
-                                                                    "/images/play.png"
-                                                                }
-                                                                alt="play"
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                        <div className="text-center truncate">
-                                                            {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
-                                                            }
-                                                        </div>
-                                                        <div className="flex justify-center mt-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setValue(
-                                                                        "backgroundVideo",
-                                                                        video.name,
-                                                                        {
-                                                                            shouldDirty:
-                                                                                true,
-                                                                        }
-                                                                    );
-                                                                    onClose();
-                                                                }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
-                                                                Select
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            {!uploading && (
-                                <ModalFooter>
-                                    {getValues("backgroundVideo") ? (
-                                        <button
-                                            onClick={() => {
-                                                setValue(
-                                                    "backgroundVideo",
-                                                    "",
-                                                    {
-                                                        shouldDirty: true,
-                                                    }
-                                                );
-                                                onClose();
-                                                setNotVideoError(false);
-                                                setBackgroundNamingError(false);
-                                                setSizeError(false);
-                                            }}
-                                            className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
-                                            Remove
-                                        </button>
-                                    ) : (
-                                        ""
-                                    )}
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            onClose();
-                                            setNotVideoError(false);
-                                            setBackgroundNamingError(false);
-                                            setSizeError(false);
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
-                            )}
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Change Video 1 video modal */}
-            <Modal
-                hideCloseButton
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenSelectShowreel}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeSelectShowreel}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Video 1
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div className="w-full text-center">
-                                    Max size: 100MB
-                                </div>
-                                {notVideoError && (
-                                    <div className="w-full text-center text-red-400">
-                                        Please Upload file in video format.
-                                    </div>
-                                )}
-                                {video1NamingError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with VIDEO_
-                                    </div>
-                                )}
-                                {sizeError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File size too large.
-                                    </div>
-                                )}
-                                <div className="flex justify-evenly w-full">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <div className="file-input shadow-xl">
-                                            <PageVideoUploadButton
-                                                check="VIDEO"
-                                                format="video"
-                                                target="video1"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {props.videos.map(
-                                        (video: Videos, index: number) => {
-                                            if (
-                                                video.name.split("_")[0] ===
-                                                "VIDEO"
-                                            ) {
-                                                return (
-                                                    <div
-                                                        key={
-                                                            video.name +
-                                                            "-" +
-                                                            index
-                                                        }>
-                                                        <div
-                                                            onClick={() => {
-                                                                setPreviewVideo(
-                                                                    video.name
-                                                                );
-                                                                onOpenChangePreviewVideo();
-                                                            }}
-                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                            <Image
-                                                                height={100}
-                                                                width={100}
-                                                                src={
-                                                                    "/images/play.png"
-                                                                }
-                                                                alt="play"
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                        <div className="text-center truncate">
-                                                            {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
-                                                            }
-                                                        </div>
-                                                        <div className="flex justify-center mt-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setValue(
-                                                                        "video1",
-                                                                        video.name,
-                                                                        {
-                                                                            shouldDirty:
-                                                                                true,
-                                                                        }
-                                                                    );
-
-                                                                    onClose();
-                                                                    setVideo1NamingError(
-                                                                        false
-                                                                    );
-                                                                    setNotVideoError(
-                                                                        false
-                                                                    );
-                                                                    setSizeError(
-                                                                        false
-                                                                    );
-                                                                }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
-                                                                Select
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            {!uploading && (
-                                <ModalFooter>
-                                    {getValues("video1") ? (
-                                        <button
-                                            onClick={() => {
-                                                setValue("video1", "", {
-                                                    shouldDirty: true,
-                                                });
-                                                onClose();
-                                                setNotVideoError(false);
-                                                setVideo1NamingError(false);
-                                                setSizeError(false);
-                                            }}
-                                            className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
-                                            Remove
-                                        </button>
-                                    ) : (
-                                        ""
-                                    )}
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            onClose();
-                                            setVideo1NamingError(false);
-                                            setSizeError(false);
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
-                            )}
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <ChangeVideoModal
+                videos={props.videos}
+                isOpenSelectVideo={isOpenSelectBackgroundVideo}
+                onOpenChangeSelectVideo={onOpenChangeSelectBackgroundVideo}
+                onOpenChangePreviewVideo={onOpenChangePreviewVideo}
+                setValue={setValue}
+                hasVideoSet={getValues("backgroundVideo") ? true : false}
+                modalTarget="backgroundVideo"
+                modalTitle="Background Video"
+                prefixCheck="HEADER"
+            />
+            {/* Change Video 1 modal */}
+            <ChangeVideoModal
+                videos={props.videos}
+                isOpenSelectVideo={isOpenSelectVideo1}
+                onOpenChangeSelectVideo={onOpenChangeSelectVideo1}
+                onOpenChangePreviewVideo={onOpenChangePreviewVideo}
+                setValue={setValue}
+                hasVideoSet={getValues("video1") ? true : false}
+                modalTarget="video1"
+                modalTitle="Video 1"
+                prefixCheck="VIDEO"
+            />
             {/* Change video 2 modal */}
-            <Modal
-                hideCloseButton
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenSelectYear}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeSelectYear}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Video 2
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div className="w-full text-center">
-                                    Max size: 100MB
-                                </div>
-                                {notVideoError && (
-                                    <div className="w-full text-center text-red-400">
-                                        Please Upload file in video format.
-                                    </div>
-                                )}
-                                {video2NamingError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with VIDEO_
-                                    </div>
-                                )}
-                                {sizeError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File size too large.
-                                    </div>
-                                )}
-                                <div className="flex justify-evenly w-full">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <div className="file-input shadow-xl">
-                                            <PageVideoUploadButton
-                                                check="VIDEO"
-                                                format="video"
-                                                target="video2"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {props.videos.map(
-                                        (video: Videos, index: number) => {
-                                            if (
-                                                video.name.split("_")[0] ===
-                                                "VIDEO"
-                                            ) {
-                                                return (
-                                                    <div
-                                                        key={
-                                                            video.name +
-                                                            "-" +
-                                                            index
-                                                        }>
-                                                        <div
-                                                            onClick={() => {
-                                                                setPreviewVideo(
-                                                                    video.name
-                                                                );
-                                                                onOpenChangePreviewVideo();
-                                                            }}
-                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                            <Image
-                                                                height={100}
-                                                                width={100}
-                                                                src={
-                                                                    "/images/play.png"
-                                                                }
-                                                                alt="play"
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                        <div className="text-center truncate">
-                                                            {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
-                                                            }
-                                                        </div>
-                                                        <div className="flex justify-center mt-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setValue(
-                                                                        "video2",
-                                                                        video.name
-                                                                    );
-                                                                    onClose();
-                                                                    setVideo2NamingError(
-                                                                        false
-                                                                    );
-                                                                    setNotVideoError(
-                                                                        false
-                                                                    );
-                                                                    setSizeError(
-                                                                        false
-                                                                    );
-                                                                }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
-                                                                Select
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            {!uploading && (
-                                <ModalFooter>
-                                    {getValues("video2") ? (
-                                        <button
-                                            onClick={() => {
-                                                setValue("video2", "", {
-                                                    shouldDirty: true,
-                                                });
-                                                onClose();
-                                                setNotVideoError(false);
-                                                setVideo2NamingError(false);
-                                                setSizeError(false);
-                                            }}
-                                            className="px-10 py-2 bg-red-400 rounded-xl">
-                                            Remove
-                                        </button>
-                                    ) : (
-                                        ""
-                                    )}
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            onClose();
-                                            setNotVideoError(false);
-                                            setVideo2NamingError(false);
-                                            setSizeError(false);
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
-                            )}
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <ChangeVideoModal
+                videos={props.videos}
+                isOpenSelectVideo={isOpenSelectVideo2}
+                onOpenChangeSelectVideo={onOpenChangeSelectVideo2}
+                onOpenChangePreviewVideo={onOpenChangePreviewVideo}
+                setValue={setValue}
+                hasVideoSet={getValues("video2") ? true : false}
+                modalTarget="video2"
+                modalTitle="Video 2"
+                prefixCheck="VIDEO"
+            />
         </div>
     );
 }
