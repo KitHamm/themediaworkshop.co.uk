@@ -1088,6 +1088,7 @@ export default function Media(props: {
                                 {!uploading && (
                                     <div className="flex justify-evenly">
                                         <Button
+                                            className="rounded-md"
                                             onPress={() => {
                                                 clearFileInput();
                                             }}
@@ -1100,7 +1101,7 @@ export default function Media(props: {
                                                 uploadMedia();
                                             }}
                                             disabled={newUpload ? false : true}
-                                            className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
+                                            className="rounded-md disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
                                             Upload
                                         </Button>
                                     </div>
@@ -1109,6 +1110,7 @@ export default function Media(props: {
                             <ModalFooter>
                                 {!uploading && (
                                     <Button
+                                        className="rounded-md"
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
