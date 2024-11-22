@@ -1,8 +1,8 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { DashboardStateContext } from "../DashboardStateProvider";
 import {
+    Select,
+    SelectItem,
     Button,
     CircularProgress,
     Modal,
@@ -11,42 +11,35 @@ import {
     ModalFooter,
     ModalHeader,
     Pagination,
-    Select,
-    SelectItem,
 } from "@nextui-org/react";
-import Image from "next/image";
 import { Images } from "@prisma/client";
+import Image from "next/image";
+import { useState, useContext, useEffect } from "react";
+import { DashboardStateContext } from "../DashboardStateProvider";
 import { imageSort, itemOrder } from "@/lib/functions";
-import SegmentTopImageUploadButton from "../Uploads/SegmentTopImageUploadButton";
+import SegmentAddImageUploadButton from "../Uploads/SegmentAddImageUploadButton";
 
-export default function TopImageSelectModal(props: {
-    isOpenTopImage: boolean;
-    onOpenChangeTopImage: any;
-    segmentTitle: string;
+export default function SegmentImagesModal(props: {
+    isOpenAddImage: boolean;
+    onOpenChangeAddImage: any;
     images: Images[];
-    setValue: any;
-    setTopImage: any;
+    imageAppend: any;
 }) {
     const {
+        segmentImageNamingError,
         uploading,
         uploadProgress,
-        topImageNamingError,
-        sizeError,
         notImageError,
-        setTopImageNamingError,
-        setSizeError,
-        setNotImageError,
+        sizeError,
     } = useContext(DashboardStateContext);
-
     const [availableImages, setAvailableImages] = useState<Images[]>(
-        imageSort(props.images, [], "header")
+        imageSort(props.images, [], "segment")
     );
 
     useEffect(() => {
-        setAvailableImages(imageSort(props.images, [], "header"));
+        setAvailableImages(imageSort(props.images, [], "segment"));
     }, [props.images]);
 
-    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [imagesPerPage, setImagesPerPage] = useState(8);
     const [sortBy, setSortBy] = useState("date");
@@ -58,29 +51,29 @@ export default function TopImageSelectModal(props: {
 
     return (
         <Modal
-            isDismissable={false}
-            hideCloseButton
             size="5xl"
             backdrop="blur"
-            isOpen={props.isOpenTopImage}
+            isOpen={props.isOpenAddImage}
             className="dark"
             scrollBehavior="inside"
-            onOpenChange={props.onOpenChangeTopImage}>
+            onOpenChange={props.onOpenChangeAddImage}>
             <ModalContent>
                 {(onClose) => (
                     <>
                         <ModalHeader>
-                            {"Top Image for " + props.segmentTitle}
+                            <div className="w-full text-center font-bold">
+                                Select or Upload Image
+                            </div>
                         </ModalHeader>
                         <ModalBody>
+                            {segmentImageNamingError && (
+                                <div className="text-center text-red-400">
+                                    File name prefix should be SEGMENT_
+                                </div>
+                            )}
                             {notImageError && (
                                 <div className="w-full text-center text-red-400">
                                     Please Upload file in video format.
-                                </div>
-                            )}
-                            {topImageNamingError && (
-                                <div className="w-full text-center text-red-400">
-                                    File name should be prefixed with HEADER_
                                 </div>
                             )}
                             {sizeError && (
@@ -88,11 +81,11 @@ export default function TopImageSelectModal(props: {
                                     File size too large.
                                 </div>
                             )}
-                            <div className="flex justify-center">
+                            <div className="w-full flex justify-center mb-10">
                                 {uploading ? (
                                     <CircularProgress
                                         classNames={{
-                                            svg: "w-20 h-20 drop-shadow-md",
+                                            svg: "w-20 h-20 text-orange-600 drop-shadow-md",
                                             value: "text-xl",
                                         }}
                                         showValueLabel={true}
@@ -101,15 +94,16 @@ export default function TopImageSelectModal(props: {
                                         aria-label="Loading..."
                                     />
                                 ) : (
-                                    <SegmentTopImageUploadButton
-                                        check="SEGHEAD"
-                                        format="image"
-                                        setValue={props.setValue}
-                                        setTopImage={props.setTopImage}
-                                        onOpenChange={
-                                            props.onOpenChangeTopImage
-                                        }
-                                    />
+                                    <>
+                                        <SegmentAddImageUploadButton
+                                            onOpenChange={
+                                                props.onOpenChangeAddImage
+                                            }
+                                            imageAppend={props.imageAppend}
+                                            check="SEGMENT"
+                                            format="image"
+                                        />
+                                    </>
                                 )}
                             </div>
                             <div className="flex justify-evenly gap-12 mt-4">
@@ -219,7 +213,7 @@ export default function TopImageSelectModal(props: {
                                     onChange={setCurrentPage}
                                 />
                             </div>
-                            <div className="grid xl:grid-cols-4 gap-5">
+                            <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                 {availableImages.map(
                                     (image: Images, index: number) => {
                                         if (
@@ -227,7 +221,7 @@ export default function TopImageSelectModal(props: {
                                                 currentPage * imagesPerPage -
                                                     (imagesPerPage + 1) &&
                                             index < currentPage * imagesPerPage
-                                        ) {
+                                        )
                                             return (
                                                 <div
                                                     key={
@@ -235,17 +229,9 @@ export default function TopImageSelectModal(props: {
                                                     }
                                                     className="flex cursor-pointer"
                                                     onClick={() => {
-                                                        props.setValue(
-                                                            "headerImage",
-                                                            image.name,
-                                                            {
-                                                                shouldDirty:
-                                                                    true,
-                                                            }
-                                                        );
-                                                        props.setTopImage(
-                                                            image.name
-                                                        );
+                                                        props.imageAppend({
+                                                            url: image.name,
+                                                        });
                                                         onClose();
                                                     }}>
                                                     <Image
@@ -261,19 +247,14 @@ export default function TopImageSelectModal(props: {
                                                     />
                                                 </div>
                                             );
-                                        }
                                     }
                                 )}
                             </div>
                         </ModalBody>
                         <ModalFooter>
                             <Button
-                                className="rounded-md"
                                 color="danger"
                                 onPress={() => {
-                                    setTopImageNamingError(false);
-                                    setSizeError(false);
-                                    setNotImageError(false);
                                     onClose();
                                 }}>
                                 Close
