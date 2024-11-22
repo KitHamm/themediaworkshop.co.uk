@@ -686,7 +686,7 @@ export default function EditSegment(props: {
                 <TopImageSelectModal
                     isOpenTopImage={isOpenTopImage}
                     onOpenChangeTopImage={onOpenChangeTopImage}
-                    segment={props.segment}
+                    segmentTitle={props.segment.title!}
                     images={props.images}
                     setValue={setValue}
                     setTopImage={setTopImage}

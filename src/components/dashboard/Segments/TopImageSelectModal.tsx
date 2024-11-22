@@ -17,19 +17,28 @@ import {
     SelectItem,
 } from "@nextui-org/react";
 import Image from "next/image";
-import { Images, Segment } from "@prisma/client";
+import { Images } from "@prisma/client";
 import { imageSort, itemOrder } from "@/lib/functions";
 import SegmentTopImageUploadButton from "../Uploads/SegmentTopImageUploadButton";
 
 export default function TopImageSelectModal(props: {
     isOpenTopImage: boolean;
     onOpenChangeTopImage: any;
-    segment: Segment;
+    segmentTitle: string;
     images: Images[];
     setValue: any;
     setTopImage: any;
 }) {
-    const { uploading, uploadProgress } = useContext(DashboardStateContext);
+    const {
+        uploading,
+        uploadProgress,
+        topImageNamingError,
+        sizeError,
+        notImageError,
+        setTopImageNamingError,
+        setSizeError,
+        setNotImageError,
+    } = useContext(DashboardStateContext);
 
     const [availableImages, setAvailableImages] = useState<Images[]>(
         imageSort(props.images, [], "header")
@@ -51,6 +60,8 @@ export default function TopImageSelectModal(props: {
 
     return (
         <Modal
+            isDismissable={false}
+            hideCloseButton
             size="5xl"
             backdrop="blur"
             isOpen={props.isOpenTopImage}
@@ -61,9 +72,24 @@ export default function TopImageSelectModal(props: {
                 {(onClose) => (
                     <>
                         <ModalHeader>
-                            {"Top Image for " + props.segment.title}
+                            {"Top Image for " + props.segmentTitle}
                         </ModalHeader>
                         <ModalBody>
+                            {notImageError && (
+                                <div className="w-full text-center text-red-400">
+                                    Please Upload file in video format.
+                                </div>
+                            )}
+                            {topImageNamingError && (
+                                <div className="w-full text-center text-red-400">
+                                    File name should be prefixed with HEADER_
+                                </div>
+                            )}
+                            {sizeError && (
+                                <div className="w-full text-center text-red-400">
+                                    File size too large.
+                                </div>
+                            )}
                             <div className="flex justify-center">
                                 {uploading ? (
                                     <CircularProgress
@@ -247,6 +273,9 @@ export default function TopImageSelectModal(props: {
                                 className="rounded-md"
                                 color="danger"
                                 onPress={() => {
+                                    setTopImageNamingError(false);
+                                    setSizeError(false);
+                                    setNotImageError(false);
                                     onClose();
                                 }}>
                                 Close

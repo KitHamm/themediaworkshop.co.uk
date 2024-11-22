@@ -33,9 +33,8 @@ export default function PageVideoUploadButton(props: {
             const fileTypeCheck = fileType === props.format;
 
             if (!nameCheck) {
-                inputElm.current!.value = "";
                 switch (props.target) {
-                    case "background":
+                    case "backgroundVideo":
                         setBackgroundNamingError(true);
                         break;
                     case "video1":
@@ -52,14 +51,12 @@ export default function PageVideoUploadButton(props: {
             }
 
             if (!sizeCheck) {
-                inputElm.current!.value = "";
                 setSizeError(true);
             } else {
                 setSizeError(false);
             }
 
             if (!fileTypeCheck) {
-                inputElm.current!.value = "";
                 setNotVideoError(true);
             } else {
                 setNotVideoError(false);

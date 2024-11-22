@@ -28,6 +28,7 @@ import { ImageFormType, SegmentFormType } from "@/lib/types";
 // Functions
 import axios from "axios";
 import { createSegment } from "@/components/server/segmentActions/createSegment";
+import TopImageSelectModal from "./TopImageSelectModal";
 
 export default function NewSegment(props: {
     title: string;
@@ -88,6 +89,8 @@ export default function NewSegment(props: {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [notImageError, setNotImageError] = useState(false);
     const [success, setSuccess] = useState(false);
+
+    const [topImage, setTopImage] = useState("");
     // Top image select modal
     const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
         useDisclosure();
@@ -172,7 +175,7 @@ export default function NewSegment(props: {
                             <div className="">Top Image</div>
                         </div>
                         <div className="relative my-2">
-                            {getValues("headerImage") ? (
+                            {topImage ? (
                                 <div>
                                     <Image
                                         height={2000}
@@ -180,9 +183,9 @@ export default function NewSegment(props: {
                                         src={
                                             process.env
                                                 .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                            getValues("headerImage")
+                                            topImage
                                         }
-                                        alt={getValues("headerImage")}
+                                        alt={topImage}
                                         className="w-full h-auto m-auto"
                                     />
                                     <div className="hover:opacity-100 flex justify-center transition-opacity opacity-0 absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
@@ -207,6 +210,7 @@ export default function NewSegment(props: {
                                                                     true,
                                                             }
                                                         );
+                                                        setTopImage("");
                                                     }}
                                                     aria-hidden
                                                     className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
@@ -216,7 +220,7 @@ export default function NewSegment(props: {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="w-full grid xl:grid-cols-2 xl:gap-0 gap-4 my-10">
+                                <div className="w-full  my-10">
                                     {uploading ? (
                                         <CircularProgress
                                             classNames={{
@@ -230,67 +234,7 @@ export default function NewSegment(props: {
                                             aria-label="Loading..."
                                         />
                                     ) : (
-                                        <>
-                                            <div>
-                                                {topImageNamingError && (
-                                                    <div className="text-center text-red-400">
-                                                        File name should be
-                                                        prefixed with SEGHEAD_
-                                                    </div>
-                                                )}
-                                                <div className="file-input">
-                                                    <input
-                                                        onChange={(e) => {
-                                                            if (
-                                                                e.target.files
-                                                            ) {
-                                                                if (
-                                                                    namingConventionCheck(
-                                                                        e.target
-                                                                            .files[0]
-                                                                            .name,
-                                                                        "SEGHEAD"
-                                                                    )
-                                                                ) {
-                                                                    setUploading(
-                                                                        true
-                                                                    );
-                                                                    setTopImageNamingError(
-                                                                        false
-                                                                    );
-                                                                    uploadImage(
-                                                                        e.target
-                                                                            .files[0],
-                                                                        "header"
-                                                                    );
-                                                                } else {
-                                                                    setTopImageNamingError(
-                                                                        true
-                                                                    );
-                                                                    clearFileInput(
-                                                                        "header"
-                                                                    );
-                                                                }
-                                                            }
-                                                        }}
-                                                        id={"top-image-input"}
-                                                        type="file"
-                                                        className="inputFile"
-                                                    />
-                                                    <label
-                                                        className="mx-auto"
-                                                        htmlFor={
-                                                            "top-image-input"
-                                                        }>
-                                                        Upload New
-                                                    </label>
-                                                </div>
-                                                <div className="w-full text-center text-red-400">
-                                                    {notImageError
-                                                        ? "Please upload media in Image format"
-                                                        : ""}
-                                                </div>
-                                            </div>
+                                        <div className="flex justify-center">
                                             <div className="text-center">
                                                 <button
                                                     type="button"
@@ -301,7 +245,7 @@ export default function NewSegment(props: {
                                                     Select
                                                 </button>
                                             </div>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -487,7 +431,15 @@ export default function NewSegment(props: {
                         </div>
                     </form>
                     {/* Top Image modal */}
-                    <Modal
+                    <TopImageSelectModal
+                        isOpenTopImage={isOpenTopImage}
+                        onOpenChangeTopImage={onOpenChangeTopImage}
+                        segmentTitle={"New Segment"}
+                        images={props.images}
+                        setValue={setValue}
+                        setTopImage={setTopImage}
+                    />
+                    {/* <Modal
                         size="5xl"
                         backdrop="blur"
                         isOpen={isOpenTopImage}
@@ -566,7 +518,7 @@ export default function NewSegment(props: {
                                 </>
                             )}
                         </ModalContent>
-                    </Modal>
+                    </Modal> */}
                     {/* Segment images modal */}
                     <Modal
                         size="2xl"

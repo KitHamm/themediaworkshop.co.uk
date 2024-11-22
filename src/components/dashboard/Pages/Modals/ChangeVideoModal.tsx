@@ -33,11 +33,15 @@ export default function ChangeVideoModal(props: {
     const {
         notVideoError,
         backgroundNamingError,
+        video1NamingError,
+        video2NamingError,
         sizeError,
         uploadProgress,
         uploading,
         setNotVideoError,
         setBackgroundNamingError,
+        setVideo1NamingError,
+        setVideo2NamingError,
         setSizeError,
         setPreviewVideo,
     } = useContext(DashboardStateContext);
@@ -100,6 +104,16 @@ export default function ChangeVideoModal(props: {
                             {backgroundNamingError && (
                                 <div className="w-full text-center text-red-400">
                                     File name should be prefixed with HEADER_
+                                </div>
+                            )}
+                            {video1NamingError && (
+                                <div className="w-full text-center text-red-400">
+                                    File name should be prefixed with VIDEO_
+                                </div>
+                            )}
+                            {video2NamingError && (
+                                <div className="w-full text-center text-red-400">
+                                    File name should be prefixed with VIDEO_
                                 </div>
                             )}
                             {sizeError && (
@@ -317,6 +331,8 @@ export default function ChangeVideoModal(props: {
                                             onClose();
                                             setNotVideoError(false);
                                             setBackgroundNamingError(false);
+                                            setVideo1NamingError(false);
+                                            setVideo2NamingError(false);
                                             setSizeError(false);
                                         }}
                                         className="xl:px-10 px-4 py-2 rounded-md">
@@ -332,6 +348,8 @@ export default function ChangeVideoModal(props: {
                                         onClose();
                                         setNotVideoError(false);
                                         setBackgroundNamingError(false);
+                                        setVideo1NamingError(false);
+                                        setVideo2NamingError(false);
                                         setSizeError(false);
                                     }}>
                                     Close
