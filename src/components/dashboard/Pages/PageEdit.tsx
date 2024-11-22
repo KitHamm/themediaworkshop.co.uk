@@ -37,6 +37,7 @@ import axios from "axios";
 import { NotificationsContext } from "../DashboardMain";
 import Link from "next/link";
 import { updatePage } from "@/components/server/pageActions/updatePage";
+import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 // Constants
 const accordionBaseHeight = "3.5rem";
@@ -52,9 +53,10 @@ export default function PageEdit(props: {
     // Media uploading and error state for if not a video
     const [uploading, setUploading] = useState(false);
     const [notVideoError, setNotVideoError] = useState(false);
-    const [showreelNamingError, setShowreelNamingError] = useState(false);
+    const [sizeError, setSizeError] = useState(false);
     const [backgroundNamingError, setBackgroundNamingError] = useState(false);
-    const [yearNamingError, setYearNamingError] = useState(false);
+    const [video1NamingError, setVideo1NamingError] = useState(false);
+    const [video2NamingError, setVideo2NamingError] = useState(false);
 
     // Preview Markdown text state
     const [previewText, setPreviewText] = useState(false);
@@ -187,7 +189,57 @@ export default function PageEdit(props: {
         }
     }
 
+    function onSelectFile(
+        file: File,
+        check: string,
+        format: string,
+        target: string
+    ) {
+        const fileSize = file.size / 1024 / 1024;
+        const filePrefix = file.name.split("_")[0];
+        const fileType = file.type.split("/")[0];
+
+        const nameCheck = filePrefix === check;
+        const sizeCheck = fileSize < 100;
+        const fileTypeCheck = fileType === format;
+
+        if (!nameCheck) {
+            switch (target) {
+                case "background":
+                    setBackgroundNamingError(true);
+                    break;
+                case "video1":
+                    setVideo1NamingError(true);
+                    break;
+                case "video2":
+                    setVideo2NamingError(true);
+                    break;
+            }
+        } else {
+            setBackgroundNamingError(false);
+            setVideo1NamingError(false);
+            setVideo2NamingError(false);
+        }
+
+        if (!sizeCheck) {
+            setSizeError(true);
+        } else {
+            setSizeError(false);
+        }
+
+        if (!fileTypeCheck) {
+            setNotVideoError(true);
+        } else {
+            setNotVideoError(false);
+        }
+
+        if (nameCheck && sizeCheck && fileTypeCheck) {
+            uploadVideo(file);
+        }
+    }
+
     async function uploadVideo(file: File) {
+        setUploading(true);
         setUploadProgress(0);
         if (file.type.split("/")[0] !== "video") {
             setNotVideoError(true);
@@ -212,6 +264,7 @@ export default function PageEdit(props: {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
+                        revalidateDashboard();
                     }
                 })
                 .catch((err) => console.log(err));
@@ -892,6 +945,7 @@ export default function PageEdit(props: {
             </Modal>
             {/* Change background Video modal */}
             <Modal
+                hideCloseButton
                 size="5xl"
                 backdrop="blur"
                 isOpen={isOpenSelectVideo}
@@ -908,6 +962,9 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
+                                <div className="w-full text-center">
+                                    Max size: 100MB
+                                </div>
                                 {notVideoError && (
                                     <div className="w-full text-center text-red-400">
                                         Please Upload file in video format.
@@ -917,6 +974,11 @@ export default function PageEdit(props: {
                                     <div className="w-full text-center text-red-400">
                                         File name should be prefixed with
                                         HEADER_
+                                    </div>
+                                )}
+                                {sizeError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File size too large.
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
@@ -936,28 +998,12 @@ export default function PageEdit(props: {
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        if (
-                                                            namingErrorCheck(
-                                                                e.target
-                                                                    .files[0]
-                                                                    .name,
-                                                                "HEADER"
-                                                            )
-                                                        ) {
-                                                            setUploading(true);
-                                                            setBackgroundNamingError(
-                                                                false
-                                                            );
-                                                            uploadVideo(
-                                                                e.target
-                                                                    .files[0]
-                                                            );
-                                                        } else {
-                                                            setBackgroundNamingError(
-                                                                true
-                                                            );
-                                                            e.target.value = "";
-                                                        }
+                                                        onSelectFile(
+                                                            e.target.files[0],
+                                                            "HEADER",
+                                                            "video",
+                                                            "background"
+                                                        );
                                                     }
                                                 }}
                                                 id={"upload-showreel"}
@@ -1021,9 +1067,6 @@ export default function PageEdit(props: {
                                                                         }
                                                                     );
                                                                     onClose();
-                                                                    setBackgroundNamingError(
-                                                                        false
-                                                                    );
                                                                 }}
                                                                 className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
                                                                 Select
@@ -1036,40 +1079,49 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                {getValues("backgroundVideo") ? (
-                                    <button
-                                        onClick={() => {
-                                            setValue("backgroundVideo", "", {
-                                                shouldDirty: true,
-                                            });
+                            {!uploading && (
+                                <ModalFooter>
+                                    {getValues("backgroundVideo") ? (
+                                        <button
+                                            onClick={() => {
+                                                setValue(
+                                                    "backgroundVideo",
+                                                    "",
+                                                    {
+                                                        shouldDirty: true,
+                                                    }
+                                                );
+                                                onClose();
+                                                setNotVideoError(false);
+                                                setBackgroundNamingError(false);
+                                                setSizeError(false);
+                                            }}
+                                            className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
+                                            Remove
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
                                             onClose();
                                             setNotVideoError(false);
                                             setBackgroundNamingError(false);
-                                        }}
-                                        className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
-                                        Remove
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setBackgroundNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
+                                            setSizeError(false);
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            )}
                         </>
                     )}
                 </ModalContent>
             </Modal>
             {/* Change Video 1 video modal */}
             <Modal
+                hideCloseButton
                 size="5xl"
                 backdrop="blur"
                 isOpen={isOpenSelectShowreel}
@@ -1086,14 +1138,22 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
+                                <div className="w-full text-center">
+                                    Max size: 100MB
+                                </div>
                                 {notVideoError && (
                                     <div className="w-full text-center text-red-400">
                                         Please Upload file in video format.
                                     </div>
                                 )}
-                                {showreelNamingError && (
+                                {video1NamingError && (
                                     <div className="w-full text-center text-red-400">
                                         File name should be prefixed with VIDEO_
+                                    </div>
+                                )}
+                                {sizeError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File size too large.
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
@@ -1113,28 +1173,12 @@ export default function PageEdit(props: {
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        if (
-                                                            namingErrorCheck(
-                                                                e.target
-                                                                    .files[0]
-                                                                    .name,
-                                                                "VIDEO"
-                                                            )
-                                                        ) {
-                                                            setUploading(true);
-                                                            setShowreelNamingError(
-                                                                false
-                                                            );
-                                                            uploadVideo(
-                                                                e.target
-                                                                    .files[0]
-                                                            );
-                                                        } else {
-                                                            setShowreelNamingError(
-                                                                true
-                                                            );
-                                                            e.target.value = "";
-                                                        }
+                                                        onSelectFile(
+                                                            e.target.files[0],
+                                                            "VIDEO",
+                                                            "video",
+                                                            "video1"
+                                                        );
                                                     }
                                                 }}
                                                 id={"upload-showreel"}
@@ -1199,10 +1243,13 @@ export default function PageEdit(props: {
                                                                     );
 
                                                                     onClose();
-                                                                    setShowreelNamingError(
+                                                                    setVideo1NamingError(
                                                                         false
                                                                     );
                                                                     setNotVideoError(
+                                                                        false
+                                                                    );
+                                                                    setSizeError(
                                                                         false
                                                                     );
                                                                 }}
@@ -1217,40 +1264,44 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                {getValues("video1") ? (
-                                    <button
-                                        onClick={() => {
-                                            setValue("video1", "", {
-                                                shouldDirty: true,
-                                            });
+                            {!uploading && (
+                                <ModalFooter>
+                                    {getValues("video1") ? (
+                                        <button
+                                            onClick={() => {
+                                                setValue("video1", "", {
+                                                    shouldDirty: true,
+                                                });
+                                                onClose();
+                                                setNotVideoError(false);
+                                                setVideo1NamingError(false);
+                                                setSizeError(false);
+                                            }}
+                                            className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
+                                            Remove
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
                                             onClose();
-                                            setNotVideoError(false);
-                                            setShowreelNamingError(false);
-                                        }}
-                                        className="xl:px-10 px-4 py-2 bg-red-400 rounded-xl">
-                                        Remove
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setShowreelNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
+                                            setVideo1NamingError(false);
+                                            setSizeError(false);
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            )}
                         </>
                     )}
                 </ModalContent>
             </Modal>
             {/* Change video 2 modal */}
             <Modal
+                hideCloseButton
                 size="5xl"
                 backdrop="blur"
                 isOpen={isOpenSelectYear}
@@ -1267,14 +1318,22 @@ export default function PageEdit(props: {
                                 </div>
                             </ModalHeader>
                             <ModalBody>
+                                <div className="w-full text-center">
+                                    Max size: 100MB
+                                </div>
                                 {notVideoError && (
                                     <div className="w-full text-center text-red-400">
                                         Please Upload file in video format.
                                     </div>
                                 )}
-                                {yearNamingError && (
+                                {video2NamingError && (
                                     <div className="w-full text-center text-red-400">
                                         File name should be prefixed with VIDEO_
+                                    </div>
+                                )}
+                                {sizeError && (
+                                    <div className="w-full text-center text-red-400">
+                                        File size too large.
                                     </div>
                                 )}
                                 <div className="flex justify-evenly w-full">
@@ -1294,28 +1353,12 @@ export default function PageEdit(props: {
                                             <input
                                                 onChange={(e) => {
                                                     if (e.target.files) {
-                                                        if (
-                                                            namingErrorCheck(
-                                                                e.target
-                                                                    .files[0]
-                                                                    .name,
-                                                                "VIDEO"
-                                                            )
-                                                        ) {
-                                                            setUploading(true);
-                                                            setYearNamingError(
-                                                                false
-                                                            );
-                                                            uploadVideo(
-                                                                e.target
-                                                                    .files[0]
-                                                            );
-                                                        } else {
-                                                            setYearNamingError(
-                                                                true
-                                                            );
-                                                            e.target.value = "";
-                                                        }
+                                                        onSelectFile(
+                                                            e.target.files[0],
+                                                            "VIDEO",
+                                                            "video",
+                                                            "video2"
+                                                        );
                                                     }
                                                 }}
                                                 id={"upload-year"}
@@ -1375,10 +1418,13 @@ export default function PageEdit(props: {
                                                                         video.name
                                                                     );
                                                                     onClose();
-                                                                    setYearNamingError(
+                                                                    setVideo2NamingError(
                                                                         false
                                                                     );
                                                                     setNotVideoError(
+                                                                        false
+                                                                    );
+                                                                    setSizeError(
                                                                         false
                                                                     );
                                                                 }}
@@ -1393,34 +1439,38 @@ export default function PageEdit(props: {
                                     )}
                                 </div>
                             </ModalBody>
-                            <ModalFooter>
-                                {getValues("video2") ? (
-                                    <button
-                                        onClick={() => {
-                                            setValue("video2", "", {
-                                                shouldDirty: true,
-                                            });
+                            {!uploading && (
+                                <ModalFooter>
+                                    {getValues("video2") ? (
+                                        <button
+                                            onClick={() => {
+                                                setValue("video2", "", {
+                                                    shouldDirty: true,
+                                                });
+                                                onClose();
+                                                setNotVideoError(false);
+                                                setVideo2NamingError(false);
+                                                setSizeError(false);
+                                            }}
+                                            className="px-10 py-2 bg-red-400 rounded-xl">
+                                            Remove
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
                                             onClose();
                                             setNotVideoError(false);
-                                            setYearNamingError(false);
-                                        }}
-                                        className="px-10 py-2 bg-red-400 rounded-xl">
-                                        Remove
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setYearNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
+                                            setVideo2NamingError(false);
+                                            setSizeError(false);
+                                        }}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            )}
                         </>
                     )}
                 </ModalContent>

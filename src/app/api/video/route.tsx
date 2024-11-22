@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 interface ArrayFile extends File {
     arrayBuffer: () => Promise<ArrayBuffer>;
@@ -64,6 +65,6 @@ export async function POST(request: Request) {
             { status: 500 }
         );
     } finally {
-        revalidatePath("/");
+        revalidateDashboard();
     }
 }
