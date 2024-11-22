@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function TickerTape(props: {
-    top: boolean;
+    start: boolean;
     logoImages: Logos[];
 }) {
     const [emblaHeight, setEmblaHeight] = useState("auto");
@@ -21,22 +21,23 @@ export default function TickerTape(props: {
     };
     const [logos, setLogos] = useState<string[]>([]);
     useEffect(() => {
-        let tempArray = [];
-        for (let i = 0; i < props.logoImages.length; i++) {
-            tempArray.push(props.logoImages[i].name);
+        let tempArray = props.logoImages.map((image: Logos) => image.name);
+
+        if (!props.start) {
+            const splitInHalf = (arr: string[]) => [
+                arr.slice(0, Math.ceil(arr.length / 2)),
+                arr.slice(Math.ceil(arr.length / 2)),
+            ];
+            var newTemp = splitInHalf(tempArray);
+            setLogos(newTemp[1].concat(newTemp[0]));
+        } else {
+            setLogos(tempArray);
         }
-        tempArray.sort(function (a: any, b: any) {
-            return a - b;
-        });
-        setLogos(tempArray);
     }, [props.logoImages]);
 
     const [emblaRef] = useEmblaCarousel(OPTIONS, [AutoScroll({ speed: 1 })]);
     return (
-        <div
-            className={` ${
-                props.top ? "mb-8" : ""
-            } w-full h-fit overflow-hidden bg-neutral-800`}>
+        <div className={` w-full h-fit overflow-hidden bg-neutral-800`}>
             <div className="embla my-5 h-fit xl:my-6">
                 <div className="embla__viewport" ref={emblaRef}>
                     <div

@@ -35,8 +35,8 @@ export default async function Home() {
             <MainHeader data={data as ExtendedPage} logoImages={logoImages} />
             {/* Top Ticker Tape */}
             {logoImages.length > 0 && (
-                <div className="mt-8">
-                    <TickerTape top={true} logoImages={logoImages} />
+                <div className="my-8">
+                    <TickerTape start={true} logoImages={logoImages} />
                 </div>
             )}
             {/* Iterate over segments and display in sequence */}
@@ -49,7 +49,7 @@ export default async function Home() {
             })}
             {/* Bottom Ticker Tape */}
             {logoImages.length > 0 && (
-                <TickerTape top={false} logoImages={logoImages} />
+                <TickerTape start={false} logoImages={logoImages} />
             )}
         </>
     );

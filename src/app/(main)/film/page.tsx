@@ -36,7 +36,7 @@ export default async function Home() {
             {/* Top Ticker Tape */}
             {logoImages.length > 0 && (
                 <div className="mt-8">
-                    <TickerTape top={true} logoImages={logoImages} />
+                    <TickerTape start={false} logoImages={logoImages} />
                 </div>
             )}
             {/* Iterate over segments and display in sequence */}
@@ -49,7 +49,7 @@ export default async function Home() {
             })}
             {/* Bottom Ticker Tape */}
             {logoImages.length > 0 && (
-                <TickerTape top={false} logoImages={logoImages} />
+                <TickerTape start={true} logoImages={logoImages} />
             )}
         </>
     );
