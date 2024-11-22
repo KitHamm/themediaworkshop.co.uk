@@ -35,7 +35,7 @@ import {
 } from "../server/mediaActions/deleteFile";
 import { revalidateDashboard } from "../server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
-import { imageSort, videoSort } from "@/lib/functions";
+import { imageSort, itemOrder, videoSort } from "@/lib/functions";
 
 export default function Media(props: {
     session: any;
@@ -60,21 +60,31 @@ export default function Media(props: {
         videoSort(props.videos, "background")
     );
 
+    // Pagination Controls
+    const [videoPage, setVideoPage] = useState(1);
+    const [imagePage, setImagePage] = useState(1);
+    const [imagesPerPage, setImagesPerPage] = useState(8);
+    const [videosPerPage, setVideosPerPage] = useState(8);
+    const [sortVideosBy, setSortVideosBy] = useState("date");
+    const [orderVideos, setOrderVideos] = useState("desc");
+    const [sortImagesBy, setSortImagesBy] = useState("date");
+    const [orderImages, setOrderImages] = useState("desc");
+
     useEffect(() => {
         setSelectedImages(imageSort(props.images, props.logos, imageView));
         setImagePage(1);
     }, [props.images, imageView]);
 
     useEffect(() => {
-        setSelectedVideos(videoSort(props.videos, videoView));
+        setSelectedVideos(
+            itemOrder(
+                videoSort(props.videos, videoView),
+                sortVideosBy,
+                orderVideos
+            )
+        );
         setVideoPage(1);
     }, [props.videos, videoView]);
-
-    // Pagination Controls
-    const [videoPage, setVideoPage] = useState(1);
-    const [imagePage, setImagePage] = useState(1);
-    const [imagesPerPage, setImagesPerPage] = useState(12);
-    const [videosPerPage, setVideosPerPage] = useState(8);
 
     useEffect(() => {
         setVideoPage(1);
@@ -83,6 +93,42 @@ export default function Media(props: {
     useEffect(() => {
         setImagePage(1);
     }, [imagesPerPage]);
+
+    useEffect(() => {
+        setSelectedVideos(itemOrder(selectedVideos, sortVideosBy, orderVideos));
+    }, [sortVideosBy, orderVideos]);
+
+    useEffect(() => {
+        const temp = [...selectedImages];
+        switch (sortImagesBy) {
+            case "date":
+                if (orderImages === "desc") {
+                    temp.sort(
+                        (a, b) =>
+                            new Date(b.createdAt).getTime() -
+                            new Date(a.createdAt).getTime()
+                    );
+                    setSelectedImages(temp);
+                } else {
+                    temp.sort(
+                        (a, b) =>
+                            new Date(a.createdAt).getTime() -
+                            new Date(b.createdAt).getTime()
+                    );
+                    setSelectedImages(temp);
+                }
+                break;
+            case "name":
+                if (orderImages === "desc") {
+                    temp.sort((a, b) => b.name.localeCompare(a.name));
+                    setSelectedImages(temp);
+                } else {
+                    temp.sort((a, b) => a.name.localeCompare(b.name));
+                    setSelectedImages(temp);
+                }
+                break;
+        }
+    }, [sortImagesBy, orderImages]);
 
     // State for file to upload
     const [newUpload, setNewUpload] = useState<File>();
@@ -249,9 +295,87 @@ export default function Media(props: {
                             Videos
                         </Link>
                     </div>
-                    <div className="flex flex-col xl:flex-row my-4 gap-12 xl:gap-0">
-                        <div className="hidden xl:block w-1/6" />
-                        <div className="flex justify-center grow">
+                    <div className="flex justify-evenly gap-12 mt-4">
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[videosPerPage.toString()]}
+                            labelPlacement="outside"
+                            label={"Videos Per Page"}
+                            onChange={(e) =>
+                                setVideosPerPage(parseInt(e.target.value))
+                            }>
+                            <SelectItem className="dark" key={8} value={8}>
+                                8
+                            </SelectItem>
+                            <SelectItem className="dark" key={12} value={12}>
+                                12
+                            </SelectItem>
+                            <SelectItem className="dark" key={16} value={16}>
+                                16
+                            </SelectItem>
+                            <SelectItem className="dark" key={20} value={20}>
+                                20
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={1000000}
+                                value={1000000}>
+                                All
+                            </SelectItem>
+                        </Select>
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[sortVideosBy.toString()]}
+                            labelPlacement="outside"
+                            label={"Sort by"}
+                            onChange={(e) => setSortVideosBy(e.target.value)}>
+                            <SelectItem
+                                className="dark"
+                                key={"date"}
+                                value={"date"}>
+                                Date
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={"name"}
+                                value={"name"}>
+                                Name
+                            </SelectItem>
+                        </Select>
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[orderVideos.toString()]}
+                            labelPlacement="outside"
+                            label={"Order"}
+                            onChange={(e) => setOrderVideos(e.target.value)}>
+                            <SelectItem
+                                className="dark"
+                                key={"asc"}
+                                value={"asc"}>
+                                Ascending
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={"desc"}
+                                value={"desc"}>
+                                Descending
+                            </SelectItem>
+                        </Select>
+                    </div>
+                    <div className="flex justify-center my-4">
+                        <div className="flex justify-center">
                             <Pagination
                                 className="dark mt-auto"
                                 classNames={{
@@ -264,48 +388,6 @@ export default function Media(props: {
                                 page={videoPage}
                                 onChange={setVideoPage}
                             />
-                        </div>
-                        <div className="w-1/2 xl:w-1/6 mx-auto xl:mx-0">
-                            <Select
-                                className="dark ms-auto me-auto xl:me-0"
-                                classNames={{
-                                    popoverContent: "bg-neutral-600",
-                                }}
-                                variant="bordered"
-                                selectedKeys={[videosPerPage.toString()]}
-                                labelPlacement="outside"
-                                label={"Videos Per Page"}
-                                onChange={(e) =>
-                                    setVideosPerPage(parseInt(e.target.value))
-                                }>
-                                <SelectItem className="dark" key={8} value={8}>
-                                    8
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={12}
-                                    value={12}>
-                                    12
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={16}
-                                    value={16}>
-                                    16
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={20}
-                                    value={20}>
-                                    20
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={1000000}
-                                    value={1000000}>
-                                    All
-                                </SelectItem>
-                            </Select>
                         </div>
                     </div>
                     {/* Videos section */}
@@ -434,9 +516,87 @@ export default function Media(props: {
                             Logos
                         </Link>
                     </div>
-                    <div className="flex flex-col xl:flex-row my-4 gap-12 xl:gap-0">
-                        <div className="hidden xl:block w-1/6" />
-                        <div className="flex justify-center grow">
+                    <div className="flex justify-evenly gap-12 mt-4">
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[imagesPerPage.toString()]}
+                            labelPlacement="outside"
+                            label={"Images Per Page"}
+                            onChange={(e) =>
+                                setImagesPerPage(parseInt(e.target.value))
+                            }>
+                            <SelectItem className="dark" key={8} value={8}>
+                                8
+                            </SelectItem>
+                            <SelectItem className="dark" key={12} value={12}>
+                                12
+                            </SelectItem>
+                            <SelectItem className="dark" key={16} value={16}>
+                                16
+                            </SelectItem>
+                            <SelectItem className="dark" key={20} value={20}>
+                                20
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={1000000}
+                                value={1000000}>
+                                All
+                            </SelectItem>
+                        </Select>
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[sortImagesBy.toString()]}
+                            labelPlacement="outside"
+                            label={"Sort by"}
+                            onChange={(e) => setSortImagesBy(e.target.value)}>
+                            <SelectItem
+                                className="dark"
+                                key={"date"}
+                                value={"date"}>
+                                Date
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={"name"}
+                                value={"name"}>
+                                Name
+                            </SelectItem>
+                        </Select>
+                        <Select
+                            className="dark ms-auto me-auto xl:me-0"
+                            classNames={{
+                                popoverContent: "bg-neutral-600",
+                            }}
+                            variant="bordered"
+                            selectedKeys={[orderImages.toString()]}
+                            labelPlacement="outside"
+                            label={"Order"}
+                            onChange={(e) => setOrderImages(e.target.value)}>
+                            <SelectItem
+                                className="dark"
+                                key={"asc"}
+                                value={"asc"}>
+                                Ascending
+                            </SelectItem>
+                            <SelectItem
+                                className="dark"
+                                key={"desc"}
+                                value={"desc"}>
+                                Descending
+                            </SelectItem>
+                        </Select>
+                    </div>
+                    <div className="flex justify-center my-4">
+                        <div className="flex justify-center">
                             <Pagination
                                 className="dark mt-auto"
                                 classNames={{
@@ -449,48 +609,6 @@ export default function Media(props: {
                                 page={imagePage}
                                 onChange={setImagePage}
                             />
-                        </div>
-                        <div className="w-1/2 xl:w-1/6 mx-auto xl:mx-0">
-                            <Select
-                                className="dark ms-auto me-auto xl:me-0"
-                                classNames={{
-                                    popoverContent: "bg-neutral-600",
-                                }}
-                                variant="bordered"
-                                selectedKeys={[imagesPerPage.toString()]}
-                                labelPlacement="outside"
-                                label={"Images Per Page"}
-                                onChange={(e) =>
-                                    setImagesPerPage(parseInt(e.target.value))
-                                }>
-                                <SelectItem className="dark" key={8} value={8}>
-                                    8
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={12}
-                                    value={12}>
-                                    12
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={16}
-                                    value={16}>
-                                    16
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={20}
-                                    value={20}>
-                                    20
-                                </SelectItem>
-                                <SelectItem
-                                    className="dark"
-                                    key={1000000}
-                                    value={1000000}>
-                                    All
-                                </SelectItem>
-                            </Select>
                         </div>
                     </div>
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-2">
@@ -556,7 +674,6 @@ export default function Media(props: {
                     </div>
                 </div>
             </div>
-
             {/* Delete warning modal */}
             <Modal
                 size="xl"
@@ -715,6 +832,7 @@ export default function Media(props: {
                             <ModalFooter>
                                 {props.session.user.role === "ADMIN" && (
                                     <Button
+                                        className="rounded-md"
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
@@ -729,7 +847,7 @@ export default function Media(props: {
                                     </Button>
                                 )}
                                 <a
-                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-xl"
+                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
                                     href={
                                         selectedImage.split("_")[0] === "LOGO"
                                             ? process.env
@@ -743,6 +861,7 @@ export default function Media(props: {
                                     Download
                                 </a>
                                 <Button
+                                    className="rounded-md"
                                     color="danger"
                                     onPress={() => {
                                         onClose();
@@ -783,6 +902,7 @@ export default function Media(props: {
                             <ModalFooter>
                                 {props.session.user.role === "ADMIN" && (
                                     <Button
+                                        className="rounded-md"
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
@@ -797,7 +917,7 @@ export default function Media(props: {
                                     </Button>
                                 )}
                                 <a
-                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-xl"
+                                    className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
                                     href={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
                                         selectedVideo
@@ -806,6 +926,7 @@ export default function Media(props: {
                                     Download
                                 </a>
                                 <Button
+                                    className="rounded-md"
                                     color="danger"
                                     onPress={() => {
                                         onClose();

@@ -328,7 +328,6 @@ export default function ChangeVideoModal(props: {
                         </ModalBody>
                         {!uploading && (
                             <ModalFooter className="mt-4">
-                                {/* getValues("backgroundVideo") */}
                                 {props.hasVideoSet ? (
                                     <Button
                                         color="danger"
@@ -354,8 +353,7 @@ export default function ChangeVideoModal(props: {
                                     ""
                                 )}
                                 <Button
-                                    color="danger"
-                                    className="rounded-md"
+                                    className="rounded-md bg-orange-600"
                                     onPress={() => {
                                         setCurrentPage(1);
                                         onClose();
