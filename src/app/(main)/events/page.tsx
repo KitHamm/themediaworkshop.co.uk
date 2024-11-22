@@ -35,7 +35,7 @@ export default async function Home() {
             <MainHeader data={data as ExtendedPage} logoImages={logoImages} />
             {/* Top Ticker Tape */}
             {logoImages.length > 0 && (
-                <div className="mt-8">
+                <div className="my-8">
                     <TickerTape start={true} logoImages={logoImages} />
                 </div>
             )}
