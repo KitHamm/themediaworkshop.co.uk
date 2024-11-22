@@ -24,7 +24,7 @@ export async function updateCaseStudy(
                 video: caseStudyData.video,
                 videoThumbnail: caseStudyData.videoThumbnail,
                 tags: tagTexts,
-                order: caseStudyData.order,
+                order: parseInt(caseStudyData.order.toString()),
                 segmentId: caseStudyData.segmentId,
             },
         });

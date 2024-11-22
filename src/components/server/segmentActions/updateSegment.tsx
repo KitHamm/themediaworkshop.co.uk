@@ -19,7 +19,7 @@ export async function updateSegment(data: SegmentFormType) {
                 image: imageUrls,
                 video: videoUrls,
                 headerimage: data.headerImage,
-                order: data.order,
+                order: parseInt(data.order.toString()),
                 buttonText: data.buttonText,
                 linkTo: data.linkTo,
             },

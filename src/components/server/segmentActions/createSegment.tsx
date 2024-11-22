@@ -18,7 +18,7 @@ export async function createSegment(
                 image: imageUrls,
                 video: videoUrls,
                 headerimage: segmentData.headerImage,
-                order: segmentData.order,
+                order: parseInt(segmentData.order.toString()),
                 buttonText: segmentData.buttonText,
                 linkTo: segmentData.linkTo,
                 pageId: pageId,

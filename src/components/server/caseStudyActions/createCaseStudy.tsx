@@ -18,7 +18,7 @@ export async function createCaseStudy(caseStudyData: CaseStudyFromType) {
                 video: caseStudyData.video,
                 videoThumbnail: caseStudyData.videoThumbnail,
                 tags: tagTexts,
-                order: caseStudyData.order,
+                order: parseInt(caseStudyData.order.toString()),
                 published: caseStudyData.published,
                 segmentId: caseStudyData.segmentId,
             },
