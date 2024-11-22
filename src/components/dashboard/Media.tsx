@@ -36,6 +36,8 @@ import {
 import { revalidateDashboard } from "../server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
 import { imageSort, videoSort } from "@/lib/functions";
+import { on } from "events";
+import { set } from "react-hook-form";
 
 export default function Media(props: {
     session: any;
@@ -96,6 +98,7 @@ export default function Media(props: {
 
     // Error state for if the media upload has wrong naming convention
     const [namingError, setNamingError] = useState(false);
+    const [sizeError, setSizeError] = useState(false);
 
     // Delete state with file and file type
     const [toDelete, setToDelete] = useState({ file: "", type: "" });
@@ -179,9 +182,28 @@ export default function Media(props: {
         setNewUpload(undefined);
     }
 
-    function fileNamingCheck(fileName: string) {
-        const filePrefix = fileName.split("_")[0];
-        return FilePrefixList.includes(filePrefix);
+    function onSelectFile(file: File) {
+        const fileSize = file.size / 1024 / 1024;
+        const filePrefix = file.name.split("_")[0];
+
+        const nameCheck = FilePrefixList.includes(filePrefix);
+        const sizeCheck = fileSize < 100;
+
+        if (!nameCheck) {
+            setNamingError(true);
+        } else {
+            setNamingError(false);
+        }
+
+        if (!sizeCheck) {
+            setSizeError(true);
+        } else {
+            setSizeError(false);
+        }
+
+        if (nameCheck && sizeCheck) {
+            setNewUpload(file);
+        }
     }
 
     return (
@@ -799,6 +821,7 @@ export default function Media(props: {
             </Modal>
             {/* Media upload modal */}
             <Modal
+                hideCloseButton
                 size="2xl"
                 backdrop="blur"
                 isOpen={isOpenUpload}
@@ -892,7 +915,12 @@ export default function Media(props: {
                                 </div>
                                 {namingError && (
                                     <div className="text-center text-red-400">
-                                        Please check the file name prefix
+                                        Please check the file name prefix.
+                                    </div>
+                                )}
+                                {sizeError && (
+                                    <div className="text-center text-red-400">
+                                        File size too large.
                                     </div>
                                 )}
                                 <div className="flex mx-auto mt-4">
@@ -912,26 +940,11 @@ export default function Media(props: {
                                         <div className="file-input">
                                             <input
                                                 onChange={(e) => {
-                                                    if (e.target.files)
-                                                        if (
-                                                            fileNamingCheck(
-                                                                e.target
-                                                                    .files[0]
-                                                                    .name
-                                                            )
-                                                        ) {
-                                                            setNamingError(
-                                                                false
-                                                            );
-                                                            setNewUpload(
-                                                                e.target
-                                                                    .files[0]
-                                                            );
-                                                        } else {
-                                                            setNamingError(
-                                                                true
-                                                            );
-                                                        }
+                                                    if (e.target.files) {
+                                                        onSelectFile(
+                                                            e.target.files[0]
+                                                        );
+                                                    }
                                                 }}
                                                 className="inputFile"
                                                 type="file"
@@ -948,42 +961,47 @@ export default function Media(props: {
                                             <div className="text-center mt-4">
                                                 {newUpload !== undefined
                                                     ? newUpload.name
-                                                    : "No File Selected"}
+                                                    : "Max size: 100MB"}
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex justify-evenly">
-                                    <Button
-                                        onPress={() => {
-                                            clearFileInput();
-                                        }}
-                                        color="danger">
-                                        Clear
-                                    </Button>
-                                    <Button
-                                        onPress={() => {
-                                            setUploading(true);
-                                            uploadMedia();
-                                        }}
-                                        disabled={newUpload ? false : true}
-                                        className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
-                                        Upload
-                                    </Button>
-                                </div>
+                                {!uploading && (
+                                    <div className="flex justify-evenly">
+                                        <Button
+                                            onPress={() => {
+                                                clearFileInput();
+                                            }}
+                                            color="danger">
+                                            Clear
+                                        </Button>
+                                        <Button
+                                            onPress={() => {
+                                                setUploading(true);
+                                                uploadMedia();
+                                            }}
+                                            disabled={newUpload ? false : true}
+                                            className="disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
+                                            Upload
+                                        </Button>
+                                    </div>
+                                )}
                             </ModalBody>
                             <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        setUploading(false);
-                                        setNamingError(false);
-                                        onClose();
-                                        clearFileInput();
-                                    }}>
-                                    Close
-                                </Button>
+                                {!uploading && (
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        onPress={() => {
+                                            setUploading(false);
+                                            setNamingError(false);
+                                            setSizeError(false);
+                                            onClose();
+                                            clearFileInput();
+                                        }}>
+                                        Close
+                                    </Button>
+                                )}
                             </ModalFooter>
                         </>
                     )}
