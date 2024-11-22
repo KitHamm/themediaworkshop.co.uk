@@ -16,7 +16,7 @@ import {
 import Markdown from "react-markdown";
 
 // React Components
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 // Types
 import { Images, Videos } from "@prisma/client";
@@ -29,6 +29,9 @@ import {
     CaseStudyTagType,
     CaseStudyFromType,
 } from "@/lib/types";
+
+// Context imports
+import { DashboardStateContext } from "../DashboardStateProvider";
 export default function NewCaseStudy(props: {
     segmentId: number;
     studyCount: number;
@@ -91,15 +94,31 @@ export default function NewCaseStudy(props: {
     // Submit success state
     const [success, setSuccess] = useState(false);
 
+    // Context state imports
+    const {
+        imageNamingError,
+        setImageNamingError,
+        videoNamingError,
+        setVideoNamingError,
+        notVideoError,
+        setNotVideoError,
+        notImageError,
+        setNotImageError,
+        uploading,
+        setUploading,
+        uploadProgress,
+        setUploadProgress,
+    } = useContext(DashboardStateContext);
+
     // States for naming errors of uploads
-    const [imageNamingError, setImageNamingError] = useState(false);
-    const [videoNamingError, setVideoNamingError] = useState(false);
-    const [notVideoError, setNotVideoError] = useState(false);
-    const [notImageError, setNotImageError] = useState(false);
+    // const [imageNamingError, setImageNamingError] = useState(false);
+    // const [videoNamingError, setVideoNamingError] = useState(false);
+    // const [notVideoError, setNotVideoError] = useState(false);
+    // const [notImageError, setNotImageError] = useState(false);
 
     // Uploading State
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    // const [uploading, setUploading] = useState(false);
+    // const [uploadProgress, setUploadProgress] = useState(0);
 
     // Image select modal declaration
     const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =

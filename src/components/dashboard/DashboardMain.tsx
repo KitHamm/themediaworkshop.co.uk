@@ -43,6 +43,7 @@ import NotificationCard from "./NotificationCard";
 import { updateUserActivation } from "../server/userActions/userActivation";
 import { UserWithoutPassword } from "@/lib/types";
 import { Session } from "next-auth";
+import DashboardStateProvider from "./DashboardStateProvider";
 
 export const NotificationsContext = createContext<NotificationProviderType>(
     {} as any
@@ -191,14 +192,16 @@ function DashboardSwitchView(props: {
             );
         case "pages":
             return (
-                <Pages
-                    hidden={false}
-                    data={props.data}
-                    videos={props.videos}
-                    images={props.images}
-                    segments={props.segments}
-                    caseStudies={props.caseStudies}
-                />
+                <DashboardStateProvider>
+                    <Pages
+                        hidden={false}
+                        data={props.data}
+                        videos={props.videos}
+                        images={props.images}
+                        segments={props.segments}
+                        caseStudies={props.caseStudies}
+                    />
+                </DashboardStateProvider>
             );
         case "media":
             return (

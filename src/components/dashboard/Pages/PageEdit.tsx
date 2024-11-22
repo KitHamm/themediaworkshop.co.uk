@@ -14,6 +14,7 @@ import {
     PopoverTrigger,
     PopoverContent,
 } from "@nextui-org/react";
+
 import { useForm } from "react-hook-form";
 
 // Components
@@ -25,19 +26,21 @@ import { useContext, useEffect, useRef, useState } from "react";
 
 // Next Components
 import Image from "next/image";
+import Link from "next/link";
 
 // Types
 import { CaseStudy, Images, Page, Segment, Videos } from "@prisma/client";
 import { PageFormType } from "@/lib/types";
+
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
+import { updatePage } from "@/components/server/pageActions/updatePage";
+import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
-import Link from "next/link";
-import { updatePage } from "@/components/server/pageActions/updatePage";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
+import { DashboardStateContext } from "../DashboardStateProvider";
 
 // Constants
 const accordionBaseHeight = "3.5rem";
@@ -50,13 +53,22 @@ export default function PageEdit(props: {
     caseStudies: CaseStudy[];
     hidden: boolean;
 }) {
-    // Media uploading and error state for if not a video
-    const [uploading, setUploading] = useState(false);
-    const [notVideoError, setNotVideoError] = useState(false);
-    const [sizeError, setSizeError] = useState(false);
-    const [backgroundNamingError, setBackgroundNamingError] = useState(false);
-    const [video1NamingError, setVideo1NamingError] = useState(false);
-    const [video2NamingError, setVideo2NamingError] = useState(false);
+    const {
+        uploading,
+        setUploading,
+        notVideoError,
+        setNotVideoError,
+        sizeError,
+        setSizeError,
+        backgroundNamingError,
+        setBackgroundNamingError,
+        video1NamingError,
+        setVideo1NamingError,
+        video2NamingError,
+        setVideo2NamingError,
+        uploadProgress,
+        setUploadProgress,
+    } = useContext(DashboardStateContext);
 
     // Preview Markdown text state
     const [previewText, setPreviewText] = useState(false);
@@ -67,9 +79,6 @@ export default function PageEdit(props: {
         useContext(NotificationsContext);
     // State to hold available videos and video selected for video view modal
     const [previewVideo, setPreviewVideo] = useState("");
-
-    // Upload Progress
-    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Segment Accordion Ref
     const accordionItem = useRef<HTMLDivElement[]>([]);

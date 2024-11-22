@@ -15,6 +15,9 @@ import {
     SelectItem,
 } from "@nextui-org/react";
 
+// Form Components
+import { useFieldArray, useForm } from "react-hook-form";
+
 // React Components
 import { useContext, useEffect, useState } from "react";
 
@@ -33,15 +36,15 @@ import { SegmentFormType, ImageFormType, VideoFormType } from "@/lib/types";
 // Functions
 import Markdown from "react-markdown";
 import axios from "axios";
-
-// Context imports
-import { NotificationsContext } from "../DashboardMain";
-import { useFieldArray, useForm } from "react-hook-form";
 import {
     updateSegment,
     updateSegmentPublish,
 } from "@/components/server/segmentActions/updateSegment";
 import { deleteSegment as deleteSegmentSA } from "@/components/server/segmentActions/deleteSegment";
+
+// Context imports
+import { NotificationsContext } from "../DashboardMain";
+import { DashboardStateContext } from "../DashboardStateProvider";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -53,6 +56,20 @@ export default function EditSegment(props: {
 }) {
     // Form
     const segmentForm = useForm<SegmentFormType>();
+
+    // State declarations
+    const {
+        topImageNamingError,
+        setTopImageNamingError,
+        segmentImageNamingError,
+        setSegmentImageNamingError,
+        uploading,
+        setUploading,
+        notImageError,
+        setNotImageError,
+        uploadProgress,
+        setUploadProgress,
+    } = useContext(DashboardStateContext);
 
     const {
         register,
@@ -71,15 +88,6 @@ export default function EditSegment(props: {
     } = useFieldArray({
         control: segmentControl,
         name: "image",
-    });
-
-    const {
-        fields: videoFields,
-        append: videoAppend,
-        remove: videoRemove,
-    } = useFieldArray({
-        control: segmentControl,
-        name: "video",
     });
 
     // Set initial form state
@@ -114,18 +122,6 @@ export default function EditSegment(props: {
         });
     }
 
-    // State for naming convention errors on upload
-    const [topImageNamingError, setTopImageNamingError] = useState(false);
-    const [segmentImageNamingError, setSegmentImageNamingError] =
-        useState(false);
-
-    // State to re render the publish state
-    const [published, setPublished] = useState(props.segment.published);
-
-    // Uploading State
-    const [uploading, setUploading] = useState(false);
-    const [notImageError, setNotImageError] = useState(false);
-
     // State for description preview
     const [previewText, setPreviewText] = useState(false);
 
@@ -143,9 +139,6 @@ export default function EditSegment(props: {
     const [deleteError, setDeleteError] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
-    // Upload Progress
-    const [uploadProgress, setUploadProgress] = useState(0);
-    // Top image modal declaration
     const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
         useDisclosure();
 
