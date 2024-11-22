@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 // Components
 import EditSegment from "../Segments/Segment";
 import NewSegment from "../Segments/NewSegment";
+import PageVideoUploadButton from "../Uploads/PageVideoUploadButton";
 
 // React Components
 import { useContext, useEffect, useRef, useState } from "react";
@@ -34,9 +35,7 @@ import { PageFormType } from "@/lib/types";
 
 // Functions
 import Markdown from "react-markdown";
-import axios from "axios";
 import { updatePage } from "@/components/server/pageActions/updatePage";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
@@ -190,96 +189,6 @@ export default function PageEdit(props: {
         }
     }, [isDirty]);
 
-    function namingErrorCheck(fileName: string, check: string) {
-        if (fileName.split("_")[0] === check) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function onSelectFile(
-        file: File,
-        check: string,
-        format: string,
-        target: string
-    ) {
-        const fileSize = file.size / 1024 / 1024;
-        const filePrefix = file.name.split("_")[0];
-        const fileType = file.type.split("/")[0];
-
-        const nameCheck = filePrefix === check;
-        const sizeCheck = fileSize < 100;
-        const fileTypeCheck = fileType === format;
-
-        if (!nameCheck) {
-            switch (target) {
-                case "background":
-                    setBackgroundNamingError(true);
-                    break;
-                case "video1":
-                    setVideo1NamingError(true);
-                    break;
-                case "video2":
-                    setVideo2NamingError(true);
-                    break;
-            }
-        } else {
-            setBackgroundNamingError(false);
-            setVideo1NamingError(false);
-            setVideo2NamingError(false);
-        }
-
-        if (!sizeCheck) {
-            setSizeError(true);
-        } else {
-            setSizeError(false);
-        }
-
-        if (!fileTypeCheck) {
-            setNotVideoError(true);
-        } else {
-            setNotVideoError(false);
-        }
-
-        if (nameCheck && sizeCheck && fileTypeCheck) {
-            uploadVideo(file);
-        }
-    }
-
-    async function uploadVideo(file: File) {
-        setUploading(true);
-        setUploadProgress(0);
-        if (file.type.split("/")[0] !== "video") {
-            setNotVideoError(true);
-            setUploading(false);
-            return;
-        } else {
-            const formData = new FormData();
-            formData.append("file", file);
-            axios
-                .post("/api/video", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    onUploadProgress: (ProgressEvent) => {
-                        if (ProgressEvent.bytes) {
-                            let percent = Math.round(
-                                (ProgressEvent.loaded / ProgressEvent.total!) *
-                                    100
-                            );
-                            setUploadProgress(percent);
-                        }
-                    },
-                })
-                .then((res) => {
-                    if (res.data.message) {
-                        setUploading(false);
-                        revalidateDashboard();
-                    }
-                })
-                .catch((err) => console.log(err));
-        }
-    }
-
     // Pre-populate data with updated Page information
     async function handleUpdate(data: PageFormType) {
         try {
@@ -375,7 +284,10 @@ export default function PageEdit(props: {
                                         </div>
                                         <div
                                             onClick={() => {
-                                                onOpenChangeShowreelModal();
+                                                setPreviewVideo(
+                                                    getValues("video1")
+                                                );
+                                                onOpenChangePreviewVideo();
                                             }}
                                             className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
@@ -429,7 +341,10 @@ export default function PageEdit(props: {
                                         </div>
                                         <div
                                             onClick={() => {
-                                                onOpenChangeYearModal();
+                                                setPreviewVideo(
+                                                    getValues("video2")
+                                                );
+                                                onOpenChangePreviewVideo();
                                             }}
                                             className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
@@ -483,7 +398,10 @@ export default function PageEdit(props: {
                                         </div>
                                         <div
                                             onClick={() => {
-                                                onOpenChangeVideoModal();
+                                                setPreviewVideo(
+                                                    getValues("backgroundVideo")
+                                                );
+                                                onOpenChangePreviewVideo();
                                             }}
                                             className="cursor-pointer m-auto border rounded p-4 flex w-1/3 xl:w-1/2 my-4">
                                             <Image
@@ -781,7 +699,7 @@ export default function PageEdit(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {/* Preview selectable video modal */}
+            {/* Preview video modal */}
             <Modal
                 size="5xl"
                 backdrop="blur"
@@ -792,7 +710,11 @@ export default function PageEdit(props: {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader></ModalHeader>
+                            <ModalHeader>
+                                <div className="w-full text-center font-bold text-3xl">
+                                    {previewVideo.split("-")[0].split("_")[1]}
+                                </div>
+                            </ModalHeader>
                             <ModalBody>
                                 <video
                                     playsInline
@@ -802,138 +724,6 @@ export default function PageEdit(props: {
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
                                         previewVideo
-                                    }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Preview Background Video Modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenVideoModal}
-                className="dark"
-                scrollBehavior="inside"
-                onOpenChange={onOpenChangeVideoModal}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Background video
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <video
-                                    playsInline
-                                    disablePictureInPicture
-                                    id="bg-video"
-                                    controls={true}
-                                    src={
-                                        process.env
-                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
-                                        getValues("backgroundVideo")
-                                    }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Preview video 1 modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenShowreelModal}
-                className="dark"
-                scrollBehavior="inside"
-                onOpenChange={onOpenChangeShowreelModal}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Video 1
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <video
-                                    playsInline
-                                    disablePictureInPicture
-                                    id="bg-video"
-                                    controls={true}
-                                    src={
-                                        process.env
-                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
-                                        getValues("video1")
-                                    }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Preview Video 2 Modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenYearModal}
-                className="dark"
-                scrollBehavior="inside"
-                onOpenChange={onOpenChangeYearModal}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Video 2
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <video
-                                    playsInline
-                                    disablePictureInPicture
-                                    id="bg-video"
-                                    controls={true}
-                                    src={
-                                        process.env
-                                            .NEXT_PUBLIC_BASE_VIDEO_URL! +
-                                        getValues("video2")
                                     }
                                 />
                             </ModalBody>
@@ -1004,24 +794,11 @@ export default function PageEdit(props: {
                                         />
                                     ) : (
                                         <div className="file-input shadow-xl">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        onSelectFile(
-                                                            e.target.files[0],
-                                                            "HEADER",
-                                                            "video",
-                                                            "background"
-                                                        );
-                                                    }
-                                                }}
-                                                id={"upload-showreel"}
-                                                type="file"
-                                                className="inputFile"
+                                            <PageVideoUploadButton
+                                                check="HEADER"
+                                                format="video"
+                                                target="background"
                                             />
-                                            <label htmlFor={"upload-showreel"}>
-                                                Upload New
-                                            </label>
                                         </div>
                                     )}
                                 </div>
@@ -1179,24 +956,11 @@ export default function PageEdit(props: {
                                         />
                                     ) : (
                                         <div className="file-input shadow-xl">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        onSelectFile(
-                                                            e.target.files[0],
-                                                            "VIDEO",
-                                                            "video",
-                                                            "video1"
-                                                        );
-                                                    }
-                                                }}
-                                                id={"upload-showreel"}
-                                                type="file"
-                                                className="inputFile"
+                                            <PageVideoUploadButton
+                                                check="VIDEO"
+                                                format="video"
+                                                target="video1"
                                             />
-                                            <label htmlFor={"upload-showreel"}>
-                                                Upload New
-                                            </label>
                                         </div>
                                     )}
                                 </div>
@@ -1359,24 +1123,11 @@ export default function PageEdit(props: {
                                         />
                                     ) : (
                                         <div className="file-input shadow-xl">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        onSelectFile(
-                                                            e.target.files[0],
-                                                            "VIDEO",
-                                                            "video",
-                                                            "video2"
-                                                        );
-                                                    }
-                                                }}
-                                                id={"upload-year"}
-                                                type="file"
-                                                className="inputFile"
+                                            <PageVideoUploadButton
+                                                check="VIDEO"
+                                                format="video"
+                                                target="video2"
                                             />
-                                            <label htmlFor={"upload-year"}>
-                                                Upload New
-                                            </label>
                                         </div>
                                     )}
                                 </div>
