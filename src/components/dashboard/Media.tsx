@@ -36,8 +36,6 @@ import {
 import { revalidateDashboard } from "../server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
 import { imageSort, videoSort } from "@/lib/functions";
-import { on } from "events";
-import { set } from "react-hook-form";
 
 export default function Media(props: {
     session: any;

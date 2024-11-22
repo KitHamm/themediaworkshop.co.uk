@@ -43,7 +43,11 @@ export default async function Dashboard() {
             { name: "asc" },
         ],
     });
-    const videos = await prisma.videos.findMany();
+    const videos = await prisma.videos.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
     const images = await prisma.images.findMany();
     const logos = await prisma.logos.findMany();
     const requests = await prisma.serviceRequest.findMany({

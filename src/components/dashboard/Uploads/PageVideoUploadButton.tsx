@@ -104,17 +104,13 @@ export default function PageVideoUploadButton(props: {
                 onChange={(e) => {
                     if (e.target.files) {
                         onSelectFile(e.target.files[0]);
-                        // ,
-                        //     "VIDEO",
-                        //     "video",
-                        //     "video1"
                     }
                 }}
                 id={"upload-showreel"}
                 type="file"
                 className="inputFile"
             />
-            <label htmlFor={"upload-showreel"}>Upload New</label>
+            <label htmlFor={"upload-showreel"}>Upload New Video</label>
         </>
     );
 }
