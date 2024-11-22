@@ -17,6 +17,7 @@ import { DashboardStateContext } from "../../DashboardStateProvider";
 import { useContext, useEffect, useState } from "react";
 import { Videos } from "@prisma/client";
 import Image from "next/image";
+import { itemOrder } from "@/lib/functions";
 
 export default function ChangeVideoModal(props: {
     videos: Videos[];
@@ -66,35 +67,7 @@ export default function ChangeVideoModal(props: {
     }, [props.videos]);
 
     useEffect(() => {
-        const temp = [...availableVideos];
-        switch (sortBy) {
-            case "date":
-                if (order === "desc") {
-                    temp.sort(
-                        (a, b) =>
-                            new Date(b.createdAt).getTime() -
-                            new Date(a.createdAt).getTime()
-                    );
-                    setAvailableVideos(temp);
-                } else {
-                    temp.sort(
-                        (a, b) =>
-                            new Date(a.createdAt).getTime() -
-                            new Date(b.createdAt).getTime()
-                    );
-                    setAvailableVideos(temp);
-                }
-                break;
-            case "name":
-                if (order === "desc") {
-                    temp.sort((a, b) => b.name.localeCompare(a.name));
-                    setAvailableVideos(temp);
-                } else {
-                    temp.sort((a, b) => a.name.localeCompare(b.name));
-                    setAvailableVideos(temp);
-                }
-                break;
-        }
+        setAvailableVideos(itemOrder(availableVideos, sortBy, order));
     }, [sortBy, order]);
 
     return (

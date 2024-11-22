@@ -1,27 +1,24 @@
 "use client";
 
-import { useContext, useRef } from "react";
-import { DashboardStateContext } from "../DashboardStateProvider";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 import axios from "axios";
+import { DashboardStateContext } from "../DashboardStateProvider";
+import { useContext, useRef } from "react";
 
-export default function PageVideoUploadButton(props: {
+export default function SegmentTopImageUploadButton(props: {
     check: string;
     format: string;
-    target: string;
+    setValue: any;
+    setTopImage: any;
+    onOpenChange: any;
 }) {
     const {
-        setBackgroundNamingError,
-        setVideo1NamingError,
-        setVideo2NamingError,
+        setTopImageNamingError,
         setSizeError,
-        setNotVideoError,
-        setUploading,
+        setNotImageError,
         setUploadProgress,
+        setUploading,
     } = useContext(DashboardStateContext);
-
     const inputElm = useRef<HTMLInputElement>(null);
-
     function onSelectFile(file: File) {
         if (file) {
             const fileSize = file.size / 1024 / 1024;
@@ -33,56 +30,44 @@ export default function PageVideoUploadButton(props: {
             const fileTypeCheck = fileType === props.format;
 
             if (!nameCheck) {
+                setTopImageNamingError(true);
                 inputElm.current!.value = "";
-                switch (props.target) {
-                    case "background":
-                        setBackgroundNamingError(true);
-                        break;
-                    case "video1":
-                        setVideo1NamingError(true);
-                        break;
-                    case "video2":
-                        setVideo2NamingError(true);
-                        break;
-                }
             } else {
-                setBackgroundNamingError(false);
-                setVideo1NamingError(false);
-                setVideo2NamingError(false);
+                setTopImageNamingError(false);
             }
 
             if (!sizeCheck) {
-                inputElm.current!.value = "";
                 setSizeError(true);
+                inputElm.current!.value = "";
             } else {
                 setSizeError(false);
             }
 
             if (!fileTypeCheck) {
+                setNotImageError(true);
                 inputElm.current!.value = "";
-                setNotVideoError(true);
             } else {
-                setNotVideoError(false);
+                setNotImageError(false);
             }
 
             if (nameCheck && sizeCheck && fileTypeCheck) {
-                uploadVideo(file);
+                uploadImage(file);
             }
         }
     }
 
-    async function uploadVideo(file: File) {
+    async function uploadImage(file: File) {
         setUploading(true);
         setUploadProgress(0);
-        if (file.type.split("/")[0] !== "video") {
-            setNotVideoError(true);
+        if (file.type.split("/")[0] !== "image") {
+            setNotImageError(true);
             setUploading(false);
             return;
         } else {
             const formData = new FormData();
             formData.append("file", file);
             axios
-                .post("/api/video", formData, {
+                .post("/api/image", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                     onUploadProgress: (ProgressEvent) => {
                         if (ProgressEvent.bytes) {
@@ -97,7 +82,11 @@ export default function PageVideoUploadButton(props: {
                 .then((res) => {
                     if (res.data.message) {
                         setUploading(false);
-                        revalidateDashboard();
+                        props.setValue("headerImage", res.data.message, {
+                            shouldDirty: true,
+                        });
+                        props.setTopImage(res.data.message);
+                        props.onOpenChange();
                     }
                 })
                 .catch((err) => console.log(err));
@@ -105,7 +94,7 @@ export default function PageVideoUploadButton(props: {
     }
 
     return (
-        <>
+        <div className="file-input">
             <input
                 ref={inputElm}
                 onChange={(e) => {
@@ -113,11 +102,11 @@ export default function PageVideoUploadButton(props: {
                         onSelectFile(e.target.files[0]);
                     }
                 }}
-                id={"upload-showreel"}
+                id={"upload-image"}
                 type="file"
                 className="inputFile"
             />
-            <label htmlFor={"upload-showreel"}>Upload New Video</label>
-        </>
+            <label htmlFor={"upload-image"}>Upload New Image</label>
+        </div>
     );
 }

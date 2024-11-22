@@ -45,6 +45,7 @@ import { deleteSegment as deleteSegmentSA } from "@/components/server/segmentAct
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
 import { DashboardStateContext } from "../DashboardStateProvider";
+import TopImageSelectModal from "./TopImageSelectModal";
 
 export default function EditSegment(props: {
     segment: Segment;
@@ -139,6 +140,11 @@ export default function EditSegment(props: {
     const [deleteError, setDeleteError] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
+    // Top image
+    const [topImage, setTopImage] = useState<string>(
+        props.segment.headerimage || ""
+    );
+
     const { isOpen: isOpenTopImage, onOpenChange: onOpenChangeTopImage } =
         useDisclosure();
 
@@ -204,15 +210,6 @@ export default function EditSegment(props: {
         }
     }, [isDirty]);
 
-    // Check naming conventions for uploads
-    function namingConventionCheck(fileName: string, check: string) {
-        if (fileName.split("_")[0] !== check) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     // Pre populate information for segment update
     function handleUpdate(segmentData: SegmentFormType) {
         updateSegment(segmentData)
@@ -239,55 +236,6 @@ export default function EditSegment(props: {
                 });
             })
             .catch((err) => console.log(err));
-    }
-
-    async function uploadImage(file: File, target: string) {
-        setUploadProgress(0);
-        if (file.type.split("/")[0] !== "image") {
-            setNotImageError(true);
-            setUploading(false);
-            return;
-        } else {
-            const formData = new FormData();
-            formData.append("file", file);
-            axios
-                .post("/api/image", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    onUploadProgress: (ProgressEvent) => {
-                        if (ProgressEvent.bytes) {
-                            let percent = Math.round(
-                                (ProgressEvent.loaded / ProgressEvent.total!) *
-                                    100
-                            );
-                            setUploadProgress(percent);
-                        }
-                    },
-                })
-                .then((res) => {
-                    if (res.data.message) {
-                        setUploading(false);
-                        if (target === "header") {
-                            setValue("headerImage", res.data.message, {
-                                shouldDirty: true,
-                            });
-                            clearFileInput(target);
-                        } else {
-                            clearFileInput(target);
-                        }
-                    }
-                })
-                .catch((err) => console.log(err));
-        }
-    }
-
-    function clearFileInput(target: string) {
-        var id = target === "header" ? "-top-image-input" : "-image-input";
-        const inputElm = document.getElementById(
-            props.segment.id + id
-        ) as HTMLInputElement;
-        if (inputElm) {
-            inputElm.value = "";
-        }
     }
 
     async function deleteSegment() {
@@ -348,16 +296,16 @@ export default function EditSegment(props: {
                         </div>
                     </div>
                     <div className="relative my-2">
-                        {getValues("headerImage") ? (
+                        {topImage !== "" ? (
                             <div>
                                 <Image
                                     height={2000}
                                     width={1000}
                                     src={
                                         process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
-                                        getValues("headerImage")
+                                        topImage
                                     }
-                                    alt={getValues("headerImage")}
+                                    alt={topImage}
                                     className="w-full h-auto m-auto"
                                 />
                                 <div className="hover:opacity-100 flex justify-center transition-opacity opacity-0 absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
@@ -373,13 +321,14 @@ export default function EditSegment(props: {
                                         </div>
                                         <div className="w-1/2 text-center">
                                             <i
-                                                onClick={() =>
+                                                onClick={() => {
                                                     setValue(
                                                         "headerImage",
                                                         "",
                                                         { shouldDirty: true }
-                                                    )
-                                                }
+                                                    );
+                                                    setTopImage("");
+                                                }}
                                                 aria-hidden
                                                 className="fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
                                             />
@@ -389,93 +338,18 @@ export default function EditSegment(props: {
                             </div>
                         ) : (
                             <div className="rounded-lg bg-black w-full flex justify-evenly py-10">
-                                {uploading ? (
-                                    <CircularProgress
-                                        classNames={{
-                                            svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                            value: "text-xl",
-                                        }}
-                                        showValueLabel={true}
-                                        value={uploadProgress}
-                                        color="warning"
-                                        aria-label="Loading..."
-                                    />
-                                ) : (
-                                    <div className="grid xl:grid-cols-2 xl:gap-40 gap-4">
-                                        <div>
-                                            {topImageNamingError && (
-                                                <div className="text-center text-red-400">
-                                                    File name prefix should be
-                                                    SEGHEAD_
-                                                </div>
-                                            )}
-                                            <div className="file-input shadow-xl">
-                                                <input
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            if (
-                                                                namingConventionCheck(
-                                                                    e.target
-                                                                        .files[0]
-                                                                        .name,
-                                                                    "SEGHEAD"
-                                                                )
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                uploadImage(
-                                                                    e.target
-                                                                        .files[0],
-                                                                    "header"
-                                                                );
-                                                                setTopImageNamingError(
-                                                                    false
-                                                                );
-                                                            } else {
-                                                                setTopImageNamingError(
-                                                                    true
-                                                                );
-                                                                clearFileInput(
-                                                                    "header"
-                                                                );
-                                                            }
-                                                        }
-                                                    }}
-                                                    id={
-                                                        props.segment.id +
-                                                        "-top-image-input"
-                                                    }
-                                                    type="file"
-                                                    className="inputFile"
-                                                />
-                                                <label
-                                                    className="mx-auto"
-                                                    htmlFor={
-                                                        props.segment.id +
-                                                        "-top-image-input"
-                                                    }>
-                                                    Upload New
-                                                </label>
-                                            </div>
-                                            <div className="w-full text-center text-red-400">
-                                                {notImageError
-                                                    ? "Please upload media in Image format"
-                                                    : ""}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    onOpenChangeTopImage();
-                                                }}
-                                                className="bg-orange-600 py-3 px-20 rounded shadow-xl">
-                                                Select
-                                            </button>
-                                        </div>
+                                <div className="flex justify-center">
+                                    <div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                onOpenChangeTopImage();
+                                            }}
+                                            className="bg-orange-600 py-3 px-20 rounded shadow-xl">
+                                            Select
+                                        </button>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -809,7 +683,15 @@ export default function EditSegment(props: {
                     </div>
                 </form>
                 {/* Top Image modal */}
-                <Modal
+                <TopImageSelectModal
+                    isOpenTopImage={isOpenTopImage}
+                    onOpenChangeTopImage={onOpenChangeTopImage}
+                    segment={props.segment}
+                    images={props.images}
+                    setValue={setValue}
+                    setTopImage={setTopImage}
+                />
+                {/* <Modal
                     size="5xl"
                     backdrop="blur"
                     isOpen={isOpenTopImage}
@@ -879,7 +761,7 @@ export default function EditSegment(props: {
                             </>
                         )}
                     </ModalContent>
-                </Modal>
+                </Modal> */}
                 {/* Segment images select modal */}
                 <Modal
                     size="2xl"
@@ -917,7 +799,7 @@ export default function EditSegment(props: {
                                         ) : (
                                             <>
                                                 <div className="file-input shadow-xl">
-                                                    <input
+                                                    {/* <input
                                                         onChange={(e) => {
                                                             if (
                                                                 e.target.files
@@ -964,7 +846,7 @@ export default function EditSegment(props: {
                                                             "-image-input"
                                                         }>
                                                         Upload New
-                                                    </label>
+                                                    </label> */}
                                                 </div>
                                             </>
                                         )}

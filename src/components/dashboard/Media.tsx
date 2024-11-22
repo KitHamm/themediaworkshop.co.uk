@@ -99,35 +99,7 @@ export default function Media(props: {
     }, [sortVideosBy, orderVideos]);
 
     useEffect(() => {
-        const temp = [...selectedImages];
-        switch (sortImagesBy) {
-            case "date":
-                if (orderImages === "desc") {
-                    temp.sort(
-                        (a, b) =>
-                            new Date(b.createdAt).getTime() -
-                            new Date(a.createdAt).getTime()
-                    );
-                    setSelectedImages(temp);
-                } else {
-                    temp.sort(
-                        (a, b) =>
-                            new Date(a.createdAt).getTime() -
-                            new Date(b.createdAt).getTime()
-                    );
-                    setSelectedImages(temp);
-                }
-                break;
-            case "name":
-                if (orderImages === "desc") {
-                    temp.sort((a, b) => b.name.localeCompare(a.name));
-                    setSelectedImages(temp);
-                } else {
-                    temp.sort((a, b) => a.name.localeCompare(b.name));
-                    setSelectedImages(temp);
-                }
-                break;
-        }
+        setSelectedImages(itemOrder(selectedImages, sortImagesBy, orderImages));
     }, [sortImagesBy, orderImages]);
 
     // State for file to upload
@@ -227,26 +199,28 @@ export default function Media(props: {
     }
 
     function onSelectFile(file: File) {
-        const fileSize = file.size / 1024 / 1024;
-        const filePrefix = file.name.split("_")[0];
+        if (file) {
+            const fileSize = file.size / 1024 / 1024;
+            const filePrefix = file.name.split("_")[0];
 
-        const nameCheck = FilePrefixList.includes(filePrefix);
-        const sizeCheck = fileSize < 100;
+            const nameCheck = FilePrefixList.includes(filePrefix);
+            const sizeCheck = fileSize < 100;
 
-        if (!nameCheck) {
-            setNamingError(true);
-        } else {
-            setNamingError(false);
-        }
+            if (!nameCheck) {
+                setNamingError(true);
+            } else {
+                setNamingError(false);
+            }
 
-        if (!sizeCheck) {
-            setSizeError(true);
-        } else {
-            setSizeError(false);
-        }
+            if (!sizeCheck) {
+                setSizeError(true);
+            } else {
+                setSizeError(false);
+            }
 
-        if (nameCheck && sizeCheck) {
-            setNewUpload(file);
+            if (nameCheck && sizeCheck) {
+                setNewUpload(file);
+            }
         }
     }
 
