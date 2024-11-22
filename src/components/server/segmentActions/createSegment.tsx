@@ -28,6 +28,7 @@ export async function createSegment(
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/", "layout");
     }
 }

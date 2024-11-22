@@ -22,6 +22,7 @@ export async function deleteSegment(id: number) {
         }
         return Promise.resolve();
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/");
     }
 }

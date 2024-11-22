@@ -3,6 +3,7 @@
 import axios from "axios";
 import { DashboardStateContext } from "../DashboardStateProvider";
 import { useContext } from "react";
+import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 export default function SegmentAddImageUploadButton(props: {
     onOpenChange: any;
@@ -81,6 +82,7 @@ export default function SegmentAddImageUploadButton(props: {
                             url: res.data.message,
                         });
                         props.onOpenChange();
+                        revalidateDashboard();
                     }
                 })
                 .catch((err) => console.log(err));
@@ -93,19 +95,6 @@ export default function SegmentAddImageUploadButton(props: {
                 onChange={(e) => {
                     if (e.target.files) {
                         onSelectFile(e.target.files[0]);
-                        // if (
-                        //     namingConventionCheck(
-                        //         e.target.files[0].name,
-                        //         "SEGMENT"
-                        //     )
-                        // ) {
-                        //     setSegmentImageNamingError(false);
-                        //     setUploading(true);
-                        //     uploadImage(e.target.files[0], "image");
-                        // } else {
-                        //     setSegmentImageNamingError(true);
-                        //     clearFileInput("SEGMENT");
-                        // }
                     }
                 }}
                 id={"image-input"}

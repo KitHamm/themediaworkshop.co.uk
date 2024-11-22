@@ -27,6 +27,7 @@ export async function createCaseStudy(caseStudyData: CaseStudyFromType) {
     } catch (error: any) {
         Promise.reject(new Error(error));
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/", "layout");
     }
 }

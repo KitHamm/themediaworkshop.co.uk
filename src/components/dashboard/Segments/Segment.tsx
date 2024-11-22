@@ -7,7 +7,6 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
-    CircularProgress,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -35,7 +34,6 @@ import { SegmentFormType, ImageFormType, VideoFormType } from "@/lib/types";
 
 // Functions
 import Markdown from "react-markdown";
-import axios from "axios";
 import {
     updateSegment,
     updateSegmentPublish,
@@ -44,7 +42,6 @@ import { deleteSegment as deleteSegmentSA } from "@/components/server/segmentAct
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";
-import { DashboardStateContext } from "../DashboardStateProvider";
 import TopImageSelectModal from "./TopImageSelectModal";
 import SegmentImagesModal from "./SegmentImagesModal";
 
@@ -58,21 +55,6 @@ export default function EditSegment(props: {
 }) {
     // Form
     const segmentForm = useForm<SegmentFormType>();
-
-    // State declarations
-    const {
-        topImageNamingError,
-        setTopImageNamingError,
-        segmentImageNamingError,
-        setSegmentImageNamingError,
-        uploading,
-        setUploading,
-        notImageError,
-        setNotImageError,
-        uploadProgress,
-        setUploadProgress,
-    } = useContext(DashboardStateContext);
-
     const {
         register,
         handleSubmit,

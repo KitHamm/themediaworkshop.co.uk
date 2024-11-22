@@ -14,6 +14,7 @@ export async function deleteCaseStudy(id: number) {
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {
+        revalidatePath("/dashboard");
         revalidatePath("/", "layout");
     }
 }
