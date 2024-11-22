@@ -3,6 +3,7 @@
 import axios from "axios";
 import { DashboardStateContext } from "../DashboardStateProvider";
 import { useContext, useRef } from "react";
+import { revalidateDashboard } from "@/components/server/revalidateDashboard";
 
 export default function SegmentTopImageUploadButton(props: {
     check: string;
@@ -13,6 +14,7 @@ export default function SegmentTopImageUploadButton(props: {
 }) {
     const {
         setTopImageNamingError,
+        setImageNamingError,
         setSizeError,
         setNotImageError,
         setUploadProgress,
@@ -31,9 +33,10 @@ export default function SegmentTopImageUploadButton(props: {
 
             if (!nameCheck) {
                 setTopImageNamingError(true);
-                inputElm.current!.value = "";
+                setImageNamingError(true);
             } else {
                 setTopImageNamingError(false);
+                setImageNamingError(false);
             }
 
             if (!sizeCheck) {
@@ -87,6 +90,7 @@ export default function SegmentTopImageUploadButton(props: {
                         });
                         props.setTopImage(res.data.message);
                         props.onOpenChange();
+                        revalidateDashboard();
                     }
                 })
                 .catch((err) => console.log(err));

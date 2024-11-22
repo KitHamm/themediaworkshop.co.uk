@@ -18,6 +18,7 @@ export default function PageVideoUploadButton(props: {
         setNotVideoError,
         setUploading,
         setUploadProgress,
+        setVideoNamingError,
     } = useContext(DashboardStateContext);
 
     const inputElm = useRef<HTMLInputElement>(null);
@@ -37,6 +38,9 @@ export default function PageVideoUploadButton(props: {
                     case "backgroundVideo":
                         setBackgroundNamingError(true);
                         break;
+                    case "video":
+                        setVideoNamingError(true);
+                        break;
                     case "video1":
                         setVideo1NamingError(true);
                         break;
@@ -48,6 +52,7 @@ export default function PageVideoUploadButton(props: {
                 setBackgroundNamingError(false);
                 setVideo1NamingError(false);
                 setVideo2NamingError(false);
+                setVideoNamingError(false);
             }
 
             if (!sizeCheck) {

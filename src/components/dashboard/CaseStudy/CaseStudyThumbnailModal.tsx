@@ -12,36 +12,37 @@ import {
     ModalHeader,
     Pagination,
 } from "@nextui-org/react";
-import { Images } from "@prisma/client";
 import Image from "next/image";
-import { useState, useContext, useEffect } from "react";
 import { DashboardStateContext } from "../DashboardStateProvider";
+import { useContext, useEffect, useState } from "react";
 import { imageSort, itemOrder } from "@/lib/functions";
-import SegmentAddImageUploadButton from "../Uploads/SegmentAddImageUploadButton";
+import { Images } from "@prisma/client";
+import SegmentTopImageUploadButton from "../Uploads/SegmentTopImageUploadButton";
 
-export default function SegmentImagesModal(props: {
-    isOpenAddImage: boolean;
-    onOpenChangeAddImage: any;
+export default function CaseStudyThumbnailModal(props: {
+    isOpenThumbnailSelect: boolean;
+    onOpenChangeThumbnailSelect: any;
+    setValue: any;
     images: Images[];
-    imageAppend: any;
-    prefixCheck: string;
+    setThumbnailImage: any;
 }) {
     const {
-        segmentImageNamingError,
+        imageNamingError,
+        setImageNamingError,
+        notImageError,
+        setNotImageError,
+        sizeError,
+        setSizeError,
         uploading,
         uploadProgress,
-        notImageError,
-        sizeError,
-        setSegmentImageNamingError,
-        setNotImageError,
-        setSizeError,
     } = useContext(DashboardStateContext);
-    const [availableImages, setAvailableImages] = useState<Images[]>(
-        imageSort(props.images, [], props.prefixCheck)
+
+    const [availableImages, setAvailableImages] = useState(
+        imageSort(props.images, [], "thumbnails")
     );
 
     useEffect(() => {
-        setAvailableImages(imageSort(props.images, [], props.prefixCheck));
+        setAvailableImages(imageSort(props.images, [], "thumbnails"));
     }, [props.images]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,14 +56,14 @@ export default function SegmentImagesModal(props: {
 
     return (
         <Modal
-            isDismissable={false}
             hideCloseButton
             size="5xl"
             backdrop="blur"
-            isOpen={props.isOpenAddImage}
+            isOpen={props.isOpenThumbnailSelect}
             className="dark"
             scrollBehavior="inside"
-            onOpenChange={props.onOpenChangeAddImage}>
+            isDismissable={false}
+            onOpenChange={props.onOpenChangeThumbnailSelect}>
             <ModalContent>
                 {(onClose) => (
                     <>
@@ -72,17 +73,14 @@ export default function SegmentImagesModal(props: {
                             </div>
                         </ModalHeader>
                         <ModalBody>
-                            {segmentImageNamingError && (
+                            {imageNamingError && (
                                 <div className="text-center text-red-400">
-                                    File name prefix should be{" "}
-                                    {props.prefixCheck === "segment"
-                                        ? "SEGMENT_"
-                                        : "CASESTUDY_"}
+                                    File name prefix should be THUMBNAIL_
                                 </div>
                             )}
                             {notImageError && (
                                 <div className="w-full text-center text-red-400">
-                                    Please Upload file in video format.
+                                    Please Upload file in image format.
                                 </div>
                             )}
                             {sizeError && (
@@ -97,6 +95,7 @@ export default function SegmentImagesModal(props: {
                                             svg: "w-20 h-20 text-orange-600 drop-shadow-md",
                                             value: "text-xl",
                                         }}
+                                        className="m-auto"
                                         showValueLabel={true}
                                         value={uploadProgress}
                                         color="warning"
@@ -104,17 +103,16 @@ export default function SegmentImagesModal(props: {
                                     />
                                 ) : (
                                     <>
-                                        <SegmentAddImageUploadButton
-                                            onOpenChange={
-                                                props.onOpenChangeAddImage
-                                            }
-                                            imageAppend={props.imageAppend}
-                                            check={
-                                                props.prefixCheck === "segment"
-                                                    ? "SEGMENT"
-                                                    : "CASESTUDY"
-                                            }
+                                        <SegmentTopImageUploadButton
+                                            check="THUMBNAIL"
                                             format="image"
+                                            setValue={props.setValue}
+                                            setTopImage={
+                                                props.setThumbnailImage
+                                            }
+                                            onOpenChange={
+                                                props.onOpenChangeThumbnailSelect
+                                            }
                                         />
                                     </>
                                 )}
@@ -228,7 +226,7 @@ export default function SegmentImagesModal(props: {
                             </div>
                             <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
                                 {availableImages.map(
-                                    (image: Images, index: number) => {
+                                    (image: any, index: number) => {
                                         if (
                                             index >
                                                 currentPage * imagesPerPage -
@@ -242,9 +240,17 @@ export default function SegmentImagesModal(props: {
                                                     }
                                                     className="flex cursor-pointer"
                                                     onClick={() => {
-                                                        props.imageAppend({
-                                                            url: image.name,
-                                                        });
+                                                        props.setValue(
+                                                            "videoThumbnail",
+                                                            image.name,
+                                                            {
+                                                                shouldDirty:
+                                                                    true,
+                                                            }
+                                                        );
+                                                        props.setThumbnailImage(
+                                                            image.name
+                                                        );
                                                         onClose();
                                                     }}>
                                                     <Image
@@ -266,12 +272,9 @@ export default function SegmentImagesModal(props: {
                         </ModalBody>
                         <ModalFooter>
                             <Button
-                                color="danger"
                                 className="rounded-md"
+                                color="danger"
                                 onPress={() => {
-                                    setSegmentImageNamingError(false);
-                                    setNotImageError(false);
-                                    setSizeError(false);
                                     onClose();
                                 }}>
                                 Close

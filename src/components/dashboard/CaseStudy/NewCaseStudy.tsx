@@ -1,13 +1,6 @@
 // Library Components
 import {
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Button,
     useDisclosure,
-    CircularProgress,
     Chip,
     Popover,
     PopoverContent,
@@ -21,7 +14,6 @@ import { useState, useEffect, useContext } from "react";
 // Types
 import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
-import axios from "axios";
 import { useFieldArray, useForm } from "react-hook-form";
 import { createCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
 import {
@@ -32,6 +24,10 @@ import {
 
 // Context imports
 import { DashboardStateContext } from "../DashboardStateProvider";
+import ChangeVideoModal from "../Pages/Modals/ChangeVideoModal";
+import PreviewVideoModal from "../Pages/Modals/PreviewVideoModal";
+import SegmentImagesModal from "../Segments/SegmentImagesModal";
+import CaseStudyThumbnailModal from "./CaseStudyThumbnailModal";
 export default function NewCaseStudy(props: {
     segmentId: number;
     studyCount: number;
@@ -55,7 +51,6 @@ export default function NewCaseStudy(props: {
 
     const {
         register,
-        reset,
         handleSubmit,
         getValues,
         setValue,
@@ -83,9 +78,6 @@ export default function NewCaseStudy(props: {
     // New Tag State
     const [newTag, setNewTag] = useState("");
 
-    // States for preview media
-    const [selectedPreviewVideo, setSelectedPreviewVideo] = useState("");
-
     // State for preview description text
     const [previewText, setPreviewText] = useState(false);
     // State for if there are unsaved changes
@@ -95,30 +87,9 @@ export default function NewCaseStudy(props: {
     const [success, setSuccess] = useState(false);
 
     // Context state imports
-    const {
-        imageNamingError,
-        setImageNamingError,
-        videoNamingError,
-        setVideoNamingError,
-        notVideoError,
-        setNotVideoError,
-        notImageError,
-        setNotImageError,
-        uploading,
-        setUploading,
-        uploadProgress,
-        setUploadProgress,
-    } = useContext(DashboardStateContext);
+    const { previewVideo, setPreviewVideo } = useContext(DashboardStateContext);
 
-    // States for naming errors of uploads
-    // const [imageNamingError, setImageNamingError] = useState(false);
-    // const [videoNamingError, setVideoNamingError] = useState(false);
-    // const [notVideoError, setNotVideoError] = useState(false);
-    // const [notImageError, setNotImageError] = useState(false);
-
-    // Uploading State
-    // const [uploading, setUploading] = useState(false);
-    // const [uploadProgress, setUploadProgress] = useState(0);
+    const [thumbnailImage, setThumbnailImage] = useState("");
 
     // Image select modal declaration
     const { isOpen: isOpenImageSelect, onOpenChange: onOpenChangeImageSelect } =
@@ -152,24 +123,6 @@ export default function NewCaseStudy(props: {
         }
     }, [dirtyFields.title, dirtyFields.copy, dirtyFields.image]);
 
-    // Check naming conventions for uploads
-    function namingConventionCheck(fileName: string, check: string) {
-        if (fileName.split("_")[0] !== check) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    function clearFileInput(target: string) {
-        const inputElm = document.getElementById(
-            "new-case-study-" + target + "-upload"
-        ) as HTMLInputElement;
-        if (inputElm) {
-            inputElm.value = "";
-        }
-    }
-
     // Update segment with pre populated data
     async function addCaseStudy(data: CaseStudyFromType) {
         createCaseStudy(data)
@@ -177,71 +130,6 @@ export default function NewCaseStudy(props: {
                 setSuccess(true);
             })
             .catch((err) => console.log(err));
-    }
-
-    async function uploadImage(file: File, target: string) {
-        setUploadProgress(0);
-        if (file.type.split("/")[0] !== "image") {
-            setNotImageError(true);
-            setUploading(false);
-            return;
-        } else {
-            setNotImageError(false);
-            const formData = new FormData();
-            formData.append("file", file);
-            axios
-                .post("/api/image", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    onUploadProgress: (ProgressEvent) => {
-                        if (ProgressEvent.bytes) {
-                            let percent = Math.round(
-                                (ProgressEvent.loaded / ProgressEvent.total!) *
-                                    100
-                            );
-                            setUploadProgress(percent);
-                        }
-                    },
-                })
-                .then((res) => {
-                    if (res.data.message) {
-                        setUploading(false);
-                        clearFileInput("image");
-                    }
-                })
-                .catch((err) => console.log(err));
-        }
-    }
-
-    async function uploadVideo(file: File, target: string) {
-        if (file.type.split("/")[0] !== "video") {
-            setNotVideoError(true);
-            setUploading(false);
-            return;
-        } else {
-            setNotVideoError(false);
-            const formData = new FormData();
-            formData.append("file", file);
-            axios
-                .post("/api/video", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    onUploadProgress: (ProgressEvent) => {
-                        if (ProgressEvent.bytes) {
-                            let percent = Math.round(
-                                (ProgressEvent.loaded / ProgressEvent.total!) *
-                                    100
-                            );
-                            setUploadProgress(percent);
-                        }
-                    },
-                })
-                .then((res) => {
-                    if (res.data.message) {
-                        setUploading(false);
-                        clearFileInput("video");
-                    }
-                })
-                .catch((err) => console.log(err));
-        }
     }
 
     return (
@@ -339,7 +227,7 @@ export default function NewCaseStudy(props: {
                                         <>
                                             <div
                                                 onClick={() => {
-                                                    setSelectedPreviewVideo(
+                                                    setPreviewVideo(
                                                         getValues("video")
                                                     );
                                                     onOpenChangeVideoPreview();
@@ -414,7 +302,7 @@ export default function NewCaseStudy(props: {
                                                 <div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
                                                     <div className="text-red-400 h-full flex justify-center">
                                                         <i
-                                                            onClick={() =>
+                                                            onClick={() => {
                                                                 setValue(
                                                                     "videoThumbnail",
                                                                     "",
@@ -422,8 +310,11 @@ export default function NewCaseStudy(props: {
                                                                         shouldDirty:
                                                                             true,
                                                                     }
-                                                                )
-                                                            }
+                                                                );
+                                                                setThumbnailImage(
+                                                                    ""
+                                                                );
+                                                            }}
                                                             aria-hidden
                                                             className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
                                                         />
@@ -611,530 +502,42 @@ export default function NewCaseStudy(props: {
             )}
 
             {/* Change video modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenVideoSelect}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeVideoSelect}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    Video
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                {notVideoError && (
-                                    <div className="w-full text-center text-red-400">
-                                        Please Upload file in video format.
-                                    </div>
-                                )}
-                                {videoNamingError && (
-                                    <div className="w-full text-center text-red-400">
-                                        File name should be prefixed with VIDEO_
-                                    </div>
-                                )}
-                                <div className="flex justify-evenly w-full">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            className="m-auto"
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <div className="file-input shadow-xl">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        if (
-                                                            namingConventionCheck(
-                                                                e.target
-                                                                    .files[0]
-                                                                    .name,
-                                                                "VIDEO"
-                                                            )
-                                                        ) {
-                                                            setUploading(true);
-                                                            setVideoNamingError(
-                                                                false
-                                                            );
-                                                            uploadVideo(
-                                                                e.target
-                                                                    .files[0],
-                                                                "video"
-                                                            );
-                                                        } else {
-                                                            setVideoNamingError(
-                                                                true
-                                                            );
-                                                            e.target.value = "";
-                                                        }
-                                                    }
-                                                }}
-                                                id={
-                                                    "new-case-study-video-upload"
-                                                }
-                                                type="file"
-                                                className="inputFile"
-                                            />
-                                            <label
-                                                htmlFor={
-                                                    "new-case-study-video-upload"
-                                                }>
-                                                Upload New
-                                            </label>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {props.videos.map(
-                                        (video: any, index: number) => {
-                                            if (
-                                                video.name.split("_")[0] ===
-                                                "VIDEO"
-                                            ) {
-                                                return (
-                                                    <div
-                                                        key={
-                                                            video.name +
-                                                            "-" +
-                                                            index
-                                                        }>
-                                                        <div
-                                                            onClick={() => {
-                                                                setSelectedPreviewVideo(
-                                                                    video.name
-                                                                );
-                                                                onOpenChangeVideoPreview();
-                                                            }}
-                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
-                                                            <Image
-                                                                height={100}
-                                                                width={100}
-                                                                src={
-                                                                    "/images/play.png"
-                                                                }
-                                                                alt="play"
-                                                                className="w-full h-auto m-auto"
-                                                            />
-                                                        </div>
-                                                        <div className="text-center truncate">
-                                                            {
-                                                                video.name.split(
-                                                                    "-"
-                                                                )[0]
-                                                            }
-                                                        </div>
-                                                        <div className="flex justify-center mt-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setValue(
-                                                                        "video",
-                                                                        video.name,
-                                                                        {
-                                                                            shouldDirty:
-                                                                                true,
-                                                                        }
-                                                                    );
+            <ChangeVideoModal
+                videos={props.videos}
+                isOpenSelectVideo={isOpenVideoSelect}
+                onOpenChangeSelectVideo={onOpenChangeVideoSelect}
+                onOpenChangePreviewVideo={onOpenChangeVideoSelect}
+                setValue={setValue}
+                hasVideoSet={getValues("video") !== "" ? true : false}
+                modalTarget="video"
+                modalTitle="Case Study Video"
+                prefixCheck="VIDEO"
+            />
 
-                                                                    onClose();
-                                                                    setVideoNamingError(
-                                                                        false
-                                                                    );
-                                                                    setNotVideoError(
-                                                                        false
-                                                                    );
-                                                                }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
-                                                                Select
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {getValues("video") ? (
-                                    <button
-                                        onClick={() => {
-                                            setValue("video", "", {
-                                                shouldDirty: true,
-                                            });
+            {/* Preview video modal */}
+            <PreviewVideoModal
+                isOpenPreviewVideo={isOpenVideoPreview}
+                onOpenChangePreviewVideo={onOpenChangeVideoPreview}
+                previewVideo={previewVideo}
+            />
 
-                                            onClose();
-                                            setNotVideoError(false);
-                                            setVideoNamingError(false);
-                                        }}
-                                        className="px-10 py-2 bg-red-400 rounded-xl">
-                                        Remove
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setVideoNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
             {/* Change image modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenImageSelect}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeImageSelect}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold">
-                                    Select or Upload Image
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                {imageNamingError && (
-                                    <div className="text-center text-red-400">
-                                        File name prefix should be STUDY_
-                                    </div>
-                                )}
-                                {notImageError && (
-                                    <div className="text-center text-red-400">
-                                        File should be an image.
-                                    </div>
-                                )}
-                                <div className="w-full flex justify-center mb-10">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            className="m-auto"
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <>
-                                            <div className="file-input shadow-xl">
-                                                <input
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            if (
-                                                                namingConventionCheck(
-                                                                    e.target
-                                                                        .files[0]
-                                                                        .name,
-                                                                    "STUDY"
-                                                                )
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                setImageNamingError(
-                                                                    false
-                                                                );
-                                                                uploadImage(
-                                                                    e.target
-                                                                        .files[0],
-                                                                    "video"
-                                                                );
-                                                            } else {
-                                                                setImageNamingError(
-                                                                    true
-                                                                );
-                                                                e.target.value =
-                                                                    "";
-                                                            }
-                                                        }
-                                                    }}
-                                                    id={
-                                                        "new-case-study-image-upload"
-                                                    }
-                                                    type="file"
-                                                    className="inputFile"
-                                                />
-                                                <label
-                                                    htmlFor={
-                                                        "new-case-study-image-upload"
-                                                    }>
-                                                    Upload New
-                                                </label>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                    {props.images.map(
-                                        (image: any, index: number) => {
-                                            if (
-                                                image.name.split("_")[0] ===
-                                                "STUDY"
-                                            )
-                                                return (
-                                                    <div
-                                                        key={
-                                                            image.name +
-                                                            "-" +
-                                                            index
-                                                        }
-                                                        className="flex cursor-pointer"
-                                                        onClick={() => {
-                                                            imageAppend({
-                                                                url: image.name,
-                                                            });
+            <SegmentImagesModal
+                isOpenAddImage={isOpenImageSelect}
+                onOpenChangeAddImage={onOpenChangeImageSelect}
+                images={props.images}
+                imageAppend={imageAppend}
+                prefixCheck="study"
+            />
 
-                                                            onClose();
-                                                        }}>
-                                                        <Image
-                                                            height={300}
-                                                            width={300}
-                                                            src={
-                                                                process.env
-                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                image.name
-                                                            }
-                                                            alt={image.name}
-                                                            className="w-full h-auto m-auto"
-                                                        />
-                                                    </div>
-                                                );
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    onPress={() => {
-                                        onClose();
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
             {/* Change thumbnail modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenThumbnailSelect}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeThumbnailSelect}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold">
-                                    Select or Upload Image
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                {imageNamingError && (
-                                    <div className="text-center text-red-400">
-                                        File name prefix should be THUMBNAIL_
-                                    </div>
-                                )}
-                                {notImageError && (
-                                    <div className="text-center text-red-400">
-                                        File should be an image.
-                                    </div>
-                                )}
-                                <div className="w-full flex justify-center mb-10">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-20 h-20 text-orange-600 drop-shadow-md",
-                                                value: "text-xl",
-                                            }}
-                                            className="m-auto"
-                                            showValueLabel={true}
-                                            value={uploadProgress}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                        />
-                                    ) : (
-                                        <>
-                                            <div className="file-input shadow-xl">
-                                                <input
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            if (
-                                                                namingConventionCheck(
-                                                                    e.target
-                                                                        .files[0]
-                                                                        .name,
-                                                                    "THUMBNAIL"
-                                                                )
-                                                            ) {
-                                                                setUploading(
-                                                                    true
-                                                                );
-                                                                setImageNamingError(
-                                                                    false
-                                                                );
-                                                                uploadImage(
-                                                                    e.target
-                                                                        .files[0],
-                                                                    "video"
-                                                                );
-                                                            } else {
-                                                                setImageNamingError(
-                                                                    true
-                                                                );
-                                                                e.target.value =
-                                                                    "";
-                                                            }
-                                                        }
-                                                    }}
-                                                    id={
-                                                        "new-case-study-image-upload"
-                                                    }
-                                                    type="file"
-                                                    className="inputFile"
-                                                />
-                                                <label
-                                                    htmlFor={
-                                                        "new-case-study-image-upload"
-                                                    }>
-                                                    Upload New
-                                                </label>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="grid xl:grid-cols-4 grid-cols-2 gap-5">
-                                    {props.images.map(
-                                        (image: any, index: number) => {
-                                            if (
-                                                image.name.split("_")[0] ===
-                                                "THUMBNAIL"
-                                            )
-                                                return (
-                                                    <div
-                                                        key={
-                                                            image.name +
-                                                            "-" +
-                                                            index
-                                                        }
-                                                        className="flex cursor-pointer"
-                                                        onClick={() => {
-                                                            setValue(
-                                                                "videoThumbnail",
-                                                                image.name,
-                                                                {
-                                                                    shouldDirty:
-                                                                        true,
-                                                                }
-                                                            );
-
-                                                            onClose();
-                                                        }}>
-                                                        <Image
-                                                            height={300}
-                                                            width={300}
-                                                            src={
-                                                                process.env
-                                                                    .NEXT_PUBLIC_BASE_IMAGE_URL +
-                                                                image.name
-                                                            }
-                                                            alt={image.name}
-                                                            className="w-full h-auto m-auto"
-                                                        />
-                                                    </div>
-                                                );
-                                        }
-                                    )}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    onPress={() => {
-                                        onClose();
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-            {/* Preview Video Modal */}
-            <Modal
-                size="5xl"
-                backdrop="blur"
-                isOpen={isOpenVideoPreview}
-                className="dark"
-                scrollBehavior="inside"
-                isDismissable={false}
-                onOpenChange={onOpenChangeVideoPreview}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div className="w-full text-center font-bold text-3xl">
-                                    {selectedPreviewVideo}
-                                </div>
-                            </ModalHeader>
-                            <ModalBody>
-                                <video
-                                    playsInline
-                                    disablePictureInPicture
-                                    id="bg-video"
-                                    controls={true}
-                                    src={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
-                                        selectedPreviewVideo
-                                    }
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={() => {
-                                        onClose();
-                                        setNotVideoError(false);
-                                        setVideoNamingError(false);
-                                    }}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            <CaseStudyThumbnailModal
+                isOpenThumbnailSelect={isOpenThumbnailSelect}
+                onOpenChangeThumbnailSelect={onOpenChangeThumbnailSelect}
+                setValue={setValue}
+                images={props.images}
+                setThumbnailImage={setThumbnailImage}
+            />
         </div>
     );
 }

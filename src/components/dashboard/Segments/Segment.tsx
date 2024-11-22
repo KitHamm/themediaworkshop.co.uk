@@ -698,6 +698,7 @@ export default function EditSegment(props: {
                     onOpenChangeAddImage={onOpenChangeAddImage}
                     images={props.images}
                     imageAppend={imageAppend}
+                    prefixCheck={"segment"}
                 />
                 {/* Edit Case Study modal */}
                 <Modal
