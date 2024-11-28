@@ -1,11 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Lato } from "next/font/google";
 import "../globals.css";
-import SidePanel from "@/components/dashboard/SidePanel";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/authOptions";
-import prisma from "@/lib/prisma";
-import { Message, Tickets, User } from "@prisma/client";
 
 const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
@@ -16,6 +11,7 @@ export const viewport: Viewport = {
     initialScale: 1,
     width: "device-width",
     minimumScale: 1,
+    themeColor: "#131313",
 };
 
 export const metadata: Metadata = {
