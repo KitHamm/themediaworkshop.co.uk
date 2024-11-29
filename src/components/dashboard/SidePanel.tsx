@@ -22,13 +22,15 @@ import { signOut } from "next-auth/react";
 // Next Components
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 //  Functions
 import { Message, Tickets } from "@prisma/client";
 import CreateTicketModal from "./modals/CreateTicketModal";
 import ViewTicketsModal from "./modals/ViewTicketsModal";
 import UploadAvatarModal from "./modals/uploadAvatarModal";
+import DesktopNavLink from "./DesktopNavLink";
+import MobileNavLink from "./MobileNavLink";
 
 export default function SidePanel(props: {
     session: any;
@@ -36,6 +38,7 @@ export default function SidePanel(props: {
     tickets: Tickets[];
     avatar: string | undefined;
 }) {
+    const pathname = usePathname();
     // Search params for which view is active
     const searchParams = useSearchParams();
     const view: string = searchParams.get("view")
@@ -67,6 +70,10 @@ export default function SidePanel(props: {
             setUnreadMessages(count);
         });
     }, [props.messages]);
+
+    useEffect(() => {
+        console.log(pathname);
+    }, [pathname]);
 
     return (
         <>
@@ -138,79 +145,42 @@ export default function SidePanel(props: {
                             </DropdownSection>
                         </DropdownMenu>
                     </Dropdown>
-
-                    <Link
-                        href={"/dashboard"}
-                        className={`mt-auto transition-all text-center text-xs`}>
-                        <i
-                            aria-hidden
-                            className={`${
-                                view === "dashboard"
-                                    ? "text-orange-600"
-                                    : "text-white"
-                            } fa-solid fa-house fa-xl`}
-                        />
-                        <div className="mt-1">Dash</div>
-                    </Link>
-                    <Link
-                        href={"/dashboard/pages"}
-                        className={`mt-auto transition-all text-center text-xs`}>
-                        <i
-                            aria-hidden
-                            className={`${
-                                view === "pages"
-                                    ? "text-orange-600"
-                                    : "text-white"
-                            } fa-regular fa-window-restore fa-xl`}
-                        />
-                        <div className="mt-1">Pages</div>
-                    </Link>
-                    <Link
-                        href={"/dashboard/media"}
-                        className={`mt-auto transition-all text-center text-xs`}>
-                        <i
-                            aria-hidden
-                            className={`${
-                                view === "media"
-                                    ? "text-orange-600"
-                                    : "text-white"
-                            } fa-regular fa-images fa-xl`}
-                        />
-                        <div className="mt-1">Media</div>
-                    </Link>
-                    <Link
-                        href={"/dashboard/messages"}
-                        className={`mt-auto transition-all text-center text-xs`}>
-                        <i
-                            aria-hidden
-                            className={`${
-                                view === "messages"
-                                    ? "text-orange-600"
-                                    : "text-white"
-                            } fa-regular fa-message fa-xl`}
-                        />
-                        <Badge
-                            placement="top-right"
-                            color="danger"
-                            isInvisible={unreadMessages === 0 ? true : false}
-                            content={unreadMessages}>
-                            {""}
-                        </Badge>
-                        <div className="mt-1">Msg</div>
-                    </Link>
-                    <Link
-                        href={"/dashboard/settings"}
-                        className={`mt-auto transition-all text-center text-xs`}>
-                        <i
-                            aria-hidden
-                            className={`${
-                                view === "settings"
-                                    ? "text-orange-600"
-                                    : "text-white"
-                            } fa-solid fa-gear fa-xl`}
-                        />
-                        <div className="mt-1">Settings</div>
-                    </Link>
+                    <MobileNavLink
+                        pathname={pathname}
+                        link=""
+                        page="dashboard"
+                        text="Dash"
+                        icon="fa-solid fa-house"
+                    />
+                    <MobileNavLink
+                        pathname={pathname}
+                        link="/pages"
+                        page="pages"
+                        text="Pages"
+                        icon="fa-regular fa-window-restore"
+                    />
+                    <MobileNavLink
+                        pathname={pathname}
+                        link="/media"
+                        page="media"
+                        text="Media"
+                        icon="fa-regular fa-images"
+                    />
+                    <MobileNavLink
+                        pathname={pathname}
+                        link="/messages"
+                        page="messages"
+                        text="Msg"
+                        icon="fa-regular fa-message"
+                        unreadMessages={0}
+                    />
+                    <MobileNavLink
+                        pathname={pathname}
+                        link="/settings"
+                        page="settings"
+                        text="Settings"
+                        icon="fa-solid fa-gear"
+                    />
                 </div>
             </div>
             {/* Desktop Side Panel */}
@@ -316,73 +286,37 @@ export default function SidePanel(props: {
                     </div>
                 </div>
                 {/* Navigation Links using state props */}
-                <Link
-                    href={"/dashboard"}
-                    className={`${
-                        view === "dashboard"
-                            ? "bg-orange-600 border-l-5 border-white"
-                            : ""
-                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <i
-                        aria-hidden
-                        className="fa-solid fa-house fa-xl my-auto"
-                    />
-                    <div className="my-auto">Dashboard</div>
-                </Link>
-                <Link
-                    href={"/dashboard/pages"}
-                    className={`${
-                        view === "pages"
-                            ? "bg-orange-600 border-l-5 border-white"
-                            : ""
-                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <i
-                        aria-hidden
-                        className="fa-regular fa-window-restore fa-xl my-auto"
-                    />
-                    <div className="my-auto">Pages</div>
-                </Link>
-                <Link
-                    href={"/dashboard/media"}
-                    className={`${
-                        view === "media"
-                            ? "bg-orange-600 border-l-5 border-white"
-                            : ""
-                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <i
-                        aria-hidden
-                        className="fa-regular fa-images fa-xl my-auto"
-                    />
-                    <div className="my-auto">Media</div>
-                </Link>
-                <Link
-                    href={"/dashboard/messages"}
-                    className={`${
-                        view === "messages"
-                            ? "bg-orange-600 border-l-5 border-white"
-                            : ""
-                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <Badge
-                        color="danger"
-                        isInvisible={unreadMessages === 0 ? true : false}
-                        content={unreadMessages}>
-                        <i
-                            aria-hidden
-                            className="fa-regular fa-message fa-xl my-auto"
-                        />
-                    </Badge>
-                    <div className="my-auto">Messages</div>
-                </Link>
-                <Link
-                    href={"/dashboard/settings"}
-                    className={`${
-                        view === "settings"
-                            ? "bg-orange-600 border-l-5 border-white"
-                            : ""
-                    } w-4/5 rounded-tr-full rounded-br-full transition-all flex gap-6 hover:bg-gray-600 cursor-pointer font-bold text-xl pe-5 py-3 ps-10`}>
-                    <i aria-hidden className="fa-solid fa-gear fa-xl my-auto" />
-                    <div className="my-auto">Settings</div>
-                </Link>
+                <DesktopNavLink
+                    pathname={pathname}
+                    page="dashboard"
+                    link=""
+                    icon="fa-solid fa-house"
+                />
+                <DesktopNavLink
+                    pathname={pathname}
+                    page="pages"
+                    link="/pages"
+                    icon="fa-regular fa-window-restore"
+                />
+                <DesktopNavLink
+                    pathname={pathname}
+                    page="media"
+                    link="/media"
+                    icon="fa-regular fa-images"
+                />
+                <DesktopNavLink
+                    pathname={pathname}
+                    page="messages"
+                    link="/messages"
+                    icon="fa-regular fa-message"
+                    unreadMessages={1}
+                />
+                <DesktopNavLink
+                    pathname={pathname}
+                    page="settings"
+                    link="/settings"
+                    icon="fa-solid fa-gear"
+                />
             </div>
             {/* Report a Problem Modal */}
             <CreateTicketModal
