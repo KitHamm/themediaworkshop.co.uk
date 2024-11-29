@@ -9,9 +9,9 @@ export async function checkUserActivation(id: string) {
             where: { id: id },
         });
         if (!user) {
-            return Promise.resolve({ status: 201, message: false });
+            return Promise.resolve({ status: 201, message: true });
         }
-        return Promise.resolve();
+        return Promise.resolve({ status: 200, message: user.activated });
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {

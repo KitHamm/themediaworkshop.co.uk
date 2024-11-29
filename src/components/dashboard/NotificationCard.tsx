@@ -1,8 +1,8 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Card, CardBody } from "@nextui-org/react";
-import { NotificationsContext } from "./DashboardMain";
+import { NotificationsContext } from "./providers/NotificationProvider";
 import { Notification } from "@/lib/types";
 
 export default function NotificationCard() {

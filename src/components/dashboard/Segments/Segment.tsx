@@ -41,7 +41,7 @@ import {
 import { deleteSegment as deleteSegmentSA } from "@/server/segmentActions/deleteSegment";
 
 // Context imports
-import { NotificationsContext } from "../DashboardMain";
+import { NotificationsContext } from "../providers/NotificationProvider";
 import TopImageSelectModal from "./TopImageSelectModal";
 import SegmentImagesModal from "./SegmentImagesModal";
 

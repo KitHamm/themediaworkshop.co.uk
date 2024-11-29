@@ -36,7 +36,7 @@ import Markdown from "react-markdown";
 import { updatePage } from "@/server/pageActions/updatePage";
 
 // Context imports
-import { NotificationsContext } from "../DashboardMain";
+import { NotificationsContext } from "../providers/NotificationProvider";
 import PreviewVideoModal from "./Modals/PreviewVideoModal";
 import ChangeVideoModal from "./Modals/ChangeVideoModal";
 

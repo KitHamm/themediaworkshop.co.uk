@@ -140,7 +140,7 @@ export default function SidePanel(props: {
                     </Dropdown>
 
                     <Link
-                        href={"?view=dashboard"}
+                        href={"/dashboard"}
                         className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
@@ -153,7 +153,7 @@ export default function SidePanel(props: {
                         <div className="mt-1">Dash</div>
                     </Link>
                     <Link
-                        href={"?view=pages"}
+                        href={"/dashboard/pages"}
                         className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
@@ -166,7 +166,7 @@ export default function SidePanel(props: {
                         <div className="mt-1">Pages</div>
                     </Link>
                     <Link
-                        href={"?view=media"}
+                        href={"/dashboard/media"}
                         className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
@@ -179,7 +179,7 @@ export default function SidePanel(props: {
                         <div className="mt-1">Media</div>
                     </Link>
                     <Link
-                        href={"?view=messages"}
+                        href={"/dashboard/messages"}
                         className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
@@ -199,7 +199,7 @@ export default function SidePanel(props: {
                         <div className="mt-1">Msg</div>
                     </Link>
                     <Link
-                        href={"?view=settings"}
+                        href={"/dashboard/settings"}
                         className={`mt-auto transition-all text-center text-xs`}>
                         <i
                             aria-hidden
@@ -317,7 +317,7 @@ export default function SidePanel(props: {
                 </div>
                 {/* Navigation Links using state props */}
                 <Link
-                    href={"?view=dashboard"}
+                    href={"/dashboard"}
                     className={`${
                         view === "dashboard"
                             ? "bg-orange-600 border-l-5 border-white"
@@ -330,7 +330,7 @@ export default function SidePanel(props: {
                     <div className="my-auto">Dashboard</div>
                 </Link>
                 <Link
-                    href={"?view=pages"}
+                    href={"/dashboard/pages"}
                     className={`${
                         view === "pages"
                             ? "bg-orange-600 border-l-5 border-white"
@@ -343,7 +343,7 @@ export default function SidePanel(props: {
                     <div className="my-auto">Pages</div>
                 </Link>
                 <Link
-                    href={"?view=media"}
+                    href={"/dashboard/media"}
                     className={`${
                         view === "media"
                             ? "bg-orange-600 border-l-5 border-white"
@@ -356,7 +356,7 @@ export default function SidePanel(props: {
                     <div className="my-auto">Media</div>
                 </Link>
                 <Link
-                    href={"?view=messages"}
+                    href={"/dashboard/messages"}
                     className={`${
                         view === "messages"
                             ? "bg-orange-600 border-l-5 border-white"
@@ -374,7 +374,7 @@ export default function SidePanel(props: {
                     <div className="my-auto">Messages</div>
                 </Link>
                 <Link
-                    href={"?view=settings"}
+                    href={"/dashboard/settings"}
                     className={`${
                         view === "settings"
                             ? "bg-orange-600 border-l-5 border-white"
