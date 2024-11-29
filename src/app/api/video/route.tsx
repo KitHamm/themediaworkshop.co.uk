@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import path from "path";
 import { writeFile } from "fs/promises";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 
 interface ArrayFile extends File {
     arrayBuffer: () => Promise<ArrayBuffer>;

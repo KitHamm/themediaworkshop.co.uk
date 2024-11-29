@@ -1,6 +1,6 @@
 "use client";
 
-import { createTicket } from "@/components/server/userActions/adminTickets";
+import { createTicket } from "@/server/userActions/adminTickets";
 import {
     Button,
     Modal,

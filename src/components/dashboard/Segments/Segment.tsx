@@ -37,8 +37,8 @@ import Markdown from "react-markdown";
 import {
     updateSegment,
     updateSegmentPublish,
-} from "@/components/server/segmentActions/updateSegment";
-import { deleteSegment as deleteSegmentSA } from "@/components/server/segmentActions/deleteSegment";
+} from "@/server/segmentActions/updateSegment";
+import { deleteSegment as deleteSegmentSA } from "@/server/segmentActions/deleteSegment";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";

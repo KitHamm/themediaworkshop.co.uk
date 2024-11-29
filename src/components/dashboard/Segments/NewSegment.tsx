@@ -27,7 +27,7 @@ import { ImageFormType, SegmentFormType } from "@/lib/types";
 
 // Functions
 import axios from "axios";
-import { createSegment } from "@/components/server/segmentActions/createSegment";
+import { createSegment } from "@/server/segmentActions/createSegment";
 import TopImageSelectModal from "./TopImageSelectModal";
 import SegmentImagesModal from "./SegmentImagesModal";
 

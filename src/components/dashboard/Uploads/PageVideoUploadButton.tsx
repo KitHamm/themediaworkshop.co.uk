@@ -2,7 +2,7 @@
 
 import { useContext, useRef } from "react";
 import { DashboardStateContext } from "../DashboardStateProvider";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 import axios from "axios";
 
 export default function PageVideoUploadButton(props: {

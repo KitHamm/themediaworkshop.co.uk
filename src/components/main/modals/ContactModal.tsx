@@ -11,14 +11,15 @@ import {
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createMessage } from "./server/messageActions/createMessage";
+import { createMessage } from "@/server/messageActions/createMessage";
 import { ContactFormTypes } from "@/lib/types";
 
 export default function ContactModal(props: {
-    onOpenChange: any;
-    isOpen: any;
-    onClose: any;
+    onOpenChange: () => void;
+    isOpen: boolean;
 }) {
+    const { onOpenChange, isOpen } = props;
+
     const form = useForm<ContactFormTypes>();
     const [showSuccess, setShowSuccess] = useState(false);
     const [sending, setSending] = useState(false);
@@ -31,7 +32,6 @@ export default function ContactModal(props: {
             setTimeout(() => {
                 setSending(false);
                 setShowSuccess(true);
-
                 setTimeout(() => {
                     setSuccess(false);
                     setShowSuccess(false);
@@ -54,10 +54,10 @@ export default function ContactModal(props: {
         <Modal
             size="2xl"
             backdrop="blur"
-            isOpen={props.isOpen}
+            isOpen={isOpen}
             className="dark transition-all"
             placement="center"
-            onOpenChange={props.onOpenChange}>
+            onOpenChange={onOpenChange}>
             <ModalContent>
                 {(onClose) => (
                     <>

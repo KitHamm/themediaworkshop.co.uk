@@ -20,11 +20,11 @@ import { Message } from "@prisma/client";
 import {
     updateMessage,
     updateMultipleMessages,
-} from "../server/messageActions/updateMessage";
+} from "@/server/messageActions/updateMessage";
 import {
     deleteMessage,
     deleteMultipleMessages,
-} from "../server/messageActions/deleteMessage";
+} from "@/server/messageActions/deleteMessage";
 import { DateRender } from "@/lib/functions";
 
 export default function Messages(props: {

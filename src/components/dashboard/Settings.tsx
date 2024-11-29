@@ -18,7 +18,7 @@ import {
 } from "@nextui-org/react";
 
 // React Components
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // Next Components
 import { signOut } from "next-auth/react";
@@ -27,14 +27,14 @@ import { useSearchParams } from "next/navigation";
 // Function
 import axios from "axios";
 import { UserWithoutPassword } from "@/lib/types";
-import { createUser } from "../server/userActions/createUser";
-import { updateEmailHost as updateEmailHostSA } from "../server/userActions/updateEmailHost";
-import { deleteUser as deleteUserSA } from "../server/userActions/deleteUser";
+import { createUser } from "@/server/userActions/createUser";
+import { updateEmailHost as updateEmailHostSA } from "@/server/userActions/updateEmailHost";
+import { deleteUser as deleteUserSA } from "@/server/userActions/deleteUser";
 import { Role } from "@prisma/client";
-import { updateUser as updateUserSA } from "../server/userActions/updateUser";
+import { updateUser as updateUserSA } from "@/server/userActions/updateUser";
 import { Session } from "next-auth";
-import { resetUserPassword } from "../server/userActions/resetUserPassword";
-import { changePassword } from "../server/userActions/changePassword";
+import { resetUserPassword } from "@/server/userActions/resetUserPassword";
+import { changePassword } from "@/server/userActions/changePassword";
 
 // Types
 import {

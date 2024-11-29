@@ -32,8 +32,8 @@ import axios from "axios";
 import {
     deleteFile as deleteFileSA,
     errorResponse,
-} from "../server/mediaActions/deleteFile";
-import { revalidateDashboard } from "../server/revalidateDashboard";
+} from "@/server/mediaActions/deleteFile";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
 import { imageSort, itemOrder, videoSort } from "@/lib/functions";
 

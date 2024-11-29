@@ -33,7 +33,7 @@ import { PageFormType } from "@/lib/types";
 
 // Functions
 import Markdown from "react-markdown";
-import { updatePage } from "@/components/server/pageActions/updatePage";
+import { updatePage } from "@/server/pageActions/updatePage";
 
 // Context imports
 import { NotificationsContext } from "../DashboardMain";

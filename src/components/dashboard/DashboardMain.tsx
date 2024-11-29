@@ -40,7 +40,7 @@ import {
 import { Notification, NotificationProviderType } from "@/lib/types";
 
 import NotificationCard from "./NotificationCard";
-import { updateUserActivation } from "../server/userActions/userActivation";
+import { updateUserActivation } from "@/server/userActions/userActivation";
 import { UserWithoutPassword } from "@/lib/types";
 import { Session } from "next-auth";
 import DashboardStateProvider from "./DashboardStateProvider";

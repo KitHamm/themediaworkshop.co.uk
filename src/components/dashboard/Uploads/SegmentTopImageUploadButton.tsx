@@ -3,7 +3,7 @@
 import axios from "axios";
 import { DashboardStateContext } from "../DashboardStateProvider";
 import { useContext, useRef } from "react";
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 
 export default function SegmentTopImageUploadButton(props: {
     check: string;

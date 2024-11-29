@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Lato } from "next/font/google";
 import "../globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Navbar from "@/components/main/Navbar";
+import Footer from "@/components/main/Footer";
 
 const lato = Lato({
     weight: ["100", "300", "400", "700", "900"],
@@ -42,7 +42,7 @@ export default async function RootLayout({
                     lato.className +
                     " bg-neutral-900 text-white m-0 w-screen overflow-x-hidden"
                 }>
-                <Navbar active={"home"} />
+                <Navbar />
                 {children}
                 <Footer />
             </body>

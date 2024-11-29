@@ -1,6 +1,6 @@
 "use client";
 
-import { updateAvatar as updateAvatarSA } from "@/components/server/userActions/userAvatar";
+import { updateAvatar as updateAvatarSA } from "@/server/userActions/userAvatar";
 import {
     Avatar,
     Button,

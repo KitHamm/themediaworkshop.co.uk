@@ -1,11 +1,11 @@
 "use client";
 
 import { useDisclosure } from "@nextui-org/react";
-import ContactModal from "./ContactModal";
+import ContactModal from "./modals/ContactModal";
 
 export default function Footer() {
     const date = new Date();
-    const { onClose, isOpen, onOpenChange } = useDisclosure();
+    const { isOpen, onOpenChange } = useDisclosure();
     return (
         <div className="w-full">
             <div className="flex justify-center bg-neutral-900 py-10">
@@ -67,11 +67,7 @@ export default function Footer() {
             <div className="pb-20 xl:pb-5 text-center bg-black py-4">
                 &copy; {date.getFullYear()} The Media Workshop
             </div>
-            <ContactModal
-                isOpen={isOpen}
-                onClose={onClose}
-                onOpenChange={onOpenChange}
-            />
+            <ContactModal isOpen={isOpen} onOpenChange={onOpenChange} />
         </div>
     );
 }

@@ -15,7 +15,7 @@ import { useState, useEffect, useContext } from "react";
 import { Images, Videos } from "@prisma/client";
 import Image from "next/image";
 import { useFieldArray, useForm } from "react-hook-form";
-import { createCaseStudy } from "@/components/server/caseStudyActions/createCaseStudy";
+import { createCaseStudy } from "@/server/caseStudyActions/createCaseStudy";
 import {
     CaseStudyImageType,
     CaseStudyTagType,

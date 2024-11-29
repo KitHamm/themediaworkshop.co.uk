@@ -29,8 +29,8 @@ import {
 import {
     updateCaseStudy,
     updateCaseStudyPublished,
-} from "@/components/server/caseStudyActions/updateCaseStudy";
-import { deleteCaseStudy } from "@/components/server/caseStudyActions/deleteCaseStudy";
+} from "@/server/caseStudyActions/updateCaseStudy";
+import { deleteCaseStudy } from "@/server/caseStudyActions/deleteCaseStudy";
 import SegmentImagesModal from "../Segments/SegmentImagesModal";
 import CaseStudyThumbnailModal from "./CaseStudyThumbnailModal";
 import ChangeVideoModal from "../Pages/Modals/ChangeVideoModal";

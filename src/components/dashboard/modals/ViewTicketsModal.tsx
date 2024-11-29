@@ -1,10 +1,7 @@
 "use client";
 
-import { revalidateDashboard } from "@/components/server/revalidateDashboard";
-import {
-    deleteTicket,
-    resolveTicket,
-} from "@/components/server/userActions/adminTickets";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
+import { deleteTicket, resolveTicket } from "@/server/userActions/adminTickets";
 import {
     Accordion,
     AccordionItem,

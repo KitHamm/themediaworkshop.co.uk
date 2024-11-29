@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@nextui-org/react";
-import { getStorageStats } from "@/components/server/storageStats";
+import { getStorageStats } from "@/server/storageStats";
 import { DiskSpaceType } from "@/lib/types";
 
 export default function StorageStats() {
