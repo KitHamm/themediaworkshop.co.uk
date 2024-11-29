@@ -15,6 +15,7 @@ export default function ScrollChevrons() {
                 chevron.current?.classList.replace("opacity-0", "opacity-100");
             }
         }, 10000);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
 
     return (
