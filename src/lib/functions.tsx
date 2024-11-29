@@ -1,4 +1,4 @@
-import { Images, Logos, Videos } from "@prisma/client";
+import { Images, Logos, Message, Videos } from "@prisma/client";
 
 export function DateRender(date: Date) {
     var formattedDate;
@@ -119,3 +119,13 @@ export const mapNumRange = (
     outMin: number,
     outMax: number
 ) => ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+
+export function countUnreadMessages(messages: Message[]) {
+    let unreadMessages = 0;
+    messages.forEach((message: Message) => {
+        if (message.read === false) {
+            unreadMessages += 1;
+        }
+    });
+    return unreadMessages;
+}

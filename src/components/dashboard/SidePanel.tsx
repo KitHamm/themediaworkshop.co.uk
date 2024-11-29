@@ -31,6 +31,7 @@ import ViewTicketsModal from "./modals/ViewTicketsModal";
 import UploadAvatarModal from "./modals/uploadAvatarModal";
 import DesktopNavLink from "./DesktopNavLink";
 import MobileNavLink from "./MobileNavLink";
+import { countUnreadMessages } from "@/lib/functions";
 
 export default function SidePanel(props: {
     session: any;
@@ -40,15 +41,16 @@ export default function SidePanel(props: {
 }) {
     const pathname = usePathname();
     // Search params for which view is active
-    const searchParams = useSearchParams();
-    const view: string = searchParams.get("view")
-        ? searchParams.get("view")!
-        : "dashboard";
 
-    // The count of unread messages
-    const [unreadMessages, setUnreadMessages] = useState(0);
     // Modal states
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [unreadMessages, setUnreadMessages] = useState<number>(
+        countUnreadMessages(props.messages)
+    );
+
+    useEffect(() => {
+        setUnreadMessages(countUnreadMessages(props.messages));
+    }, props.messages);
 
     const {
         isOpen: isOpenReport,
@@ -60,16 +62,6 @@ export default function SidePanel(props: {
         onOpen: onOpenTickets,
         onOpenChange: onOpenChangeTickets,
     } = useDisclosure();
-
-    useEffect(() => {
-        var count = 0;
-        props.messages.forEach((message: any) => {
-            if (!message.read) {
-                count++;
-            }
-            setUnreadMessages(count);
-        });
-    }, [props.messages]);
 
     useEffect(() => {
         console.log(pathname);
@@ -172,7 +164,7 @@ export default function SidePanel(props: {
                         page="messages"
                         text="Msg"
                         icon="fa-regular fa-message"
-                        unreadMessages={0}
+                        unreadMessages={unreadMessages}
                     />
                     <MobileNavLink
                         pathname={pathname}
@@ -309,7 +301,7 @@ export default function SidePanel(props: {
                     page="messages"
                     link="/messages"
                     icon="fa-regular fa-message"
-                    unreadMessages={1}
+                    unreadMessages={unreadMessages}
                 />
                 <DesktopNavLink
                     pathname={pathname}
