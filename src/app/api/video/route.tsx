@@ -1,70 +1,58 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-import path from "path";
-import { writeFile } from "fs/promises";
-import { revalidateDashboard } from "@/server/revalidateDashboard";
+import {
+    PutObjectCommand,
+    S3Client,
+    ObjectCannedACL,
+} from "@aws-sdk/client-s3";
 
-interface ArrayFile extends File {
-    arrayBuffer: () => Promise<ArrayBuffer>;
-}
+const bucketName = process.env.SPACES_BUCKET_NAME!;
+const endpoint = process.env.SPACES_ENDPOINT!;
+const region = process.env.SPACES_REGION!;
+const accessKeyId = process.env.SPACES_ACCESS_KEY!;
+const secretAccessKey = process.env.SPACES_SECRET_KEY!;
 
-export async function GET(request: Request) {
-    revalidatePath("/api/video");
-    const result = await prisma.videos.findMany({
-        orderBy: { createdAt: "desc" },
-    });
-
-    return new NextResponse(JSON.stringify(result), { status: 201 });
-}
+const s3 = new S3Client({
+    region,
+    endpoint,
+    credentials: {
+        accessKeyId,
+        secretAccessKey,
+    },
+});
 
 export async function POST(request: Request) {
-    const formData = await request.formData();
-    const file = formData.get("file") as ArrayFile;
-    const date = new Date();
-    if (!file) {
-        return new NextResponse(JSON.stringify({ error: "No file received" }), {
-            status: 400,
-        });
-    }
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = file.name.split(".")[0].replace(" ", "-");
-    const extension = file.name.split(".")[1];
-    const formattedDate = date.toISOString().replace(/:|\./g, "-");
-    const formattedName =
-        fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
     try {
-        await writeFile(
-            path.join(
-                process.cwd(),
-                process.env.PUT_STATIC_VIDEOS + formattedName
-            ),
-            buffer
-        );
-        try {
-            await prisma.videos.create({
-                data: {
-                    name: formattedName,
-                },
-            });
-            return new NextResponse(
-                JSON.stringify({ message: formattedName }),
-                { status: 201 }
+        const formData = await request.formData();
+        const file = formData.get("file") as File;
+        const buffer = Buffer.from(await file.arrayBuffer());
+        if (!file) {
+            return NextResponse.json(
+                { error: "No file provided" },
+                { status: 400 }
             );
-        } catch {
-            return new NextResponse(
-                JSON.stringify({ error: "An Error Occurred" }),
-                { status: 500 }
-            );
-        } finally {
-            revalidatePath("/");
         }
+
+        const fileKey = file.name;
+
+        const uploadParams = {
+            Bucket: bucketName,
+            Key: "videos/" + fileKey,
+            Body: buffer,
+            ACL: ObjectCannedACL.public_read,
+            ContentType: file.type,
+        };
+
+        await s3.send(new PutObjectCommand(uploadParams));
+
+        return NextResponse.json(
+            { message: "File uploaded successfully" },
+            { status: 201 }
+        );
     } catch (error) {
-        return new NextResponse(
-            JSON.stringify({ error: "An Error Occurred" }),
+        console.error("Upload Error:", error);
+        return NextResponse.json(
+            { error: "File upload failed" },
             { status: 500 }
         );
-    } finally {
-        revalidateDashboard();
     }
 }

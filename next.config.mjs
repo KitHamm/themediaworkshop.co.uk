@@ -34,6 +34,11 @@ const nextConfig = {
                 pathname: "**",
             },
             {
+                protocol: "https",
+                hostname: "tmw-website-media.lon1.cdn.digitaloceanspaces.com",
+                pathname: "**",
+            },
+            {
                 protocol: "http",
                 hostname: "localhost",
                 pathname: "**",

@@ -12,6 +12,7 @@
         "@nextui-org/react": "^2.4.6",
         "@prisma/client": "^5.19.1",
         "@types/bcrypt": "^5.0.2",
+        "aws-sdk": "^2.1692.0",
         "axios": "^1.7.7",
         "bcrypt": "^5.1.1",
         "chart.js": "^4.4.4",

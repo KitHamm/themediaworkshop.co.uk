@@ -124,9 +124,6 @@ export default function Media(props: {
         []
     );
 
-    // Upload Progress State
-    const [uploadProgress, setUploadProgress] = useState(0);
-
     // Image view modal declaration
     const {
         isOpen: isOpenImage,
@@ -148,7 +145,6 @@ export default function Media(props: {
 
     // Delete media depending on file type
     async function uploadMedia() {
-        setUploadProgress(0);
         if (newUpload) {
             var type = newUpload.type.split("/")[0];
             const formData = new FormData();
@@ -156,18 +152,10 @@ export default function Media(props: {
             axios
                 .post(("/api/" as string) + type, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
-                    onUploadProgress: (ProgressEvent) => {
-                        if (ProgressEvent.bytes) {
-                            let percent = Math.round(
-                                (ProgressEvent.loaded / ProgressEvent.total!) *
-                                    100
-                            );
-                            setUploadProgress(percent);
-                        }
-                    },
                 })
                 .then((res) => {
-                    if (res.data.message) {
+                    console.log(res);
+                    if (res.status === 201) {
                         setUploading(false);
                         clearFileInput();
                         onOpenChangeUpload();
@@ -1023,8 +1011,6 @@ export default function Media(props: {
                                                 svg: "w-28 h-28 drop-shadow-md",
                                                 value: "text-2xl",
                                             }}
-                                            showValueLabel={true}
-                                            value={uploadProgress}
                                             color="warning"
                                             aria-label="Loading..."
                                             className="ms-4"
@@ -1041,12 +1027,12 @@ export default function Media(props: {
                                                 }}
                                                 className="inputFile"
                                                 type="file"
-                                                name={"new-video"}
-                                                id={"new-video"}
+                                                name={"uploader"}
+                                                id={"uploader"}
                                             />
                                             <label
                                                 className="m-auto"
-                                                htmlFor="new-video">
+                                                htmlFor="uploader">
                                                 {newUpload !== undefined
                                                     ? "Change"
                                                     : "Select file"}

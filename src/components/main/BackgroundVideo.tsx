@@ -37,7 +37,7 @@ export default function BackgroundVideo(props: {
                 autoPlay={true}
                 muted
                 loop
-                src={process.env.NEXT_PUBLIC_BASE_VIDEO_URL + backgroundVideo}
+                src={process.env.NEXT_PUBLIC_CDN + "/videos/HEADER_test.mp4"}
             />
             <div
                 className={`${

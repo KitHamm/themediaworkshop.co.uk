@@ -22,7 +22,7 @@ import { signOut } from "next-auth/react";
 // Next Components
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 //  Functions
 import { Message, Tickets } from "@prisma/client";
@@ -62,10 +62,6 @@ export default function SidePanel(props: {
         onOpen: onOpenTickets,
         onOpenChange: onOpenChangeTickets,
     } = useDisclosure();
-
-    useEffect(() => {
-        console.log(pathname);
-    }, [pathname]);
 
     return (
         <>
