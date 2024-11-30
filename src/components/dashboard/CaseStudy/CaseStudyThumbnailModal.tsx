@@ -258,7 +258,8 @@ export default function CaseStudyThumbnailModal(props: {
                                                         width={300}
                                                         src={
                                                             process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                .NEXT_PUBLIC_CDN +
+                                                            "/images/" +
                                                             image.name
                                                         }
                                                         alt={image.name}

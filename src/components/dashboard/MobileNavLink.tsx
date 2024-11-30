@@ -1,6 +1,5 @@
 "use client";
 
-import { getIcon } from "@/lib/functions";
 import { Badge } from "@nextui-org/react";
 import Link from "next/link";
 

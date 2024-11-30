@@ -1,9 +1,13 @@
+"use server";
+
 import { NextResponse } from "next/server";
 import {
     PutObjectCommand,
     S3Client,
     ObjectCannedACL,
 } from "@aws-sdk/client-s3";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 const bucketName = process.env.SPACES_BUCKET_NAME!;
 const endpoint = process.env.SPACES_ENDPOINT!;
@@ -24,7 +28,7 @@ export async function POST(request: Request) {
     try {
         const formData = await request.formData();
         const file = formData.get("file") as File;
-        const buffer = Buffer.from(await file.arrayBuffer());
+
         if (!file) {
             return NextResponse.json(
                 { error: "No file provided" },
@@ -32,7 +36,15 @@ export async function POST(request: Request) {
             );
         }
 
-        const fileKey = file.name;
+        const date = new Date();
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const fileName = file.name.split(".")[0].replace(" ", "-");
+        const extension = file.name.split(".")[1];
+        const formattedDate = date.toISOString().replace(/:|\./g, "-");
+        const formattedName =
+            fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
+
+        const fileKey = formattedName;
 
         const uploadParams = {
             Bucket: bucketName,
@@ -44,12 +56,22 @@ export async function POST(request: Request) {
 
         await s3.send(new PutObjectCommand(uploadParams));
 
-        return NextResponse.json(
-            { message: "File uploaded successfully" },
-            { status: 201 }
-        );
+        try {
+            await prisma.videos.create({
+                data: {
+                    name: formattedName,
+                },
+            });
+            return new NextResponse(
+                JSON.stringify({ message: formattedName }),
+                { status: 201 }
+            );
+        } catch (error: any) {
+            return new NextResponse(JSON.stringify({ error: error }), {
+                status: 500,
+            });
+        }
     } catch (error) {
-        console.error("Upload Error:", error);
         return NextResponse.json(
             { error: "File upload failed" },
             { status: 500 }

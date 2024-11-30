@@ -285,7 +285,8 @@ export default function EditSegment(props: {
                                     height={2000}
                                     width={1000}
                                     src={
-                                        process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                        process.env.NEXT_PUBLIC_CDN +
+                                        "/images/" +
                                         topImage
                                     }
                                     alt={topImage}
@@ -540,7 +541,8 @@ export default function EditSegment(props: {
                                                         width={100}
                                                         src={
                                                             process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                .NEXT_PUBLIC_CDN +
+                                                            "/images/" +
                                                             image.url
                                                         }
                                                         alt={image.url}

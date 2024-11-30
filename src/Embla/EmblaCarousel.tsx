@@ -31,7 +31,8 @@ export function EmblaCarouselCaseStudyInner(props: { slides: string[] }) {
                                 width={900}
                                 height={500}
                                 src={
-                                    process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                    process.env.NEXT_PUBLIC_CDN +
+                                    "/images/" +
                                     image
                                 }
                                 alt={image}
@@ -70,7 +71,8 @@ export function EmblaCarouselCaseStudyView(props: { slides: string[] }) {
                                 width={900}
                                 height={500}
                                 src={
-                                    process.env.NEXT_PUBLIC_BASE_IMAGE_URL +
+                                    process.env.NEXT_PUBLIC_CDN +
+                                    "/images/" +
                                     image
                                 }
                                 alt={image}

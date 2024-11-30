@@ -285,7 +285,8 @@ export default function EditCaseStudy(props: {
                                                         width={100}
                                                         src={
                                                             process.env
-                                                                .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                .NEXT_PUBLIC_CDN +
+                                                            "/images/" +
                                                             image.url
                                                         }
                                                         alt={image.url}
@@ -393,7 +394,8 @@ export default function EditCaseStudy(props: {
                                                     width={200}
                                                     src={
                                                         process.env
-                                                            .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                            .NEXT_PUBLIC_CDN +
+                                                        "/images/" +
                                                         thumbnailImage
                                                     }
                                                     alt={thumbnailImage}

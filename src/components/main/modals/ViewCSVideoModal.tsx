@@ -37,7 +37,8 @@ export default function ViewCSVideoModal(props: {
                                 autoPlay={true}
                                 controls
                                 src={
-                                    process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                    process.env.NEXT_PUBLIC_CDN +
+                                    "/videos/" +
                                     videoURL
                                 }
                             />

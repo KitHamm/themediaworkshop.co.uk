@@ -48,7 +48,8 @@ export default function SegmentImage(props: {
                                                 className="embla__slide__img"
                                                 src={
                                                     process.env
-                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                        .NEXT_PUBLIC_CDN +
+                                                    "/images/" +
                                                     image
                                                 }
                                                 alt={image}
@@ -63,7 +64,9 @@ export default function SegmentImage(props: {
                     <Image
                         width={900}
                         height={500}
-                        src={process.env.NEXT_PUBLIC_BASE_IMAGE_URL + images[0]}
+                        src={
+                            process.env.NEXT_PUBLIC_CDN + "/images/" + images[0]
+                        }
                         alt={images[0]}
                         className="w-full h-auto"
                     />

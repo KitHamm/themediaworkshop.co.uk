@@ -215,7 +215,8 @@ export default function CaseStudyModal(props: {
                                                                         src={
                                                                             process
                                                                                 .env
-                                                                                .NEXT_PUBLIC_BASE_IMAGE_URL! +
+                                                                                .NEXT_PUBLIC_CDN! +
+                                                                            "/images/" +
                                                                             casestudy
                                                                                 .image[0]
                                                                         }
@@ -245,7 +246,8 @@ export default function CaseStudyModal(props: {
                                                                         src={
                                                                             process
                                                                                 .env
-                                                                                .NEXT_PUBLIC_BASE_VIDEO_URL! +
+                                                                                .NEXT_PUBLIC_CDN! +
+                                                                            "/videos/" +
                                                                             casestudy.video
                                                                         }
                                                                     />
@@ -262,7 +264,8 @@ export default function CaseStudyModal(props: {
                                                                                 src={
                                                                                     process
                                                                                         .env
-                                                                                        .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                                        .NEXT_PUBLIC_CDN +
+                                                                                    "/images/" +
                                                                                     casestudy.videoThumbnail
                                                                                 }
                                                                                 alt="thumbnail"

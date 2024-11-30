@@ -39,8 +39,8 @@ export default function ViewCSImagesModal(props: {
                                     width={900}
                                     height={500}
                                     src={
-                                        process.env
-                                            .NEXT_PUBLIC_BASE_IMAGE_URL! +
+                                        process.env.NEXT_PUBLIC_CDN! +
+                                        "/images/" +
                                         images[0]
                                     }
                                     alt={images[0]}

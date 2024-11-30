@@ -347,7 +347,8 @@ export default function Settings(props: {
                                                 src={
                                                     user.image
                                                         ? process.env
-                                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                              .NEXT_PUBLIC_CDN +
+                                                          "/avatars/" +
                                                           user.image
                                                         : undefined
                                                 }
@@ -493,7 +494,8 @@ export default function Settings(props: {
                                                 src={
                                                     user.image
                                                         ? process.env
-                                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                              .NEXT_PUBLIC_CDN +
+                                                          "/avatars/" +
                                                           user.image
                                                         : undefined
                                                 }
@@ -777,7 +779,8 @@ export default function Settings(props: {
                                                                 )
                                                                     ? process
                                                                           .env
-                                                                          .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                                          .NEXT_PUBLIC_CDN +
+                                                                      "/avatars/" +
                                                                       getValueNewUser(
                                                                           "image"
                                                                       )

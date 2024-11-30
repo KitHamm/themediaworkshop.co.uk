@@ -11,6 +11,7 @@ import {
     useDisclosure,
     Badge,
     User,
+    Button,
 } from "@nextui-org/react";
 
 //  React Components
@@ -32,6 +33,7 @@ import UploadAvatarModal from "./modals/uploadAvatarModal";
 import DesktopNavLink from "./DesktopNavLink";
 import MobileNavLink from "./MobileNavLink";
 import { countUnreadMessages } from "@/lib/functions";
+import { updateDatabase } from "@/server/devFunctions/updateDatabase";
 
 export default function SidePanel(props: {
     session: any;
@@ -79,8 +81,8 @@ export default function SidePanel(props: {
                                 }
                                 src={
                                     props.avatar !== undefined
-                                        ? process.env
-                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                        ? process.env.NEXT_PUBLIC_CDN +
+                                          "/avatars/" +
                                           props.avatar
                                         : undefined
                                 }
@@ -204,8 +206,8 @@ export default function SidePanel(props: {
                             avatarProps={{
                                 src:
                                     props.avatar !== undefined
-                                        ? process.env
-                                              .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                        ? process.env.NEXT_PUBLIC_CDN +
+                                          "/avatars/" +
                                           props.avatar
                                         : undefined,
                                 name: Array.from(
@@ -305,6 +307,7 @@ export default function SidePanel(props: {
                     link="/settings"
                     icon="fa-solid fa-gear"
                 />
+                {/* <Button onClick={() => updateDatabase()}>DB Update</Button> */}
             </div>
             {/* Report a Problem Modal */}
             <CreateTicketModal

@@ -172,7 +172,8 @@ export default function UploadAvatarModal(props: {
                                                     src={
                                                         newAvatar
                                                             ? process.env
-                                                                  .NEXT_PUBLIC_BASE_AVATAR_URL +
+                                                                  .NEXT_PUBLIC_CDN +
+                                                              "/avatars/" +
                                                               newAvatar
                                                             : undefined
                                                     }

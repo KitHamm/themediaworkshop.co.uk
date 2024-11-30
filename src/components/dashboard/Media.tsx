@@ -36,6 +36,7 @@ import {
 import { revalidateDashboard } from "@/server/revalidateDashboard";
 import { FilePrefixList } from "@/lib/constants";
 import { imageSort, itemOrder, videoSort } from "@/lib/functions";
+import { deleteFile, uploadMedia } from "@/lib/clientFunctions";
 
 export default function Media(props: {
     session: any;
@@ -117,7 +118,7 @@ export default function Media(props: {
     const [sizeError, setSizeError] = useState(false);
 
     // Delete state with file and file type
-    const [toDelete, setToDelete] = useState({ file: "", type: "" });
+    const [toDelete, setToDelete] = useState<string>("");
 
     // Delete Errors
     const [deleteErrorArray, setDeleteErrorArray] = useState<errorResponse[]>(
@@ -144,37 +145,47 @@ export default function Media(props: {
         useDisclosure();
 
     // Delete media depending on file type
-    async function uploadMedia() {
-        if (newUpload) {
-            var type = newUpload.type.split("/")[0];
-            const formData = new FormData();
-            formData.append("file", newUpload);
-            axios
-                .post(("/api/" as string) + type, formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                })
-                .then((res) => {
-                    console.log(res);
-                    if (res.status === 201) {
-                        setUploading(false);
-                        clearFileInput();
-                        onOpenChangeUpload();
-                        revalidateDashboard();
-                    }
-                })
-                .catch((err) => console.log(err));
-        }
-    }
+    // async function uploadMedia(file?: File) {
+    //     if (file) {
+    //         var type = file.type.split("/")[0];
+    //         const formData = new FormData();
+    //         formData.append("file", file);
+    //         axios
+    //             .post(("/api/" as string) + type, formData, {
+    //                 headers: { "Content-Type": "multipart/form-data" },
+    //             })
+    //             .then((res) => {
+    //                 console.log(res);
+    //                 if (res.status === 201) {
+    // setUploading(false);
+    // clearFileInput();
+    // onOpenChangeUpload();
+    // revalidateDashboard();
+    //                 }
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }
 
-    async function deleteFile(type: string, file: string) {
-        deleteFileSA(file, type)
-            .then(() => {
-                onOpenChangeDelete();
-            })
-            .catch((err) => {
-                setDeleteErrorArray(JSON.parse(err.message));
-            });
-    }
+    // async function deleteFile(file: string) {
+    //     axios
+    //         .post(
+    //             "/api/delete",
+    //             { fileName: file },
+    //             {
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             }
+    //         )
+    //         .then(() => {
+    // onOpenChangeDelete();
+    // revalidateDashboard();
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error:", error.response?.data || error.message);
+    //         });
+    // }
 
     function clearFileInput() {
         const inputElm = document.getElementById(
@@ -606,10 +617,12 @@ export default function Media(props: {
                                                                 "_"
                                                             )[0] === "LOGO"
                                                                 ? process.env
-                                                                      .NEXT_PUBLIC_BASE_LOGO_URL +
+                                                                      .NEXT_PUBLIC_CDN +
+                                                                  "/logos/" +
                                                                   image.name
                                                                 : process.env
-                                                                      .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                                      .NEXT_PUBLIC_CDN +
+                                                                  "/images/" +
                                                                   image.name
                                                         }
                                                         alt={image.name}
@@ -738,10 +751,13 @@ export default function Media(props: {
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
-                                            deleteFile(
-                                                toDelete.type,
-                                                toDelete.file
-                                            );
+                                            deleteFile(toDelete)
+                                                .then(() => {
+                                                    onOpenChangeDelete();
+                                                })
+                                                .catch((err) => {
+                                                    console.log(err);
+                                                });
                                         }}>
                                         Delete
                                     </Button>
@@ -779,11 +795,11 @@ export default function Media(props: {
                                         src={
                                             selectedImage.split("_")[0] ===
                                             "LOGO"
-                                                ? process.env
-                                                      .NEXT_PUBLIC_BASE_LOGO_URL +
+                                                ? process.env.NEXT_PUBLIC_CDN +
+                                                  "/logos/" +
                                                   selectedImage
-                                                : process.env
-                                                      .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                                : process.env.NEXT_PUBLIC_CDN +
+                                                  "/images/" +
                                                   selectedImage
                                         }
                                         alt={selectedImage}
@@ -800,10 +816,7 @@ export default function Media(props: {
                                         onPress={() => {
                                             onOpenChangeDelete();
                                             onClose();
-                                            setToDelete({
-                                                file: selectedImage,
-                                                type: "image",
-                                            });
+                                            setToDelete(selectedImage);
                                         }}>
                                         Delete
                                     </Button>
@@ -812,11 +825,11 @@ export default function Media(props: {
                                     className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
                                     href={
                                         selectedImage.split("_")[0] === "LOGO"
-                                            ? process.env
-                                                  .NEXT_PUBLIC_BASE_LOGO_URL +
+                                            ? process.env.NEXT_PUBLIC_CDN +
+                                              "/logos/" +
                                               selectedImage
-                                            : process.env
-                                                  .NEXT_PUBLIC_BASE_IMAGE_URL +
+                                            : process.env.NEXT_PUBLIC_CDN +
+                                              "/images/" +
                                               selectedImage
                                     }
                                     download>
@@ -849,13 +862,14 @@ export default function Media(props: {
                             <ModalBody>
                                 <div>
                                     <video
+                                        autoPlay
                                         playsInline
                                         disablePictureInPicture
                                         id="bg-video"
                                         controls={true}
                                         src={
-                                            process.env
-                                                .NEXT_PUBLIC_BASE_VIDEO_URL +
+                                            process.env.NEXT_PUBLIC_CDN +
+                                            "/videos/" +
                                             selectedVideo
                                         }
                                     />
@@ -870,10 +884,7 @@ export default function Media(props: {
                                         onPress={() => {
                                             onOpenChangeDelete();
                                             onClose();
-                                            setToDelete({
-                                                file: selectedVideo,
-                                                type: "video",
-                                            });
+                                            setToDelete(selectedVideo);
                                         }}>
                                         Delete
                                     </Button>
@@ -881,7 +892,8 @@ export default function Media(props: {
                                 <a
                                     className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
                                     href={
-                                        process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                        process.env.NEXT_PUBLIC_CDN +
+                                        "/videos/" +
                                         selectedVideo
                                     }
                                     download>
@@ -1058,7 +1070,15 @@ export default function Media(props: {
                                         <Button
                                             onPress={() => {
                                                 setUploading(true);
-                                                uploadMedia();
+                                                uploadMedia(newUpload)
+                                                    .then(() => {
+                                                        setUploading(false);
+                                                        clearFileInput();
+                                                        onOpenChangeUpload();
+                                                    })
+                                                    .catch((err) =>
+                                                        console.log(err)
+                                                    );
                                             }}
                                             disabled={newUpload ? false : true}
                                             className="rounded-md disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">

@@ -48,7 +48,7 @@ export default function ParallaxImage(props: { headerImage: string | null }) {
                     height={500}
                     className="opacity-0 absolute w-[200%] h-auto xl:w-full xl:w-full xl:h-auto"
                     alt={headerImage}
-                    src={process.env.NEXT_PUBLIC_BASE_IMAGE_URL + headerImage}
+                    src={process.env.NEXT_PUBLIC_CDN + "/images/" + headerImage}
                 />
             </div>
         );

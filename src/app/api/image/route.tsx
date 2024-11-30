@@ -1,6 +1,14 @@
-"yse server";
+"use server";
 
 import { NextResponse } from "next/server";
+import {
+    PutObjectCommand,
+    DeleteObjectCommand,
+    S3Client,
+    ObjectCannedACL,
+    DeleteBucketCommandInput,
+    DeleteObjectCommandInput,
+} from "@aws-sdk/client-s3";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import path from "path";
@@ -10,15 +18,32 @@ interface ArrayFile extends File {
     arrayBuffer: () => Promise<ArrayBuffer>;
 }
 
+const bucketName = process.env.SPACES_BUCKET_NAME!;
+const endpoint = process.env.SPACES_ENDPOINT!;
+const region = process.env.SPACES_REGION!;
+const accessKeyId = process.env.SPACES_ACCESS_KEY!;
+const secretAccessKey = process.env.SPACES_SECRET_KEY!;
+
+const s3 = new S3Client({
+    region,
+    endpoint,
+    credentials: {
+        accessKeyId,
+        secretAccessKey,
+    },
+});
+
 export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as ArrayFile;
-    const date = new Date();
+
     if (!file) {
         return new NextResponse(JSON.stringify({ error: "No file received" }), {
             status: 400,
         });
     }
+
+    const date = new Date();
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = file.name.split(".")[0].replace(" ", "-");
     const type = file.name.split("_")[0];
@@ -26,19 +51,22 @@ export async function POST(request: Request) {
     const formattedDate = date.toISOString().replace(/:|\./g, "-");
     const formattedName =
         fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
+    const fileKey = formattedName;
+
     switch (type) {
         case "THUMBNAIL":
         case "STUDY":
         case "SEGMENT":
         case "SEGHEAD":
             try {
-                await writeFile(
-                    path.join(
-                        process.cwd(),
-                        process.env.PUT_STATIC_IMAGES + formattedName
-                    ),
-                    buffer
-                );
+                const uploadParams = {
+                    Bucket: bucketName,
+                    Key: "images/" + fileKey,
+                    Body: buffer,
+                    ACL: ObjectCannedACL.public_read,
+                    ContentType: file.type,
+                };
+                await s3.send(new PutObjectCommand(uploadParams));
                 try {
                     await prisma.images.create({
                         data: {
@@ -49,31 +77,30 @@ export async function POST(request: Request) {
                         JSON.stringify({ message: formattedName }),
                         { status: 201 }
                     );
-                } catch {
-                    return new NextResponse(
-                        JSON.stringify({ error: "An Error Occurred" }),
-                        { status: 500 }
-                    );
-                } finally {
-                    revalidatePath("/dashboard");
+                } catch (error: any) {
+                    return new NextResponse(JSON.stringify({ error: error }), {
+                        status: 500,
+                    });
                 }
             } catch (error) {
-                return new NextResponse(
-                    JSON.stringify({ error: "An Error Occurred" }),
+                return NextResponse.json(
+                    { error: "File upload failed" },
                     { status: 500 }
                 );
             } finally {
-                revalidatePath("/dashboard");
+                revalidatePath("/", "layout");
+                revalidatePath("/dashboard", "layout");
             }
         case "LOGO":
             try {
-                await writeFile(
-                    path.join(
-                        process.cwd(),
-                        process.env.PUT_STATIC_LOGOS + formattedName
-                    ),
-                    buffer
-                );
+                const uploadParams = {
+                    Bucket: bucketName,
+                    Key: "logos/" + fileKey,
+                    Body: buffer,
+                    ACL: ObjectCannedACL.public_read,
+                    ContentType: file.type,
+                };
+                await s3.send(new PutObjectCommand(uploadParams));
                 try {
                     await prisma.logos.create({
                         data: {
@@ -84,45 +111,39 @@ export async function POST(request: Request) {
                         JSON.stringify({ message: formattedName }),
                         { status: 201 }
                     );
-                } catch {
-                    return new NextResponse(
-                        JSON.stringify({ error: "An Error Occurred" }),
-                        { status: 500 }
-                    );
-                } finally {
-                    revalidatePath("/dashboard");
+                } catch (error: any) {
+                    return new NextResponse(JSON.stringify({ error: error }), {
+                        status: 500,
+                    });
                 }
             } catch (error) {
-                return new NextResponse(
-                    JSON.stringify({ error: "An Error Occurred" }),
+                return NextResponse.json(
+                    { error: "File upload failed" },
                     { status: 500 }
                 );
             } finally {
-                revalidatePath("/dashboard");
+                revalidatePath("/", "layout");
+                revalidatePath("/dashboard", "layout");
             }
         default:
-            const formattedFileName = file.name.replace(" ", "_");
             try {
-                await writeFile(
-                    path.join(
-                        process.cwd(),
-                        process.env.PUT_STATIC_AVATARS + formattedFileName
-                    ),
-                    buffer
-                );
+                const uploadParams = {
+                    Bucket: bucketName,
+                    Key: "avatars/" + fileKey,
+                    Body: buffer,
+                    ACL: ObjectCannedACL.public_read,
+                    ContentType: file.type,
+                };
+                await s3.send(new PutObjectCommand(uploadParams));
                 return new NextResponse(
-                    JSON.stringify({ message: formattedFileName }),
-                    {
-                        status: 201,
-                    }
+                    JSON.stringify({ message: formattedName }),
+                    { status: 201 }
                 );
             } catch (error) {
-                return new NextResponse(
-                    JSON.stringify({ error: "An Error Occurred" }),
+                return NextResponse.json(
+                    { error: "File upload failed" },
                     { status: 500 }
                 );
-            } finally {
-                revalidatePath("/dashboard");
             }
     }
 }

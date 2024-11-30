@@ -58,7 +58,8 @@ export default function TickerTape(props: {
                                     width={250}
                                     height={250}
                                     src={
-                                        process.env.NEXT_PUBLIC_BASE_LOGO_URL +
+                                        process.env.NEXT_PUBLIC_CDN +
+                                        "/logos/" +
                                         image
                                     }
                                     alt={image}

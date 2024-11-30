@@ -37,7 +37,8 @@ export default function PreviewVideoModal(props: {
                                 id="bg-video"
                                 controls={true}
                                 src={
-                                    process.env.NEXT_PUBLIC_BASE_VIDEO_URL +
+                                    process.env.NEXT_PUBLIC_CDN +
+                                    "/videos/" +
                                     props.previewVideo
                                 }
                             />
