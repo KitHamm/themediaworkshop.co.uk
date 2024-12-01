@@ -8,7 +8,8 @@ import { updatePage } from "@/server/pageActions/updatePage";
 import { revalidateDashboard } from "@/server/revalidateDashboard";
 
 export default function UpdatePageHeaderButton() {
-    const { handleSubmit, isDirty } = useContext(HeaderStateContext);
+    const { handleSubmit, isDirty, handleReset } =
+        useContext(HeaderStateContext);
 
     function onSubmit(data: PageFormType) {
         updatePage(data).then(() => {
@@ -18,14 +19,22 @@ export default function UpdatePageHeaderButton() {
 
     if (isDirty) {
         return (
-            <div className="fade-in flex gap-6">
+            <div className="fade-in flex gap-4">
                 <div className="my-auto text-red-400 font-bold text-lg">
                     Unsaved Changes
                 </div>
                 <Button
                     type="button"
+                    color="warning"
+                    variant="light"
+                    onClick={handleReset}
+                    className="text-md rounded-md">
+                    Discard
+                </Button>
+                <Button
+                    type="button"
                     onClick={handleSubmit(onSubmit)}
-                    className="bg-orange-600 text-white text-md">
+                    className="bg-orange-600 text-white text-md rounded-md">
                     Save Changes
                 </Button>
             </div>

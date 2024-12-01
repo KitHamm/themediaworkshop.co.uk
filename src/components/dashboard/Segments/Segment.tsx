@@ -365,14 +365,12 @@ export default function EditSegment(props: {
                             </div>
                             <div className="mt-2">
                                 <Select
-                                    onChange={
-                                        (e) =>
-                                            setValue(
-                                                "linkTo",
-                                                e.target.value as toLink,
-                                                { shouldDirty: true }
-                                            )
-                                        // setLinkTo(e.target.value as toLink)
+                                    onChange={(e) =>
+                                        setValue(
+                                            "linkTo",
+                                            e.target.value as toLink,
+                                            { shouldDirty: true }
+                                        )
                                     }
                                     selectedKeys={[getValues("linkTo")]}
                                     className="dark"

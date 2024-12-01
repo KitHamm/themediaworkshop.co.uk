@@ -1,10 +1,9 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { HeaderStateContext } from "./HeaderStateProvider";
+import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import { imageSort, itemOrder } from "@/lib/functions";
+import { useContext } from "react";
 import { MediaFilesContext } from "./MediaFIlesProvider";
-import { Videos } from "@prisma/client";
-import { itemOrder, videoSort } from "@/lib/functions";
 import {
     Button,
     Modal,
@@ -15,96 +14,70 @@ import {
     Pagination,
     Select,
     SelectItem,
-    useDisclosure,
 } from "@nextui-org/react";
+import { Images } from "@prisma/client";
 import Image from "next/image";
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import { useEffect, useState } from "react";
 import { MediaType } from "@/lib/constants";
 
-export default function SelectVideoModal(props: {
-    formTarget: "video1" | "video2" | "backgroundVideo";
+export default function SelectImageModal(props: {
     isOpen: boolean;
     onOpenChange: () => void;
+    imageType: "SEGHEAD" | "SEGMENT" | "STUDY" | "THUMBNAIL";
+    returnURL: (url: string) => void;
 }) {
-    const { formTarget, isOpen, onOpenChange } = props;
-    const { video1, video2, backgroundVideo, setValue } =
-        useContext(HeaderStateContext);
-
-    const { videos } = useContext(MediaFilesContext);
-
-    const { isOpen: isOpenPreview, onOpenChange: onOpenChangePreview } =
-        useDisclosure();
-
-    function videoFromTarget() {
-        switch (formTarget) {
-            case "video1":
-                return video1;
-            case "video2":
-                return video2;
-            case "backgroundVideo":
-                return backgroundVideo;
-        }
-    }
+    const { isOpen, onOpenChange, imageType, returnURL } = props;
+    const { images } = useContext(MediaFilesContext);
 
     function titleFromTarget() {
-        switch (formTarget) {
-            case "video1":
-                return "Video 1";
-            case "video2":
-                return "Video 2";
-            case "backgroundVideo":
-                return "Background Video";
+        switch (imageType) {
+            case "SEGHEAD":
+                return "Header Image";
+            case "SEGMENT":
+                return "Segment Image";
+            case "STUDY":
+                return "Case Study Image";
+            case "THUMBNAIL":
+                return "Thumbnail Image";
         }
     }
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [videosPerPage, setVideosPerPage] = useState(8);
+    const [imagesPerPage, setImagesPerPage] = useState(8);
     const [sortBy, setSortBy] = useState("date");
     const [order, setOrder] = useState("desc");
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [videosPerPage]);
+    }, [imagesPerPage]);
 
-    const [availableVideos, setAvailableVideos] = useState<Videos[]>(
-        itemOrder(
-            videoSort(
-                videos,
-                formTarget === "backgroundVideo" ? "HEADER" : "VIDEO"
-            ),
-            sortBy,
-            order
-        )
+    const [availableImages, setAvailableImages] = useState<Images[]>(
+        itemOrder(imageSort(images, [], imageType), sortBy, order)
     );
 
-    const [previewVideo, setPreviewVideo] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!isOpenPreview) {
-            setTimeout(() => {
-                setPreviewVideo(null);
-            }, 300);
+    function mediaTypeFromImageType() {
+        switch (imageType) {
+            case "SEGHEAD":
+                return MediaType.SEGHEAD;
+            case "SEGMENT":
+                return MediaType.SEGMENT;
+            case "STUDY":
+                return MediaType.STUDY;
+            case "THUMBNAIL":
+                return MediaType.THUMBNAIL;
         }
-    }, [isOpenPreview]);
-
-    useEffect(() => {
-        setAvailableVideos(
-            videoSort(
-                videos,
-                formTarget === "backgroundVideo" ? "HEADER" : "VIDEO"
-            )
-        );
-    }, [videos]);
-
-    useEffect(() => {
-        setAvailableVideos(itemOrder(availableVideos, sortBy, order));
-    }, [sortBy, order]);
-
-    function handleSetValue(returnedURL: string) {
-        setValue(formTarget, returnedURL);
     }
+
+    useEffect(() => {
+        setAvailableImages(imageSort(images, [], imageType));
+    }, [images]);
+
+    useEffect(() => {
+        setAvailableImages(itemOrder(availableImages, sortBy, order));
+    }, [sortBy, order]);
 
     function handleReturnError(error: string) {
         if (error !== "success" && error !== "") {
@@ -112,11 +85,6 @@ export default function SelectVideoModal(props: {
         } else {
             setUploadError(null);
         }
-    }
-
-    function handleReturnClose() {
-        setUploadError(null);
-        onOpenChange();
     }
 
     return (
@@ -145,14 +113,11 @@ export default function SelectVideoModal(props: {
                                             {uploadError}
                                         </div>
                                     )}
+
                                     <MediaUploadButton
-                                        mediaType={
-                                            formTarget === "backgroundVideo"
-                                                ? MediaType.HEADER
-                                                : MediaType.VIDEO
-                                        }
-                                        onOpenChange={handleReturnClose}
-                                        returnURL={handleSetValue}
+                                        mediaType={mediaTypeFromImageType()}
+                                        onOpenChange={onOpenChange}
+                                        returnURL={returnURL}
                                         returnError={handleReturnError}
                                     />
                                 </div>
@@ -164,12 +129,12 @@ export default function SelectVideoModal(props: {
                                         }}
                                         variant="bordered"
                                         selectedKeys={[
-                                            videosPerPage.toString(),
+                                            imagesPerPage.toString(),
                                         ]}
                                         labelPlacement="outside"
                                         label={"Videos Per Page"}
                                         onChange={(e) =>
-                                            setVideosPerPage(
+                                            setImagesPerPage(
                                                 parseInt(e.target.value)
                                             )
                                         }>
@@ -263,79 +228,61 @@ export default function SelectVideoModal(props: {
                                         }}
                                         showControls
                                         total={Math.ceil(
-                                            availableVideos.length /
-                                                videosPerPage
+                                            availableImages.length /
+                                                imagesPerPage
                                         )}
                                         page={currentPage}
                                         onChange={setCurrentPage}
                                     />
                                 </div>
                                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-                                    {availableVideos.map(
-                                        (video: Videos, index: number) => {
+                                    {availableImages.map(
+                                        (image: Images, index: number) => {
                                             if (
                                                 index >
                                                     currentPage *
-                                                        videosPerPage -
-                                                        (videosPerPage + 1) &&
+                                                        imagesPerPage -
+                                                        (imagesPerPage + 1) &&
                                                 index <
-                                                    currentPage * videosPerPage
+                                                    currentPage * imagesPerPage
                                             ) {
                                                 return (
                                                     <div
                                                         key={
-                                                            video.name +
+                                                            image.name +
                                                             "-" +
                                                             index
                                                         }>
                                                         <div
                                                             onClick={() => {
-                                                                setPreviewVideo(
-                                                                    video.name
+                                                                returnURL(
+                                                                    image.name
                                                                 );
-                                                                onOpenChangePreview();
+                                                                onOpenChange();
                                                             }}
-                                                            className="cursor-pointer m-auto border rounded p-4 flex w-1/2 my-4">
+                                                            className="cursor-pointer m-auto flex my-4">
                                                             <Image
-                                                                height={100}
-                                                                width={100}
+                                                                height={200}
+                                                                width={200}
                                                                 src={
-                                                                    "/images/play.png"
+                                                                    image.name.split(
+                                                                        "_"
+                                                                    )[0] ===
+                                                                    "LOGO"
+                                                                        ? process
+                                                                              .env
+                                                                              .NEXT_PUBLIC_CDN +
+                                                                          "/logos/" +
+                                                                          image.name
+                                                                        : process
+                                                                              .env
+                                                                              .NEXT_PUBLIC_CDN +
+                                                                          "/images/" +
+                                                                          image.name
                                                                 }
-                                                                alt="play"
+                                                                alt={image.name}
                                                                 className="w-full h-auto m-auto"
                                                             />
-                                                        </div>
-                                                        <div className="text-center truncate">
-                                                            {
-                                                                video.name
-                                                                    .split(
-                                                                        "-"
-                                                                    )[0]
-                                                                    .split(
-                                                                        "_"
-                                                                    )[1]
-                                                            }
-                                                        </div>
-                                                        <div className="flex justify-center mt-2">
-                                                            <button
-                                                                onClick={() => {
-                                                                    setValue(
-                                                                        formTarget,
-                                                                        video.name,
-                                                                        {
-                                                                            shouldDirty:
-                                                                                true,
-                                                                        }
-                                                                    );
-                                                                    setCurrentPage(
-                                                                        1
-                                                                    );
-                                                                    onClose();
-                                                                }}
-                                                                className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded">
-                                                                Select
-                                                            </button>
                                                         </div>
                                                     </div>
                                                 );
@@ -345,23 +292,6 @@ export default function SelectVideoModal(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter className="mt-4">
-                                {videoFromTarget() ? (
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            setValue(formTarget, "", {
-                                                shouldDirty: true,
-                                            });
-                                            setCurrentPage(1);
-                                            onClose();
-                                        }}
-                                        className="xl:px-10 px-4 py-2 rounded-md">
-                                        Remove Video
-                                    </Button>
-                                ) : (
-                                    ""
-                                )}
                                 <Button
                                     className="rounded-md bg-orange-600"
                                     onPress={() => {
@@ -375,53 +305,6 @@ export default function SelectVideoModal(props: {
                     )}
                 </ModalContent>
             </Modal>
-            {previewVideo && (
-                <Modal
-                    size="5xl"
-                    backdrop="blur"
-                    isOpen={isOpenPreview}
-                    className="dark"
-                    scrollBehavior="inside"
-                    onOpenChange={onOpenChangePreview}>
-                    <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader>
-                                    <div className="w-full text-center font-bold text-3xl">
-                                        {previewVideo.split("-")[0] +
-                                            "." +
-                                            previewVideo.split(".")[1]}
-                                    </div>
-                                </ModalHeader>
-                                <ModalBody>
-                                    <video
-                                        autoPlay
-                                        playsInline
-                                        disablePictureInPicture
-                                        id="bg-video"
-                                        controls={true}
-                                        src={
-                                            process.env.NEXT_PUBLIC_CDN +
-                                            "/videos/" +
-                                            previewVideo
-                                        }
-                                    />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button
-                                        color="danger"
-                                        variant="light"
-                                        onPress={() => {
-                                            onClose();
-                                        }}>
-                                        Close
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
-                </Modal>
-            )}
         </>
     );
 }

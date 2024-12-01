@@ -1,7 +1,6 @@
 "use client";
 
 import { ExtendedPage, PageFormType } from "@/lib/types";
-import { Images, Videos } from "@prisma/client";
 import { createContext, useEffect } from "react";
 import {
     useForm,
@@ -10,12 +9,9 @@ import {
     UseFormRegister,
     UseFormReset,
     UseFormSetValue,
-    UseFormWatch,
 } from "react-hook-form";
 
 type HeaderStateContextType = {
-    videos: Videos[];
-    images: Images[];
     register: UseFormRegister<PageFormType>;
     handleSubmit: UseFormHandleSubmit<PageFormType>;
     isDirty: boolean;
@@ -26,6 +22,7 @@ type HeaderStateContextType = {
     video2: string;
     backgroundVideo: string;
     description: string;
+    handleReset: () => void;
 };
 
 export const HeaderStateContext = createContext<HeaderStateContextType>(
@@ -34,13 +31,10 @@ export const HeaderStateContext = createContext<HeaderStateContextType>(
 
 export default function HeaderStateProvider({
     children,
-    images,
-    videos,
+
     data,
 }: {
     children: React.ReactNode;
-    images: Images[];
-    videos: Videos[];
     data: ExtendedPage;
 }) {
     const pageForm = useForm<PageFormType>({
@@ -71,6 +65,10 @@ export default function HeaderStateProvider({
     } = pageForm;
 
     useEffect(() => {
+        handleReset();
+    }, [data]);
+
+    function handleReset() {
         reset({
             page: data.title,
             subTitle: data.subTitle ? data.subTitle : "",
@@ -86,7 +84,7 @@ export default function HeaderStateProvider({
                 ? data.videoTwoButtonText
                 : "",
         });
-    }, [data]);
+    }
 
     const video1 = watch("video1");
     const video2 = watch("video2");
@@ -96,8 +94,6 @@ export default function HeaderStateProvider({
     return (
         <HeaderStateContext.Provider
             value={{
-                videos,
-                images,
                 register,
                 handleSubmit,
                 isDirty,
@@ -108,6 +104,7 @@ export default function HeaderStateProvider({
                 video2,
                 backgroundVideo,
                 description,
+                handleReset,
             }}>
             {children}
         </HeaderStateContext.Provider>
