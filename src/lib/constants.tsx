@@ -7,3 +7,11 @@ export const FilePrefixList = [
     "LOGO",
     "THUMBNAIL",
 ];
+
+export enum MediaType {
+    SEGHEAD = "SEGHEAD",
+    SEGMENT = "SEGMENT",
+    STUDY = "STUDY",
+    LOGO = "LOGO",
+    THUMBNAIL = "THUMBNAIL",
+}

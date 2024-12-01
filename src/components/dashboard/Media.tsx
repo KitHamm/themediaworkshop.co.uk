@@ -9,7 +9,6 @@ import {
     ModalFooter,
     Button,
     useDisclosure,
-    CircularProgress,
     Tooltip,
     Pagination,
     Select,
@@ -28,15 +27,11 @@ import { Images, Logos, Videos } from "@prisma/client";
 
 // Functions
 import Link from "next/link";
-import axios from "axios";
-import {
-    deleteFile as deleteFileSA,
-    errorResponse,
-} from "@/server/mediaActions/deleteFile";
+import { errorResponse } from "@/server/mediaActions/deleteFile";
 import { revalidateDashboard } from "@/server/revalidateDashboard";
-import { FilePrefixList } from "@/lib/constants";
-import { imageSort, itemOrder, videoSort } from "@/lib/functions";
-import { deleteFile, uploadMedia } from "@/lib/clientFunctions";
+import { imageSort, itemOrder, onSelectFile, videoSort } from "@/lib/functions";
+import { deleteFile } from "@/lib/clientFunctions";
+import MediaUploadButton from "../shared/MediaUploadButton";
 
 export default function Media(props: {
     session: any;
@@ -70,6 +65,7 @@ export default function Media(props: {
     const [orderVideos, setOrderVideos] = useState("desc");
     const [sortImagesBy, setSortImagesBy] = useState("date");
     const [orderImages, setOrderImages] = useState("desc");
+    const [mediaError, setMediaError] = useState<string | null>(null);
 
     useEffect(() => {
         setSelectedImages(imageSort(props.images, props.logos, imageView));
@@ -144,49 +140,6 @@ export default function Media(props: {
     const { isOpen: isOpenUpload, onOpenChange: onOpenChangeUpload } =
         useDisclosure();
 
-    // Delete media depending on file type
-    // async function uploadMedia(file?: File) {
-    //     if (file) {
-    //         var type = file.type.split("/")[0];
-    //         const formData = new FormData();
-    //         formData.append("file", file);
-    //         axios
-    //             .post(("/api/" as string) + type, formData, {
-    //                 headers: { "Content-Type": "multipart/form-data" },
-    //             })
-    //             .then((res) => {
-    //                 console.log(res);
-    //                 if (res.status === 201) {
-    // setUploading(false);
-    // clearFileInput();
-    // onOpenChangeUpload();
-    // revalidateDashboard();
-    //                 }
-    //             })
-    //             .catch((err) => console.log(err));
-    //     }
-    // }
-
-    // async function deleteFile(file: string) {
-    //     axios
-    //         .post(
-    //             "/api/delete",
-    //             { fileName: file },
-    //             {
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                 },
-    //             }
-    //         )
-    //         .then(() => {
-    // onOpenChangeDelete();
-    // revalidateDashboard();
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error:", error.response?.data || error.message);
-    //         });
-    // }
-
     function clearFileInput() {
         const inputElm = document.getElementById(
             "new-video"
@@ -197,30 +150,14 @@ export default function Media(props: {
         setNewUpload(undefined);
     }
 
-    function onSelectFile(file: File) {
-        if (file) {
-            const fileSize = file.size / 1024 / 1024;
-            const filePrefix = file.name.split("_")[0];
-
-            const nameCheck = FilePrefixList.includes(filePrefix);
-            const sizeCheck = fileSize < 100;
-
-            if (!nameCheck) {
-                setNamingError(true);
-            } else {
-                setNamingError(false);
-            }
-
-            if (!sizeCheck) {
-                setSizeError(true);
-            } else {
-                setSizeError(false);
-            }
-
-            if (nameCheck && sizeCheck) {
+    function handleFileSelect(file: File) {
+        onSelectFile(file)
+            .then(() => {
                 setNewUpload(file);
-            }
-        }
+            })
+            .catch((error) => {
+                setMediaError(error.error);
+            });
     }
 
     return (
@@ -1016,76 +953,9 @@ export default function Media(props: {
                                         File size too large.
                                     </div>
                                 )}
-                                <div className="flex mx-auto mt-4">
-                                    {uploading ? (
-                                        <CircularProgress
-                                            classNames={{
-                                                svg: "w-28 h-28 drop-shadow-md",
-                                                value: "text-2xl",
-                                            }}
-                                            color="warning"
-                                            aria-label="Loading..."
-                                            className="ms-4"
-                                        />
-                                    ) : (
-                                        <div className="file-input">
-                                            <input
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        onSelectFile(
-                                                            e.target.files[0]
-                                                        );
-                                                    }
-                                                }}
-                                                className="inputFile"
-                                                type="file"
-                                                name={"uploader"}
-                                                id={"uploader"}
-                                            />
-                                            <label
-                                                className="m-auto"
-                                                htmlFor="uploader">
-                                                {newUpload !== undefined
-                                                    ? "Change"
-                                                    : "Select file"}
-                                            </label>
-                                            <div className="text-center mt-4">
-                                                {newUpload !== undefined
-                                                    ? newUpload.name
-                                                    : "Max size: 100MB"}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                {!uploading && (
-                                    <div className="flex justify-evenly">
-                                        <Button
-                                            className="rounded-md"
-                                            onPress={() => {
-                                                clearFileInput();
-                                            }}
-                                            color="danger">
-                                            Clear
-                                        </Button>
-                                        <Button
-                                            onPress={() => {
-                                                setUploading(true);
-                                                uploadMedia(newUpload)
-                                                    .then(() => {
-                                                        setUploading(false);
-                                                        clearFileInput();
-                                                        onOpenChangeUpload();
-                                                    })
-                                                    .catch((err) =>
-                                                        console.log(err)
-                                                    );
-                                            }}
-                                            disabled={newUpload ? false : true}
-                                            className="rounded-md disabled:cursor-not-allowed disabled:bg-neutral-800 bg-orange-600 ">
-                                            Upload
-                                        </Button>
-                                    </div>
-                                )}
+                                <MediaUploadButton
+                                    onOpenChange={onOpenChangeUpload}
+                                />
                             </ModalBody>
                             <ModalFooter>
                                 {!uploading && (

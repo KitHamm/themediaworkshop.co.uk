@@ -3,39 +3,55 @@
 import { revalidateDashboard } from "@/server/revalidateDashboard";
 import axios from "axios";
 
-export async function uploadMedia(file?: File) {
-    if (file) {
-        var type = file.type.split("/")[0];
+export function uploadMedia(file?: File): Promise<{ status: number }> {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            return reject({ error: "No file provided" });
+        }
+
+        const type = file.type.split("/")[0];
         const formData = new FormData();
         formData.append("file", file);
+
         axios
-            .post(("/api/" as string) + type, formData, {
+            .post(`/api/${type}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             })
             .then((res) => {
-                revalidateDashboard();
-                Promise.resolve();
+                if (res.status === 201) {
+                    revalidateDashboard();
+                    resolve({ status: 201 });
+                } else {
+                    reject({
+                        error: "Unexpected status code",
+                        status: res.status,
+                    });
+                }
             })
-            .catch((error) => Promise.reject(error));
-    }
+            .catch((error) => {
+                reject(error);
+            });
+    });
 }
 
-export async function deleteFile(file: string) {
-    axios
-        .post(
-            "/api/delete",
-            { fileName: file },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        )
-        .then(() => {
-            revalidateDashboard();
-            Promise.resolve();
-        })
-        .catch((error) => {
-            Promise.reject(error);
-        });
+export function deleteFile(file: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(
+                "/api/delete",
+                { fileName: file },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(() => {
+                revalidateDashboard();
+                resolve();
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
 }

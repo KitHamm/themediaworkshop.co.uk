@@ -1,5 +1,6 @@
 import { Images, Logos, Message, Videos } from "@prisma/client";
 import axios from "axios";
+import { FilePrefixList, MediaType } from "./constants";
 
 export function DateRender(date: Date) {
     var formattedDate;
@@ -129,4 +130,40 @@ export function countUnreadMessages(messages: Message[]) {
         }
     });
     return unreadMessages;
+}
+
+export function onSelectFile(file: File, mediaType?: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            return reject({ error: "no file" });
+        }
+
+        const fileSize = file.size / 1024 / 1024; // Convert size to MB
+        const filePrefix = file.name.split("_")[0];
+        const sizeCheck = fileSize < 100;
+
+        let nameCheck = false;
+        if (mediaType) {
+            nameCheck = filePrefix === mediaType;
+        } else {
+            nameCheck = FilePrefixList.includes(filePrefix);
+        }
+
+        if (!nameCheck) {
+            if (mediaType) {
+                return reject({
+                    error:
+                        "File name should be prefixed with " + mediaType + "_",
+                });
+            } else {
+                return reject({ error: "Please check the file name prefix." });
+            }
+        }
+
+        if (!sizeCheck) {
+            return reject({ error: "File size too large." });
+        }
+
+        resolve();
+    });
 }
