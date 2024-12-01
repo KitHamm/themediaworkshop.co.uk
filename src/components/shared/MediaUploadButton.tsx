@@ -39,11 +39,11 @@ export default function MediaUploadButton(props: {
                     if (res.status === 201) {
                         setUploading(false);
                         clearFileInput();
-                        if (onOpenChange) {
-                            onOpenChange();
-                        }
                         if (returnURL && res.message) {
                             returnURL(res.message);
+                        }
+                        if (onOpenChange) {
+                            onOpenChange();
                         }
                     }
                 })
@@ -56,6 +56,9 @@ export default function MediaUploadButton(props: {
             inputField.current.value = "";
         }
         setNewUpload(undefined);
+        if (returnError) {
+            returnError("");
+        }
     }
 
     return (

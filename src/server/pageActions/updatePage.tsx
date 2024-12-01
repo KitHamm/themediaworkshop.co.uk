@@ -25,7 +25,7 @@ export async function updatePage(data: PageFormType) {
     } catch (error: any) {
         throw new Error(error);
     } finally {
-        revalidatePath("/dashboard", "layout");
+        revalidatePath("/dashboard/pages", "layout");
         revalidatePath("/", "layout");
     }
 }

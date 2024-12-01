@@ -139,13 +139,27 @@ export function onSelectFile(
         if (!file) {
             return reject({ message: "no file" });
         }
-
-        const fileSize = file.size / 1024 / 1024; // Convert size to MB
+        const fileType = file.type.split("/")[0];
+        const fileSize = file.size / 1024 / 1024;
         const filePrefix = file.name.split("_")[0];
         const sizeCheck = fileSize < 100;
 
         let nameCheck = false;
+        let typeCheck = false;
         if (mediaType) {
+            if (
+                mediaType === MediaType.VIDEO ||
+                mediaType === MediaType.HEADER
+            ) {
+                if (fileType === "video") {
+                    typeCheck = true;
+                }
+            } else {
+                if (fileType === "image") {
+                    typeCheck = true;
+                }
+            }
+
             if (mediaType === MediaType.AVATAR) {
                 nameCheck = true;
             } else {
@@ -153,6 +167,18 @@ export function onSelectFile(
             }
         } else {
             nameCheck = FilePrefixList.includes(filePrefix);
+            typeCheck = true;
+        }
+
+        if (!typeCheck) {
+            if (
+                mediaType === MediaType.VIDEO ||
+                mediaType === MediaType.HEADER
+            ) {
+                return reject({ message: "Please upload in video format." });
+            } else {
+                return reject({ message: "Please upload in image format." });
+            }
         }
 
         if (!nameCheck) {

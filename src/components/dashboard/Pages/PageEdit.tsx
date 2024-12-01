@@ -445,7 +445,7 @@ export default function PageEdit(props: {
                             </div>
                         </div>
                     </div>
-                    <div id="right-colum">
+                    <div id="right-column">
                         {props.data.title !== "home" && (
                             <div className="mb-2">
                                 <div className="border-b pb-2 mb-2">Header</div>
