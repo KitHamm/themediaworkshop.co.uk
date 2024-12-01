@@ -3,13 +3,15 @@
 //  Prisma
 import prisma from "@/lib/prisma";
 //  Components
-import DashboardView from "@/components/dashboard/Dashboard";
+import InfoAccordion from "@/components/dashboard/mainView/InfoAccordion";
+import ChangeLogAccordion from "@/components/dashboard/mainView/ChangeLogAccordion";
+import PageViewTracker from "@/components/dashboard/mainView/PageViewTracker";
+import ActivationPopup from "@/components/dashboard/modals/ActivationPopup";
 //  Types
 import { Message } from "@prisma/client";
 //  Functions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
-import ActivationPopup from "@/components/dashboard/modals/ActivationPopup";
 import { checkUserActivation } from "@/server/userActions/userActivation";
 
 export default async function Dashboard() {
@@ -18,29 +20,6 @@ export default async function Dashboard() {
 
     const activated = await checkUserActivation(session?.user?.id!);
 
-    const messages: Message[] = await prisma.message.findMany({
-        orderBy: [
-            {
-                createdAt: "desc",
-            },
-            { name: "asc" },
-        ],
-    });
-    const videos = await prisma.videos.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
-    const images = await prisma.images.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
-    const logos = await prisma.logos.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
     const requests = await prisma.serviceRequest.findMany({
         orderBy: {
             createdAt: "desc",
@@ -49,14 +28,23 @@ export default async function Dashboard() {
 
     return (
         <>
-            <DashboardView
-                hidden={false}
-                images={images}
-                videos={videos}
-                logos={logos}
-                messages={messages}
-                requests={requests}
-            />
+            <div className="xl:mx-20 mx-4 pb-20 xl:pb-0 fade-in">
+                <div className="grid xl:mb-10 xl:grid-cols-2 grid-cols-1 xl:gap-10">
+                    <div id="left">
+                        <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
+                            Change Log
+                        </div>
+                        <ChangeLogAccordion />
+                    </div>
+                    <div id="right">
+                        <div className="border-b py-4 text-3xl xl:my-10 my-5 font-bold capitalize">
+                            Information
+                        </div>
+                        <PageViewTracker requests={requests} />
+                        <InfoAccordion />
+                    </div>
+                </div>
+            </div>
             {session && session.user && (
                 <ActivationPopup
                     activated={activated.message}
