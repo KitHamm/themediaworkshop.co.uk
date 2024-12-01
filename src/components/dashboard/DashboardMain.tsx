@@ -14,7 +14,7 @@ import {
 
 // Components
 // import DashboardView from "./Dashboard";
-import Messages from "./Message";
+// import Messages from "./Message";
 // import Settings from "./Settings";
 import Media from "./Media";
 import Pages from "./Pages/Pages";
@@ -212,8 +212,8 @@ function DashboardSwitchView(props: {
                     videos={props.videos}
                 />
             );
-        case "messages":
-            return <Messages messages={props.messages} hidden={false} />;
+        // case "messages":
+        //     return <Messages messages={props.messages} hidden={false} />;
         // case "settings":
         //     return (
         //         <Settings

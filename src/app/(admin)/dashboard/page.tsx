@@ -7,8 +7,6 @@ import InfoAccordion from "@/components/dashboard/mainView/InfoAccordion";
 import ChangeLogAccordion from "@/components/dashboard/mainView/ChangeLogAccordion";
 import PageViewTracker from "@/components/dashboard/mainView/PageViewTracker";
 import ActivationPopup from "@/components/dashboard/modals/ActivationPopup";
-//  Types
-import { Message } from "@prisma/client";
 //  Functions
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";

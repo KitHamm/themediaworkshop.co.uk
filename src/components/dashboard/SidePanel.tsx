@@ -52,7 +52,7 @@ export default function SidePanel(props: {
 
     useEffect(() => {
         setUnreadMessages(countUnreadMessages(props.messages));
-    }, props.messages);
+    }, [props.messages]);
 
     const {
         isOpen: isOpenReport,
