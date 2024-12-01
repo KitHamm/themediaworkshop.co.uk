@@ -9,8 +9,9 @@ import { useRef, useState } from "react";
 export default function MediaUploadButton(props: {
     mediaType?: MediaType;
     onOpenChange?: () => void;
+    returnURL?: (url: string) => void;
 }) {
-    const { mediaType, onOpenChange } = props;
+    const { mediaType, onOpenChange, returnURL } = props;
     const [newUpload, setNewUpload] = useState<File>();
     const [uploading, setUploading] = useState(false);
     const inputField = useRef<HTMLInputElement>(null);
@@ -20,18 +21,22 @@ export default function MediaUploadButton(props: {
     }
 
     function handleUpload() {
-        uploadMedia(newUpload)
-            .then((res) => {
-                if (res.status === 201) {
-                    console.log("Media uploaded helper");
-                    setUploading(false);
-                    clearFileInput();
-                    if (onOpenChange) {
-                        onOpenChange();
+        if (newUpload) {
+            uploadMedia(newUpload)
+                .then((res) => {
+                    if (res.status === 201) {
+                        setUploading(false);
+                        clearFileInput();
+                        if (onOpenChange) {
+                            onOpenChange();
+                        }
+                        if (returnURL && res.message) {
+                            returnURL(res.message);
+                        }
                     }
-                }
-            })
-            .catch((err) => console.log(err));
+                })
+                .catch((err) => console.log(err));
+        }
     }
 
     function clearFileInput() {

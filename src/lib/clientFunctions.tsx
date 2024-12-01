@@ -3,7 +3,9 @@
 import { revalidateDashboard } from "@/server/revalidateDashboard";
 import axios from "axios";
 
-export function uploadMedia(file?: File): Promise<{ status: number }> {
+export function uploadMedia(
+    file?: File
+): Promise<{ status: number; message?: string }> {
     return new Promise((resolve, reject) => {
         if (!file) {
             return reject({ error: "No file provided" });
@@ -20,7 +22,7 @@ export function uploadMedia(file?: File): Promise<{ status: number }> {
             .then((res) => {
                 if (res.status === 201) {
                     revalidateDashboard();
-                    resolve({ status: 201 });
+                    resolve({ status: 201, message: res.data.message });
                 } else {
                     reject({
                         error: "Unexpected status code",

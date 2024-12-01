@@ -14,4 +14,7 @@ export enum MediaType {
     STUDY = "STUDY",
     LOGO = "LOGO",
     THUMBNAIL = "THUMBNAIL",
+    AVATAR = "AVATAR",
+    VIDEO = "VIDEO",
+    HEADER = "HEADER",
 }

@@ -13,9 +13,9 @@ import {
 } from "@nextui-org/react";
 
 // Components
-import DashboardView from "./Dashboard";
+// import DashboardView from "./Dashboard";
 import Messages from "./Message";
-import Settings from "./Settings";
+// import Settings from "./Settings";
 import Media from "./Media";
 import Pages from "./Pages/Pages";
 
@@ -179,17 +179,17 @@ function DashboardSwitchView(props: {
     view: string;
 }) {
     switch (props.view) {
-        case "dashboard":
-            return (
-                <DashboardView
-                    hidden={false}
-                    images={props.images}
-                    videos={props.videos}
-                    logos={props.logos}
-                    messages={props.messages}
-                    requests={props.requests}
-                />
-            );
+        // case "dashboard":
+        //     return (
+        //         <DashboardView
+        //             hidden={false}
+        //             images={props.images}
+        //             videos={props.videos}
+        //             logos={props.logos}
+        //             messages={props.messages}
+        //             requests={props.requests}
+        //         />
+        //     );
         case "pages":
             return (
                 <DashboardStateProvider>
@@ -214,14 +214,14 @@ function DashboardSwitchView(props: {
             );
         case "messages":
             return <Messages messages={props.messages} hidden={false} />;
-        case "settings":
-            return (
-                <Settings
-                    emailHost={props.emailHost.emailHost}
-                    session={props.session}
-                    users={props.users}
-                    hidden={false}
-                />
-            );
+        // case "settings":
+        //     return (
+        //         <Settings
+        //             emailHost={props.emailHost.emailHost}
+        //             session={props.session}
+        //             users={props.users}
+        //             hidden={false}
+        //         />
+        //     );
     }
 }

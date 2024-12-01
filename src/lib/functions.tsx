@@ -114,6 +114,21 @@ export function parallaxOnScroll(
     }
 }
 
+export function randomPassword(length: number) {
+    let result = "";
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        );
+        counter += 1;
+    }
+    return result;
+}
+
 export const mapNumRange = (
     num: number,
     inMin: number,
@@ -132,7 +147,7 @@ export function countUnreadMessages(messages: Message[]) {
     return unreadMessages;
 }
 
-export function onSelectFile(file: File, mediaType?: string): Promise<void> {
+export function onSelectFile(file: File, mediaType?: MediaType): Promise<void> {
     return new Promise((resolve, reject) => {
         if (!file) {
             return reject({ error: "no file" });
@@ -144,7 +159,11 @@ export function onSelectFile(file: File, mediaType?: string): Promise<void> {
 
         let nameCheck = false;
         if (mediaType) {
-            nameCheck = filePrefix === mediaType;
+            if (mediaType === MediaType.AVATAR) {
+                nameCheck = true;
+            } else {
+                nameCheck = filePrefix === mediaType;
+            }
         } else {
             nameCheck = FilePrefixList.includes(filePrefix);
         }
