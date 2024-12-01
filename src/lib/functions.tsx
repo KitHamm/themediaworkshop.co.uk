@@ -11,35 +11,19 @@ export function DateRender(date: Date) {
     return formattedDate;
 }
 
-export function imageSort(images: Images[], logos: Logos[], type: string) {
+export function imageSort(
+    images: Images[],
+    logos: Logos[],
+    type: "SEGHEAD" | "SEGMENT" | "STUDY" | "LOGO" | "THUMBNAIL"
+) {
     return images.concat(logos).filter(function (image: Images | Logos) {
-        switch (type) {
-            case "header":
-                return image.name.split("_")[0] === "SEGHEAD";
-            case "segment":
-                return image.name.split("_")[0] === "SEGMENT";
-            case "study":
-                return image.name.split("_")[0] === "STUDY";
-            case "logos":
-                return image.name.split("_")[0] === "LOGO";
-            case "thumbnails":
-                return image.name.split("_")[0] === "THUMBNAIL";
-            case "all":
-                return true;
-        }
+        return image.name.split("_")[0] === type;
     });
 }
 
-export function videoSort(videos: Videos[], type: string) {
+export function videoSort(videos: Videos[], type: "HEADER" | "VIDEO") {
     return videos.filter(function (video: Videos) {
-        switch (type) {
-            case "background":
-                return video.name.split("_")[0] === "HEADER";
-            case "video":
-                return video.name.split("_")[0] === "VIDEO";
-            case "all":
-                return true;
-        }
+        return video.name.split("_")[0] === type;
     });
 }
 type Items = {
@@ -147,10 +131,13 @@ export function countUnreadMessages(messages: Message[]) {
     return unreadMessages;
 }
 
-export function onSelectFile(file: File, mediaType?: MediaType): Promise<void> {
+export function onSelectFile(
+    file: File,
+    mediaType?: MediaType
+): Promise<{ message: string }> {
     return new Promise((resolve, reject) => {
         if (!file) {
-            return reject({ error: "no file" });
+            return reject({ message: "no file" });
         }
 
         const fileSize = file.size / 1024 / 1024; // Convert size to MB
@@ -171,18 +158,20 @@ export function onSelectFile(file: File, mediaType?: MediaType): Promise<void> {
         if (!nameCheck) {
             if (mediaType) {
                 return reject({
-                    error:
+                    message:
                         "File name should be prefixed with " + mediaType + "_",
                 });
             } else {
-                return reject({ error: "Please check the file name prefix." });
+                return reject({
+                    message: "Please check the file name prefix.",
+                });
             }
         }
 
         if (!sizeCheck) {
-            return reject({ error: "File size too large." });
+            return reject({ message: "File size too large." });
         }
 
-        resolve();
+        return resolve({ message: "success" });
     });
 }

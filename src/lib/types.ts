@@ -129,3 +129,10 @@ export type DiskSpaceType = {
     free: number;
     size: number;
 };
+
+export type errorResponse = {
+    type: string;
+    pageTitle?: string;
+    segmentTitle?: string;
+    caseTitle?: string;
+};

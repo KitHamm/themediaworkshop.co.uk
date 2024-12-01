@@ -10,14 +10,26 @@ export default function MediaUploadButton(props: {
     mediaType?: MediaType;
     onOpenChange?: () => void;
     returnURL?: (url: string) => void;
+    returnError?: (error: string) => void;
 }) {
-    const { mediaType, onOpenChange, returnURL } = props;
+    const { mediaType, onOpenChange, returnURL, returnError } = props;
     const [newUpload, setNewUpload] = useState<File>();
     const [uploading, setUploading] = useState(false);
     const inputField = useRef<HTMLInputElement>(null);
 
     function handleFileSelect(file: File, mediaType?: MediaType) {
-        onSelectFile(file, mediaType).then(() => setNewUpload(file));
+        onSelectFile(file, mediaType)
+            .then((res) => {
+                setNewUpload(file);
+                if (returnError) {
+                    returnError(res.message);
+                }
+            })
+            .catch((error) => {
+                if (returnError) {
+                    returnError(error.message);
+                }
+            });
     }
 
     function handleUpload() {
