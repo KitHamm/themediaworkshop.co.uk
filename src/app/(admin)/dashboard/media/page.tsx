@@ -6,15 +6,10 @@ import ImageDisplayControls from "@/components/dashboard/mediaView/ImageDisplayC
 import MediaUploadButtonModal from "@/components/dashboard/mediaView/MediaUploadButtonModal";
 import VideoDisplay from "@/components/dashboard/mediaView/VideoDisplay";
 import VideoDisplayControls from "@/components/dashboard/mediaView/VideoDisplayControls";
-// Functions
-import { authOptions } from "@/authOptions";
-import { getServerSession } from "next-auth";
 // Provider
 import MediaStateProvider from "@/components/dashboard/mediaView/MediaStateProvider";
 
 export default async function MediaPage() {
-    const session = await getServerSession(authOptions);
-
     const videos = await prisma.videos.findMany({
         orderBy: {
             createdAt: "desc",

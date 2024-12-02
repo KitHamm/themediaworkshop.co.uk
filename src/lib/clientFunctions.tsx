@@ -11,7 +11,7 @@ export function uploadMedia(
             return reject({ error: "No file provided" });
         }
 
-        const type = file.type.split("/")[0];
+        const type = file.type.split("/")[0] === "image" ? "image" : "video";
         const formData = new FormData();
         formData.append("file", file);
 

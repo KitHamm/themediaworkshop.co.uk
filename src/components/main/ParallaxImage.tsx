@@ -1,6 +1,6 @@
 "use client";
 
-import { mapNumRange, parallaxOnScroll } from "@/lib/functions";
+import { parallaxOnScroll } from "@/lib/functions";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -46,7 +46,7 @@ export default function ParallaxImage(props: { headerImage: string | null }) {
                     style={{ top: parallaxValue + "px" }}
                     width={2560}
                     height={500}
-                    className="opacity-0 absolute w-[200%] h-auto xl:w-full xl:w-full xl:h-auto"
+                    className="opacity-0 absolute w-[200vw] h-auto xl:w-screen"
                     alt={headerImage}
                     src={process.env.NEXT_PUBLIC_CDN + "/images/" + headerImage}
                 />

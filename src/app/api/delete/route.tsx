@@ -194,6 +194,18 @@ export async function POST(req: Request) {
             Key: filePath,
         };
         await s3.send(new DeleteObjectCommand(deleteParams));
+
+        if (prefix === "VIDEO" || prefix === "HEADER") {
+            const posterName = fileName.split(".")[0] + ".webp";
+            const posterPath = "videos/posters/" + posterName;
+
+            const deletePosterParams = {
+                Bucket: bucketName,
+                Key: posterPath,
+            };
+
+            await s3.send(new DeleteObjectCommand(deletePosterParams));
+        }
         try {
             switch (prefix) {
                 case "SEGHEAD":

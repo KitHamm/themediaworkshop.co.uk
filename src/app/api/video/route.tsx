@@ -7,8 +7,12 @@ import {
     ObjectCannedACL,
 } from "@aws-sdk/client-s3";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { join } from "path";
+import { tmpdir } from "os";
+import { writeFile, readFile } from "fs/promises";
+import ffmpeg from "fluent-ffmpeg";
 
+// S3 Configuration
 const bucketName = process.env.SPACES_BUCKET_NAME!;
 const endpoint = process.env.SPACES_ENDPOINT!;
 const region = process.env.SPACES_REGION!;
@@ -18,14 +22,12 @@ const secretAccessKey = process.env.SPACES_SECRET_KEY!;
 const s3 = new S3Client({
     region,
     endpoint,
-    credentials: {
-        accessKeyId,
-        secretAccessKey,
-    },
+    credentials: { accessKeyId, secretAccessKey },
 });
 
 export async function POST(request: Request) {
     try {
+        // Parse form data and extract the file
         const formData = await request.formData();
         const file = formData.get("file") as File;
 
@@ -36,45 +38,66 @@ export async function POST(request: Request) {
             );
         }
 
-        const date = new Date();
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = file.name.split(".")[0].replace(" ", "-");
-        const extension = file.name.split(".")[1];
-        const formattedDate = date.toISOString().replace(/:|\./g, "-");
-        const formattedName =
-            fileName.replace(" ", "_") + "-" + formattedDate + "." + extension;
+        // Prepare file details
+        const videoBuffer = Buffer.from(await file.arrayBuffer());
+        const [baseName, extension] = file.name.split(".");
+        const timestamp = new Date().toISOString().replace(/:|\./g, "-");
+        const sanitizedBaseName = baseName.replace(/\s+/g, "-");
+        const videoName = `${sanitizedBaseName}-${timestamp}.${extension}`;
+        const videoKey = `videos/${videoName}`;
 
-        const fileKey = formattedName;
+        // Temporary paths
+        const tempVideoPath = join(tmpdir(), sanitizedBaseName);
+        const thumbnailName = `${sanitizedBaseName}-${timestamp}.webp`;
+        const tempThumbnailPath = join(tmpdir(), thumbnailName);
 
-        const uploadParams = {
-            Bucket: bucketName,
-            Key: "videos/" + fileKey,
-            Body: buffer,
-            ACL: ObjectCannedACL.public_read,
-            ContentType: file.type,
-        };
+        // Write video to a temp file
+        await writeFile(tempVideoPath, videoBuffer);
 
-        await s3.send(new PutObjectCommand(uploadParams));
+        // Generate thumbnail
+        await new Promise((resolve, reject) => {
+            ffmpeg(tempVideoPath)
+                .on("end", resolve)
+                .on("error", reject)
+                .thumbnail({
+                    timemarks: ["0%"],
+                    size: "1920x1080",
+                    folder: tmpdir(),
+                    filename: thumbnailName,
+                });
+        });
 
-        try {
-            await prisma.videos.create({
-                data: {
-                    name: formattedName,
-                },
-            });
-            return new NextResponse(
-                JSON.stringify({ message: formattedName }),
-                { status: 201 }
-            );
-        } catch (error: any) {
-            return new NextResponse(JSON.stringify({ error: error }), {
-                status: 500,
-            });
-        }
-    } catch (error) {
-        return NextResponse.json(
-            { error: "File upload failed" },
-            { status: 500 }
+        // Read the generated thumbnail
+        const thumbnailBuffer = await readFile(tempThumbnailPath);
+        const thumbnailKey = `videos/posters/${thumbnailName}`;
+
+        // Upload thumbnail to S3
+        await s3.send(
+            new PutObjectCommand({
+                Bucket: bucketName,
+                Key: thumbnailKey,
+                Body: thumbnailBuffer,
+                ACL: ObjectCannedACL.public_read,
+                ContentType: "image/webp",
+            })
         );
+
+        // Upload video to S3
+        await s3.send(
+            new PutObjectCommand({
+                Bucket: bucketName,
+                Key: videoKey,
+                Body: videoBuffer,
+                ACL: ObjectCannedACL.public_read,
+                ContentType: file.type,
+            })
+        );
+
+        // Save video metadata to database
+        await prisma.videos.create({ data: { name: videoName } });
+
+        return NextResponse.json({ message: videoName }, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ error: error }, { status: 500 });
     }
 }

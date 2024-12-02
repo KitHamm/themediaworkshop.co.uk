@@ -28,7 +28,7 @@ export default function SelectImageModal(props: {
     currentImage?: string;
 }) {
     const { isOpen, onOpenChange, imageType, returnURL, currentImage } = props;
-    const { images } = useContext(MediaFilesContext);
+    const { images, session } = useContext(MediaFilesContext);
 
     function titleFromTarget() {
         switch (imageType) {
@@ -285,6 +285,16 @@ export default function SelectImageModal(props: {
                                                                 className="w-full h-auto m-auto"
                                                             />
                                                         </div>
+                                                        {session.user.name ===
+                                                            "Kit Hamm" && (
+                                                            <div>
+                                                                {
+                                                                    image.name.split(
+                                                                        "."
+                                                                    )[1]
+                                                                }
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             }

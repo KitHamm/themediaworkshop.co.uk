@@ -23,6 +23,8 @@ export default function BackgroundVideo(props: {
         return <div className="no-video" />;
     }
 
+    const posterUrl = backgroundVideo.split(".")[0] + ".webp";
+
     return (
         <>
             <video
@@ -30,16 +32,16 @@ export default function BackgroundVideo(props: {
                 playsInline
                 disablePictureInPicture
                 id="bg-video"
-                className={`${
-                    !loading ? "fade-in" : "opacity-0"
-                } h-screen w-auto xl:w-full z-20`}
-                onCanPlayThrough={() => setLoading(false)}
+                className={`fade-in h-screen w-auto xl:w-full z-20`}
+                poster={
+                    process.env.NEXT_PUBLIC_CDN + "/videos/posters/" + posterUrl
+                }
                 autoPlay={true}
                 muted
                 loop
                 src={process.env.NEXT_PUBLIC_CDN + "/videos/" + backgroundVideo}
             />
-            <div
+            {/* <div
                 className={`${
                     !loading ? "hidden" : "flex fade-in"
                 } absolute w-screen z-10 h-screen top-0 left-0 flex justify-center`}>
@@ -50,7 +52,7 @@ export default function BackgroundVideo(props: {
                     }}
                     aria-label="Loading..."
                 />
-            </div>
+            </div> */}
         </>
     );
 }

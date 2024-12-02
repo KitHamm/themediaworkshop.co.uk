@@ -40,7 +40,11 @@ export default function VideoDisplay() {
                     onOpenChangeDeleteWarning();
                 })
                 .catch((err) => {
-                    console.log(err);
+                    if (err.response.data.error) {
+                        setDeleteErrorArray(err.response.data.error);
+                    } else {
+                        console.log(err);
+                    }
                 });
         }
     }

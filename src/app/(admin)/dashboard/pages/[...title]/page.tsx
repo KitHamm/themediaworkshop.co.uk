@@ -11,6 +11,8 @@ import Link from "next/link";
 // Providers
 import HeaderStateProvider from "@/components/dashboard/pageView/HeaderStateProvider";
 import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/authOptions";
 
 export default async function Page({ params }: { params: { title: string } }) {
     const data = await prisma.page.findUnique({
@@ -27,6 +29,8 @@ export default async function Page({ params }: { params: { title: string } }) {
         },
     });
 
+    const session = await getServerSession(authOptions);
+
     const videos = await prisma.videos.findMany({
         orderBy: {
             createdAt: "desc",
@@ -41,7 +45,7 @@ export default async function Page({ params }: { params: { title: string } }) {
     if (!data || !videos || !images) return <div>Not Found</div>;
 
     return (
-        <MediaFilesProvider images={images} videos={videos}>
+        <MediaFilesProvider images={images} videos={videos} session={session!}>
             <div className="xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 flex flex-col">
                 <div className="xl:pt-10 w-full">
                     <div className="border-b flex gap-10 w-full py-4 mb-10">
