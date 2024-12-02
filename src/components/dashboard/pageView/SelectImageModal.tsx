@@ -25,8 +25,9 @@ export default function SelectImageModal(props: {
     onOpenChange: () => void;
     imageType: "SEGHEAD" | "SEGMENT" | "STUDY" | "THUMBNAIL";
     returnURL: (url: string) => void;
+    currentImage?: string;
 }) {
-    const { isOpen, onOpenChange, imageType, returnURL } = props;
+    const { isOpen, onOpenChange, imageType, returnURL, currentImage } = props;
     const { images } = useContext(MediaFilesContext);
 
     function titleFromTarget() {
@@ -292,8 +293,21 @@ export default function SelectImageModal(props: {
                                 </div>
                             </ModalBody>
                             <ModalFooter className="mt-4">
+                                {currentImage && (
+                                    <Button
+                                        color="danger"
+                                        variant="light"
+                                        className="rounded-md"
+                                        onPress={() => {
+                                            returnURL("");
+                                            onClose();
+                                        }}>
+                                        Remove Image
+                                    </Button>
+                                )}
                                 <Button
-                                    className="rounded-md bg-orange-600"
+                                    color="danger"
+                                    className="rounded-md"
                                     onPress={() => {
                                         setCurrentPage(1);
                                         onClose();

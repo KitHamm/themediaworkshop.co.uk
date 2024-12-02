@@ -25,7 +25,7 @@ export default function SegmentTopImageInput(props: {
     return (
         <>
             {headerImage ? (
-                <div className="relative">
+                <div className="relative my-2">
                     <Image
                         height={2000}
                         width={1000}
@@ -79,6 +79,7 @@ export default function SegmentTopImageInput(props: {
                 </div>
             )}
             <SelectImageModal
+                currentImage={headerImage}
                 isOpen={isOpenSelectHeader}
                 onOpenChange={onOpenChangeSelectHeader}
                 imageType="SEGHEAD"

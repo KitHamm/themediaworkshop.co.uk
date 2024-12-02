@@ -2,17 +2,23 @@
 
 import { useDisclosure } from "@nextui-org/react";
 import SelectImageModal from "./SelectImageModal";
-import { UseFieldArrayAppend } from "react-hook-form";
-import { SegmentFormType } from "@/lib/types";
+import { UseFieldArrayAppend, UseFormSetValue } from "react-hook-form";
+import { CaseStudyFromType, SegmentFormType } from "@/lib/types";
 
 export default function AddImageArray(props: {
-    imageAppend: UseFieldArrayAppend<SegmentFormType, "image">;
+    imageAppendSegment?: UseFieldArrayAppend<SegmentFormType, "image">;
+    imageAppendCaseStudy?: UseFieldArrayAppend<CaseStudyFromType, "image">;
+    setValue?: UseFormSetValue<CaseStudyFromType>;
+    currentImage?: string;
 }) {
-    const { imageAppend } = props;
+    const { imageAppendSegment, imageAppendCaseStudy, currentImage, setValue } =
+        props;
     const { isOpen, onOpenChange } = useDisclosure();
 
     function handleReturnURL(url: string) {
-        imageAppend({ url: url });
+        imageAppendSegment && imageAppendSegment({ url: url });
+        imageAppendCaseStudy && imageAppendCaseStudy({ url: url });
+        setValue && setValue("videoThumbnail", url);
         onOpenChange();
     }
 
@@ -28,10 +34,17 @@ export default function AddImageArray(props: {
                 </div>
             </div>
             <SelectImageModal
+                currentImage={currentImage}
                 returnURL={handleReturnURL}
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
-                imageType="SEGMENT"
+                imageType={
+                    setValue
+                        ? "THUMBNAIL"
+                        : imageAppendSegment
+                        ? "SEGMENT"
+                        : "STUDY"
+                }
             />
         </>
     );

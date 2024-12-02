@@ -20,13 +20,23 @@ import {
 import Image from "next/image";
 import MediaUploadButton from "@/components/shared/MediaUploadButton";
 import { MediaType } from "@/lib/constants";
+import { set, UseFormSetValue } from "react-hook-form";
+import { CaseStudyFromType } from "@/lib/types";
 
 export default function SelectVideoModal(props: {
-    formTarget: "video1" | "video2" | "backgroundVideo";
+    formTarget?: "video1" | "video2" | "backgroundVideo";
+    setValueCaseStudy?: UseFormSetValue<CaseStudyFromType>;
     isOpen: boolean;
     onOpenChange: () => void;
+    currentVideo?: string;
 }) {
-    const { formTarget, isOpen, onOpenChange } = props;
+    const {
+        formTarget,
+        isOpen,
+        onOpenChange,
+        setValueCaseStudy,
+        currentVideo,
+    } = props;
     const { video1, video2, backgroundVideo, setValue } =
         useContext(HeaderStateContext);
 
@@ -43,6 +53,8 @@ export default function SelectVideoModal(props: {
                 return video2;
             case "backgroundVideo":
                 return backgroundVideo;
+            default:
+                return currentVideo;
         }
     }
 
@@ -54,6 +66,8 @@ export default function SelectVideoModal(props: {
                 return "Video 2";
             case "backgroundVideo":
                 return "Background Video";
+            default:
+                return "Case Study Video";
         }
     }
 
@@ -103,7 +117,12 @@ export default function SelectVideoModal(props: {
     }, [sortBy, order]);
 
     function handleSetValue(returnedURL: string) {
-        setValue(formTarget, returnedURL);
+        if (formTarget) {
+            setValue(formTarget, returnedURL, { shouldDirty: true });
+        }
+        if (setValueCaseStudy !== undefined) {
+            setValueCaseStudy("video", returnedURL, { shouldDirty: true });
+        }
     }
 
     function handleReturnError(error: string) {
@@ -320,13 +339,8 @@ export default function SelectVideoModal(props: {
                                                         <div className="flex justify-center mt-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setValue(
-                                                                        formTarget,
-                                                                        video.name,
-                                                                        {
-                                                                            shouldDirty:
-                                                                                true,
-                                                                        }
+                                                                    handleSetValue(
+                                                                        video.name
                                                                     );
                                                                     setCurrentPage(
                                                                         1
@@ -350,9 +364,7 @@ export default function SelectVideoModal(props: {
                                         color="danger"
                                         variant="light"
                                         onPress={() => {
-                                            setValue(formTarget, "", {
-                                                shouldDirty: true,
-                                            });
+                                            handleSetValue("");
                                             setCurrentPage(1);
                                             onClose();
                                         }}

@@ -13,22 +13,32 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import SelectVideoModal from "./SelectVideoModal";
+import { UseFormSetValue } from "react-hook-form";
+import { CaseStudyFromType } from "@/lib/types";
 
 export default function VideoSelect(props: {
-    formTarget: "video1" | "video2" | "backgroundVideo";
+    formTarget?: "video1" | "video2" | "backgroundVideo";
+    currentVideo?: string;
+    setValueCaseStudy?: UseFormSetValue<CaseStudyFromType>;
 }) {
-    const { formTarget } = props;
+    const { formTarget, currentVideo, setValueCaseStudy } = props;
     const { video1, video2, backgroundVideo } = useContext(HeaderStateContext);
     const [previewVideo, setPreviewVideo] = useState<string | null>(null);
 
     function videoFromTarget() {
-        switch (formTarget) {
-            case "video1":
-                return video1;
-            case "video2":
-                return video2;
-            case "backgroundVideo":
-                return backgroundVideo;
+        if (currentVideo) {
+            return currentVideo;
+        } else if (formTarget) {
+            switch (formTarget) {
+                case "video1":
+                    return video1;
+                case "video2":
+                    return video2;
+                case "backgroundVideo":
+                    return backgroundVideo;
+            }
+        } else {
+            return "";
         }
     }
 
@@ -58,7 +68,7 @@ export default function VideoSelect(props: {
 
     if (videoFromTarget()) {
         return (
-            <div id="video1">
+            <div id="video">
                 <div className="text-center">{titleFromTarget()}</div>
                 <div
                     onClick={() => {
@@ -90,6 +100,8 @@ export default function VideoSelect(props: {
                     </button>
                 </div>
                 <SelectVideoModal
+                    currentVideo={currentVideo}
+                    setValueCaseStudy={setValueCaseStudy}
                     formTarget={formTarget}
                     isOpen={isOpenSelect}
                     onOpenChange={onOpenChangeSelect}
@@ -159,6 +171,8 @@ export default function VideoSelect(props: {
                     </Button>
                 </div>
                 <SelectVideoModal
+                    currentVideo={currentVideo}
+                    setValueCaseStudy={setValueCaseStudy}
                     formTarget={formTarget}
                     isOpen={isOpenSelect}
                     onOpenChange={onOpenChangeSelect}

@@ -51,7 +51,7 @@ export async function updateCaseStudyPublished(id: number, published: boolean) {
     } catch (error: any) {
         return Promise.reject(new Error(error));
     } finally {
-        revalidatePath("/dashboard");
+        revalidatePath("/dashboard/pages", "layout");
         revalidatePath("/", "layout");
     }
 }

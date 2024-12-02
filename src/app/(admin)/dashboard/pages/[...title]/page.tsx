@@ -1,20 +1,27 @@
+// Prisma
+import prisma from "@/lib/prisma";
+// Components
 import AddSegmentButtonModal from "@/components/dashboard/pageView/AddSegmentButtonModal";
-import HeaderStateProvider from "@/components/dashboard/pageView/HeaderStateProvider";
 import HeaderTextareaInput from "@/components/dashboard/pageView/HeaderTextareaInput";
 import HeaderTextInput from "@/components/dashboard/pageView/HeaderTextInput";
-import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
+import SegmentAccordion from "@/components/dashboard/pageView/SegmentAccordion";
 import UpdatePageHeaderButton from "@/components/dashboard/pageView/UpdatePageHeaderButton";
 import VideoSelect from "@/components/dashboard/pageView/VideoSelect";
-import prisma from "@/lib/prisma";
 import Link from "next/link";
+// Providers
+import HeaderStateProvider from "@/components/dashboard/pageView/HeaderStateProvider";
+import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
 
 export default async function Page({ params }: { params: { title: string } }) {
     const data = await prisma.page.findUnique({
         where: { title: params.title[0] },
         include: {
             segment: {
+                orderBy: { order: "asc" },
                 include: {
-                    casestudy: true,
+                    casestudy: {
+                        orderBy: { order: "asc" },
+                    },
                 },
             },
         },
@@ -35,7 +42,7 @@ export default async function Page({ params }: { params: { title: string } }) {
 
     return (
         <MediaFilesProvider images={images} videos={videos}>
-            <div className="xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 xl:h-screen flex flex-col">
+            <div className="xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 flex flex-col">
                 <div className="xl:pt-10 w-full">
                     <div className="border-b flex gap-10 w-full py-4 mb-10">
                         <div className="flex gap-4">
@@ -127,6 +134,7 @@ export default async function Page({ params }: { params: { title: string } }) {
                     </div>
                     {/* TODO */}
                     {/* Segment Accordion */}
+                    <SegmentAccordion segments={data.segment} />
                 </div>
             </div>
         </MediaFilesProvider>
