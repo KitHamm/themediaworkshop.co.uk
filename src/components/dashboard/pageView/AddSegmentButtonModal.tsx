@@ -263,7 +263,9 @@ export default function AddSegmentButtonModal(props: { pageID: number }) {
                                                     }
                                                 )}
                                                 <AddImageArray
-                                                    imageAppend={imageAppend}
+                                                    imageAppendSegment={
+                                                        imageAppend
+                                                    }
                                                 />
                                             </div>
                                         </div>

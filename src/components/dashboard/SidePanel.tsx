@@ -93,12 +93,9 @@ export default function SidePanel(props: {
                                 <DropdownItem
                                     textValue="Edit Profile"
                                     key="edit-profile">
-                                    <a
-                                        href={
-                                            "dashboard?view=settings&open=true"
-                                        }>
+                                    <Link href={"/dashboard/settings"}>
                                         Edit Profile
-                                    </a>
+                                    </Link>
                                 </DropdownItem>
                                 <DropdownItem
                                     onClick={() => onOpen()}
@@ -231,12 +228,9 @@ export default function SidePanel(props: {
                                     <DropdownItem
                                         textValue="Edit Profile"
                                         key="edit-profile">
-                                        <a
-                                            href={
-                                                "dashboard?view=settings&open=true"
-                                            }>
+                                        <Link href={"/dashboard/settings"}>
                                             Edit Profile
-                                        </a>
+                                        </Link>
                                     </DropdownItem>
                                     <DropdownItem
                                         onClick={() => onOpen()}
@@ -328,7 +322,6 @@ export default function SidePanel(props: {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 userId={props.session.user.id}
-                userName={Array.from(props.session.user.name)[0] as string}
             />
         </>
     );
