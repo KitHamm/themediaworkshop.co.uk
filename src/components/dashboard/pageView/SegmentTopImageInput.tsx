@@ -19,7 +19,7 @@ export default function SegmentTopImageInput(props: {
     } = useDisclosure();
 
     function handleSetValue(returnedURL: string) {
-        setValue("headerImage", returnedURL);
+        setValue("headerImage", returnedURL, { shouldDirty: true });
     }
 
     return (
