@@ -66,7 +66,7 @@ export default function MediaStateProvider({
 
     useEffect(() => {
         setVideoPage(1);
-    }, [videosPerPage]);
+    }, [videosPerPage, videoView]);
 
     useEffect(() => {
         setSelectedVideos(
@@ -91,7 +91,7 @@ export default function MediaStateProvider({
 
     useEffect(() => {
         setImagePage(1);
-    }, [imagesPerPage]);
+    }, [imagesPerPage, imageView]);
 
     useEffect(() => {
         setSelectedImages(
