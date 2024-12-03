@@ -18,9 +18,37 @@ const nextConfig = {
                     },
                 ],
             },
+            {
+                source: "/_next/static/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+            {
+                source: "/images/:path*",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+            {
+                source: "/favicon.ico",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
         ];
     },
     images: {
+        minimumCacheTTL: 31536000, // Cache for 1 year
         disableStaticImages: true,
         remotePatterns: [
             {

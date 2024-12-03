@@ -69,43 +69,50 @@ export default function SegmentText(props: {
             id={"fade-" + index}
             className={`${
                 index % 2 === 0 ? "xl:order-first" : "xl:order-last"
-            } order-first relative opacity-0 text-center my-auto z-20`}>
-            <div className="xl:absolute xl:left-0 xl:right-0 xl:-top-10">
+            } order-first grid grid-cols-1 opacity-0 text-center my-auto z-20`}>
+            {/* Title */}
+            <div className="h-18 flex justify-center">
                 {linkTo !== "NONE" ? (
                     <Link
-                        className="hover:text-orange-600 transition-all uppercase font-bold text-3xl"
+                        className="hover:text-orange-600 transition-all uppercase font-bold mt-auto text-3xl"
                         href={"/" + linkTo.toLowerCase()}>
                         {title}
                     </Link>
                 ) : (
-                    <div className="uppercase font-bold text-3xl">{title}</div>
+                    <div className="uppercase font-bold text-3xl mt-auto">
+                        {title}
+                    </div>
                 )}
             </div>
+            {/* Copy */}
             <div ref={ref}>
                 <div
                     ref={copyText}
-                    className="copy-text text-justify text-md xl:text-lg xl:mb-0 mt-4 mb-5">
+                    className="copy-text text-justify text-md xl:text-lg my-4">
                     <Markdown>{copy}</Markdown>
                 </div>
             </div>
+            {/* Button */}
 
-            {caseStudies.length > 0 && (
-                <div className="xl:absolute xl:left-0 xl:right-0 xl:-bottom-15">
-                    <div className="xl:text-center xl:mt-4">
-                        <button
-                            onClick={onOpenChange}
-                            className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 xl:mt-2 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
-                            {buttonText ? buttonText : "Examples"}
-                        </button>
-                    </div>
-                    <CaseStudyModal
-                        isOpen={isOpen}
-                        onOpenChange={onOpenChange}
-                        segmentTitle={title}
-                        caseStudies={caseStudies}
-                    />
-                </div>
-            )}
+            <div className="h-18 flex justify-center">
+                {caseStudies.length > 0 && (
+                    <>
+                        <div className="xl:text-center">
+                            <button
+                                onClick={onOpenChange}
+                                className="transition-all hover:bg-opacity-0 hover:text-orange-600 border border-orange-600 bg-opacity-90 mb-6 xl:mb-0 px-4 py-2 bg-orange-600">
+                                {buttonText ? buttonText : "Examples"}
+                            </button>
+                        </div>
+                        <CaseStudyModal
+                            isOpen={isOpen}
+                            onOpenChange={onOpenChange}
+                            segmentTitle={title}
+                            caseStudies={caseStudies}
+                        />
+                    </>
+                )}
+            </div>
         </div>
     );
 }

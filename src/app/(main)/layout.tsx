@@ -17,6 +17,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
     title: "The Media Workshop Ltd",
     description:
         "The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",

@@ -24,11 +24,11 @@ export default function SegmentImage(props: {
     ]);
 
     return (
-        <div className="text-center">
+        <div className="text-center flex">
             <div
                 className={`${
                     index % 2 === 0 ? "ms-0 xl:-ms-24" : "ms-0 xl:-me-24"
-                }  relative`}>
+                }  relative my-auto`}>
                 {images.length > 1 ? (
                     <div
                         className="embla"

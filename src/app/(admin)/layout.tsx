@@ -20,9 +20,19 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
     title: "TMW | Dashboard",
     description:
         "The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
+    openGraph: {
+        title: "The Media Workshop Ltd",
+        description:
+            "The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
+        url: "https://themediaworkshop.co.uk/",
+        siteName: "The Media Workshop Ltd",
+        locale: "en-US",
+        type: "website",
+    },
 };
 
 export default async function RootLayout({
