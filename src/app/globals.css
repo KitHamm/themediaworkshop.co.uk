@@ -95,6 +95,24 @@ video {
     top: 0;
     width: 100%;
 }
+
+.spin {
+    opacity: 100%;
+    animation: spin 3s ease-in-out;
+    animation-iteration-count: infinite;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .fade-in {
     opacity: 100%;
     animation: fadeIn 1s ease-in-out;
