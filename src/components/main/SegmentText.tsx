@@ -71,7 +71,7 @@ export default function SegmentText(props: {
                 index % 2 === 0 ? "xl:order-first" : "xl:order-last"
             } order-first grid grid-cols-1 opacity-0 text-center my-auto z-20`}>
             {/* Title */}
-            <div className="h-20 flex justify-center">
+            <div className="xl:h-20 flex justify-center">
                 {linkTo !== "NONE" ? (
                     <Link
                         className="hover:text-orange-600 transition-all uppercase font-bold mt-auto text-3xl"
@@ -94,7 +94,7 @@ export default function SegmentText(props: {
             </div>
             {/* Button */}
 
-            <div className="h-20 flex justify-center">
+            <div className="xl:h-20 flex justify-center">
                 {caseStudies.length > 0 && (
                     <>
                         <div className="xl:text-center">
