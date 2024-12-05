@@ -1,5 +1,3 @@
-# Hi, I'm Kit! 👋
-
 ## 🔗 Links
 
 **Contact me on my [website](https://kitmakesthings.co.uk/?view=contact)**
@@ -15,9 +13,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 This repo contains the source code used to create the company website for [The Media Workshop](https://staging.themediaworkshop.co.uk/)
 
-## My Role - Full Stack Developer
+## My Role
 
-`This project is still in the development stage.`
+FUll Stack Developer. Frontend, Backend, Server.
 
 ## Tech Stack
 
@@ -31,18 +29,14 @@ This repo contains the source code used to create the company website for [The M
 
 ## Features
 
--   Static and Dynamic SSR
--   Custom built dashboard for content management
--   Add page segments as needed with customizability
--   Media pool on dashboard for quickly seeing all media available
--   Contact form with message center on dashboard
--   Media storing and serving from hosting Server
--   PostgreSQL Database with Prisma client
--   Custom Parallax Views
-
-## TODO
-
--   Mobile and Tablet responsive styling
--   Add case study carousel modal for page segments
--   Media folders for content management
--   Finalize styling
+-   Public pages focus on SSR.
+-   Digital Ocean CDN for content.
+-   Custom built dashboard for content management.
+-   Add page segments as needed with customizability.
+-   Add Case Studies as needed with customizability.
+-   Media uploads (videos) pre processed to capture thumbnail (poster) image.
+-   Media uploads (images) pre processed for lightweight image formats.
+-   Media pool on dashboard for quickly seeing all media available.
+-   Contact form with message center on dashboard.
+-   PostgreSQL Database with Prisma client.
+-   Custom Parallax Views.
