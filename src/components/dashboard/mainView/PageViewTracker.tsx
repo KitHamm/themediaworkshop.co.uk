@@ -13,7 +13,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import { Tooltip as TooltipNextUI } from "@nextui-org/react";
+import { Tooltip as TooltipNextUI } from "@heroui/react";
 ChartJS.register(
     CategoryScale,
     LinearScale,

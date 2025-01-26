@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import Link from "next/link";
 
 type PageTitleSegmentTitles = {

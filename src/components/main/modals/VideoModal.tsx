@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, ModalContent } from "@nextui-org/react";
+import { Modal, ModalContent } from "@heroui/react";
 
 export default function VideoModal(props: {
     videoURL: string;

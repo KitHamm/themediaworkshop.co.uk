@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@heroui/react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 

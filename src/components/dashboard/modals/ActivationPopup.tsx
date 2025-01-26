@@ -9,7 +9,7 @@ import {
     ModalFooter,
     ModalHeader,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useEffect } from "react";
 
 export default function ActivationPopup(props: {

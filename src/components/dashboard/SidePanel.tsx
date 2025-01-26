@@ -12,7 +12,7 @@ import {
     Badge,
     User,
     Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 //  React Components
 import { useEffect, useState } from "react";

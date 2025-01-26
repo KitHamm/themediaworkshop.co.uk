@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { MessageStateContext } from "./MessageStateProvider";
 import { Message } from "@prisma/client";
-import { Checkbox } from "@nextui-org/react";
+import { Checkbox } from "@heroui/react";
 import { DateRender } from "@/lib/functions";
 import { updateMessage } from "@/server/messageActions/updateMessage";
 

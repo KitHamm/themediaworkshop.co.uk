@@ -3,7 +3,7 @@
 import { uploadMedia } from "@/lib/clientFunctions";
 import { MediaType } from "@/lib/constants";
 import { onSelectFile } from "@/lib/functions";
-import { Button, CircularProgress } from "@nextui-org/react";
+import { Button, CircularProgress } from "@heroui/react";
 import { useRef, useState } from "react";
 
 export default function MediaUploadButton(props: {

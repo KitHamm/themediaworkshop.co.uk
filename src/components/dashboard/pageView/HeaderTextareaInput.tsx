@@ -2,7 +2,7 @@
 
 import { useContext, useState } from "react";
 import { HeaderStateContext } from "./HeaderStateProvider";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import Markdown from "react-markdown";
 
 export default function HeaderTextareaInput() {

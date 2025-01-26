@@ -10,7 +10,7 @@ import {
     ModalFooter,
     ModalHeader,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { CaseStudy } from "@prisma/client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";

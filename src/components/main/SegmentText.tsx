@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import Markdown from "react-markdown";
 import CaseStudyModal from "./modals/CaseStudyModal";
-import { useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@heroui/react";
 
 export default function SegmentText(props: {
     index: number;

@@ -14,7 +14,7 @@ import {
     ModalFooter,
     ModalHeader,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Role } from "@prisma/client";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

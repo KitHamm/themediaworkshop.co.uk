@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import { MessageStateContext } from "./MessageStateProvider";
-import { Checkbox } from "@nextui-org/react";
+import { Checkbox } from "@heroui/react";
 
 export default function SelectAllButton() {
     const { setMultipleMessagesIDs, multipleMessagesIDs, messages } =

@@ -1,6 +1,6 @@
 "use client";
 
-import { CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 
 export default function BackgroundVideo(props: {

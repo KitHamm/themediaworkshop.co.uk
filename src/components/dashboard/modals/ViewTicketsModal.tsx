@@ -11,7 +11,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Tickets } from "@prisma/client";
 
 export default function ViewTicketsModal(props: {

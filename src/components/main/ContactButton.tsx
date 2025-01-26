@@ -1,6 +1,6 @@
 "use client";
 
-import { useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@heroui/react";
 import ContactModal from "./modals/ContactModal";
 
 export default function ContactButton() {

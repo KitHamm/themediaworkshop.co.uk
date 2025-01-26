@@ -12,7 +12,7 @@ import {
     ModalHeader,
     Tooltip,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import Image from "next/image";
 import { deleteFile } from "@/lib/clientFunctions";
 import { errorResponse } from "@/lib/types";
