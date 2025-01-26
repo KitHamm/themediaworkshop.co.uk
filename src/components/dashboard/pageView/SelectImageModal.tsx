@@ -14,7 +14,7 @@ import {
     Pagination,
     Select,
     SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Images } from "@prisma/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";

@@ -11,7 +11,7 @@ import {
     Avatar,
     Button,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import EditUserModal from "./EditUserModal";
 import DeleteUserWarningModal from "./DeleteUserWarningModal";

@@ -9,7 +9,7 @@ import {
     ModalFooter,
     ModalHeader,
     Switch,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { TicketFormType } from "@/lib/types";

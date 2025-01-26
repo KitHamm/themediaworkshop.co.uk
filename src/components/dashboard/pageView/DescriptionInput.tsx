@@ -1,7 +1,7 @@
 "use client";
 
 import { CaseStudyFromType, SegmentFormType } from "@/lib/types";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import { useState } from "react";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import Markdown from "react-markdown";

@@ -8,7 +8,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import Image from "next/image";
 
 export default function ViewCSImagesModal(props: {

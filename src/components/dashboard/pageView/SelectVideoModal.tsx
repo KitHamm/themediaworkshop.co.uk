@@ -16,7 +16,7 @@ import {
     Select,
     SelectItem,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import Image from "next/image";
 import MediaUploadButton from "@/components/shared/MediaUploadButton";
 import { MediaType } from "@/lib/constants";

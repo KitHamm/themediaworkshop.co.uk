@@ -1,6 +1,6 @@
 "use client";
 
-import { useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@heroui/react";
 import SelectImageModal from "./SelectImageModal";
 import { UseFieldArrayAppend, UseFormSetValue } from "react-hook-form";
 import { CaseStudyFromType, SegmentFormType } from "@/lib/types";

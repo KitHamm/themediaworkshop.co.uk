@@ -7,7 +7,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 export default function ViewCSVideoModal(props: {
     isOpen: boolean;
