@@ -72,15 +72,20 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 								</div>
 
 								{!slug ? (
-									<Image
-										src={"/images/tmw-logo.png"}
-										alt="TMW Logo"
-										priority
-										id="title-logo"
-										height={75}
-										width={720}
-										className="w-11/12 xl:w-3/4 h-auto mx-auto mt-2"
-									/>
+									<>
+										<h1 className="hidden">
+											{data.header}
+										</h1>
+										<Image
+											src={"/images/tmw-logo.png"}
+											alt="TMW Logo"
+											priority
+											id="title-logo"
+											height={75}
+											width={720}
+											className="w-11/12 xl:w-3/4 h-auto mx-auto mt-2"
+										/>
+									</>
 								) : (
 									<h1 className="font-bold text-4xl uppercase">
 										{data.header}
