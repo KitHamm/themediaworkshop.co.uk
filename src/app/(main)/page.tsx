@@ -14,6 +14,7 @@ import ParallaxImage from "@/components/main/ParallaxImage";
 import SegmentText from "@/components/main/SegmentText";
 import SegmentImage from "@/components/main/SegmentImage";
 import NotFound from "@/components/main/NotFound";
+import DataError from "@/components/main/shared/DataError";
 // Types
 import { ExtendedSegment } from "@/lib/types";
 import { ExtendedPage } from "@/lib/types/pageTypes";
@@ -45,7 +46,7 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 		});
 	} catch (error) {
 		// TODO add data error
-		return <NotFound />;
+		return <DataError />;
 	}
 
 	if (!data) {

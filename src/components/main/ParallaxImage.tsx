@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 // functions
 import { parallaxOnScroll } from "@/lib/functions";
 
-const ParallaxImage = ({ headerImage }: { headerImage: string | null }) => {
+const ParallaxImage = ({
+	headerImage,
+}: Readonly<{ headerImage: string | null }>) => {
 	const [parallaxValue, setParallaxValue] = useState(0);
 	const [containerHeight, setContainerHeight] = useState(0);
 	const headerImageContainerEl = useRef<HTMLDivElement>(null);

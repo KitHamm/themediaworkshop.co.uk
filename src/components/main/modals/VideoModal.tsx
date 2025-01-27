@@ -6,11 +6,11 @@ const VideoModal = ({
 	videoURL,
 	isOpen,
 	onOpenChange,
-}: {
+}: Readonly<{
 	videoURL: string;
 	isOpen: boolean;
 	onOpenChange: () => void;
-}) => {
+}>) => {
 	return (
 		<Modal
 			size="5xl"

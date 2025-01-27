@@ -2,30 +2,14 @@
 // packages
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
+// functions
+import addAnchorLinks from "@/lib/utils/pageUtils/addAnchorLinks";
 
-const HeaderCopy = ({ description }: { description: string }) => {
+const HeaderCopy = ({ description }: Readonly<{ description: string }>) => {
 	const copyText = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const anchors: HTMLAnchorElement[] = [];
-		if (copyText.current?.children.length! > 0) {
-			for (
-				let i = 0;
-				i < copyText.current?.children[0].children.length!;
-				i++
-			) {
-				if (copyText.current?.children[0].children[i].tagName === "A")
-					anchors.push(
-						copyText.current?.children[0].children[
-							i
-						] as HTMLAnchorElement
-					);
-			}
-		}
-		for (let i = 0; i < anchors.length; i++) {
-			anchors[i].setAttribute("target", "_blank");
-			anchors[i].setAttribute("rel", "noreferrer");
-		}
+		addAnchorLinks(copyText.current);
 	}, []);
 
 	return (

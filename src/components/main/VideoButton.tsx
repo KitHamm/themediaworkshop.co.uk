@@ -7,10 +7,10 @@ import VideoModal from "./modals/VideoModal";
 const VideoButton = ({
 	buttonText,
 	videoURL,
-}: {
+}: Readonly<{
 	buttonText: string;
 	videoURL: string;
-}) => {
+}>) => {
 	const { isOpen, onOpenChange } = useDisclosure();
 	return (
 		<div id="homeButton">

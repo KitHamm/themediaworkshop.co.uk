@@ -1,8 +1,8 @@
 const BackgroundVideo = ({
 	backgroundVideo,
-}: {
+}: Readonly<{
 	backgroundVideo: string | null | undefined;
-}) => {
+}>) => {
 	if (!backgroundVideo) {
 		return <div className="no-video" />;
 	}

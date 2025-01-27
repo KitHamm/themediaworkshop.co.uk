@@ -11,10 +11,10 @@ import { Logos } from "@prisma/client";
 const TickerTape = ({
 	start,
 	logoImages,
-}: {
+}: Readonly<{
 	start: boolean;
 	logoImages: Logos[];
-}) => {
+}>) => {
 	const [emblaHeight, setEmblaHeight] = useState("auto");
 	const OPTIONS: EmblaOptionsType = {
 		align: "start",

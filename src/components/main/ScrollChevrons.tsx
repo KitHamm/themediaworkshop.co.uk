@@ -25,18 +25,13 @@ const ScrollChevrons = () => {
 			className="transition-opacity ease-in-out opacity-0 w-full absolute left-0 right-0 text-center bottom-40 xl:bottom-10"
 		>
 			<div className="flex flex-col gap-4">
-				<i
-					aria-hidden
-					className="chevron fa-solid fa-chevron-down fa-xl"
-				/>
-				<i
-					aria-hidden
-					className="chevron fa-solid fa-chevron-down fa-xl"
-				/>
-				<i
-					aria-hidden
-					className="chevron fa-solid fa-chevron-down fa-xl"
-				/>
+				{Array.from({ length: 3 }, (_, i) => (
+					<i
+						key={"chevron-" + i}
+						aria-hidden
+						className="chevron fa-solid fa-chevron-down fa-xl"
+					/>
+				))}
 			</div>
 		</div>
 	);

@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import { useDisclosure } from "@heroui/react";
 import Markdown from "react-markdown";
+// functions
+import addAnchorLinks from "@/lib/utils/pageUtils/addAnchorLinks";
 // components
 import CaseStudyModal from "./modals/CaseStudyModal";
 // types
@@ -17,14 +19,14 @@ const SegmentText = ({
 	copy,
 	buttonText,
 	caseStudies,
-}: {
+}: Readonly<{
 	index: number;
 	linkTo: toLink;
 	title: string | null;
 	copy: string | null;
 	buttonText: string | null;
 	caseStudies: CaseStudy[];
-}) => {
+}>) => {
 	const { isOpen, onOpenChange } = useDisclosure();
 	const copyText = useRef<HTMLDivElement>(null);
 	const { ref, inView } = useInView({
@@ -44,25 +46,7 @@ const SegmentText = ({
 	}, [inView]);
 
 	useEffect(() => {
-		const anchors: HTMLAnchorElement[] = [];
-		if (copyText.current?.children.length! > 0) {
-			for (
-				let i = 0;
-				i < copyText.current?.children[0].children.length!;
-				i++
-			) {
-				if (copyText.current?.children[0].children[i].tagName === "A")
-					anchors.push(
-						copyText.current?.children[0].children[
-							i
-						] as HTMLAnchorElement
-					);
-			}
-		}
-		for (let i = 0; i < anchors.length; i++) {
-			anchors[i].setAttribute("target", "_blank");
-			anchors[i].setAttribute("rel", "noreferrer");
-		}
+		addAnchorLinks(copyText.current);
 	}, []);
 
 	return (

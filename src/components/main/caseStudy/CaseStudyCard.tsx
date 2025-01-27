@@ -1,11 +1,14 @@
-import { EmblaCarouselCaseStudyInner } from "@/Embla/EmblaCarousel";
+// packages
 import { Chip, useDisclosure } from "@heroui/react";
-import { CaseStudy } from "@prisma/client";
 import Image from "next/image";
 import { useRef } from "react";
 import Markdown from "react-markdown";
+// components
+import { EmblaCarouselCaseStudyInner } from "@/Embla/EmblaCarousel";
 import ViewCSImagesModal from "../modals/ViewCSImagesModal";
 import ViewCSVideoModal from "../modals/ViewCSVideoModal";
+// types
+import { CaseStudy } from "@prisma/client";
 
 const CaseStudyCard = ({
 	caseStudy,
