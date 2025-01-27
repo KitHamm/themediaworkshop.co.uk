@@ -103,7 +103,6 @@ export default function CaseStudyModal(props: {
 	const [newTag, setNewTag] = useState("");
 
 	function handleSubmitCaseStudy(data: CaseStudyFromType) {
-		console.log(data);
 		if (caseStudy) {
 			updateCaseStudy(data, caseStudy.id)
 				.then(() => onOpenChange())
@@ -136,10 +135,13 @@ export default function CaseStudyModal(props: {
 									{title ? title : "Unnamed Case Study"}
 								</div>
 							</ModalHeader>
-							<form
-								onSubmit={handleSubmit(handleSubmitCaseStudy)}
-							>
-								<ModalBody className="light">
+							<ModalBody className="light">
+								<form
+									id="case-study-form"
+									onSubmit={handleSubmit(
+										handleSubmitCaseStudy
+									)}
+								>
 									<div className="grid xl:grid-cols-2 gap-10">
 										<div id="left">
 											<div className="font-bold text-2xl">
@@ -384,72 +386,41 @@ export default function CaseStudyModal(props: {
 											</div>
 										</div>
 									</div>
-								</ModalBody>
-								<ModalFooter>
-									{caseStudy && (
+								</form>
+							</ModalBody>
+							<ModalFooter>
+								{caseStudy && (
+									<>
 										<Button
-											color="danger"
+											color="warning"
 											variant="light"
 											className="rounded-md"
 											onPress={() => {
-												onOpenChangeDeleteWarning();
+												reset();
 											}}
 										>
-											Delete Case Study
+											Reset
 										</Button>
-									)}
-									<Button
-										color="warning"
-										variant="light"
-										className="rounded-md"
-										onPress={() => {
-											reset();
-										}}
-									>
-										Reset
-									</Button>
-									<Button
-										color="danger"
-										className="rounded-md"
-										onPress={() => {
-											onClose();
-											reset();
-										}}
-									>
-										Cancel
-									</Button>
-									{caseStudy && (
 										<Button
-											color={
-												published ? "danger" : "success"
-											}
+											color="danger"
 											className="rounded-md"
 											onPress={() => {
-												updateCaseStudyPublished(
-													caseStudy.id,
-													!caseStudy.published
-												)
-													.then(() => {
-														onOpenChange();
-													})
-													.catch((err) =>
-														console.log(err)
-													);
+												onClose();
+												reset();
 											}}
 										>
-											{published
-												? "Unpublish"
-												: "Publish"}
+											Cancel
 										</Button>
-									)}
-									<Button
-										type="submit"
-										className="bg-orange-600 text-white rounded-md"
-									>
-										Save
-									</Button>
-								</ModalFooter>
-							</form>
+									</>
+								)}
+								<Button
+									type="submit"
+									form="case-study-form"
+									className="bg-orange-600 text-white rounded-md"
+								>
+									Save
+								</Button>
+							</ModalFooter>
 						</>
 					)}
 				</ModalContent>
