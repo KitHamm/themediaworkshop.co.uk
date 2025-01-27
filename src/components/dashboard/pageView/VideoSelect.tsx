@@ -143,6 +143,7 @@ export default function VideoSelect(props: {
 									</ModalBody>
 									<ModalFooter>
 										<Button
+											type="button"
 											color="danger"
 											variant="light"
 											onPress={() => {

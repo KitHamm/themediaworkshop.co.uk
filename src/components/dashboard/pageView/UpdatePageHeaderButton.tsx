@@ -8,14 +8,13 @@ import { updatePage } from "@/server/pageActions/updatePage";
 import { revalidateDashboard } from "@/server/revalidateDashboard";
 
 export default function UpdatePageHeaderButton() {
-	const { handleSubmit, isDirty, handleReset } =
-		useContext(HeaderStateContext);
+	const { isDirty, handleReset } = useContext(HeaderStateContext);
 
-	function onSubmit(data: PageFormType) {
-		updatePage(data).then(() => {
-			revalidateDashboard();
-		});
-	}
+	// function onSubmit(data: PageFormType) {
+	// 	updatePage(data).then(() => {
+	// 		revalidateDashboard();
+	// 	});
+	// }
 
 	if (isDirty) {
 		return (
@@ -33,8 +32,7 @@ export default function UpdatePageHeaderButton() {
 					Discard
 				</Button>
 				<Button
-					type="button"
-					onPress={() => handleSubmit(onSubmit)}
+					type="submit"
 					className="bg-orange-600 text-white text-md rounded-md"
 				>
 					Save Changes
