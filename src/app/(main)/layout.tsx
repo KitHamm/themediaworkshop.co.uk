@@ -1,6 +1,13 @@
+// packages
 import type { Metadata, Viewport } from "next";
+// fonts
 import { Lato } from "next/font/google";
+// styles
 import "../globals.css";
+// functions
+import { getMetadata } from "@/data/getMetaData";
+import { getViewport } from "@/data/getViewport";
+// components
 import Navbar from "@/components/main/layout/Navbar";
 import Footer from "@/components/main/Footer";
 
@@ -9,28 +16,9 @@ const lato = Lato({
 	subsets: ["latin"],
 });
 
-export const viewport: Viewport = {
-	initialScale: 1,
-	width: "device-width",
-	minimumScale: 1,
-	themeColor: "#131313",
-};
+export const viewport: Viewport = getViewport("#131313");
 
-export const metadata: Metadata = {
-	metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
-	title: "The Media Workshop Ltd",
-	description:
-		"The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
-	openGraph: {
-		title: "The Media Workshop Ltd",
-		description:
-			"The Media Workshop is a digital production and development company who work creatively with new media and developing technologies.",
-		url: "https://themediaworkshop.co.uk/",
-		siteName: "The Media Workshop Ltd",
-		locale: "en-US",
-		type: "website",
-	},
-};
+export const metadata: Metadata = getMetadata("The Media Workshop Ltd");
 
 export default async function RootLayout({
 	children,
