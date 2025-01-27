@@ -1,0 +1,68 @@
+name: Green deployment on DigitalOcean
+
+on:
+    workflow_dispatch:
+    # push:
+    #     branches:
+    #         - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Check for changes in prisma.schema
+              id: prisma_changes
+              run: |
+                  git fetch origin main
+                  if git diff --quiet HEAD origin/main -- prisma/schema.prisma; then
+                    echo "No changes in prisma.schema"
+                      echo "prisma_changed=false" >> $GITHUB_ENV
+                  else
+                    echo "prisma.schema has changed"
+                      echo "prisma_changed=true" >> $GITHUB_ENV
+                  fi
+
+            - name: Deploy to DigitalOcean
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.DIGITAL_OCEAN_IP }}
+                  username: root
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  passphrase: ${{ secrets.DO_SSH_PASSPHRASE }}
+                  port: 22
+                  script_stop: true
+                  command_timeout: 20m
+                  script: |
+                      if [ "${{ env.prisma_changed }}" = "false" ]; then
+                        echo "No changes in prisma.schema, continuing with green deployment..."
+
+                        echo "Moving to stable directory..."
+                        cd ../var/www/stagingthemediaworkshop.co.uk || { echo "Failed to change directory to /var/www/stagingthemediaworkshop.co.uk"; exit 1; }
+
+                        echo "Pulling latest changes..."
+                        git pull || { echo "Git pull failed"; exit 1; }
+
+                        echo "Installing dependencies..."
+                        export NVM_DIR=~/.nvm
+                        source ~/.nvm/nvm.sh || { echo "Failed to source NVM"; exit 1; }
+                        npm install || { echo "NPM install failed"; exit 1; }
+
+                        echo "Stopping pm2 process..."
+                        pm2 stop stagingthemediaworkshop.co.uk || { echo "Failed to stop pm2 process"; exit 1; }
+
+                        echo "Building project..."
+                        npm run build
+                        if [ $? -ne 0 ]; then
+                          echo "Build failed, exiting deployment."
+                          exit 1
+                        fi
+
+                        echo "Starting pm2 process..."
+                        pm2 start 3 || { echo "Failed to stop pm2 process"; exit 1; }
+
+                        echo "Deployment completed successfully."
+                        echo "Ready for blue deployment."
+                      fi
