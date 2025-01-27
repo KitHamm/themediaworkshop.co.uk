@@ -136,302 +136,320 @@ export default function CaseStudyModal(props: {
 									{title ? title : "Unnamed Case Study"}
 								</div>
 							</ModalHeader>
-							<ModalBody className="light">
-								<div className="grid xl:grid-cols-2 gap-10">
-									<div id="left">
-										<div className="font-bold text-2xl">
-											Title:
-										</div>
-										<input
-											type="text"
-											{...register("title", {
-												required: {
-													value: true,
-													message:
-														"Title is requited.",
-												},
-											})}
-											placeholder={
-												errors.title
-													? errors.title.message
-													: "Title"
-											}
-											className={
-												errors.title
-													? "placeholder:text-red-400"
-													: "text-black"
-											}
-										/>
-										<div className="font-bold text-2xl mt-2">
-											Date/Location:
-										</div>
-										<input
-											type="text"
-											className="text-black"
-											{...register("dateLocation")}
-										/>
-										<div className="flex justify-between mt-5">
-											<div className="font-bold text-2xl mt-auto">
-												Tags:
+							<form
+								onSubmit={handleSubmit(handleSubmitCaseStudy)}
+							>
+								<ModalBody className="light">
+									<div className="grid xl:grid-cols-2 gap-10">
+										<div id="left">
+											<div className="font-bold text-2xl">
+												Title:
 											</div>
-											<em className="my-auto text-neutral-600">
-												Click a tag to remove it
-											</em>
-										</div>
-										<div className="flex flex-wrap gap-4 mt-2">
-											{tagsFields.map(
-												(
-													tag: CaseStudyTagType,
-													index: number
-												) => {
-													return (
-														<Chip
-															onClick={() =>
-																tagsRemove(
-																	index
-																)
-															}
-															className="cursor-pointer"
-															key={
-																tag.text +
-																"-" +
-																index
-															}
-														>
-															{tag.text}
-														</Chip>
-													);
-												}
-											)}
-										</div>
-										<div className="font-bold text-2xl mt-5">
-											New Tag:
-										</div>
-										<div className="flex gap-4">
 											<input
-												className="text-black"
 												type="text"
-												placeholder="Add a new Tag"
-												value={newTag}
-												onChange={(e) => {
-													setNewTag(e.target.value);
-												}}
+												{...register("title", {
+													required: {
+														value: true,
+														message:
+															"Title is requited.",
+													},
+												})}
+												placeholder={
+													errors.title
+														? errors.title.message
+														: "Title"
+												}
+												className={
+													errors.title
+														? "placeholder:text-red-400"
+														: "text-black"
+												}
 											/>
-
-											<Button
-												type="button"
-												onPress={() => {
-													if (newTag !== "") {
-														tagsAppend({
-															text: newTag,
-														});
-														setNewTag("");
-													}
-												}}
-												className="bg-orange-600 rounded-md my-auto text-white"
-											>
-												Add
-											</Button>
-										</div>
-									</div>
-									<div id="right">
-										<DescriptionInput
-											copy={copy}
-											registerCaseStudy={register}
-											errors={errors}
-										/>
-										<div className="font-bold text-2xl mt-5">
-											Order:
-										</div>
-										<div className="w-1/4">
-											<input
-												className="text-black"
-												type="number"
-												{...register("order")}
-											/>
-										</div>
-									</div>
-								</div>
-								<div className="grid xl:grid-cols-2 gap-10">
-									<div id="left">
-										<div className="min-h-[33%]">
-											<div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-												Images:
+											<div className="font-bold text-2xl mt-2">
+												Date/Location:
 											</div>
-											<div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
-												{imageFields.map(
+											<input
+												type="text"
+												className="text-black"
+												{...register("dateLocation")}
+											/>
+											<div className="flex justify-between mt-5">
+												<div className="font-bold text-2xl mt-auto">
+													Tags:
+												</div>
+												<em className="my-auto text-neutral-600">
+													Click a tag to remove it
+												</em>
+											</div>
+											<div className="flex flex-wrap gap-4 mt-2">
+												{tagsFields.map(
 													(
-														image: ImageFormType,
+														tag: CaseStudyTagType,
 														index: number
 													) => {
 														return (
-															<div
+															<Chip
+																onClick={() =>
+																	tagsRemove(
+																		index
+																	)
+																}
+																className="cursor-pointer"
 																key={
-																	image +
+																	tag.text +
 																	"-" +
 																	index
 																}
-																className="relative"
 															>
-																<Image
-																	height={100}
-																	width={100}
-																	src={
-																		process
-																			.env
-																			.NEXT_PUBLIC_CDN +
-																		"/images/" +
-																		image.url
-																	}
-																	alt={
-																		image.url
-																	}
-																	className="w-full h-auto"
-																/>
-																<div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-																	<div className="text-red-400 h-full flex justify-center">
-																		<i
-																			onClick={() =>
-																				imageRemove(
-																					index
-																				)
-																			}
-																			aria-hidden
-																			className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-																		/>
-																	</div>
-																</div>
-															</div>
+																{tag.text}
+															</Chip>
 														);
 													}
 												)}
-												<AddImageArray
-													imageAppendCaseStudy={
-														imageAppend
-													}
+											</div>
+											<div className="font-bold text-2xl mt-5">
+												New Tag:
+											</div>
+											<div className="flex gap-4">
+												<input
+													className="text-black"
+													type="text"
+													placeholder="Add a new Tag"
+													value={newTag}
+													onChange={(e) => {
+														setNewTag(
+															e.target.value
+														);
+													}}
+												/>
+
+												<Button
+													type="button"
+													onPress={() => {
+														if (newTag !== "") {
+															tagsAppend({
+																text: newTag,
+															});
+															setNewTag("");
+														}
+													}}
+													className="bg-orange-600 rounded-md my-auto text-white"
+												>
+													Add
+												</Button>
+											</div>
+										</div>
+										<div id="right">
+											<DescriptionInput
+												copy={copy}
+												registerCaseStudy={register}
+												errors={errors}
+											/>
+											<div className="font-bold text-2xl mt-5">
+												Order:
+											</div>
+											<div className="w-1/4">
+												<input
+													className="text-black"
+													type="number"
+													{...register("order")}
 												/>
 											</div>
 										</div>
 									</div>
-									<div id="right">
-										<div className="h-1/3 flex justify-between gap-2">
-											<div className="basis-1/2">
+									<div className="grid xl:grid-cols-2 gap-10">
+										<div id="left">
+											<div className="min-h-[33%]">
 												<div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-													Video:
+													Images:
 												</div>
-												<VideoSelect
-													setValueCaseStudy={setValue}
-													currentVideo={currentVideo}
-												/>
-											</div>
-											<div className="basis-1/2">
-												<div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
-													Thumbnail:
-												</div>
-												{videoThumbnail ? (
-													<div className="relative">
-														<Image
-															height={100}
-															width={100}
-															src={
-																process.env
-																	.NEXT_PUBLIC_CDN +
-																"/images/" +
-																videoThumbnail
-															}
-															alt={videoThumbnail}
-															className="w-full h-auto"
-														/>
-														<div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
-															<div className="text-red-400 h-full flex justify-center">
-																<i
-																	onClick={() =>
-																		setValue(
-																			"videoThumbnail",
-																			""
-																		)
+												<div className="grid xl:grid-cols-4 grid-cols-2 gap-4 p-2">
+													{imageFields.map(
+														(
+															image: ImageFormType,
+															index: number
+														) => {
+															return (
+																<div
+																	key={
+																		image +
+																		"-" +
+																		index
 																	}
-																	aria-hidden
-																	className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
-																/>
+																	className="relative"
+																>
+																	<Image
+																		height={
+																			100
+																		}
+																		width={
+																			100
+																		}
+																		src={
+																			process
+																				.env
+																				.NEXT_PUBLIC_CDN +
+																			"/images/" +
+																			image.url
+																		}
+																		alt={
+																			image.url
+																		}
+																		className="w-full h-auto"
+																	/>
+																	<div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+																		<div className="text-red-400 h-full flex justify-center">
+																			<i
+																				onClick={() =>
+																					imageRemove(
+																						index
+																					)
+																				}
+																				aria-hidden
+																				className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+																			/>
+																		</div>
+																	</div>
+																</div>
+															);
+														}
+													)}
+													<AddImageArray
+														imageAppendCaseStudy={
+															imageAppend
+														}
+													/>
+												</div>
+											</div>
+										</div>
+										<div id="right">
+											<div className="h-1/3 flex justify-between gap-2">
+												<div className="basis-1/2">
+													<div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+														Video:
+													</div>
+													<VideoSelect
+														setValueCaseStudy={
+															setValue
+														}
+														currentVideo={
+															currentVideo
+														}
+													/>
+												</div>
+												<div className="basis-1/2">
+													<div className="font-bold text-2xl pb-2 mb-2 border-b border-neutral-400">
+														Thumbnail:
+													</div>
+													{videoThumbnail ? (
+														<div className="relative">
+															<Image
+																height={100}
+																width={100}
+																src={
+																	process.env
+																		.NEXT_PUBLIC_CDN +
+																	"/images/" +
+																	videoThumbnail
+																}
+																alt={
+																	videoThumbnail
+																}
+																className="w-full h-auto"
+															/>
+															<div className="hover:opacity-100 opacity-0 transition-opacity absolute w-full h-full bg-black bg-opacity-75 top-0 left-0">
+																<div className="text-red-400 h-full flex justify-center">
+																	<i
+																		onClick={() =>
+																			setValue(
+																				"videoThumbnail",
+																				""
+																			)
+																		}
+																		aria-hidden
+																		className="m-auto fa-solid cursor-pointer fa-trash fa-2xl text-red-400"
+																	/>
+																</div>
 															</div>
 														</div>
-													</div>
-												) : (
-													<AddImageArray
-														currentImage={
-															videoThumbnail
-														}
-														setValue={setValue}
-													/>
-												)}
+													) : (
+														<AddImageArray
+															currentImage={
+																videoThumbnail
+															}
+															setValue={setValue}
+														/>
+													)}
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</ModalBody>
-							<ModalFooter>
-								{caseStudy && (
+								</ModalBody>
+								<ModalFooter>
+									{caseStudy && (
+										<Button
+											color="danger"
+											variant="light"
+											className="rounded-md"
+											onPress={() => {
+												onOpenChangeDeleteWarning();
+											}}
+										>
+											Delete Case Study
+										</Button>
+									)}
 									<Button
-										color="danger"
+										color="warning"
 										variant="light"
 										className="rounded-md"
 										onPress={() => {
-											onOpenChangeDeleteWarning();
+											reset();
 										}}
 									>
-										Delete Case Study
+										Reset
 									</Button>
-								)}
-								<Button
-									color="warning"
-									variant="light"
-									className="rounded-md"
-									onPress={() => {
-										reset();
-									}}
-								>
-									Reset
-								</Button>
-								<Button
-									color="danger"
-									className="rounded-md"
-									onPress={() => {
-										onClose();
-										reset();
-									}}
-								>
-									Cancel
-								</Button>
-								{caseStudy && (
 									<Button
-										color={published ? "danger" : "success"}
+										color="danger"
 										className="rounded-md"
 										onPress={() => {
-											updateCaseStudyPublished(
-												caseStudy.id,
-												!caseStudy.published
-											)
-												.then(() => {
-													onOpenChange();
-												})
-												.catch((err) =>
-													console.log(err)
-												);
+											onClose();
+											reset();
 										}}
 									>
-										{published ? "Unpublish" : "Publish"}
+										Cancel
 									</Button>
-								)}
-								<Button
-									className="bg-orange-600 text-white rounded-md"
-									onPress={() =>
-										handleSubmit(handleSubmitCaseStudy)
-									}
-								>
-									Save
-								</Button>
-							</ModalFooter>
+									{caseStudy && (
+										<Button
+											color={
+												published ? "danger" : "success"
+											}
+											className="rounded-md"
+											onPress={() => {
+												updateCaseStudyPublished(
+													caseStudy.id,
+													!caseStudy.published
+												)
+													.then(() => {
+														onOpenChange();
+													})
+													.catch((err) =>
+														console.log(err)
+													);
+											}}
+										>
+											{published
+												? "Unpublish"
+												: "Publish"}
+										</Button>
+									)}
+									<Button
+										type="submit"
+										className="bg-orange-600 text-white rounded-md"
+									>
+										Save
+									</Button>
+								</ModalFooter>
+							</form>
 						</>
 					)}
 				</ModalContent>
