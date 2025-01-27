@@ -1,0 +1,74 @@
+name: Blue deployment on DigitalOcean
+
+on:
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Check for changes in prisma.schema
+              id: prisma_changes
+              run: |
+                  git fetch origin main
+                  if git diff --quiet HEAD origin/main -- prisma/schema.prisma; then
+                    echo "No changes in prisma.schema"
+                      echo "prisma_changed=false" >> $GITHUB_ENV
+                  else
+                    echo "prisma.schema has changed"
+                      echo "prisma_changed=true" >> $GITHUB_ENV
+                  fi
+
+            - name: Deploy to DigitalOcean
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.DIGITAL_OCEAN_IP }}
+                  username: root
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  passphrase: ${{ secrets.DO_SSH_PASSPHRASE }}
+                  port: 22
+                  script_stop: true
+                  command_timeout: 20m
+                  script: |
+                      if [ "${{ env.prisma_changed }}" = "false" ]; then
+                        echo "No changes in prisma.schema, continuing with blue deployment..."
+                        
+                        echo "Switching traffic to green..."
+                        sudo rm /etc/nginx/sites-enabled/themediaworkshop.co.uk || { echo "Failed to remove symlink for themediaworkshop.co.uk"; exit 1; }
+                        sudo ln -s /etc/nginx/sites-available/tmw_stable /etc/nginx/sites-enabled/ || { echo "Failed to create symlink for tmw_stable"; exit 1; }
+                        sudo systemctl reload nginx || { echo "Failed to reload Nginx"; exit 1; }
+
+                        echo "Stopping blue instance..."
+                        export NVM_DIR=~/.nvm
+                        source ~/.nvm/nvm.sh || { echo "Failed to source NVM"; exit 1; }                        
+                        pm2 stop 0 || { echo "Failed to stop PM2 process"; exit 1; }
+
+                        echo "Moving to live directory..."
+                        cd ../var/www/themediaworkshop.co.uk || { echo "Failed to change directory to /srv/www/themediaworkshop.co.uk"; exit 1; }
+
+                        echo "Pulling latest changes..."
+                        git pull || { echo "Git pull failed"; exit 1; }
+
+                        echo "Installing dependencies..."
+                        npm install || { echo "NPM install failed"; exit 1; }
+
+                        echo "Building project..."
+                        npm run build
+                        if [ $? -ne 0 ]; then
+                          echo "Build failed, exiting deployment."
+                          exit 1
+                        fi
+
+                        echo "Starting blue instance..."
+                        pm2 start 0 || { echo "Failed to start PM2 process"; exit 1; }
+
+                        echo "Switching traffic to blue..."
+                        sudo rm /etc/nginx/sites-enabled/tmw_stable || { echo "Failed to remove symlink for tmw_stable"; exit 1; }
+                        sudo ln -s /etc/nginx/sites-available/themediaworkshop.co.uk /etc/nginx/sites-enabled/ || { echo "Failed to create symlink for themediaworkshop.co.uk"; exit 1; }
+                        sudo systemctl reload nginx || { echo "Failed to reload Nginx"; exit 1; }
+
+                        echo "Deployment completed successfully."
+                      fi
