@@ -390,28 +390,56 @@ export default function CaseStudyModal(props: {
 							</ModalBody>
 							<ModalFooter>
 								{caseStudy && (
-									<>
-										<Button
-											color="warning"
-											variant="light"
-											className="rounded-md"
-											onPress={() => {
-												reset();
-											}}
-										>
-											Reset
-										</Button>
-										<Button
-											color="danger"
-											className="rounded-md"
-											onPress={() => {
-												onClose();
-												reset();
-											}}
-										>
-											Cancel
-										</Button>
-									</>
+									<Button
+										color="danger"
+										variant="light"
+										className="rounded-md"
+										onPress={() => {
+											onOpenChangeDeleteWarning();
+										}}
+									>
+										Delete Case Study
+									</Button>
+								)}
+								<Button
+									color="warning"
+									variant="light"
+									className="rounded-md"
+									onPress={() => {
+										reset();
+									}}
+								>
+									Reset
+								</Button>
+								<Button
+									color="danger"
+									className="rounded-md"
+									onPress={() => {
+										onClose();
+										reset();
+									}}
+								>
+									Cancel
+								</Button>
+								{caseStudy && (
+									<Button
+										color={published ? "danger" : "success"}
+										className="rounded-md"
+										onPress={() => {
+											updateCaseStudyPublished(
+												caseStudy.id,
+												!caseStudy.published
+											)
+												.then(() => {
+													onOpenChange();
+												})
+												.catch((err) =>
+													console.log(err)
+												);
+										}}
+									>
+										{published ? "Unpublish" : "Publish"}
+									</Button>
 								)}
 								<Button
 									type="submit"
