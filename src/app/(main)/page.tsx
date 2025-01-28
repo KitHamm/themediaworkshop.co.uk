@@ -15,6 +15,8 @@ import SegmentText from "@/components/main/SegmentText";
 import SegmentImage from "@/components/main/SegmentImage";
 import NotFound from "@/components/main/NotFound";
 import DataError from "@/components/main/shared/DataError";
+import ContactModal from "@/components/main/modals/ContactModal";
+import CaseStudyModal from "@/components/main/modals/CaseStudyModal";
 // Types
 import { ExtendedSegment } from "@/lib/types";
 import { ExtendedPage } from "@/lib/types/pageTypes";
@@ -45,7 +47,6 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 			orderBy: { name: "asc" },
 		});
 	} catch (error) {
-		// TODO add data error
 		return <DataError />;
 	}
 
@@ -110,7 +111,9 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 											videoURL={data.video2}
 										/>
 									)}
-									<ContactButton />
+									<ContactModal>
+										<ContactButton />
+									</ContactModal>
 								</div>
 								{data.description && (
 									<HeaderCopy
@@ -123,13 +126,11 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 					</div>
 				</section>
 			</header>
-
 			{logoImages.length > 0 && (
 				<div className="my-8">
 					<TickerTape start={true} logoImages={logoImages} />
 				</div>
 			)}
-
 			{data.segment.map((segment: ExtendedSegment, index: number) => {
 				return (
 					<div key={segment.title}>
@@ -140,9 +141,17 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 								linkTo={segment.linkTo}
 								title={segment.title}
 								copy={segment.copy}
-								buttonText={segment.buttonText}
-								caseStudies={segment.casestudy}
-							/>
+							>
+								{segment.casestudy.length > 0 && (
+									<CaseStudyModal
+										segmentTitle={segment.title}
+										caseStudies={segment.casestudy}
+										buttonText={
+											segment.buttonText ?? "Examples"
+										}
+									/>
+								)}
+							</SegmentText>
 							<SegmentImage
 								index={index}
 								images={segment.image}
@@ -151,7 +160,6 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 					</div>
 				);
 			})}
-
 			{logoImages.length > 0 && (
 				<TickerTape start={false} logoImages={logoImages} />
 			)}
