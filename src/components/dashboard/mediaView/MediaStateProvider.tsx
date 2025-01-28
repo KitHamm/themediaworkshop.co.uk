@@ -9,24 +9,12 @@ import { itemOrder } from "@/lib/utils/mediaUtils/itemOrder";
 import { Images, Logos, Videos } from "@prisma/client";
 
 type MediaContextType = {
-	images: Images[];
-	videos: Videos[];
-	logos: Logos[];
-	//
 	selectedVideos: Videos[];
-	setSelectedVideos: React.Dispatch<React.SetStateAction<Videos[]>>;
 	videoView: "HEADER" | "VIDEO";
 	setVideoView: React.Dispatch<React.SetStateAction<"HEADER" | "VIDEO">>;
 	videosPerPage: number;
-	setVideosPerPage: React.Dispatch<React.SetStateAction<number>>;
 	videoPage: number;
-	setVideoPage: React.Dispatch<React.SetStateAction<number>>;
-	sortVideosBy: string;
-	setSortVideosBy: React.Dispatch<React.SetStateAction<string>>;
-	orderVideos: string;
-	setOrderVideos: React.Dispatch<React.SetStateAction<string>>;
 	selectedImages: Images[];
-	setSelectedImages: React.Dispatch<React.SetStateAction<Images[]>>;
 	imageView: "SEGHEAD" | "SEGMENT" | "STUDY" | "LOGO" | "THUMBNAIL";
 	setImageView: React.Dispatch<
 		React.SetStateAction<
@@ -34,13 +22,16 @@ type MediaContextType = {
 		>
 	>;
 	imagesPerPage: number;
-	setImagesPerPage: React.Dispatch<React.SetStateAction<number>>;
 	imagePage: number;
-	setImagePage: React.Dispatch<React.SetStateAction<number>>;
-	sortImagesBy: string;
-	setSortImagesBy: React.Dispatch<React.SetStateAction<string>>;
-	orderImages: string;
-	setOrderImages: React.Dispatch<React.SetStateAction<string>>;
+	setMediaPerPage: (value: number, isImage: boolean) => void;
+	getMediaPerPage: (isImage: boolean) => number;
+	setSortMediaBy: (value: string, isImage: boolean) => void;
+	getSortMediaBy: (isImage: boolean) => string;
+	setMediaOrderBy: (value: string, isImage: boolean) => void;
+	getMediaOrderBy: (isImage: boolean) => string;
+	getMediaLength: (isImage: boolean) => number;
+	getMediaPage: (isImage: boolean) => number;
+	setMediaPage: (value: number, isImage: boolean) => void;
 };
 
 export const MediaStateContext = createContext<MediaContextType>(
@@ -96,6 +87,78 @@ const MediaStateProvider = ({
 	const [sortImagesBy, setSortImagesBy] = useState("date");
 	const [orderImages, setOrderImages] = useState("desc");
 
+	const setMediaPerPage = (value: number, isImage: boolean) => {
+		if (isImage) {
+			setImagesPerPage(value);
+		} else {
+			setVideosPerPage(value);
+		}
+	};
+
+	const getMediaPerPage = (isImage: boolean) => {
+		if (isImage) {
+			return imagesPerPage;
+		} else {
+			return videosPerPage;
+		}
+	};
+
+	const setSortMediaBy = (value: string, isImage: boolean) => {
+		if (isImage) {
+			setSortImagesBy(value);
+		} else {
+			setSortVideosBy(value);
+		}
+	};
+
+	const getSortMediaBy = (isImage: boolean) => {
+		if (isImage) {
+			return sortImagesBy;
+		} else {
+			return sortVideosBy;
+		}
+	};
+
+	const setMediaOrderBy = (value: string, isImage: boolean) => {
+		if (isImage) {
+			setOrderImages(value);
+		} else {
+			setOrderVideos(value);
+		}
+	};
+
+	const getMediaOrderBy = (isImage: boolean) => {
+		if (isImage) {
+			return orderImages;
+		} else {
+			return orderVideos;
+		}
+	};
+
+	const getMediaLength = (isImage: boolean) => {
+		if (isImage) {
+			return selectedImages.length;
+		} else {
+			return selectedVideos.length;
+		}
+	};
+
+	const getMediaPage = (isImage: boolean) => {
+		if (isImage) {
+			return imagePage;
+		} else {
+			return videoPage;
+		}
+	};
+
+	const setMediaPage = (value: number, isImage: boolean) => {
+		if (isImage) {
+			setImagePage(value);
+		} else {
+			setVideoPage(value);
+		}
+	};
+
 	// Set Images
 	useEffect(() => {
 		setImagePage(1);
@@ -117,62 +180,46 @@ const MediaStateProvider = ({
 
 	const mediaStateValue = useMemo(
 		() => ({
-			images,
-			videos,
-			logos,
 			selectedVideos,
-			setSelectedVideos,
 			videoView,
 			setVideoView,
 			videosPerPage,
-			setVideosPerPage,
 			videoPage,
-			setVideoPage,
-			sortVideosBy,
-			setSortVideosBy,
-			orderVideos,
-			setOrderVideos,
 			selectedImages,
-			setSelectedImages,
 			imageView,
 			setImageView,
 			imagesPerPage,
-			setImagesPerPage,
 			imagePage,
-			setImagePage,
-			sortImagesBy,
-			setSortImagesBy,
-			orderImages,
-			setOrderImages,
+			setMediaPerPage,
+			getMediaPerPage,
+			setSortMediaBy,
+			getSortMediaBy,
+			setMediaOrderBy,
+			getMediaOrderBy,
+			getMediaLength,
+			getMediaPage,
+			setMediaPage,
 		}),
 		[
-			images,
-			videos,
-			logos,
 			selectedVideos,
-			setSelectedVideos,
 			videoView,
 			setVideoView,
 			videosPerPage,
-			setVideosPerPage,
 			videoPage,
-			setVideoPage,
-			sortVideosBy,
-			setSortVideosBy,
-			orderVideos,
-			setOrderVideos,
 			selectedImages,
-			setSelectedImages,
 			imageView,
 			setImageView,
 			imagesPerPage,
-			setImagesPerPage,
 			imagePage,
-			setImagePage,
-			sortImagesBy,
-			setSortImagesBy,
-			orderImages,
-			setOrderImages,
+			setMediaPerPage,
+			getMediaPerPage,
+			setSortMediaBy,
+			getSortMediaBy,
+			setMediaOrderBy,
+			getMediaOrderBy,
+			getMediaLength,
+			getMediaPage,
+			setMediaPage,
 		]
 	);
 

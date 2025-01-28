@@ -3,8 +3,8 @@
 import { Button, CircularProgress } from "@heroui/react";
 import { ChangeEvent, DragEvent, useRef, useState } from "react";
 // functions
-import { uploadMedia } from "@/lib/clientFunctions";
-import { fileCheck } from "@/lib/functions";
+import { uploadMedia } from "@/lib/utils/mediaUtils/uploadMedia";
+import { fileCheck } from "@/lib/utils/mediaUtils/fileCheck";
 // constants
 import { MediaType } from "@/lib/constants";
 import { UploadState } from "@/lib/types";
@@ -36,12 +36,12 @@ const MediaUploadButton = ({
 			);
 			if (success) {
 				setImageToUpload(e.dataTransfer.files[0]);
+				setUploadState(UploadState.READY);
 			} else {
 				if (returnError) {
 					returnError(message);
 				}
 			}
-			setUploadState(UploadState.READY);
 		}
 	};
 
@@ -51,14 +51,15 @@ const MediaUploadButton = ({
 				e.target.files[0],
 				mediaType
 			);
+			console.log(success);
 			if (success) {
 				setImageToUpload(e.target.files[0]);
+				setUploadState(UploadState.READY);
 			} else {
 				if (returnError) {
 					returnError(message);
 				}
 			}
-			setUploadState(UploadState.READY);
 		}
 	};
 

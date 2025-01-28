@@ -55,7 +55,7 @@ const MediaUploadButtonModal = () => {
 				onOpenChange={onOpenChange}
 			>
 				<ModalContent>
-					{(onClose) => (
+					{() => (
 						<>
 							<ModalHeader className="flex justify-center">
 								Upload New Media
@@ -128,14 +128,11 @@ const MediaUploadButtonModal = () => {
 										{uploadError}
 									</div>
 								)}
-
-								{isOpen && (
-									<MediaUploadButton
-										onOpenChange={onOpenChange}
-										returnError={handleReturnError}
-										isMediaPage
-									/>
-								)}
+								<MediaUploadButton
+									onOpenChange={onOpenChange}
+									returnError={handleReturnError}
+									isMediaPage
+								/>
 							</ModalBody>
 						</>
 					)}

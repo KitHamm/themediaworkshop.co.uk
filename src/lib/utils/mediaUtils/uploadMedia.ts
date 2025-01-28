@@ -1,7 +1,5 @@
-"use client";
-
-import { revalidateDashboard } from "@/server/revalidateDashboard";
 import axios from "axios";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 
 export async function uploadMedia(
 	file?: File
@@ -39,26 +37,4 @@ export async function uploadMedia(
 			message: "Error uploading file. Please try again later.",
 		};
 	}
-}
-
-export function deleteFile(file: string): Promise<void> {
-	return new Promise((resolve, reject) => {
-		axios
-			.post(
-				"/api/delete",
-				{ fileName: file },
-				{
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			)
-			.then(() => {
-				revalidateDashboard();
-				resolve();
-			})
-			.catch((error) => {
-				reject(error);
-			});
-	});
 }
