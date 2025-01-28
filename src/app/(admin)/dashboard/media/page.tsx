@@ -1,19 +1,18 @@
 // Prisma
 import prisma from "@/lib/prisma";
-// Provider
-import MediaStateProvider from "@/components/dashboard/mediaView/MediaStateProvider";
 // Components
+import MediaStateProvider from "@/components/dashboard/mediaView/MediaStateProvider";
 import ImageDisplay from "@/components/dashboard/mediaView/ImageDisplay";
 import MediaUploadButtonModal from "@/components/dashboard/mediaView/MediaUploadButtonModal";
 import VideoDisplay from "@/components/dashboard/mediaView/VideoDisplay";
-// types
-import { Images, Logos, Videos } from "@prisma/client";
 import VideoViewButtons from "@/components/dashboard/mediaView/VideoViewButtons";
 import MediaPerPageSelect from "@/components/dashboard/mediaView/MediaPerPageSelect";
 import MediaSortBySelect from "@/components/dashboard/mediaView/MediaSortBySelect";
 import MediaOrderSelect from "@/components/dashboard/mediaView/MediaOrderSelect";
 import MediaPaginationControl from "@/components/dashboard/mediaView/MediaPaginationControl";
 import ImageViewButtons from "@/components/dashboard/mediaView/ImageViewButtons";
+// types
+import { Images, Logos, Videos } from "@prisma/client";
 
 export default async function MediaPage() {
 	let videos: Videos[] = [];

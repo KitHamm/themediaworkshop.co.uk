@@ -2,9 +2,10 @@
 // packages
 import { Button, CircularProgress } from "@heroui/react";
 import { ChangeEvent, DragEvent, useRef, useState } from "react";
+import axios from "axios";
 // functions
-import { uploadMedia } from "@/lib/utils/mediaUtils/uploadMedia";
 import { fileCheck } from "@/lib/utils/mediaUtils/fileCheck";
+import { revalidateDashboard } from "@/server/revalidateDashboard";
 // constants
 import { MediaType } from "@/lib/constants";
 import { UploadState } from "@/lib/types";
@@ -51,7 +52,6 @@ const MediaUploadButton = ({
 				e.target.files[0],
 				mediaType
 			);
-			console.log(success);
 			if (success) {
 				setImageToUpload(e.target.files[0]);
 				setUploadState(UploadState.READY);
@@ -65,17 +65,24 @@ const MediaUploadButton = ({
 
 	const onUpload = async () => {
 		setUploadState(UploadState.UPLOADING);
+		if (!imageToUpload) return;
 		try {
-			if (imageToUpload) {
-				const res = await uploadMedia(imageToUpload);
-				if (res.success) {
-					setUploadState(UploadState.SUCCESS);
-					if (returnURL && res.message) {
-						returnURL(res.message);
-					}
-				}
+			const fileType = imageToUpload.type.split("/")[0];
+			const formData = new FormData();
+			formData.append("file", imageToUpload);
+
+			const res = await axios.post(`/api/${fileType}`, formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+
+			setUploadState(UploadState.SUCCESS);
+			revalidateDashboard();
+
+			if (returnURL && res.data.message) {
+				returnURL(res.data.message);
 			}
 		} catch (error) {
+			setUploadState(UploadState.ERROR);
 			console.log("Unexpected error:", error);
 		}
 	};

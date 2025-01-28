@@ -1,8 +1,6 @@
 "use client";
-
-import { useContext, useState } from "react";
-import { MediaStateContext } from "./MediaStateProvider";
-import { Videos } from "@prisma/client";
+// packages
+import { useState } from "react";
 import {
 	Button,
 	Modal,
@@ -14,61 +12,47 @@ import {
 	useDisclosure,
 } from "@heroui/react";
 import Image from "next/image";
-import { deleteFile } from "@/lib/utils/mediaUtils/deleteFile";
+// context
+import { useMediaState } from "./MediaStateProvider";
+// functions
+import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
+// components
+import ConfirmDeleteMedia from "./ConfirmDeleteMedia";
+// types
+import { Videos } from "@prisma/client";
 import { errorResponse } from "@/lib/types";
 
-export default function VideoDisplay() {
-	const { selectedVideos, videoPage, videosPerPage } =
-		useContext(MediaStateContext);
+const VideoDisplay = () => {
+	const { selectedVideos, videoPage, videosPerPage } = useMediaState();
 
-	const { isOpen: isOpenPreview, onOpenChange: onOpenChangePreview } =
-		useDisclosure();
-	const {
-		isOpen: isOpenDeleteWarning,
-		onOpenChange: onOpenChangeDeleteWarning,
-	} = useDisclosure();
+	const { isOpen, onOpenChange, onClose: onCloseMain } = useDisclosure();
 
 	const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 	const [deleteErrorArray, setDeleteErrorArray] = useState<errorResponse[]>(
 		[]
 	);
 
-	function handleDeleteFile() {
-		if (selectedVideo) {
-			deleteFile(selectedVideo)
-				.then(() => {
-					onOpenChangeDeleteWarning();
-				})
-				.catch((err) => {
-					if (err.response.data.error) {
-						setDeleteErrorArray(err.response.data.error);
-					} else {
-						console.log(err);
-					}
-				});
-		}
-	}
+	const handleOpenPreview = (video: string) => {
+		setSelectedVideo(video);
+		onOpenChange();
+	};
 
 	return (
 		<div className="grid xl:grid-cols-4 grid-cols-2 gap-4 bg-neutral-800 border-solid border-2 border-neutral-600 p-4 rounded">
 			{selectedVideos.map((video: Videos, index: number) => {
-				if (
-					index > videoPage * videosPerPage - (videosPerPage + 1) &&
-					index < videoPage * videosPerPage
-				) {
+				if (inPaginationRange(index, videoPage, videosPerPage)) {
 					return (
 						<Tooltip
-							delay={1000}
+							delay={500}
 							className="dark"
 							placement="bottom"
-							key={video.name + "-" + index}
+							key={video.name}
 							content={video.name.split("-")[0].split("_")[1]}
 						>
 							<div className="flex flex-col border rounded border-neutral-800">
 								<div
 									onClick={() => {
-										setSelectedVideo(video.name);
-										onOpenChangePreview();
+										handleOpenPreview(video.name);
 									}}
 									className="cursor-pointer bg-black bg-opacity-25 p-4 h-full flex w-full"
 								>
@@ -91,209 +75,77 @@ export default function VideoDisplay() {
 				}
 			})}
 			{selectedVideo && (
-				<>
-					<Modal
-						size="5xl"
-						backdrop="blur"
-						isOpen={isOpenPreview}
-						className="dark"
-						onOpenChange={onOpenChangePreview}
-					>
-						<ModalContent>
-							{(onClose) => (
-								<>
-									<ModalHeader>
-										{selectedVideo.split("-")[0] +
-											"." +
-											selectedVideo.split(".")[1]}
-									</ModalHeader>
-									<ModalBody>
-										<div>
-											<video
-												autoPlay
-												playsInline
-												disablePictureInPicture
-												id="bg-video"
-												controls={true}
-												src={
-													process.env
-														.NEXT_PUBLIC_CDN +
-													"/videos/" +
-													selectedVideo
-												}
-											/>
-										</div>
-									</ModalBody>
-									<ModalFooter>
-										<Button
-											className="rounded-md"
-											color="danger"
-											variant="light"
-											onPress={() => {
-												onOpenChangeDeleteWarning();
-												onClose();
-											}}
-										>
-											Delete Video
-										</Button>
-										<a
-											target="_blank"
-											rel="noreferrer"
-											className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
-											href={
+				<Modal
+					size="5xl"
+					backdrop="blur"
+					isOpen={isOpen}
+					className="dark"
+					onOpenChange={onOpenChange}
+				>
+					<ModalContent>
+						{(onClose) => (
+							<>
+								<ModalHeader>
+									{selectedVideo.split("-")[0] +
+										"." +
+										selectedVideo.split(".")[1]}
+								</ModalHeader>
+								<ModalBody>
+									<div>
+										<video
+											autoPlay
+											playsInline
+											disablePictureInPicture
+											id="bg-video"
+											controls={true}
+											src={
 												process.env.NEXT_PUBLIC_CDN +
 												"/videos/" +
 												selectedVideo
 											}
-											download
-										>
-											Download
-										</a>
-										<Button
-											className="rounded-md"
-											color="danger"
-											onPress={() => {
-												onClose();
-											}}
-										>
-											Close
-										</Button>
-									</ModalFooter>
-								</>
-							)}
-						</ModalContent>
-					</Modal>
-					<Modal
-						size="xl"
-						backdrop="blur"
-						isDismissable={false}
-						isOpen={isOpenDeleteWarning}
-						className="dark"
-						onOpenChange={onOpenChangeDeleteWarning}
-					>
-						<ModalContent>
-							{(onClose) => (
-								<>
-									<ModalHeader>
-										<div className="w-full flex justify-center">
-											<div className="font-bold text-2xl text-red-400">
-												WARNING
-											</div>
-										</div>
-									</ModalHeader>
-									<ModalBody>
-										{deleteErrorArray.length > 0 ? (
-											<>
-												<div className="w-full text-center">
-													<div className="font-bold text-red-400 text-xl">
-														This file is being used!
-													</div>
-												</div>
-
-												<div className="font-bold text-xl">
-													Details:
-												</div>
-												{deleteErrorArray.map(
-													(
-														error: errorResponse,
-														index: number
-													) => {
-														return (
-															<div
-																className="flex flex-col"
-																key={
-																	"error-" +
-																	index
-																}
-															>
-																<div>
-																	<strong>
-																		Used as:{" "}
-																	</strong>
-																	{error.type}
-																</div>
-																{error.caseTitle && (
-																	<>
-																		<div>
-																			<strong>
-																				Case
-																				Study:{" "}
-																			</strong>
-																			{
-																				error.caseTitle
-																			}
-																		</div>
-																	</>
-																)}
-																{error.segmentTitle && (
-																	<>
-																		<div>
-																			<strong>
-																				Segment:{" "}
-																			</strong>
-																			{
-																				error.segmentTitle
-																			}
-																		</div>
-																	</>
-																)}
-																{error.pageTitle && (
-																	<>
-																		<div>
-																			<strong>
-																				Page:{" "}
-																			</strong>
-																			{
-																				error.pageTitle
-																			}
-																		</div>
-																	</>
-																)}
-															</div>
-														);
-													}
-												)}
-											</>
-										) : (
-											<div className="w-full">
-												<div className="text-center">
-													Please make sure this media
-													is not used on any pages
-													before deleting.
-												</div>
-											</div>
-										)}
-									</ModalBody>
-									<ModalFooter>
-										<Button
-											color="danger"
-											className="rounded-md"
-											onPress={() => {
-												onClose();
-												setDeleteErrorArray([]);
-											}}
-										>
-											Cancel
-										</Button>
-										{deleteErrorArray.length === 0 && (
-											<Button
-												color="danger"
-												variant="light"
-												className="rounded-md"
-												onPress={() => {
-													handleDeleteFile();
-												}}
-											>
-												Delete Media
-											</Button>
-										)}
-									</ModalFooter>
-								</>
-							)}
-						</ModalContent>
-					</Modal>
-				</>
+										/>
+									</div>
+								</ModalBody>
+								<ModalFooter>
+									<ConfirmDeleteMedia
+										buttonText="Delete Video"
+										onCloseMain={onCloseMain}
+										deleteErrorArray={deleteErrorArray}
+										setDeleteErrorArray={
+											setDeleteErrorArray
+										}
+										fileToDelete={selectedVideo}
+									/>
+									<a
+										target="_blank"
+										rel="noreferrer"
+										className="transition-all hover:bg-opacity-85 text-sm bg-orange-600 flex items-center px-2 py-1 rounded-md"
+										href={
+											process.env.NEXT_PUBLIC_CDN +
+											"/videos/" +
+											selectedVideo
+										}
+										download
+									>
+										Download
+									</a>
+									<Button
+										className="rounded-md"
+										color="danger"
+										onPress={() => {
+											onClose();
+										}}
+									>
+										Close
+									</Button>
+								</ModalFooter>
+							</>
+						)}
+					</ModalContent>
+				</Modal>
 			)}
 		</div>
 	);
-}
+};
+
+export default VideoDisplay;
