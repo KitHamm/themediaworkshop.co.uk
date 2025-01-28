@@ -1,13 +1,21 @@
-import type { Metadata, Viewport } from "next";
-import { Lato } from "next/font/google";
-import "../globals.css";
-import SidePanel from "@/components/dashboard/SidePanel";
+// packages
 import prisma from "@/lib/prisma";
-import { Message, Tickets, User } from "@prisma/client";
-import { getServerSession } from "next-auth";
+import type { Metadata, Viewport } from "next";
+import { getServerSession, Session } from "next-auth";
 import { authOptions } from "@/authOptions";
+import { redirect } from "next/navigation";
+// fonts
+import { Lato } from "next/font/google";
+// styles
+import "../globals.css";
+// functions
 import { getViewport } from "@/data/getViewport";
 import { getMetadata } from "@/data/getMetaData";
+// components
+import DesktopSideBar from "@/components/dashboard/layout/DesktopSideBar";
+import MobileNav from "@/components/dashboard/layout/MobileNav";
+// types
+import { Message, Tickets, User } from "@prisma/client";
 
 const lato = Lato({
 	weight: ["100", "300", "400", "700", "900"],
@@ -23,29 +31,40 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(authOptions);
-	var user: User | null = null;
-	if (session) {
-		user = await prisma.user.findUnique({
-			where: {
-				id: session.user.id as string,
-			},
+	let messages: Message[] = [];
+	let tickets: Tickets[] = [];
+	let session: Session | null = null;
+	let user: User | null = null;
+
+	try {
+		messages = await prisma.message.findMany({
+			orderBy: [
+				{
+					createdAt: "desc",
+				},
+				{ name: "asc" },
+			],
 		});
-	}
-	const messages: Message[] = await prisma.message.findMany({
-		orderBy: [
-			{
+		tickets = await prisma.tickets.findMany({
+			orderBy: {
 				createdAt: "desc",
 			},
-			{ name: "asc" },
-		],
-	});
+		});
+		session = await getServerSession(authOptions);
+		if (session) {
+			user = await prisma.user.findUnique({
+				where: {
+					id: session.user.id as string,
+				},
+			});
+		}
+	} catch (error) {
+		console.log("Unexpected error:", error);
+	}
 
-	const tickets: Tickets[] = await prisma.tickets.findMany({
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
+	if (!session || !user) {
+		redirect("/");
+	}
 
 	return (
 		<html lang="en">
@@ -57,18 +76,15 @@ export default async function RootLayout({
 			>
 				<main className="xl:flex xl:h-auto min-h-screen">
 					<div className="relative xl:h-auto xl:basis-1/6">
-						{/* Side panel for dashboard showing user information */}
-						<SidePanel
+						<DesktopSideBar
 							messages={messages}
-							session={session}
 							tickets={tickets}
-							avatar={
-								user !== null
-									? user.image
-										? user.image
-										: undefined
-									: undefined
-							}
+							user={user}
+						/>
+						<MobileNav
+							messages={messages}
+							tickets={tickets}
+							user={user}
 						/>
 					</div>
 					<div className="xl:basis-5/6 min-h-screen">{children}</div>

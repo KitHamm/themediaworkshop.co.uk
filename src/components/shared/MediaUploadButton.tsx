@@ -15,13 +15,13 @@ const MediaUploadButton = ({
 	onOpenChange,
 	returnURL,
 	returnError,
-	isMediaPage,
+	showCloseButton,
 }: Readonly<{
 	mediaType?: MediaType;
 	onOpenChange?: () => void;
 	returnURL?: (url: string) => void;
 	returnError?: (error: string) => void;
-	isMediaPage?: boolean;
+	showCloseButton?: boolean;
 }>) => {
 	const [uploadState, setUploadState] = useState<UploadState>(
 		UploadState.NONE
@@ -201,7 +201,7 @@ const MediaUploadButton = ({
 				)}
 			</div>
 			<div className="flex justify-between my-2">
-				{isMediaPage && onOpenChange && (
+				{showCloseButton && onOpenChange && (
 					<Button
 						color="danger"
 						variant="light"

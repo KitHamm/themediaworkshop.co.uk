@@ -131,7 +131,7 @@ const MediaUploadButtonModal = () => {
 								<MediaUploadButton
 									onOpenChange={onOpenChange}
 									returnError={handleReturnError}
-									isMediaPage
+									showCloseButton
 								/>
 							</ModalBody>
 						</>
