@@ -7,7 +7,7 @@ import Image from "next/image";
 import BackgroundVideo from "@/components/main/BackgroundVideo";
 import TickerTape from "@/components/main/TickerTape";
 import ContactButton from "@/components/main/ContactButton";
-import VideoButton from "@/components/main/VideoButton";
+import VideoModal from "@/components/main/modals/VideoModal";
 import HeaderCopy from "@/components/main/HeaderCopy";
 import ScrollChevrons from "@/components/main/ScrollChevrons";
 import ParallaxImage from "@/components/main/ParallaxImage";
@@ -94,7 +94,7 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 								)}
 								<div className="block grid xl:grid-cols-3 xl:flex xl:justify-evenly grid-cols-1 gap-4 xl:gap-2 xl:px-10 my-10 xl:my-4">
 									{data.video1 && (
-										<VideoButton
+										<VideoModal
 											buttonText={
 												data.videoOneButtonText ||
 												"SHOWREEL"
@@ -103,7 +103,7 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 										/>
 									)}
 									{data.video2 && (
-										<VideoButton
+										<VideoModal
 											buttonText={
 												data.videoOneButtonText ||
 												"YEAR REVIEW"

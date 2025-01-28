@@ -22,6 +22,7 @@ const TickerTape = ({
 		watchDrag: false,
 	};
 	const [logos, setLogos] = useState<string[]>([]);
+
 	useEffect(() => {
 		let tempArray = logoImages.map((image: Logos) => image.name);
 		if (!start) {
