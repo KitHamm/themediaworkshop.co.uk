@@ -1,10 +1,5 @@
 "use client";
-
-import { useContext } from "react";
-import { MessageStateContext } from "./MessageStateProvider";
-import { Message } from "@prisma/client";
-import { updateMessage } from "@/server/messageActions/updateMessage";
-import { DateRender } from "@/lib/functions";
+// packages
 import {
 	Button,
 	Modal,
@@ -14,29 +9,64 @@ import {
 	ModalHeader,
 	useDisclosure,
 } from "@heroui/react";
-import { deleteMessage } from "@/server/messageActions/deleteMessage";
+// context
+import { useMessageState } from "./MessageStateProvider";
+// functions
+import { updateMessage } from "@/server/messageActions/updateMessage";
+import { formatDate } from "@/lib/utils/dateUtils/formatDate";
+// components
+import DeleteMessageModal from "./DeleteMessageModal";
+// types
+import { Message } from "@prisma/client";
 
-export default function MobileMessageCard(props: { message: Message }) {
-	const { message } = props;
-	const { setSelectedMessage } = useContext(MessageStateContext);
+const MobileMessageCard = ({ message }: Readonly<{ message: Message }>) => {
+	const { setSelectedMessage } = useMessageState();
+	const { isOpen, onOpenChange, onClose } = useDisclosure();
+	const {
+		isOpen: isOpenDelete,
+		onOpenChange: onOpenChangeDelete,
+		onClose: onCloseDelete,
+	} = useDisclosure();
 
-	const { isOpen, onOpenChange } = useDisclosure();
-	const { isOpen: isOpenDelete, onOpenChange: onOpenChangeDelete } =
-		useDisclosure();
+	const handleOpen = () => {
+		setSelectedMessage(message);
+		onOpenChange();
+	};
+
+	const onOpenMessage = async (messageRead: boolean) => {
+		if (messageRead) {
+			return handleOpen();
+		}
+		try {
+			const res = await updateMessage(message.id, true);
+			if (res.success) {
+				handleOpen();
+			} else {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
+
+	const onUpdateRead = async () => {
+		try {
+			const res = await updateMessage(message.id, false);
+			if (res.success) {
+				onClose();
+			} else {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
 
 	return (
 		<>
-			<div
-				onClick={() => {
-					onOpenChange();
-					setSelectedMessage(message);
-					if (!message.read) {
-						updateMessage(message.id, true).catch((err) =>
-							console.log(err)
-						);
-					}
-				}}
-				className="cursor-pointer"
+			<button
+				onClick={() => onOpenMessage(message.read)}
+				className="cursor-pointer text-left"
 				key={message.id}
 			>
 				<div
@@ -45,20 +75,18 @@ export default function MobileMessageCard(props: { message: Message }) {
 					} rounded-lg shadow-lg p-4`}
 				>
 					<div className="flex border-b mb-2 pb-2 justify-between">
-						<div>
-							<strong>From: </strong>
-							{message.name}
+						<div className="flex gap-2">
+							<div className="font-bold">From:</div>
+							<div>{message.name}</div>
 						</div>
-						<div className="">
-							{message.read ? "Read" : "Unread"}
-						</div>
+						<div>{message.read ? "Read" : "Unread"}</div>
 					</div>
-					<div>
-						<strong>Received: </strong>
-						{DateRender(message.createdAt)}
+					<div className="flex gap-2">
+						<div className="font-bold">Received:</div>
+						<div>{formatDate(message.createdAt)}</div>
 					</div>
 				</div>
-			</div>
+			</button>
 			<Modal
 				size="xl"
 				backdrop="blur"
@@ -76,28 +104,26 @@ export default function MobileMessageCard(props: { message: Message }) {
 								</div>
 							</ModalHeader>
 							<ModalBody>
-								<div>
-									<strong>From: </strong>
-									{message.name}
+								<div className="flex gap-2">
+									<div className="font-bold">From:</div>
+									<div>{message.name}</div>
+								</div>
+								<div className="flex gap-2">
+									<div className="font-bold">Email:</div>
+									<div>{message.email}</div>
 								</div>
 								<div>
-									<strong>Email: </strong>
-									{message.email}
-								</div>
-								<div>
-									<strong>Message: </strong>
+									<div className="font-bold">Message:</div>
 								</div>
 								<div>{message.message}</div>
-								<div className="mt-4">
-									<strong>Received: </strong>
-									{DateRender(message.createdAt)}
+								<div className="flex gap-2 mt-4">
+									<div className="font-bold">Received:</div>
+									<div>{formatDate(message.createdAt)}</div>
 								</div>
 							</ModalBody>
 							<ModalFooter>
 								<Button
-									onPress={() => {
-										onOpenChangeDelete();
-									}}
+									onPress={onOpenChangeDelete}
 									color="danger"
 									variant="light"
 									className="rounded-md"
@@ -105,13 +131,7 @@ export default function MobileMessageCard(props: { message: Message }) {
 									Delete Message
 								</Button>
 								<Button
-									onPress={() => {
-										updateMessage(message.id, false)
-											.then(() => {
-												onClose();
-											})
-											.catch((err) => console.log(err));
-									}}
+									onPress={onUpdateRead}
 									className="bg-orange-600 rounded-md"
 								>
 									Mark Unread
@@ -119,9 +139,7 @@ export default function MobileMessageCard(props: { message: Message }) {
 								<Button
 									color="danger"
 									className="rounded-md"
-									onPress={() => {
-										onClose();
-									}}
+									onPress={onClose}
 								>
 									Close
 								</Button>
@@ -130,59 +148,14 @@ export default function MobileMessageCard(props: { message: Message }) {
 					)}
 				</ModalContent>
 			</Modal>
-			<Modal
-				size="sm"
-				backdrop="blur"
+			<DeleteMessageModal
+				message={message}
 				isOpen={isOpenDelete}
-				className="dark"
-				isDismissable
 				onOpenChange={onOpenChangeDelete}
-			>
-				<ModalContent>
-					{(onClose) => (
-						<>
-							<ModalHeader>
-								<div className="w-full text-center font-bold text-3xl text-red-400">
-									WARNING
-								</div>
-							</ModalHeader>
-							<ModalBody>
-								<div className="w-full text-center">
-									Are you sure you want to delete this
-									message?
-								</div>
-								<div className="w-full text-center">
-									This action cannot be undone.
-								</div>
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									color="danger"
-									onPress={() => {
-										onClose();
-									}}
-								>
-									Cancel
-								</Button>
-								<Button
-									onPress={() => {
-										deleteMessage(message.id)
-											.then(() => {
-												onClose();
-												onOpenChange();
-											})
-											.catch((err) => console.log(err));
-									}}
-									color="danger"
-									variant="light"
-								>
-									Delete Message
-								</Button>
-							</ModalFooter>
-						</>
-					)}
-				</ModalContent>
-			</Modal>
+				onClose={onCloseDelete}
+			/>
 		</>
 	);
-}
+};
+
+export default MobileMessageCard;

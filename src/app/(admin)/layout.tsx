@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import type { Metadata, Viewport } from "next";
 import { getServerSession, Session } from "next-auth";
 import { authOptions } from "@/authOptions";
-import { redirect } from "next/navigation";
+import { signOut } from "next-auth/react";
 // fonts
 import { Lato } from "next/font/google";
 // styles
@@ -63,7 +63,7 @@ export default async function RootLayout({
 	}
 
 	if (!session || !user) {
-		redirect("/");
+		return signOut({ callbackUrl: "/" });
 	}
 
 	return (
