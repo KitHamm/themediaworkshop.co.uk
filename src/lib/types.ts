@@ -144,3 +144,9 @@ export enum UploadState {
 	SUCCESS,
 	ERROR,
 }
+
+export enum FormState {
+	NONE,
+	SUCCESS,
+	ERROR,
+}

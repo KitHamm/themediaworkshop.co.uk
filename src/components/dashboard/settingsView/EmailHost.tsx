@@ -1,13 +1,26 @@
 "use client";
-
-import { updateEmailHost } from "@/server/userActions/updateEmailHost";
+// packages
 import { Button } from "@heroui/react";
 import { useState } from "react";
+// functions
+import { updateEmailHost } from "@/server/userActions/updateEmailHost";
 
-export default function EmailHost(props: { emailHost: string }) {
-	const { emailHost } = props;
-
+const EmailHost = ({
+	emailHost,
+}: Readonly<{ emailHost: string | undefined }>) => {
 	const [newEmail, setNewEmail] = useState(emailHost);
+
+	const onUpdate = async () => {
+		if (!newEmail) return;
+		try {
+			const res = await updateEmailHost(emailHost, newEmail);
+			if (!res.success) {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
 
 	return (
 		<>
@@ -21,14 +34,8 @@ export default function EmailHost(props: { emailHost: string }) {
 						type="email"
 					/>
 					<Button
-						onPress={() => {
-							if (newEmail !== props.emailHost) {
-								updateEmailHost(emailHost, newEmail).catch(
-									(err) => console.log(err)
-								);
-							}
-						}}
-						disabled={newEmail === props.emailHost}
+						onPress={onUpdate}
+						isDisabled={newEmail === emailHost}
 						className={
 							"disabled:bg-neutral-600 xl:my-auto my-5 bg-orange-600 rounded-md text-white text-md"
 						}
@@ -44,4 +51,6 @@ export default function EmailHost(props: { emailHost: string }) {
 			</div>
 		</>
 	);
-}
+};
+
+export default EmailHost;

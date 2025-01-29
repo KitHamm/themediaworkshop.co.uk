@@ -5,42 +5,43 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { hash } from "bcrypt";
 import { revalidatePath } from "next/cache";
+import { createResponse } from "@/lib/utils/serverUtils/createResponse";
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: 587,
-    tls: {
-        ciphers: "SSLv3",
-        rejectUnauthorized: false,
-    },
+	host: process.env.SMTP_HOST,
+	port: 587,
+	tls: {
+		ciphers: "SSLv3",
+		rejectUnauthorized: false,
+	},
 
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-    },
+	auth: {
+		user: process.env.SMTP_USER,
+		pass: process.env.SMTP_PASSWORD,
+	},
 });
 
 export async function createUser(data: UserFormTypes) {
-    const emailHost = await prisma.emailHost.findFirst();
-    const hashedPassword = await hash(data.password, 12);
-    try {
-        await prisma.user.create({
-            data: {
-                email: data.email,
-                firstname: data.firstName,
-                lastname: data.lastName,
-                image: data.image,
-                position: data.position,
-                password: hashedPassword,
-            },
-        });
+	const emailHost = await prisma.emailHost.findFirst();
+	const hashedPassword = await hash(data.password, 12);
+	try {
+		await prisma.user.create({
+			data: {
+				email: data.email,
+				firstname: data.firstName,
+				lastname: data.lastName,
+				image: data.image,
+				position: data.position,
+				password: hashedPassword,
+			},
+		});
 
-        const mail = await transporter.sendMail({
-            from: "TMW Website",
-            to: data.email,
-            replyTo: emailHost!.emailHost,
-            subject: `New Account Created!`,
-            html: `
+		const mail = await transporter.sendMail({
+			from: "TMW Website",
+			to: data.email,
+			replyTo: emailHost!.emailHost,
+			subject: `New Account Created!`,
+			html: `
         
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
@@ -887,8 +888,8 @@ style="
                                                                         mso-text-raise: 2px;
                                                                     ">
                                                                     ${
-                                                                        data.password
-                                                                    }
+																		data.password
+																	}
                                                                 </h1>
                                                             </td>
                                                         </tr>
@@ -935,11 +936,11 @@ style="
                                                                 <a
                                                                     class="t41"
                                                                     href="${
-                                                                        process
-                                                                            .env
-                                                                            .NEXTAUTH_URL +
-                                                                        "dashboard"
-                                                                    }"
+																		process
+																			.env
+																			.NEXTAUTH_URL +
+																		"dashboard"
+																	}"
                                                                     style="
                                                                         display: block;
                                                                         margin: 0;
@@ -1001,19 +1002,10 @@ style="
 </html>
 
         `,
-        });
-        return Promise.resolve({ message: data.password });
-    } catch (error: any) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2002") {
-                return Promise.reject(new Error("Email already in use"));
-            } else {
-                return Promise.reject(new Error(error.code));
-            }
-        } else {
-            return Promise.reject(new Error(error));
-        }
-    } finally {
-        revalidatePath("/dashboard", "layout");
-    }
+		});
+		revalidatePath("/dashboard", "layout");
+		return createResponse(true, data.password);
+	} catch (error) {
+		return createResponse(false, null, error);
+	}
 }

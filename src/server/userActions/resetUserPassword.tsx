@@ -4,59 +4,57 @@ import { ResetUserPasswordFormType } from "@/lib/types";
 import prisma from "@/lib/prisma";
 import { compare, hash } from "bcrypt";
 import { revalidatePath } from "next/cache";
+import { createResponse } from "@/lib/utils/serverUtils/createResponse";
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: 587,
-    tls: {
-        ciphers: "SSLv3",
-        rejectUnauthorized: false,
-    },
+	host: process.env.SMTP_HOST,
+	port: 587,
+	tls: {
+		ciphers: "SSLv3",
+		rejectUnauthorized: false,
+	},
 
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-    },
+	auth: {
+		user: process.env.SMTP_USER,
+		pass: process.env.SMTP_PASSWORD,
+	},
 });
 
 export async function resetUserPassword(data: ResetUserPasswordFormType) {
-    const hashedPassword = await hash(data.password, 12);
-    const emailHost = await prisma.emailHost.findFirst();
+	const hashedPassword = await hash(data.password, 12);
+	const emailHost = await prisma.emailHost.findFirst();
 
-    const admin = await prisma.user.findUnique({
-        where: {
-            id: data.adminId,
-        },
-    });
+	const admin = await prisma.user.findUnique({
+		where: {
+			id: data.adminId,
+		},
+	});
 
-    const isPasswordValid = await compare(data.adminPassword, admin!.password!);
-    if (!isPasswordValid) {
-        return Promise.resolve({
-            status: 201,
-            message: "Admin Password does not match.",
-        });
-    }
+	const isPasswordValid = await compare(data.adminPassword, admin!.password!);
+	if (!isPasswordValid) {
+		return createResponse(false, null, "Admin Password does not match.");
+	}
 
-    const user = await prisma.user.findUnique({
-        where: {
-            id: data.userId,
-        },
-    });
-    try {
-        await prisma.user.update({
-            where: {
-                id: data.userId,
-            },
-            data: { password: hashedPassword },
-        });
+	const user = await prisma.user.findUnique({
+		where: {
+			id: data.userId,
+		},
+	});
+	try {
+		await prisma.user.update({
+			where: {
+				id: data.userId,
+			},
+			data: { password: hashedPassword },
+		});
 
-        await transporter.sendMail({
-            from: "TMW Website",
-            to: user!.email,
-            replyTo: emailHost!.emailHost,
-            subject: `Password Reset`,
-            html: `
+		await transporter.sendMail({
+			from: "TMW Website",
+			to: user!.email,
+			replyTo: emailHost!.emailHost,
+			subject: `Password Reset`,
+			html: `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
 xmlns="http://www.w3.org/1999/xhtml"
@@ -955,8 +953,8 @@ style="
                                                                         mso-text-raise: 2px;
                                                                     ">
                                                                     ${
-                                                                        data.password
-                                                                    }
+																		data.password
+																	}
                                                                 </h1>
                                                             </td>
                                                         </tr>
@@ -1003,11 +1001,11 @@ style="
                                                                 <a
                                                                     class="t41"
                                                                     href="${
-                                                                        process
-                                                                            .env
-                                                                            .NEXTAUTH_URL +
-                                                                        "dashboard"
-                                                                    }"
+																		process
+																			.env
+																			.NEXTAUTH_URL +
+																		"dashboard"
+																	}"
                                                                     style="
                                                                         display: block;
                                                                         margin: 0;
@@ -1069,11 +1067,11 @@ style="
 </html>
 
     `,
-        });
-        return Promise.resolve({ message: data.password });
-    } catch (error: any) {
-        return Promise.reject(new Error(error));
-    } finally {
-        revalidatePath("/dashboard");
-    }
+		});
+		revalidatePath("/dashboard");
+
+		return createResponse(true, data.password);
+	} catch (error) {
+		return createResponse(false, null, error);
+	}
 }

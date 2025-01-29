@@ -1,4 +1,5 @@
 import { Images, Logos, Message, Videos } from "@prisma/client";
+import { randomBytes } from "crypto";
 
 export function DateRender(date: Date) {
 	var formattedDate;
@@ -97,18 +98,14 @@ export function parallaxOnScroll(
 }
 
 export function randomPassword(length: number) {
-	let result = "";
 	const characters =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	const charactersLength = characters.length;
-	let counter = 0;
-	while (counter < length) {
-		result += characters.charAt(
-			Math.floor(Math.random() * charactersLength)
-		);
-		counter += 1;
-	}
-	return result;
+
+	const randomValues = randomBytes(length);
+
+	return Array.from(randomValues)
+		.map((value) => characters.charAt(value % characters.length))
+		.join("");
 }
 
 export const mapNumRange = (

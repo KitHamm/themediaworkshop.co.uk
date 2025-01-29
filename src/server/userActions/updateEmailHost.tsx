@@ -1,22 +1,28 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { createResponse } from "@/lib/utils/serverUtils/createResponse";
 import { revalidatePath } from "next/cache";
 
-export async function updateEmailHost(oldEmail: string, newEmail: string) {
-    try {
-        await prisma.emailHost.update({
-            where: {
-                emailHost: oldEmail,
-            },
-            data: {
-                emailHost: newEmail,
-            },
-        });
-        return Promise.resolve();
-    } catch (error: any) {
-        return Promise.reject(new Error(error));
-    } finally {
-        revalidatePath("/dashboard", "layout");
-    }
+export async function updateEmailHost(
+	oldEmail: string | undefined,
+	newEmail: string
+) {
+	try {
+		await prisma.emailHost.upsert({
+			where: {
+				emailHost: oldEmail,
+			},
+			update: {
+				emailHost: newEmail,
+			},
+			create: {
+				emailHost: newEmail,
+			},
+		});
+		revalidatePath("/dashboard", "layout");
+		return createResponse(true, "success");
+	} catch (error) {
+		return createResponse(false, null, error);
+	}
 }
