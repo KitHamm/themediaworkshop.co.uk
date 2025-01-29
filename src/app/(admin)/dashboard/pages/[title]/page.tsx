@@ -1,88 +1,78 @@
-// Prisma
+// prisma
 import prisma from "@/lib/prisma";
-// Components
+// components
 import AddSegmentButtonModal from "@/components/dashboard/pageView/AddSegmentButtonModal";
-import HeaderTextareaInput from "@/components/dashboard/pageView/HeaderTextareaInput";
-import HeaderTextInput from "@/components/dashboard/pageView/HeaderTextInput";
+import HeaderTextareaInput from "@/components/dashboard/pageView/mainView/HeaderTextareaInput";
+import HeaderTextInput from "@/components/dashboard/pageView/mainView/HeaderTextInput";
 import SegmentAccordion from "@/components/dashboard/pageView/SegmentAccordion";
-import UpdatePageHeaderButton from "@/components/dashboard/pageView/UpdatePageHeaderButton";
-import VideoSelect from "@/components/dashboard/pageView/VideoSelect";
+import UpdatePageHeaderButton from "@/components/dashboard/pageView/mainView/UpdatePageHeaderButton";
+import VideoSelect from "@/components/dashboard/shared/VideoSelect";
 import Link from "next/link";
-// Providers
-import HeaderStateProvider from "@/components/dashboard/pageView/HeaderStateProvider";
+// providers
+import HeaderStateProvider from "@/components/dashboard/pageView/mainView/HeaderStateProvider";
 import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
+import { ExtendedPage } from "@/lib/types";
+import { redirect } from "next/navigation";
+import { Images, User, Videos } from "@prisma/client";
+import { signOut } from "next-auth/react";
+import BreadcrumbLinks from "@/components/dashboard/pageView/mainView/Breadcrumbs";
 
 export default async function Page({
 	params,
 }: Readonly<{ params: Promise<{ title: string }> }>) {
 	const { title } = await params;
+	const session = await getServerSession(authOptions);
 
-	const data = await prisma.page.findUnique({
-		where: { title: title },
-		include: {
-			segment: {
-				orderBy: { order: "asc" },
-				include: {
-					casestudy: {
-						orderBy: { order: "asc" },
+	let data: ExtendedPage | null = null;
+	let videos: Videos[] = [];
+	let images: Images[] = [];
+	let user: User | null = null;
+	try {
+		data = await prisma.page.findUnique({
+			where: { title: title },
+			include: {
+				segment: {
+					orderBy: { order: "asc" },
+					include: {
+						casestudy: {
+							orderBy: { order: "asc" },
+						},
 					},
 				},
 			},
-		},
-	});
+		});
+		videos = await prisma.videos.findMany({
+			orderBy: {
+				createdAt: "desc",
+			},
+		});
+		images = await prisma.images.findMany({
+			orderBy: {
+				createdAt: "desc",
+			},
+		});
+		user = await prisma.user.findUnique({
+			where: {
+				id: session?.user?.id as string,
+			},
+		});
+	} catch (error) {
+		redirect("/dashboard/pages");
+	}
 
-	const session = await getServerSession(authOptions);
+	if (!data) redirect("/dashboard/pages");
 
-	const videos = await prisma.videos.findMany({
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
-	const images = await prisma.images.findMany({
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
-
-	if (!data || !videos || !images) return <div>Not Found</div>;
+	if (!user) {
+		return signOut({ callbackUrl: "/" });
+	}
 
 	return (
-		<MediaFilesProvider images={images} videos={videos} session={session!}>
+		<MediaFilesProvider images={images} videos={videos} currentUser={user}>
 			<div className="xl:mx-20 mx-4 fade-in pb-20 xl:pb-0 flex flex-col">
-				<div className="xl:pt-10 w-full">
-					<div className="border-b flex gap-10 w-full py-4 mb-10">
-						<div className="flex gap-4">
-							<div className="text-3xl font-bold">
-								<Link
-									className="capitalize hover:text-orange-600 transition-all"
-									href={"/dashboard/pages"}
-								>
-									Pages
-								</Link>
-								{" / "}
-								<Link
-									className="capitalize hover:text-orange-600 transition-all"
-									target="_blank"
-									rel="noreferrer"
-									href={
-										data.title === "home"
-											? "/"
-											: "/" + data.title
-									}
-								>
-									{data.title}
-									<i
-										aria-hidden
-										className={
-											"ms-2 text-orange-600 fa-solid fa-arrow-up-right-from-square fa-sm"
-										}
-									/>
-								</Link>
-							</div>
-						</div>
-					</div>
+				<div className="xl:pt-14 w-full border-b flex gap-10 w-full pb-4 mb-10 text-3xl font-bold">
+					<BreadcrumbLinks page={data.title} />
 				</div>
 				<HeaderStateProvider data={data}>
 					<div className="w-full">
@@ -98,9 +88,9 @@ export default async function Page({
 									Page Videos
 								</div>
 								<div className="grid xl:grid-cols-3 grid-cols-2 grid-cols-1 gap-4 xl:gap-10 min-h-20 xl:mb-0 mb-4">
-									<VideoSelect formTarget="video1" />
-									<VideoSelect formTarget="video2" />
-									<VideoSelect formTarget="backgroundVideo" />
+									<VideoSelect target="video1" />
+									<VideoSelect target="video2" />
+									<VideoSelect target="backgroundVideo" />
 								</div>
 								<div className="grid grid-cols-2 gap-8 mt-8">
 									<HeaderTextInput
@@ -142,8 +132,6 @@ export default async function Page({
 						</div>
 						<AddSegmentButtonModal pageID={data.id} />
 					</div>
-					{/* TODO */}
-					{/* Segment Accordion */}
 					<SegmentAccordion segments={data.segment} />
 				</div>
 			</div>

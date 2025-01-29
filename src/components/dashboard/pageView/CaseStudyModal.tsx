@@ -19,7 +19,7 @@ import {
 import DescriptionInput from "./DescriptionInput";
 import AddImageArray from "./AddImageArray";
 import Image from "next/image";
-import VideoSelect from "./VideoSelect";
+import VideoSelect from "../shared/VideoSelect";
 import {
 	updateCaseStudy,
 	updateCaseStudyPublished,

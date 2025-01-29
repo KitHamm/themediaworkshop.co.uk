@@ -1,33 +1,43 @@
 "use client";
-
-import { Images, Videos } from "@prisma/client";
-import { Session } from "next-auth";
-import { createContext } from "react";
+// packages
+import { Images, User, Videos } from "@prisma/client";
+import { createContext, useContext, useMemo } from "react";
 
 type MediaFilesContextType = {
-    images: Images[];
-    videos: Videos[];
-    session: Session;
+	images: Images[];
+	videos: Videos[];
+	currentUser: User;
 };
 
 export const MediaFilesContext = createContext<MediaFilesContextType>(
-    {} as MediaFilesContextType
+	{} as MediaFilesContextType
 );
 
-export default function MediaFilesProvider({
-    children,
-    images,
-    videos,
-    session,
-}: {
-    children: React.ReactNode;
-    images: Images[];
-    videos: Videos[];
-    session: Session;
-}) {
-    return (
-        <MediaFilesContext.Provider value={{ images, videos, session }}>
-            {children}
-        </MediaFilesContext.Provider>
-    );
-}
+const MediaFilesProvider = ({
+	children,
+	images,
+	videos,
+	currentUser,
+}: Readonly<{
+	children: React.ReactNode;
+	images: Images[];
+	videos: Videos[];
+	currentUser: User;
+}>) => {
+	const mediaFilesValue = useMemo(
+		() => ({
+			images,
+			videos,
+			currentUser,
+		}),
+		[images, videos, currentUser]
+	);
+	return (
+		<MediaFilesContext.Provider value={mediaFilesValue}>
+			{children}
+		</MediaFilesContext.Provider>
+	);
+};
+
+export const useMediaFiles = () => useContext(MediaFilesContext);
+export default MediaFilesProvider;

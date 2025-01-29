@@ -230,5 +230,32 @@ const MediaStateProvider = ({
 	);
 };
 
-export const useMediaState = () => useContext(MediaStateContext);
+export const useMediaState = () => {
+	const context = useContext(MediaStateContext);
+	if (!context) {
+		return {
+			selectedVideos: [],
+			videoView: "HEADER",
+			setVideoView: () => {},
+			videosPerPage: 8,
+			videoPage: 1,
+			selectedImages: [],
+			imageView: "SEGHEAD",
+			setImageView: () => {},
+			imagesPerPage: 8,
+			imagePage: 1,
+			setMediaPerPage: null,
+			getMediaPerPage: null,
+			setSortMediaBy: null,
+			getSortMediaBy: null,
+			setMediaOrderBy: null,
+			getMediaOrderBy: null,
+			getMediaLength: null,
+			getMediaPage: null,
+			setMediaPage: null,
+		};
+	}
+	return context;
+};
+
 export default MediaStateProvider;

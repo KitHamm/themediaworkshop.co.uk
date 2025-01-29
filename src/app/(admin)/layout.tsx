@@ -32,9 +32,9 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await getServerSession(authOptions);
 	let messages: Message[] = [];
 	let tickets: Tickets[] = [];
-	let session: Session | null = null;
 	let user: User | null = null;
 
 	try {
@@ -51,7 +51,7 @@ export default async function RootLayout({
 				createdAt: "desc",
 			},
 		});
-		session = await getServerSession(authOptions);
+
 		if (session) {
 			user = await prisma.user.findUnique({
 				where: {
