@@ -1,13 +1,13 @@
-// Prisma
+// prisma
 import prisma from "@/lib/prisma";
-// Components
+// components
 import DesktopMessageCard from "@/components/dashboard/messagesView/DesktopMessageCard";
 import DesktopViewMessage from "@/components/dashboard/messagesView/DesktopViewMessage";
 import MessageStateProvider from "@/components/dashboard/messagesView/MessageStateProvider";
 import MobileMessageCard from "@/components/dashboard/messagesView/MobileMessageCard";
 import MultipleMessageActions from "@/components/dashboard/messagesView/MultipleMessageActions";
 import SelectAllButton from "@/components/dashboard/messagesView/SelectAllButton";
-// Types
+// types
 import { Message } from "@prisma/client";
 
 export default async function MessagesPage() {

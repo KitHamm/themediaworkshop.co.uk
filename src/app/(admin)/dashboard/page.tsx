@@ -1,15 +1,14 @@
-"use server";
-
-//  Prisma
+// prisma
 import prisma from "@/lib/prisma";
-//  Components
+// packages
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/authOptions";
+// components
 import InfoAccordion from "@/components/dashboard/mainView/InfoAccordion";
 import ChangeLogAccordion from "@/components/dashboard/mainView/ChangeLogAccordion";
 import PageViewTracker from "@/components/dashboard/mainView/PageViewTracker";
 import ActivationPopup from "@/components/dashboard/modals/ActivationPopup";
-//  Functions
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/authOptions";
+// functions
 import { checkUserActivation } from "@/server/userActions/userActivation";
 
 export default async function Dashboard() {

@@ -1,6 +1,6 @@
-// Prisma
+// prisma
 import prisma from "@/lib/prisma";
-// Components
+// components
 import MediaStateProvider from "@/components/dashboard/mediaView/MediaStateProvider";
 import ImageDisplay from "@/components/dashboard/mediaView/ImageDisplay";
 import MediaUploadButtonModal from "@/components/dashboard/mediaView/MediaUploadButtonModal";
