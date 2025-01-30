@@ -33,7 +33,7 @@ const TitleInput = ({
 				placeholder={errors[target] ? errors[target].message : label}
 				type="text"
 				className={`${
-					errors.title && "!border-red-400 placeholder:text-red-400"
+					errors[target] && "!border-red-400 placeholder:text-red-400"
 				} text-black`}
 			/>
 		</>

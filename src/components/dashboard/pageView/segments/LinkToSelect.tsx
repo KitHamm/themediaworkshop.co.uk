@@ -1,5 +1,5 @@
 "use client";
-// components
+// packages
 import { Select, SelectItem } from "@heroui/react";
 import { UseFormSetValue } from "react-hook-form";
 // functions
@@ -17,19 +17,21 @@ const LinkToSelect = ({
 	setValue: UseFormSetValue<SegmentFormType>;
 	linkToValue: string;
 }>) => {
+	const pageTitles: { title: string }[] = [{ title: "none" }, ...linkToItems];
+
+	const handleSetValue = (value: string) => {
+		setValue("linkTo", value as toLink, { shouldDirty: true });
+	};
+
 	return (
 		<Select
-			onChange={(e) =>
-				setValue("linkTo", e.target.value as toLink, {
-					shouldDirty: true,
-				})
-			}
+			onChange={(e) => handleSetValue(e.target.value)}
 			selectedKeys={[linkToValue]}
 			className="dark"
 			variant="bordered"
 			label={"Link To"}
 		>
-			{linkToItems.map((item) => {
+			{pageTitles.map((item) => {
 				const { capitalized, upperCase } = convertToLink(item.title);
 				if (item.title === "home") return null;
 				return (

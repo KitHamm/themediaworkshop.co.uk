@@ -37,11 +37,10 @@ const VideoSelect = ({
 			return;
 		}
 		setVideoFromTarget(targetValue ?? undefined);
-	}, [target, setVideoFromTarget, targetValue]);
+	}, [target, setVideoFromTarget, targetValue, currentVideo]);
 
 	const titleFromTarget = () => {
 		if (!target) {
-			console.log("no target");
 			return null;
 		}
 		return target

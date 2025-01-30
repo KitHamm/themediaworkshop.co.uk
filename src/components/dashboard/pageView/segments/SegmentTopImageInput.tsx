@@ -17,9 +17,9 @@ const SegmentTopImageInput = ({
 }>) => {
 	const { isOpen, onOpenChange } = useDisclosure();
 
-	function handleSetValue(returnedURL: string) {
-		setValue("headerImage", returnedURL, { shouldDirty: true });
-	}
+	const handleSetValue = (returnedURL: string) => {
+		return setValue("headerImage", returnedURL, { shouldDirty: true });
+	};
 
 	if (!headerImage) {
 		return (

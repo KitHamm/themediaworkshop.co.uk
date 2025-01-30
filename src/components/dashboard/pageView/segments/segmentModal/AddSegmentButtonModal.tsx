@@ -31,7 +31,6 @@ const AddSegmentButtonModal = ({
 	pageTitles,
 }: Readonly<{ pageId: number; pageTitles: { title: string }[] }>) => {
 	const { isOpen, onOpenChange } = useDisclosure();
-	const linkToItems: { title: string }[] = [{ title: "none" }, ...pageTitles];
 	const {
 		register,
 		reset,
@@ -140,7 +139,7 @@ const AddSegmentButtonModal = ({
 											/>
 											<div className="mt-2">
 												<LinkToSelect
-													linkToItems={linkToItems}
+													linkToItems={pageTitles}
 													setValue={setValue}
 													linkToValue={linkToValue}
 												/>

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import AddSegmentButtonModal from "@/components/dashboard/pageView/segments/segmentModal/AddSegmentButtonModal";
 import HeaderTextareaInput from "@/components/dashboard/pageView/mainView/HeaderTextareaInput";
 import HeaderTextInput from "@/components/dashboard/pageView/mainView/HeaderTextInput";
-import SegmentAccordion from "@/components/dashboard/pageView/SegmentAccordion";
+import SegmentAccordion from "@/components/dashboard/pageView/segments/SegmentAccordion";
 import UpdatePageHeaderButton from "@/components/dashboard/pageView/mainView/UpdatePageHeaderButton";
 import VideoSelect from "@/components/dashboard/shared/VideoSelect";
 // providers
@@ -12,12 +12,15 @@ import HeaderStateProvider from "@/components/dashboard/pageView/mainView/Header
 import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
-import { ExtendedPage } from "@/lib/types";
+import { ExtendedPage, ExtendedSegment } from "@/lib/types";
 import { redirect } from "next/navigation";
 import { Images, User, Videos } from "@prisma/client";
 import { signOut } from "next-auth/react";
 import BreadcrumbLinks from "@/components/dashboard/pageView/mainView/Breadcrumbs";
 
+import { Fragment } from "react";
+import SegmentEdit from "@/components/dashboard/pageView/EditSegmentAccordionInner";
+import SegmentAccordionTitle from "@/components/dashboard/pageView/segments/SegmentAccordionTitle";
 export default async function Page({
 	params,
 }: Readonly<{ params: Promise<{ title: string }> }>) {
@@ -143,7 +146,22 @@ export default async function Page({
 							pageTitles={pageTitles}
 						/>
 					</div>
-					<SegmentAccordion segments={data.segment} />
+					<SegmentAccordion>
+						{data.segment.map((segment: ExtendedSegment, index) => (
+							<Fragment key={segment.id}>
+								<SegmentAccordionTitle
+									segment={segment}
+									index={index}
+								/>
+								<div className="px-4">
+									<SegmentEdit
+										segment={segment}
+										pageTitles={pageTitles}
+									/>
+								</div>
+							</Fragment>
+						))}
+					</SegmentAccordion>
 				</div>
 			</div>
 		</MediaFilesProvider>

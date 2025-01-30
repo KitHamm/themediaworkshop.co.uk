@@ -18,6 +18,7 @@ export type CaseStudyTagType = {
 };
 
 export type CaseStudyFromType = {
+	id: number | null;
 	title: string;
 	dateLocation: string;
 	copy: string;
