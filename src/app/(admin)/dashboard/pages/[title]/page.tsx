@@ -1,13 +1,12 @@
 // prisma
 import prisma from "@/lib/prisma";
 // components
-import AddSegmentButtonModal from "@/components/dashboard/pageView/AddSegmentButtonModal";
+import AddSegmentButtonModal from "@/components/dashboard/pageView/segments/segmentModal/AddSegmentButtonModal";
 import HeaderTextareaInput from "@/components/dashboard/pageView/mainView/HeaderTextareaInput";
 import HeaderTextInput from "@/components/dashboard/pageView/mainView/HeaderTextInput";
 import SegmentAccordion from "@/components/dashboard/pageView/SegmentAccordion";
 import UpdatePageHeaderButton from "@/components/dashboard/pageView/mainView/UpdatePageHeaderButton";
 import VideoSelect from "@/components/dashboard/shared/VideoSelect";
-import Link from "next/link";
 // providers
 import HeaderStateProvider from "@/components/dashboard/pageView/mainView/HeaderStateProvider";
 import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
@@ -29,6 +28,7 @@ export default async function Page({
 	let videos: Videos[] = [];
 	let images: Images[] = [];
 	let user: User | null = null;
+	let pageTitles: { title: string }[] = [];
 	try {
 		data = await prisma.page.findUnique({
 			where: { title: title },
@@ -56,6 +56,14 @@ export default async function Page({
 		user = await prisma.user.findUnique({
 			where: {
 				id: session?.user?.id as string,
+			},
+		});
+		pageTitles = await prisma.page.findMany({
+			select: {
+				title: true,
+			},
+			orderBy: {
+				id: "asc",
 			},
 		});
 	} catch (error) {
@@ -130,7 +138,10 @@ export default async function Page({
 						<div className="my-auto text-orange-600 font-bold text-2xl">
 							Segments
 						</div>
-						<AddSegmentButtonModal pageID={data.id} />
+						<AddSegmentButtonModal
+							pageId={data.id}
+							pageTitles={pageTitles}
+						/>
 					</div>
 					<SegmentAccordion segments={data.segment} />
 				</div>

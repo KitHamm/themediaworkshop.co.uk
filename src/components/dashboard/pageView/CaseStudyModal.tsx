@@ -17,7 +17,7 @@ import {
 	useDisclosure,
 } from "@heroui/react";
 import DescriptionInput from "./DescriptionInput";
-import AddImageArray from "./AddImageArray";
+import AddImageArray from "./shared/AddImageArray";
 import Image from "next/image";
 import VideoSelect from "../shared/VideoSelect";
 import {

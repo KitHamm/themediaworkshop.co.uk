@@ -21,12 +21,12 @@ const VideoSelect = ({
 	setValueCaseStudy?: UseFormSetValue<CaseStudyFromType>;
 }>) => {
 	const { watch } = usePageHeaderState();
+
 	const [videoFromTarget, setVideoFromTarget] = useState<string | undefined>(
 		undefined
 	);
 
 	let targetValue: string | null = null;
-
 	if (target) {
 		targetValue = watch(target);
 	}
@@ -64,9 +64,7 @@ const VideoSelect = ({
 				<div className="text-center mt-2">
 					<Button
 						type="button"
-						onPress={() => {
-							onOpenChangeSelect();
-						}}
+						onPress={onOpenChangeSelect}
 						className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto text-md text-white"
 					>
 						Select Video
@@ -95,9 +93,7 @@ const VideoSelect = ({
 			<div className="text-center mt-2">
 				<Button
 					type="button"
-					onPress={() => {
-						onOpenChangeSelect();
-					}}
+					onPress={onOpenChangeSelect}
 					className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded m-auto text-md text-white"
 				>
 					Change Video

@@ -1,7 +1,8 @@
 "use client";
 // packages
-import { Images, User, Videos } from "@prisma/client";
 import { createContext, useContext, useMemo } from "react";
+// types
+import { Images, User, Videos } from "@prisma/client";
 
 type MediaFilesContextType = {
 	images: Images[];

@@ -11,10 +11,8 @@ import {
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
-	useDisclosure,
 } from "@heroui/react";
 import { UseFormSetValue } from "react-hook-form";
-
 // functions
 import { itemOrder, videoSort } from "@/lib/functions";
 import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
@@ -45,8 +43,6 @@ const SelectVideoModal = ({
 }>) => {
 	const { setValue } = usePageHeaderState();
 	const { videos } = useMediaFiles();
-	const { isOpen: isOpenPreview, onOpenChange: onOpenChangePreview } =
-		useDisclosure();
 
 	const titleFromTarget = () => {
 		if (!formTarget) {
@@ -59,7 +55,6 @@ const SelectVideoModal = ({
 	};
 
 	const [uploadError, setUploadError] = useState<string | null>(null);
-	// Pagination
 	const [currentPage, setCurrentPage] = useState(1);
 	const [videosPerPage, setVideosPerPage] = useState(8);
 	const [sortBy, setSortBy] = useState("date");
@@ -109,6 +104,16 @@ const SelectVideoModal = ({
 		setUploadError(null);
 		onOpenChange();
 	}
+
+	const handleSelect = (value: string) => {
+		handleSetValue(value);
+		handleClose();
+	};
+
+	const handleClose = () => {
+		setCurrentPage(1);
+		onOpenChange();
+	};
 
 	return (
 		<Modal
@@ -198,13 +203,9 @@ const SelectVideoModal = ({
 													<div className="flex justify-center mt-2">
 														<button
 															onClick={() => {
-																handleSetValue(
+																handleSelect(
 																	video.name
 																);
-																setCurrentPage(
-																	1
-																);
-																onClose();
 															}}
 															className="xl:px-10 xl:py-2 px-2 py-1 bg-orange-600 rounded"
 														>
@@ -219,28 +220,21 @@ const SelectVideoModal = ({
 							</div>
 						</ModalBody>
 						<ModalFooter className="mt-4">
-							{currentVideo ? (
+							{currentVideo && (
 								<Button
 									color="danger"
 									variant="light"
 									onPress={() => {
-										handleSetValue("");
-										setCurrentPage(1);
-										onClose();
+										handleSelect("");
 									}}
 									className="xl:px-10 px-4 py-2 rounded-md"
 								>
 									Remove Video
 								</Button>
-							) : (
-								""
 							)}
 							<Button
 								className="rounded-md bg-orange-600"
-								onPress={() => {
-									setCurrentPage(1);
-									onClose();
-								}}
+								onPress={handleClose}
 							>
 								Close
 							</Button>

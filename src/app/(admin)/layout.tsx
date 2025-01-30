@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 // packages
 import type { Metadata, Viewport } from "next";
-import { getServerSession, Session } from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { signOut } from "next-auth/react";
 // fonts

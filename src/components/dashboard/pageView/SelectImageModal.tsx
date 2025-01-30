@@ -1,9 +1,6 @@
 "use client";
-
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
-import { imageSort, itemOrder } from "@/lib/functions";
-import { useContext } from "react";
-import { MediaFilesContext } from "./MediaFIlesProvider";
+// packages
+import { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -11,24 +8,58 @@ import {
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
-	Pagination,
-	Select,
-	SelectItem,
 } from "@heroui/react";
-import { Images } from "@prisma/client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+// context
+import { useMediaFiles } from "./MediaFIlesProvider";
+// functions
+import { imageSort, itemOrder } from "@/lib/functions";
+import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
+// components
+import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaPerPageSelect from "../mediaView/MediaPerPageSelect";
+import MediaSortBySelect from "../mediaView/MediaSortBySelect";
+import MediaOrderSelect from "../mediaView/MediaOrderSelect";
+import MediaPaginationControl from "../mediaView/MediaPaginationControl";
+// types
+import { Images } from "@prisma/client";
 import { MediaType } from "@/lib/constants";
 
-export default function SelectImageModal(props: {
+const SelectImageModal = ({
+	isOpen,
+	onOpenChange,
+	imageType,
+	returnURL,
+	currentImage,
+}: Readonly<{
 	isOpen: boolean;
 	onOpenChange: () => void;
 	imageType: "SEGHEAD" | "SEGMENT" | "STUDY" | "THUMBNAIL";
 	returnURL: (url: string) => void;
 	currentImage?: string;
-}) {
-	const { isOpen, onOpenChange, imageType, returnURL, currentImage } = props;
-	const { images, currentUser } = useContext(MediaFilesContext);
+}>) => {
+	const { images } = useMediaFiles();
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const [imagesPerPage, setImagesPerPage] = useState(8);
+	const [sortBy, setSortBy] = useState("date");
+	const [order, setOrder] = useState("desc");
+	const [uploadError, setUploadError] = useState<string | null>(null);
+	const [availableImages, setAvailableImages] = useState<Images[]>(
+		itemOrder(imageSort(images, [], imageType), sortBy, order)
+	);
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [imagesPerPage]);
+
+	useEffect(() => {
+		setAvailableImages(imageSort(images, [], imageType));
+	}, [images]);
+
+	useEffect(() => {
+		setAvailableImages(itemOrder(availableImages, sortBy, order));
+	}, [sortBy, order]);
 
 	function titleFromTarget() {
 		switch (imageType) {
@@ -43,23 +74,7 @@ export default function SelectImageModal(props: {
 		}
 	}
 
-	// Pagination
-	const [currentPage, setCurrentPage] = useState(1);
-	const [imagesPerPage, setImagesPerPage] = useState(8);
-	const [sortBy, setSortBy] = useState("date");
-	const [order, setOrder] = useState("desc");
-
-	useEffect(() => {
-		setCurrentPage(1);
-	}, [imagesPerPage]);
-
-	const [availableImages, setAvailableImages] = useState<Images[]>(
-		itemOrder(imageSort(images, [], imageType), sortBy, order)
-	);
-
-	const [uploadError, setUploadError] = useState<string | null>(null);
-
-	function mediaTypeFromImageType() {
+	const mediaTypeFromImageType = () => {
 		switch (imageType) {
 			case "SEGHEAD":
 				return MediaType.SEGHEAD;
@@ -70,282 +85,154 @@ export default function SelectImageModal(props: {
 			case "THUMBNAIL":
 				return MediaType.THUMBNAIL;
 		}
-	}
+	};
 
-	useEffect(() => {
-		setAvailableImages(imageSort(images, [], imageType));
-	}, [images]);
-
-	useEffect(() => {
-		setAvailableImages(itemOrder(availableImages, sortBy, order));
-	}, [sortBy, order]);
-
-	function handleReturnError(error: string) {
+	const handleReturnError = (error: string) => {
 		if (error !== "success" && error !== "") {
 			setUploadError(error);
 		} else {
 			setUploadError(null);
 		}
-	}
+	};
+
+	const getImageUrl = (image: string) => {
+		const folder = image.split("_")[0] === "LOGO" ? "/logos/" : "/images/";
+		return process.env.NEXT_PUBLIC_CDN + folder + image;
+	};
 
 	return (
-		<>
-			<Modal
-				hideCloseButton
-				size="5xl"
-				backdrop="blur"
-				isOpen={isOpen}
-				className="dark"
-				scrollBehavior="inside"
-				isDismissable={false}
-				onOpenChange={onOpenChange}
-			>
-				<ModalContent>
-					{(onClose) => (
-						<>
-							<ModalHeader>
-								<div className="w-full text-center font-bold text-3xl">
-									{titleFromTarget()}
-								</div>
-							</ModalHeader>
-							<ModalBody>
-								<div className="flex flex-col mx-auto bg-neutral-800 rounded p-4 w-full mb-4 xl:w-1/2 gap-4">
-									{uploadError && (
-										<div className="mx-auto text-red-500">
-											{uploadError}
-										</div>
-									)}
-
-									<MediaUploadButton
-										mediaType={mediaTypeFromImageType()}
-										onOpenChange={onOpenChange}
-										returnURL={returnURL}
-										returnError={handleReturnError}
-									/>
-								</div>
-								<div className="flex justify-evenly gap-12 mt-4">
-									<Select
-										className="dark ms-auto me-auto xl:me-0"
-										classNames={{
-											popoverContent: "bg-neutral-600",
-										}}
-										variant="bordered"
-										selectedKeys={[
-											imagesPerPage.toString(),
-										]}
-										labelPlacement="outside"
-										label={"Videos Per Page"}
-										onChange={(e) =>
-											setImagesPerPage(
-												parseInt(e.target.value)
-											)
-										}
-									>
-										<SelectItem
-											className="dark"
-											key={8}
-											value={8}
-										>
-											8
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={12}
-											value={12}
-										>
-											12
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={16}
-											value={16}
-										>
-											16
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={20}
-											value={20}
-										>
-											20
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={1000000}
-											value={1000000}
-										>
-											All
-										</SelectItem>
-									</Select>
-									<Select
-										className="dark ms-auto me-auto xl:me-0"
-										classNames={{
-											popoverContent: "bg-neutral-600",
-										}}
-										variant="bordered"
-										selectedKeys={[sortBy.toString()]}
-										labelPlacement="outside"
-										label={"Sort by"}
-										onChange={(e) =>
-											setSortBy(e.target.value)
-										}
-									>
-										<SelectItem
-											className="dark"
-											key={"date"}
-											value={"date"}
-										>
-											Date
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={"name"}
-											value={"name"}
-										>
-											Name
-										</SelectItem>
-									</Select>
-									<Select
-										className="dark ms-auto me-auto xl:me-0"
-										classNames={{
-											popoverContent: "bg-neutral-600",
-										}}
-										variant="bordered"
-										selectedKeys={[order.toString()]}
-										labelPlacement="outside"
-										label={"Order"}
-										onChange={(e) =>
-											setOrder(e.target.value)
-										}
-									>
-										<SelectItem
-											className="dark"
-											key={"asc"}
-											value={"asc"}
-										>
-											Ascending
-										</SelectItem>
-										<SelectItem
-											className="dark"
-											key={"desc"}
-											value={"desc"}
-										>
-											Descending
-										</SelectItem>
-									</Select>
-								</div>
-								<div className="flex justify-center grow">
-									<Pagination
-										className="dark mt-auto"
-										classNames={{
-											cursor: "bg-orange-600",
-										}}
-										showControls
-										total={Math.ceil(
-											availableImages.length /
-												imagesPerPage
-										)}
-										page={currentPage}
-										onChange={setCurrentPage}
-									/>
-								</div>
-								<div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
-									{availableImages.map(
-										(image: Images, index: number) => {
-											if (
-												index >
-													currentPage *
-														imagesPerPage -
-														(imagesPerPage + 1) &&
-												index <
-													currentPage * imagesPerPage
-											) {
-												return (
-													<div
-														key={
-															image.name +
-															"-" +
-															index
-														}
-													>
-														<div
-															onClick={() => {
-																returnURL(
-																	image.name
-																);
-																onOpenChange();
-															}}
-															className="cursor-pointer m-auto flex my-4"
-														>
-															<Image
-																height={200}
-																width={200}
-																src={
-																	image.name.split(
-																		"_"
-																	)[0] ===
-																	"LOGO"
-																		? process
-																				.env
-																				.NEXT_PUBLIC_CDN +
-																		  "/logos/" +
-																		  image.name
-																		: process
-																				.env
-																				.NEXT_PUBLIC_CDN +
-																		  "/images/" +
-																		  image.name
-																}
-																alt={image.name}
-																className="w-full h-auto m-auto"
-															/>
-														</div>
-														{`${currentUser.firstname} ${currentUser.lastname}` ===
-															"Kit Hamm" && (
-															<div>
-																{
-																	image.name.split(
-																		"."
-																	)[1]
-																}
-															</div>
-														)}
-													</div>
-												);
-											}
-										}
-									)}
-								</div>
-							</ModalBody>
-							<ModalFooter className="mt-4">
-								{currentImage && (
-									<Button
-										color="danger"
-										variant="light"
-										className="rounded-md"
-										onPress={() => {
-											returnURL("");
-											onClose();
-										}}
-									>
-										Remove Image
-									</Button>
+		<Modal
+			hideCloseButton
+			size="5xl"
+			backdrop="blur"
+			isOpen={isOpen}
+			className="dark"
+			scrollBehavior="inside"
+			isDismissable={false}
+			onOpenChange={onOpenChange}
+		>
+			<ModalContent>
+				{(onClose) => (
+					<>
+						<ModalHeader>
+							<div className="w-full text-center font-bold text-3xl">
+								{titleFromTarget()}
+							</div>
+						</ModalHeader>
+						<ModalBody>
+							<div className="flex flex-col mx-auto bg-neutral-800 rounded p-4 w-full mb-4 xl:w-1/2 gap-4">
+								{uploadError && (
+									<div className="mx-auto text-red-500">
+										{uploadError}
+									</div>
 								)}
+								<MediaUploadButton
+									mediaType={mediaTypeFromImageType()}
+									onOpenChange={onOpenChange}
+									returnURL={returnURL}
+									returnError={handleReturnError}
+								/>
+							</div>
+							<div className="flex justify-evenly gap-12 mt-4">
+								<MediaPerPageSelect
+									image
+									perPage={imagesPerPage}
+									setPerPage={setImagesPerPage}
+								/>
+								<MediaSortBySelect
+									image
+									getSortBy={sortBy}
+									setSortBy={setSortBy}
+								/>
+								<MediaOrderSelect
+									image
+									getOrderBy={order}
+									setOrderBy={setOrder}
+								/>
+							</div>
+							<div className="flex justify-center grow">
+								<MediaPaginationControl
+									image
+									getLength={availableImages.length}
+									getPerPage={imagesPerPage}
+									getPage={currentPage}
+									setPage={setCurrentPage}
+								/>
+							</div>
+							<div className="grid xl:grid-cols-4 grid-cols-2 gap-4">
+								{availableImages.map(
+									(image: Images, index: number) => {
+										if (
+											inPaginationRange(
+												index,
+												currentPage,
+												imagesPerPage
+											)
+										) {
+											return (
+												<div key={image.name}>
+													<button
+														type="button"
+														onClick={() => {
+															console.log(
+																"clicked"
+															);
+															returnURL(
+																image.name
+															);
+															onOpenChange();
+														}}
+														className="cursor-pointer m-auto flex my-4"
+													>
+														<Image
+															height={200}
+															width={200}
+															src={getImageUrl(
+																image.name
+															)}
+															alt={image.name}
+															className="w-full h-auto m-auto"
+														/>
+													</button>
+												</div>
+											);
+										}
+									}
+								)}
+							</div>
+						</ModalBody>
+						<ModalFooter className="mt-4">
+							{currentImage && (
 								<Button
+									type="button"
 									color="danger"
+									variant="light"
 									className="rounded-md"
 									onPress={() => {
-										setCurrentPage(1);
+										returnURL("");
 										onClose();
 									}}
 								>
-									Close
+									Remove Image
 								</Button>
-							</ModalFooter>
-						</>
-					)}
-				</ModalContent>
-			</Modal>
-		</>
+							)}
+							<Button
+								type="button"
+								color="danger"
+								className="rounded-md"
+								onPress={() => {
+									setCurrentPage(1);
+									onClose();
+								}}
+							>
+								Close
+							</Button>
+						</ModalFooter>
+					</>
+				)}
+			</ModalContent>
+		</Modal>
 	);
-}
+};
+
+export default SelectImageModal;

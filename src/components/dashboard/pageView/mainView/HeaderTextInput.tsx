@@ -1,7 +1,8 @@
 "use client";
-import { PageFormType } from "@/lib/types";
 // context
 import { usePageHeaderState } from "./HeaderStateProvider";
+// types
+import { PageFormType } from "@/lib/types";
 
 const HeaderTextInput = ({
 	label,

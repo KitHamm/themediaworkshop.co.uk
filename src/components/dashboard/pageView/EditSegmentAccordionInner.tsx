@@ -4,7 +4,7 @@ import { ExtendedSegment, ImageFormType, SegmentFormType } from "@/lib/types";
 import { CaseStudy, toLink } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import SegmentTopImageInput from "./SegmentTopImageInput";
+import SegmentTopImageInput from "./segments/SegmentTopImageInput";
 import {
 	Button,
 	Modal,
@@ -18,7 +18,7 @@ import {
 } from "@heroui/react";
 import DescriptionInput from "./DescriptionInput";
 import Image from "next/image";
-import AddImageArray from "./AddImageArray";
+import AddImageArray from "./shared/AddImageArray";
 import {
 	updateSegment,
 	updateSegmentPublish,
