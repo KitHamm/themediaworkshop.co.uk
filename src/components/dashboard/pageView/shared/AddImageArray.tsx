@@ -3,7 +3,7 @@
 import { useDisclosure } from "@heroui/react";
 import { UseFieldArrayAppend, UseFormSetValue } from "react-hook-form";
 // components
-import SelectImageModal from "../SelectImageModal";
+import SelectImageModal from "./SelectImageModal";
 // types
 import { CaseStudyFromType, SegmentFormType } from "@/lib/types";
 

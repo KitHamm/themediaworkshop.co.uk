@@ -16,6 +16,14 @@ import Image from "next/image";
 // functions
 import { createCaseStudy } from "@/server/caseStudyActions/createCaseStudy";
 import { updateCaseStudy } from "@/server/caseStudyActions/updateCaseStudy";
+import { deleteCaseStudy } from "@/server/caseStudyActions/deleteCaseStudy";
+// components
+import DescriptionInput from "../shared/DescriptionInput";
+import AddImageArray from "../shared/AddImageArray";
+import VideoSelect from "../../shared/VideoSelect";
+import TextInput from "./TextInput";
+import DeleteWarningModal from "../shared/DeleteWarningModal";
+
 // types
 import { CaseStudy } from "@prisma/client";
 import {
@@ -23,13 +31,6 @@ import {
 	CaseStudyTagType,
 	ImageFormType,
 } from "@/lib/types";
-import DescriptionInput from "../DescriptionInput";
-import AddImageArray from "../shared/AddImageArray";
-import VideoSelect from "../../shared/VideoSelect";
-import TextInput from "./TextInput";
-import DeleteWarningModal from "../shared/DeleteWarningModal";
-import { deleteCaseStudy } from "@/server/caseStudyActions/deleteCaseStudy";
-
 const CaseStudyModal = ({
 	caseStudy,
 	segmentId,

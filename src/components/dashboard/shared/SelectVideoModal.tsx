@@ -1,6 +1,6 @@
 "use client";
 // context
-import { useMediaFiles } from "../pageView/MediaFIlesProvider";
+import { useMediaFiles } from "../pageView/shared/MediaFIlesProvider";
 import { usePageHeaderState } from "../pageView/mainView/HeaderStateProvider";
 // packages
 import { useEffect, useState } from "react";

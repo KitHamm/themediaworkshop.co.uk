@@ -16,7 +16,7 @@ import Image from "next/image";
 import { createSegment } from "@/server/segmentActions/createSegment";
 // components
 import SegmentTopImageInput from "../SegmentTopImageInput";
-import DescriptionInput from "../../DescriptionInput";
+import DescriptionInput from "../../shared/DescriptionInput";
 import AddImageArray from "../../shared/AddImageArray";
 import TitleInput from "../TitleInput";
 import LinkToSelect from "../LinkToSelect";

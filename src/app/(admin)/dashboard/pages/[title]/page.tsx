@@ -9,7 +9,7 @@ import UpdatePageHeaderButton from "@/components/dashboard/pageView/mainView/Upd
 import VideoSelect from "@/components/dashboard/shared/VideoSelect";
 // providers
 import HeaderStateProvider from "@/components/dashboard/pageView/mainView/HeaderStateProvider";
-import MediaFilesProvider from "@/components/dashboard/pageView/MediaFIlesProvider";
+import MediaFilesProvider from "@/components/dashboard/pageView/shared/MediaFIlesProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { ExtendedPage, ExtendedSegment } from "@/lib/types";
@@ -19,7 +19,7 @@ import { signOut } from "next-auth/react";
 import BreadcrumbLinks from "@/components/dashboard/pageView/mainView/Breadcrumbs";
 
 import { Fragment } from "react";
-import SegmentEdit from "@/components/dashboard/pageView/EditSegmentAccordionInner";
+import SegmentEdit from "@/components/dashboard/pageView/segments/EditSegmentAccordionInner";
 import SegmentAccordionTitle from "@/components/dashboard/pageView/segments/SegmentAccordionTitle";
 export default async function Page({
 	params,

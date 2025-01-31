@@ -4,7 +4,7 @@ import { useDisclosure } from "@heroui/react";
 import Image from "next/image";
 import { UseFormSetValue } from "react-hook-form";
 // components
-import SelectImageModal from "../SelectImageModal";
+import SelectImageModal from "../shared/SelectImageModal";
 // types
 import { SegmentFormType } from "@/lib/types";
 

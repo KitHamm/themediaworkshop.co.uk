@@ -17,10 +17,10 @@ import { imageSort, itemOrder } from "@/lib/functions";
 import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
 // components
 import MediaUploadButton from "@/components/shared/MediaUploadButton";
-import MediaPerPageSelect from "../mediaView/MediaPerPageSelect";
-import MediaSortBySelect from "../mediaView/MediaSortBySelect";
-import MediaOrderSelect from "../mediaView/MediaOrderSelect";
-import MediaPaginationControl from "../mediaView/MediaPaginationControl";
+import MediaPerPageSelect from "../../mediaView/MediaPerPageSelect";
+import MediaSortBySelect from "../../mediaView/MediaSortBySelect";
+import MediaOrderSelect from "../../mediaView/MediaOrderSelect";
+import MediaPaginationControl from "../../mediaView/MediaPaginationControl";
 // types
 import { Images } from "@prisma/client";
 import { MediaType } from "@/lib/constants";

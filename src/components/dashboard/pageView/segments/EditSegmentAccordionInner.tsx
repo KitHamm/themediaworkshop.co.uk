@@ -9,19 +9,19 @@ import {
 	updateSegment,
 	updateSegmentPublish,
 } from "@/server/segmentActions/updateSegment";
+import { deleteSegment } from "@/server/segmentActions/deleteSegment";
 // components
-import SegmentTopImageInput from "./segments/SegmentTopImageInput";
-import DescriptionInput from "./DescriptionInput";
-import AddImageArray from "./shared/AddImageArray";
-import TitleInput from "./segments/TitleInput";
-import LinkToSelect from "./segments/LinkToSelect";
-import OrderInput from "./segments/OrderInput";
-import DeleteWarningModal from "./shared/DeleteWarningModal";
+import SegmentTopImageInput from "./SegmentTopImageInput";
+import DescriptionInput from "../shared/DescriptionInput";
+import AddImageArray from "../shared/AddImageArray";
+import TitleInput from "./TitleInput";
+import LinkToSelect from "./LinkToSelect";
+import OrderInput from "./OrderInput";
+import CaseStudyModal from "../caseStudy/CaseStudyModal";
+import DeleteWarningModal from "../shared/DeleteWarningModal";
 // types
 import { ExtendedSegment, ImageFormType, SegmentFormType } from "@/lib/types";
 import { CaseStudy, toLink } from "@prisma/client";
-import CaseStudyModal from "./caseStudy/CaseStudyModal";
-import { deleteSegment } from "@/server/segmentActions/deleteSegment";
 
 const SegmentEdit = ({
 	segment,
@@ -33,6 +33,7 @@ const SegmentEdit = ({
 	const [publishedCaseStudies, setPublishedCaseStudies] = useState<
 		CaseStudy[]
 	>(segment.casestudy.filter((cs) => cs.published));
+
 	const [draftCaseStudies, setDraftCaseStudies] = useState<CaseStudy[]>(
 		segment.casestudy.filter((cs) => !cs.published)
 	);
