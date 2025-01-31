@@ -210,7 +210,7 @@ const AddSegmentButtonModal = ({
 									</div>
 								</form>
 							</ModalBody>
-							<ModalFooter>
+							<ModalFooter className="justify-between">
 								<Button
 									type="button"
 									color="danger"
@@ -220,23 +220,27 @@ const AddSegmentButtonModal = ({
 								>
 									Cancel
 								</Button>
-								<Button
-									type="button"
-									color="warning"
-									variant="light"
-									className="rounded-md text-md"
-									onPress={() => reset()}
-								>
-									Reset
-								</Button>
-								<Button
-									form="segment-form"
-									type="submit"
-									isDisabled={isDisabled()}
-									className="disabled:bg-neutral-600 rounded-md bg-orange-600 text-white text-md"
-								>
-									Save Segment
-								</Button>
+								<div className="flex gap-4">
+									{isDirty && (
+										<Button
+											type="button"
+											color="warning"
+											variant="light"
+											className="rounded-md text-md fade-in"
+											onPress={() => reset()}
+										>
+											Reset
+										</Button>
+									)}
+									<Button
+										form="segment-form"
+										type="submit"
+										isDisabled={isDisabled()}
+										className="disabled:bg-neutral-600 rounded-md bg-orange-600 text-white text-md"
+									>
+										Save Segment
+									</Button>
+								</div>
 							</ModalFooter>
 						</>
 					)}
