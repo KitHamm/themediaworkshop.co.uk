@@ -14,56 +14,115 @@ import {
 } from "@heroui/react";
 import { Role } from "@prisma/client";
 import { Session } from "next-auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import ResetPasswordModal from "./ResetPasswordModal";
-import ChangePasswordModal from "./ChangePasswordModal";
+import ResetPassword from "./ResetPasswordModal";
+import ChangePassword from "./ChangePasswordModal";
 
-export default function EditUserModal(props: {
-	isOpen: boolean;
-	onOpenChange: () => void;
-	session: Session;
-	user: UserWithoutPassword;
-}) {
-	const { isOpen, onOpenChange, session, user } = props;
-	const [newRole, setNewRole] = useState(user.role);
+const EditUser = ({
+	userToEdit,
+	currentUser,
+	light,
+}: Readonly<{
+	userToEdit: UserWithoutPassword;
+	currentUser: UserWithoutPassword;
+	light?: boolean;
+}>) => {
+	const { isOpen, onOpenChange, onClose } = useDisclosure();
 
-	const {
-		isOpen: isOpenResetPassword,
-		onOpenChange: onOpenChangeResetPassword,
-	} = useDisclosure();
-	const {
-		isOpen: isOpenChangePassword,
-		onOpenChange: onOpenChangeChangePassword,
-	} = useDisclosure();
-
-	const updateUserForm = useForm<UserFormTypes>({
-		defaultValues: {
-			firstName: user.firstname,
-			lastName: user.lastname,
-			email: user.email,
-			role: user.role as Role,
-			position: user.position ? user.position : "",
-		},
-	});
 	const {
 		register,
 		handleSubmit,
 		setValue,
+		watch,
 		formState: { errors },
-	} = updateUserForm;
+	} = useForm<UserFormTypes>({
+		defaultValues: {
+			firstName: userToEdit.firstname,
+			lastName: userToEdit.lastname,
+			email: userToEdit.email,
+			role: userToEdit.role as Role,
+			position: userToEdit.position ?? "",
+		},
+	});
 
-	function handleUpdateUser(data: UserFormTypes) {
-		updateUser(data, user.id)
-			.then(() => {
-				setNewRole("");
-				onOpenChange();
-			})
-			.catch((err) => console.log(err));
-	}
+	const role = watch("role");
+
+	const handleRoleChange = () => {
+		setValue("role", role === "ADMIN" ? "EDITOR" : "ADMIN");
+	};
+
+	const onUpdateUser = async (data: UserFormTypes) => {
+		try {
+			const res = await updateUser(data, userToEdit.id);
+			if (res.success) {
+				onClose();
+			} else {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
+
+	useEffect(() => {
+		if (!isOpen) {
+			console.log("outer closed");
+		}
+	}, [isOpen]);
+
+	const renderInput = (
+		label: string,
+		target: keyof UserFormTypes,
+		required: boolean
+	) => (
+		<div>
+			<label htmlFor={target} className="font-bold px-2">
+				{label}
+			</label>
+			<input
+				{...register(target, {
+					required: {
+						value: required,
+						message: `${label} is required.`,
+					},
+				})}
+				placeholder={errors[target] ? errors[target].message : label}
+				className={`${
+					errors[target] && "!border-red-400 placeholder:text-red-400"
+				}`}
+				type="text"
+			/>
+		</div>
+	);
+
+	const renderPasswordButton = () => {
+		if (userToEdit.id === currentUser.id) {
+			return <ChangePassword adminId={currentUser.id} />;
+		}
+
+		if (currentUser.role === "ADMIN") {
+			return (
+				<ResetPassword
+					adminId={currentUser.id}
+					userId={userToEdit.id}
+				/>
+			);
+		}
+
+		return null;
+	};
 
 	return (
 		<>
+			<Button
+				onPress={onOpenChange}
+				color="warning"
+				variant={light ? "light" : undefined}
+				className="rounded-md text-orange-600 mx-2"
+			>
+				Edit
+			</Button>
 			<Modal
 				backdrop="blur"
 				className="dark"
@@ -76,126 +135,29 @@ export default function EditUserModal(props: {
 							<ModalHeader className="flex flex-col gap-1 text-orange-600">
 								Edit User
 							</ModalHeader>
-							<form onSubmit={handleSubmit(handleUpdateUser)}>
+							<form
+								id="edit-user"
+								onSubmit={handleSubmit(onUpdateUser)}
+							>
 								<ModalBody>
-									<div>First Name:</div>
-									<input
-										{...register("firstName", {
-											required: {
-												value: true,
-												message:
-													"First Name is required.",
-											},
-										})}
-										placeholder={
-											errors.firstName
-												? errors.firstName.message
-												: "First Name"
-										}
-										className={
-											errors.firstName
-												? "placeholder:text-red-400"
-												: ""
-										}
-										type="text"
-									/>
-									<div>Last Name:</div>
-									<input
-										{...register("lastName", {
-											required: {
-												value: true,
-												message:
-													"Last Name is required.",
-											},
-										})}
-										placeholder={
-											errors.lastName
-												? errors.lastName.message
-												: "Last Name"
-										}
-										className={
-											errors.lastName
-												? "placeholder:text-red-400"
-												: ""
-										}
-										type="text"
-									/>
-									<div>Email:</div>
-									<input
-										{...register("email", {
-											required: {
-												value: true,
-												message: "Email is required.",
-											},
-										})}
-										placeholder={
-											errors.email
-												? errors.email.message
-												: "Email"
-										}
-										className={
-											errors.email
-												? "placeholder:text-red-400"
-												: ""
-										}
-										type="email"
-									/>
-									<div>Position:</div>
-									<input
-										{...register("position")}
-										placeholder="Position"
-										type="text"
-									/>
+									{renderInput(
+										"First Name",
+										"firstName",
+										true
+									)}
+									{renderInput("Last Name", "lastName", true)}
+									{renderInput("Email", "email", true)}
+									{renderInput("Position", "position", false)}
 									<Switch
-										onChange={() => {
-											if (newRole === "ADMIN") {
-												setNewRole("EDITOR");
-												setValue("role", Role.EDITOR, {
-													shouldDirty: true,
-												});
-											} else {
-												setNewRole("ADMIN");
-												setValue("role", Role.ADMIN, {
-													shouldDirty: true,
-												});
-											}
-										}}
-										isSelected={
-											newRole === "ADMIN" ? true : false
-										}
+										onChange={handleRoleChange}
+										isSelected={role === "ADMIN"}
 										color="warning"
 									>
 										Admin
 									</Switch>
-									{user.id === session.user.id ? (
-										<div className="mt-2">
-											<Button
-												type="button"
-												onPress={() => {
-													{
-														onOpenChangeChangePassword();
-													}
-												}}
-												className="rounded-md bg-orange-600"
-											>
-												Change Password
-											</Button>
-										</div>
-									) : session.user.role === "ADMIN" ? (
-										<div className="mt-2">
-											<Button
-												type="button"
-												onPress={() => {
-													onOpenChangeResetPassword();
-												}}
-												className="rounded-md bg-orange-600"
-											>
-												Reset Password
-											</Button>
-										</div>
-									) : (
-										""
-									)}
+									<div className="mt-2">
+										{renderPasswordButton()}
+									</div>
 								</ModalBody>
 								<ModalFooter>
 									<Button
@@ -205,12 +167,12 @@ export default function EditUserModal(props: {
 										className="rounded-md"
 										onPress={() => {
 											onClose();
-											setNewRole("");
 										}}
 									>
 										Cancel
 									</Button>
 									<Button
+										form="edit-user"
 										type="submit"
 										className="bg-orange-600 rounded-md"
 									>
@@ -222,7 +184,7 @@ export default function EditUserModal(props: {
 					)}
 				</ModalContent>
 			</Modal>
-			<ResetPasswordModal
+			{/* <ResetPasswordModal
 				isOpen={isOpenResetPassword}
 				onOpenChange={onOpenChangeResetPassword}
 				adminID={session.user.id!}
@@ -232,7 +194,9 @@ export default function EditUserModal(props: {
 				isOpen={isOpenChangePassword}
 				onOpenChange={onOpenChangeChangePassword}
 				adminID={session.user.id!}
-			/>
+			/> */}
 		</>
 	);
-}
+};
+
+export default EditUser;

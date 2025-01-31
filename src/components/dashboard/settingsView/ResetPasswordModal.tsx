@@ -1,8 +1,5 @@
 "use client";
-
-import { randomPassword } from "@/lib/functions";
-import { ResetUserPasswordFormType } from "@/lib/types";
-import { resetUserPassword } from "@/server/userActions/resetUserPassword";
+// packages
 import {
 	Button,
 	Modal,
@@ -10,68 +7,98 @@ import {
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
+	useDisclosure,
 } from "@heroui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+// functions
+import randomPassword from "@/lib/utils/serverUtils/createRandomPassword";
+import { resetUserPassword } from "@/server/userActions/resetUserPassword";
+// types
+import { FormState, ResetUserPasswordFormType } from "@/lib/types";
 
-export default function ResetPasswordModal(props: {
-	isOpen: boolean;
-	onOpenChange: () => void;
-	adminID: string;
-	userID: string;
-}) {
-	const { isOpen, onOpenChange, adminID, userID } = props;
+const ResetPassword = ({
+	adminId,
+	userId,
+}: Readonly<{
+	adminId: string;
+	userId: string;
+}>) => {
+	const [formState, setFormState] = useState<FormState>(FormState.NONE);
 	const [passwordHidden, setPasswordHidden] = useState(true);
-	const [passwordError, setPasswordError] = useState(false);
-	const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
 	const [newPassword, setNewPassword] = useState<string | null>(null);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	const resetPasswordForm = useForm<ResetUserPasswordFormType>({
-		defaultValues: {
-			adminId: adminID,
-			userId: userID,
-		},
-	});
+	const { isOpen, onOpenChange } = useDisclosure();
+
 	const {
 		register,
 		handleSubmit,
 		reset,
 		formState: { errors },
-	} = resetPasswordForm;
+	} = useForm<ResetUserPasswordFormType>({
+		defaultValues: {
+			adminId: adminId,
+			userId: userId,
+		},
+	});
 
-	async function resetPassword(data: ResetUserPasswordFormType) {
-		data.userId = userID;
-		data.password = randomPassword(10);
-		resetUserPassword(data)
-			.then((res) => {
-				setResetPasswordSuccess(true);
-				setNewPassword(res.message);
-			})
-			.catch((err) => {
-				console.log(err);
-				setResetPasswordSuccess(false);
-				setPasswordError(true);
+	const onSubmit = async (data: ResetUserPasswordFormType) => {
+		try {
+			data.userId = userId;
+			data.password = randomPassword(10);
+			const res = await resetUserPassword(data);
+			if (res.success && res.data) {
+				setNewPassword(res.data);
+				setFormState(FormState.SUCCESS);
+			} else {
+				console.log("Error:", res.error);
+				setFormState(FormState.ERROR);
+				setErrorMessage(res.error ?? "Unknown error");
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+			setErrorMessage("Unknown error");
+		}
+	};
+
+	useEffect(() => {
+		if (!isOpen) {
+			setFormState(FormState.NONE);
+			setNewPassword(null);
+			reset({
+				adminId: adminId,
+				userId: userId,
 			});
-	}
+		}
+	}, [isOpen, setFormState, setErrorMessage, reset]);
 
 	return (
-		<Modal
-			size="xl"
-			backdrop="blur"
-			className="dark"
-			isDismissable={false}
-			isOpen={isOpen}
-			onOpenChange={onOpenChange}
-		>
-			<ModalContent>
-				{(onClose) => (
-					<>
-						<ModalHeader className="text-center flex flex-col gap-1 text-red-400">
-							Reset Password
-						</ModalHeader>
-						<form onSubmit={handleSubmit(resetPassword)}>
+		<>
+			<Button
+				onPress={onOpenChange}
+				type="button"
+				className="text-md rounded-lg bg-orange-600"
+			>
+				Reset Password
+			</Button>
+			<Modal
+				size="xl"
+				backdrop="blur"
+				className="dark"
+				isDismissable={false}
+				isOpen={isOpen}
+				onOpenChange={onOpenChange}
+			>
+				<ModalContent>
+					{(onClose) => (
+						<>
+							<ModalHeader className="text-center flex flex-col gap-1 text-red-400">
+								Reset Password
+							</ModalHeader>
+
 							<ModalBody>
-								{resetPasswordSuccess ? (
+								{formState === FormState.SUCCESS && (
 									<>
 										<div className="flex flex-col text-center text-2xl text-orange-600">
 											Success
@@ -88,94 +115,101 @@ export default function ResetPasswordModal(props: {
 											{newPassword}
 										</div>
 									</>
-								) : (
+								)}
+								{formState === FormState.ERROR && (
 									<>
-										<div className="flex flex-col text-center text-xl">
-											Are you sure you want to reset this
-											users password?
+										<div className="flex flex-col text-center text-2xl text-red-400">
+											Error
 										</div>
-										<div className="flex justify-between">
-											<div className="mt-6">
-												Enter your password to continue.
-											</div>
-											<i
-												onClick={() =>
-													setPasswordHidden(
-														!passwordHidden
-													)
-												}
-												aria-hidden
-												className={`fa-solid my-auto cursor-pointer ${
-													passwordHidden
-														? "fa-eye"
-														: "fa-eye-slash"
-												} fa-2xl`}
-											/>
+										<div className="flex flex-col text-center text-lg">
+											{errorMessage}
 										</div>
-										<input
-											className={`${
-												errors.adminPassword
-													? "placeholder:text-red-400"
-													: ""
-											} text-center`}
-											placeholder={
-												errors.adminPassword
-													? errors.adminPassword
-															.message
-													: "Password"
-											}
-											{...register("adminPassword", {
-												required: {
-													value: true,
-													message:
-														"Password is required.",
-												},
-											})}
-											type={
-												passwordHidden
-													? "password"
-													: "text"
-											}
-										/>
-										{passwordError && (
-											<p className="text-red-400">
-												Password is incorrect.
-											</p>
-										)}
 									</>
 								)}
+								<form onSubmit={handleSubmit(onSubmit)}>
+									{formState === FormState.NONE && (
+										<>
+											<div className="flex flex-col text-center text-xl">
+												Are you sure you want to reset
+												this users password?
+											</div>
+											<div className="flex justify-between">
+												<div className="mt-6">
+													Enter your password to
+													continue.
+												</div>
+												<i
+													onClick={() =>
+														setPasswordHidden(
+															!passwordHidden
+														)
+													}
+													aria-hidden
+													className={`fa-solid my-auto cursor-pointer ${
+														passwordHidden
+															? "fa-eye"
+															: "fa-eye-slash"
+													} fa-2xl`}
+												/>
+											</div>
+											<input
+												className={`${
+													errors.adminPassword &&
+													"!border-red-400 placeholder:text-red-400"
+												} text-center`}
+												placeholder={
+													errors.adminPassword
+														? errors.adminPassword
+																.message
+														: "Password"
+												}
+												{...register("adminPassword", {
+													required: {
+														value: true,
+														message:
+															"Password is required.",
+													},
+												})}
+												type={
+													passwordHidden
+														? "password"
+														: "text"
+												}
+											/>
+										</>
+									)}
+								</form>
 							</ModalBody>
 							<ModalFooter>
 								<Button
 									type="button"
-									onPress={() => {
-										onClose();
-										setResetPasswordSuccess(false);
-										setPasswordError(false);
-										reset({
-											adminId: adminID,
-											adminPassword: "",
-										});
-									}}
+									onPress={onClose}
 									variant="light"
 									color="danger"
-									className="rounded-md"
+									className="text-md rounded-lg"
 								>
 									Cancel
 								</Button>
-								{!resetPasswordSuccess && (
+								{formState === FormState.NONE && (
 									<Button
-										type="submit"
-										className="rounded-md bg-orange-600"
+										onPress={() =>
+											handleSubmit((data) =>
+												onSubmit(data)
+											)()
+										}
+										type="button"
+										className="bg-orange-600 text-md rounded-lg"
 									>
 										Reset Password
 									</Button>
 								)}
 							</ModalFooter>
-						</form>
-					</>
-				)}
-			</ModalContent>
-		</Modal>
+						</>
+					)}
+				</ModalContent>
+			</Modal>
+		</>
 	);
-}
+};
+
+export default ResetPassword;

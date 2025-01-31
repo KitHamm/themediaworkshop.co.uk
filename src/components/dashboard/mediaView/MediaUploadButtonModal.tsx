@@ -1,28 +1,41 @@
 "use client";
-
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+// packages
 import {
 	Button,
 	Modal,
 	ModalBody,
 	ModalContent,
-	ModalFooter,
 	ModalHeader,
 	useDisclosure,
 } from "@heroui/react";
 import { useState } from "react";
+// components
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 
-export default function MediaUploadButtonModal() {
+const imageNames: { for: string; name: string }[] = [
+	{ for: "Section Headers", name: "SEGHEAD_" },
+	{ for: "Section Images", name: "SEGMENT_" },
+	{ for: "Case Study Images", name: "STUDY_" },
+	{ for: "Logo Images", name: "LOGO_" },
+	{ for: "Video Thumbnail", name: "THUMBNAIL_" },
+];
+
+const videoNames: { for: string; name: string }[] = [
+	{ for: "Background Videos", name: "HEADER_" },
+	{ for: "Other Videos", name: "VIDEO_" },
+];
+
+const MediaUploadButtonModal = () => {
 	const { isOpen, onOpenChange } = useDisclosure();
 	const [uploadError, setUploadError] = useState<string | null>(null);
 
-	function handleReturnError(error: string) {
+	const handleReturnError = (error: string) => {
 		if (error !== "success") {
 			setUploadError(error);
 		} else {
 			setUploadError(null);
 		}
-	}
+	};
 
 	return (
 		<>
@@ -42,7 +55,7 @@ export default function MediaUploadButtonModal() {
 				onOpenChange={onOpenChange}
 			>
 				<ModalContent>
-					{(onClose) => (
+					{() => (
 						<>
 							<ModalHeader className="flex justify-center">
 								Upload New Media
@@ -75,53 +88,37 @@ export default function MediaUploadButtonModal() {
 												<div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
 													Images
 												</div>
-												<div>
-													<strong>
-														Section Headers:{" "}
-													</strong>
-													SEGHEAD_
-												</div>
-												<div>
-													<strong>
-														Section Images:{" "}
-													</strong>
-													SEGMENT_
-												</div>
-												<div>
-													<strong>
-														Case Study Images:{" "}
-													</strong>
-													STUDY_
-												</div>
-												<div>
-													<strong>
-														Logo Images:{" "}
-													</strong>
-													LOGO_
-												</div>
-												<div>
-													<strong>
-														Video Thumbnail:{" "}
-													</strong>
-													THUMBNAIL_
-												</div>
+												{imageNames.map((imageName) => (
+													<div
+														key={imageName.for}
+														className="flex gap-2"
+													>
+														<div className="font-bold">
+															{imageName.for}:
+														</div>
+														<div className="font-normal">
+															{imageName.name}
+														</div>
+													</div>
+												))}
 											</div>
 											<div>
 												<div className="text-xl border-b border-neutral-400 py-2 mb-2 font-bold mt-2">
 													Videos
 												</div>
-												<div>
-													<strong>
-														Background Videos:{" "}
-													</strong>
-													HEADER_
-												</div>
-												<div>
-													<strong>
-														Other Videos:{" "}
-													</strong>
-													VIDEO_
-												</div>
+												{videoNames.map((videoName) => (
+													<div
+														key={videoName.for}
+														className="flex gap-2"
+													>
+														<div className="font-bold">
+															{videoName.for}:
+														</div>
+														<div className="font-normal">
+															{videoName.name}
+														</div>
+													</div>
+												))}
 											</div>
 										</div>
 									</div>
@@ -131,31 +128,18 @@ export default function MediaUploadButtonModal() {
 										{uploadError}
 									</div>
 								)}
-
-								{isOpen && (
-									<MediaUploadButton
-										onOpenChange={onOpenChange}
-										returnError={handleReturnError}
-									/>
-								)}
+								<MediaUploadButton
+									onOpenChange={onOpenChange}
+									returnError={handleReturnError}
+									showCloseButton
+								/>
 							</ModalBody>
-							<ModalFooter>
-								<Button
-									className="rounded-md"
-									color="danger"
-									variant="light"
-									onPress={() => {
-										onClose();
-										setUploadError(null);
-									}}
-								>
-									Close
-								</Button>
-							</ModalFooter>
 						</>
 					)}
 				</ModalContent>
 			</Modal>
 		</>
 	);
-}
+};
+
+export default MediaUploadButtonModal;

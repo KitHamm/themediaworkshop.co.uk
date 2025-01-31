@@ -1,84 +1,115 @@
 "use client";
-
-import { useContext } from "react";
-import { MessageStateContext } from "./MessageStateProvider";
-import { Message } from "@prisma/client";
+// packages
+import { useState, useEffect } from "react";
 import { Checkbox } from "@heroui/react";
-import { DateRender } from "@/lib/functions";
+// context
+import { useMessageState } from "./MessageStateProvider";
+// functions
 import { updateMessage } from "@/server/messageActions/updateMessage";
+import { formatDate } from "@/lib/utils/dateUtils/formatDate";
+// types
+import { Message } from "@prisma/client";
 
-export default function DesktopMessageCard(props: { message: Message }) {
-    const { message } = props;
-    const {
-        multipleMessagesIDs,
-        setMultipleMessagesIDs,
-        selectedMessage,
-        setSelectedMessage,
-    } = useContext(MessageStateContext);
+const DesktopMessageCard = ({ message }: Readonly<{ message: Message }>) => {
+	const {
+		multipleMessagesIDs,
+		setMultipleMessagesIDs,
+		selectedMessage,
+		setSelectedMessage,
+	} = useMessageState();
 
-    return (
-        <div
-            onClick={() => {
-                updateMessage(message.id, true)
-                    .then(() => {
-                        setSelectedMessage(message);
-                    })
-                    .catch((err) => console.log(err));
-            }}
-            className={`${
-                message === selectedMessage
-                    ? "bg-neutral-600"
-                    : message.read
-                    ? " bg-neutral-800"
-                    : " bg-orange-600"
-            } fade-in py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}>
-            <div className="flex gap-2">
-                <Checkbox
-                    color="success"
-                    isSelected={multipleMessagesIDs.includes(message.id)}
-                    onChange={() => {
-                        if (!multipleMessagesIDs.includes(message.id)) {
-                            setMultipleMessagesIDs([
-                                ...multipleMessagesIDs,
-                                message.id,
-                            ]);
-                        } else {
-                            setMultipleMessagesIDs(
-                                multipleMessagesIDs.filter(
-                                    (id) => id !== message.id
-                                )
-                            );
-                        }
-                    }}
-                />
-                <div
-                    className={`font-bold ${
-                        message.read ? "text-neutral-600" : "text-green-400"
-                    } my-auto`}>
-                    {message.read ? "Read" : "New"}
-                </div>
-            </div>
-            <div>
-                <div className="font-bold capitalize my-auto text-xl">
-                    {message.name}
-                </div>
-                <div
-                    className={`text-sm transition-all ${
-                        message === selectedMessage
-                            ? "text-white"
-                            : "text-neutral-400"
-                    }`}>
-                    {message.email}
-                </div>
-            </div>
-            <div
-                className={`${
-                    message === selectedMessage
-                        ? "text-white"
-                        : "text-neutral-400"
-                } flex grow justify-end transition-all`}>
-                {DateRender(message.createdAt)}
-            </div>
-        </div>
-    );
-}
+	const [messageCardClass, setMessageCardClass] = useState("bg-neutral-600");
+	const [isSelected, setIsSelected] = useState(false);
+
+	useEffect(() => {
+		if (message === selectedMessage) {
+			setMessageCardClass("bg-neutral-500");
+		} else if (!message.read) {
+			setMessageCardClass("bg-orange-600");
+		} else {
+			setMessageCardClass("bg-neutral-600");
+		}
+	}, [message, selectedMessage, setMessageCardClass]);
+
+	useEffect(() => {
+		if (multipleMessagesIDs.includes(message.id)) {
+			setIsSelected(true);
+		} else {
+			setIsSelected(false);
+		}
+	}, [multipleMessagesIDs, message.id]);
+
+	const onOpenMessage = async (messageRead: boolean, value: boolean) => {
+		if (messageRead) {
+			return setSelectedMessage(message);
+		}
+
+		try {
+			const res = await updateMessage(message.id, value);
+			if (res.success) {
+				setSelectedMessage(message);
+			} else {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
+
+	const onSelectMessage = () => {
+		if (!multipleMessagesIDs.includes(message.id)) {
+			setMultipleMessagesIDs([...multipleMessagesIDs, message.id]);
+		} else {
+			setMultipleMessagesIDs(
+				multipleMessagesIDs.filter((id) => id !== message.id)
+			);
+		}
+	};
+
+	return (
+		<div
+			onClick={() => onOpenMessage(message.read, true)}
+			className={`${messageCardClass} fade-in py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}
+		>
+			<div className="flex gap-2">
+				<Checkbox
+					color="success"
+					isSelected={isSelected}
+					onChange={onSelectMessage}
+				/>
+				<div
+					className={`font-bold ${
+						message.read ? "text-neutral-600" : "text-green-400"
+					} my-auto`}
+				>
+					{message.read ? "Read" : "New"}
+				</div>
+			</div>
+			<div>
+				<div className="font-bold capitalize my-auto text-xl">
+					{message.name}
+				</div>
+				<div
+					className={`text-sm transition-all ${
+						message === selectedMessage
+							? "text-white"
+							: "text-neutral-400"
+					}`}
+				>
+					{message.email}
+				</div>
+			</div>
+			<div
+				className={`${
+					message === selectedMessage
+						? "text-white"
+						: "text-neutral-400"
+				} flex grow justify-end transition-all`}
+			>
+				{formatDate(message.createdAt)}
+			</div>
+		</div>
+	);
+};
+
+export default DesktopMessageCard;

@@ -1,44 +1,58 @@
 "use client";
-
+// packages
+import { createContext, useContext, useMemo, useState } from "react";
+// types
 import { Message } from "@prisma/client";
-import { createContext, useState } from "react";
 
 type MessageStateContextType = {
-    messages: Message[];
-    selectedMessage: Message | null;
-    setSelectedMessage: (message: Message | null) => void;
-    multipleMessagesIDs: string[];
-    setMultipleMessagesIDs: (ids: string[]) => void;
+	messages: Message[];
+	selectedMessage: Message | null;
+	setSelectedMessage: (message: Message | null) => void;
+	multipleMessagesIDs: string[];
+	setMultipleMessagesIDs: (ids: string[]) => void;
 };
 
 export const MessageStateContext = createContext<MessageStateContextType>(
-    {} as MessageStateContextType
+	{} as MessageStateContextType
 );
 
-export default function MessageStateProvider({
-    children,
-    messages,
-}: {
-    children: React.ReactNode;
-    messages: Message[];
-}) {
-    const [selectedMessage, setSelectedMessage] = useState<Message | null>(
-        null
-    );
-    const [multipleMessagesIDs, setMultipleMessagesIDs] = useState<string[]>(
-        []
-    );
+const MessageStateProvider = ({
+	children,
+	messages,
+}: Readonly<{
+	children: React.ReactNode;
+	messages: Message[];
+}>) => {
+	const [selectedMessage, setSelectedMessage] = useState<Message | null>(
+		null
+	);
+	const [multipleMessagesIDs, setMultipleMessagesIDs] = useState<string[]>(
+		[]
+	);
 
-    return (
-        <MessageStateContext.Provider
-            value={{
-                messages,
-                selectedMessage,
-                setSelectedMessage,
-                multipleMessagesIDs,
-                setMultipleMessagesIDs,
-            }}>
-            {children}
-        </MessageStateContext.Provider>
-    );
-}
+	const messageContextValue = useMemo(
+		() => ({
+			messages,
+			selectedMessage,
+			setSelectedMessage,
+			multipleMessagesIDs,
+			setMultipleMessagesIDs,
+		}),
+		[
+			messages,
+			selectedMessage,
+			setSelectedMessage,
+			multipleMessagesIDs,
+			setMultipleMessagesIDs,
+		]
+	);
+
+	return (
+		<MessageStateContext.Provider value={messageContextValue}>
+			{children}
+		</MessageStateContext.Provider>
+	);
+};
+
+export const useMessageState = () => useContext(MessageStateContext);
+export default MessageStateProvider;
