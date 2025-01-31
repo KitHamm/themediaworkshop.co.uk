@@ -4,7 +4,7 @@ export default function addAnchorLinks(textEl: HTMLDivElement | null) {
 	anchors.forEach((anchor) => {
 		const url = anchor.href;
 
-		if (url.includes("https")) {
+		if (!url.includes(window.location.hostname)) {
 			console.log("Adding target:", url);
 			anchor.setAttribute("target", "_blank");
 			anchor.setAttribute("rel", "noreferrer");
