@@ -136,7 +136,15 @@ const ContactModal = ({ children }: { children: React.ReactNode }) => {
 									</p>
 									<br />
 									<p>Tel: + 44 (0)845 8628456</p>
-									<p>Email: info@themediaworkshop.co.uk</p>
+									<p>
+										Email:{" "}
+										<a
+											className="text-orange-600 hover:text-orange-500 transition-all"
+											href="mailto:info@themediaworkshop.co.uk"
+										>
+											info@themediaworkshop.co.uk
+										</a>
+									</p>
 								</div>
 
 								<div id="form-container" className="relative">

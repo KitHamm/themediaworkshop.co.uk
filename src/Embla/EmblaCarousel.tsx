@@ -64,7 +64,17 @@ export const EmblaCarouselCaseStudyView = ({
 	} = usePrevNextButtons(emblaApi);
 
 	return (
-		<div className="embla">
+		<div className="embla relative">
+			{/* <div className="embla__buttons"> */}
+			<PrevButton
+				onClick={onPrevButtonClick}
+				disabled={prevBtnDisabled}
+			/>
+			<NextButton
+				onClick={onNextButtonClick}
+				disabled={nextBtnDisabled}
+			/>
+			{/* </div> */}
 			<div className="embla__viewport" ref={emblaRef}>
 				<div className="embla__container">
 					{slides.map((image: string, index: number) => (
@@ -83,16 +93,6 @@ export const EmblaCarouselCaseStudyView = ({
 						</div>
 					))}
 				</div>
-			</div>
-			<div className="embla__buttons">
-				<PrevButton
-					onClick={onPrevButtonClick}
-					disabled={prevBtnDisabled}
-				/>
-				<NextButton
-					onClick={onNextButtonClick}
-					disabled={nextBtnDisabled}
-				/>
 			</div>
 		</div>
 	);

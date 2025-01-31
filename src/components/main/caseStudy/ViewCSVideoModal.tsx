@@ -20,44 +20,29 @@ const ViewCSVideoModal = ({
 }) => {
 	return (
 		<Modal
-			size="4xl"
-			placement="center"
+			size="5xl"
 			backdrop="blur"
 			isOpen={isOpen}
-			className="dark"
-			scrollBehavior="inside"
+			className="dark transition-all"
+			placement="center"
 			onOpenChange={onOpenChange}
 		>
 			<ModalContent>
 				{(onClose) => (
 					<>
-						<ModalHeader></ModalHeader>
-						<ModalBody>
-							<video
-								playsInline
-								disablePictureInPicture
-								id="bg-video"
-								className="h-auto w-full fade-in mt-2"
-								autoPlay={true}
-								controls
-								src={
-									process.env.NEXT_PUBLIC_CDN +
-									"/videos/" +
-									videoURL
-								}
-							/>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								color="danger"
-								variant="light"
-								onPress={() => {
-									onClose();
-								}}
-							>
-								Close
-							</Button>
-						</ModalFooter>
+						<video
+							playsInline
+							disablePictureInPicture
+							id="bg-video"
+							className="h-auto w-full fade-in"
+							autoPlay={true}
+							controls
+							src={
+								process.env.NEXT_PUBLIC_CDN +
+								"/videos/" +
+								videoURL
+							}
+						/>
 					</>
 				)}
 			</ModalContent>

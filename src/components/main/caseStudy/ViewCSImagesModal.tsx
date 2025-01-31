@@ -22,47 +22,31 @@ const ViewCSImagesModal = ({
 }>) => {
 	return (
 		<Modal
-			size="4xl"
-			placement="center"
+			size="5xl"
 			backdrop="blur"
 			isOpen={isOpen}
-			className="dark"
-			scrollBehavior="inside"
+			className="dark transition-all"
+			placement="center"
 			onOpenChange={onOpenChange}
 		>
 			<ModalContent>
 				{(onClose) => (
 					<>
-						<ModalHeader></ModalHeader>
-						<ModalBody>
-							{images.length > 1 ? (
-								<EmblaCarouselCaseStudyView slides={images} />
-							) : (
-								<Image
-									width={900}
-									height={500}
-									src={
-										process.env.NEXT_PUBLIC_CDN! +
-										"/images/" +
-										images[0]
-									}
-									alt={images[0]}
-									className="w-full h-auto"
-								/>
-							)}
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								color="danger"
-								variant="light"
-								className="rounded-md"
-								onPress={() => {
-									onClose();
-								}}
-							>
-								Close
-							</Button>
-						</ModalFooter>
+						{images.length > 1 ? (
+							<EmblaCarouselCaseStudyView slides={images} />
+						) : (
+							<Image
+								width={900}
+								height={500}
+								src={
+									process.env.NEXT_PUBLIC_CDN! +
+									"/images/" +
+									images[0]
+								}
+								alt={images[0]}
+								className="w-full h-auto"
+							/>
+						)}
 					</>
 				)}
 			</ModalContent>
