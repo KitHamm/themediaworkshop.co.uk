@@ -1,6 +1,6 @@
 "use client";
 // context
-import { useContactModal } from "./modals/ContactModal";
+import { useContactModal } from "./ContactModal";
 
 const ContactButton = () => {
 	const { onOpenChange } = useContactModal();

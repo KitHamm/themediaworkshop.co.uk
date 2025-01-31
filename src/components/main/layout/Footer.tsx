@@ -1,7 +1,6 @@
 "use client";
-
-import FooterContactButton from "./layout/FootContactButton";
-import ContactModal from "./modals/ContactModal";
+import FooterContactButton from "./FootContactButton";
+import ContactModal from "../shared/ContactModal";
 
 export default function Footer() {
 	const date = new Date();

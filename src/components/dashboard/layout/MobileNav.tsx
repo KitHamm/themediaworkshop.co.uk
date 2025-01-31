@@ -16,7 +16,7 @@ import { signOut } from "next-auth/react";
 // constants
 import { navLinks } from "@/lib/constants";
 // functions
-import { countUnreadMessages } from "@/lib/functions";
+import countUnreadMessages from "@/lib/utils/messageUtils/countUnreadMessages";
 // components
 import MobileNavLink from "./MobileNavLink";
 import ChangeAvatarModal from "./ChangeAvatarModal";

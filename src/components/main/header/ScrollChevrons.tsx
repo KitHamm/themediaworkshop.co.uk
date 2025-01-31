@@ -2,7 +2,7 @@
 // packages
 import { useEffect, useRef } from "react";
 // functions
-import { handleChevronOnScroll } from "@/lib/functions";
+import handleChevronOnScroll from "@/lib/utils/pageUtils/onChevronScroll";
 
 const ScrollChevrons = () => {
 	const chevron = useRef<HTMLDivElement>(null);

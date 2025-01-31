@@ -1,6 +1,6 @@
 "use client";
 // context
-import { useContactModal } from "../modals/ContactModal";
+import { useContactModal } from "../shared/ContactModal";
 const FooterContactButton = ({}: Readonly<{}>) => {
 	const { onOpenChange } = useContactModal();
 	return (

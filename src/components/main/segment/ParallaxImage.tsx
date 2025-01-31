@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 // functions
-import { parallaxOnScroll } from "@/lib/functions";
+import parallaxOnScroll from "@/lib/utils/pageUtils/parallaxOnScroll";
 
 const ParallaxImage = ({
 	headerImage,

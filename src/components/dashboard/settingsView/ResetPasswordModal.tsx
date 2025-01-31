@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 // functions
-import { randomPassword } from "@/lib/functions";
+import randomPassword from "@/lib/utils/serverUtils/createRandomPassword";
 import { resetUserPassword } from "@/server/userActions/resetUserPassword";
 // types
 import { FormState, ResetUserPasswordFormType } from "@/lib/types";

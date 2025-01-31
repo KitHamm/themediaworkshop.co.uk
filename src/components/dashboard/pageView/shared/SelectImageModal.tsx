@@ -13,10 +13,11 @@ import Image from "next/image";
 // context
 import { useMediaFiles } from "./MediaFIlesProvider";
 // functions
-import { imageSort, itemOrder } from "@/lib/functions";
+import { imageSort } from "@/lib/utils/mediaUtils/imageSort";
+import { itemOrder } from "@/lib/utils/mediaUtils/itemOrder";
 import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
 // components
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 import MediaPerPageSelect from "../../mediaView/MediaPerPageSelect";
 import MediaSortBySelect from "../../mediaView/MediaSortBySelect";
 import MediaOrderSelect from "../../mediaView/MediaOrderSelect";

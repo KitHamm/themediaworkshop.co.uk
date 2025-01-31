@@ -9,7 +9,7 @@ import { getMetadata } from "@/data/getMetaData";
 import { getViewport } from "@/data/getViewport";
 // components
 import Navbar from "@/components/main/layout/Navbar";
-import Footer from "@/components/main/Footer";
+import Footer from "@/components/main/layout/Footer";
 
 const lato = Lato({
 	weight: ["100", "300", "400", "700", "900"],

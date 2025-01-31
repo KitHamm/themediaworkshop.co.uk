@@ -5,8 +5,8 @@ import { useRef } from "react";
 import Markdown from "react-markdown";
 // components
 import { EmblaCarouselCaseStudyInner } from "@/Embla/EmblaCarousel";
-import ViewCSImagesModal from "../modals/ViewCSImagesModal";
-import ViewCSVideoModal from "../modals/ViewCSVideoModal";
+import ViewCSImagesModal from "./ViewCSImagesModal";
+import ViewCSVideoModal from "./ViewCSVideoModal";
 // types
 import { CaseStudy } from "@prisma/client";
 

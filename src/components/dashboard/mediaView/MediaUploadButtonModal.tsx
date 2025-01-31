@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 // components
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 
 const imageNames: { for: string; name: string }[] = [
 	{ for: "Section Headers", name: "SEGHEAD_" },

@@ -14,10 +14,11 @@ import {
 } from "@heroui/react";
 import { UseFormSetValue } from "react-hook-form";
 // functions
-import { itemOrder, videoSort } from "@/lib/functions";
+import { itemOrder } from "@/lib/utils/mediaUtils/itemOrder";
+import { videoSort } from "@/lib/utils/mediaUtils/videoSort";
 import { inPaginationRange } from "@/lib/utils/mediaUtils/inPaginationRange";
 // components
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 import MediaPerPageSelect from "../mediaView/MediaPerPageSelect";
 import MediaSortBySelect from "../mediaView/MediaSortBySelect";
 import MediaOrderSelect from "../mediaView/MediaOrderSelect";

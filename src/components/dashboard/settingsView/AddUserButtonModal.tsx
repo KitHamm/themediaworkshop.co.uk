@@ -1,8 +1,8 @@
 "use client";
 
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 import { MediaType } from "@/lib/constants";
-import { randomPassword } from "@/lib/functions";
+import randomPassword from "@/lib/utils/serverUtils/createRandomPassword";
 import { FormState, UserFormTypes } from "@/lib/types";
 import { createUser } from "@/server/userActions/createUser";
 import {

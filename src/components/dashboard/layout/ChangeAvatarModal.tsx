@@ -4,7 +4,7 @@ import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 // functions
 import { updateAvatar } from "@/server/userActions/userAvatar";
 // components
-import MediaUploadButton from "@/components/shared/MediaUploadButton";
+import MediaUploadButton from "@/components/dashboard/shared/MediaUploadButton";
 // types
 import { MediaType } from "@/lib/constants";
 
