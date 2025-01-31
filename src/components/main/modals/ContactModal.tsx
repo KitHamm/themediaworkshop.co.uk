@@ -67,7 +67,7 @@ const ContactModal = ({ children }: { children: React.ReactNode }) => {
 		try {
 			const res = await createMessage(data);
 			if (res.success) {
-				handleSendingDelay(false);
+				handleSendingDelay(true);
 			} else {
 				console.log("Error:", res.error);
 				handleSendingDelay(false);
