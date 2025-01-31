@@ -94,22 +94,26 @@ export default async function Page({ slug }: Readonly<{ slug?: string }>) {
 								)}
 								<div className="block grid xl:grid-cols-3 xl:flex xl:justify-evenly grid-cols-1 gap-4 xl:gap-2 xl:px-10 my-10 xl:my-4">
 									{data.video1 && (
-										<VideoModal
-											buttonText={
-												data.videoOneButtonText ||
-												"SHOWREEL"
-											}
-											videoURL={data.video1}
-										/>
+										<div id="showreel">
+											<VideoModal
+												buttonText={
+													data.videoOneButtonText ||
+													"SHOWREEL"
+												}
+												videoURL={data.video1}
+											/>
+										</div>
 									)}
 									{data.video2 && (
-										<VideoModal
-											buttonText={
-												data.videoOneButtonText ||
-												"YEAR REVIEW"
-											}
-											videoURL={data.video2}
-										/>
+										<div id="year-review">
+											<VideoModal
+												buttonText={
+													data.videoOneButtonText ||
+													"YEAR REVIEW"
+												}
+												videoURL={data.video2}
+											/>
+										</div>
 									)}
 									<ContactModal>
 										<ContactButton />
