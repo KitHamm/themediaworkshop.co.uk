@@ -16,10 +16,12 @@ import AddImageArray from "./shared/AddImageArray";
 import TitleInput from "./segments/TitleInput";
 import LinkToSelect from "./segments/LinkToSelect";
 import OrderInput from "./segments/OrderInput";
+import DeleteWarningModal from "./shared/DeleteWarningModal";
 // types
 import { ExtendedSegment, ImageFormType, SegmentFormType } from "@/lib/types";
 import { CaseStudy, toLink } from "@prisma/client";
 import CaseStudyModal from "./caseStudy/CaseStudyModal";
+import { deleteSegment } from "@/server/segmentActions/deleteSegment";
 
 const SegmentEdit = ({
 	segment,
@@ -34,6 +36,7 @@ const SegmentEdit = ({
 	const [draftCaseStudies, setDraftCaseStudies] = useState<CaseStudy[]>(
 		segment.casestudy.filter((cs) => !cs.published)
 	);
+	const [deleteError, setDeleteError] = useState<string | null>(null);
 
 	useEffect(() => {
 		setPublishedCaseStudies(segment.casestudy.filter((cs) => cs.published));
@@ -93,6 +96,18 @@ const SegmentEdit = ({
 		});
 	};
 
+	const onDelete = async () => {
+		try {
+			const res = await deleteSegment(segment.id);
+			setDeleteError(res.success ? null : res.error);
+			if (!res.success) {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
+
 	return (
 		<div className="light rounded-md xl:px-5 mb-4 py-4">
 			<form onSubmit={handleSubmit(onSubmit)}>
@@ -106,15 +121,13 @@ const SegmentEdit = ({
 								Unsaved Changes
 							</div>
 						)}
-						<Button
-							type="button"
-							color="danger"
-							variant="light"
-							onPress={() => {}}
-							className="text-md rounded-md"
-						>
-							Delete Segment
-						</Button>
+						<DeleteWarningModal
+							buttonText="Delete Segment"
+							onDeleteCallback={onDelete}
+							onCloseCallback={() => setDeleteError(null)}
+							deleteError={deleteError}
+							type="segment"
+						/>
 						{isDirty && (
 							<>
 								<Button
@@ -249,13 +262,6 @@ const SegmentEdit = ({
 								Case Studies
 							</div>
 							<CaseStudyModal segmentId={segment.id} />
-							{/* <Button
-								type="button"
-								onPress={() => {}}
-								className="my-auto rounded-md text-white text-md bg-orange-600"
-							>
-								Add Case Study
-							</Button> */}
 						</div>
 						{publishedCaseStudies.length > 0 && (
 							<>

@@ -85,7 +85,8 @@ const DescriptionInput = ({
 						errors.copy ? errors.copy.message : "Description"
 					}
 					className={`${
-						errors.copy ? "placeholder:text-red-400" : ""
+						errors.copy &&
+						"!border-red-400 placeholder:text-red-400"
 					} text-black h-52`}
 				/>
 			)}

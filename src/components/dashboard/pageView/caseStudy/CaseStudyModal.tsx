@@ -26,6 +26,9 @@ import {
 import DescriptionInput from "../DescriptionInput";
 import AddImageArray from "../shared/AddImageArray";
 import VideoSelect from "../../shared/VideoSelect";
+import TextInput from "./TextInput";
+import DeleteWarningModal from "../shared/DeleteWarningModal";
+import { deleteCaseStudy } from "@/server/caseStudyActions/deleteCaseStudy";
 
 const CaseStudyModal = ({
 	caseStudy,
@@ -80,6 +83,7 @@ const CaseStudyModal = ({
 	const videoThumbnail = watch("videoThumbnail");
 	const published = watch("published");
 	const [newTag, setNewTag] = useState<string | null>(null);
+	const [deleteError, setDeleteError] = useState<string | null>(null);
 
 	const onSubmit = async (data: CaseStudyFromType) => {
 		const submitAction = caseStudy ? updateCaseStudy : createCaseStudy;
@@ -88,6 +92,20 @@ const CaseStudyModal = ({
 			if (res.success) {
 				onOpenChange();
 			} else {
+				console.log("Error:", res.error);
+			}
+		} catch (error) {
+			console.log("Unexpected error:", error);
+		}
+	};
+
+	const onDelete = async () => {
+		if (!caseStudy) return;
+
+		try {
+			const res = await deleteCaseStudy(caseStudy.id);
+			setDeleteError(res.success ? null : res.error);
+			if (!res.success) {
 				console.log("Error:", res.error);
 			}
 		} catch (error) {
@@ -137,36 +155,19 @@ const CaseStudyModal = ({
 							<ModalBody className="light">
 								<div className="grid xl:grid-cols-2 gap-10">
 									<div id="left">
-										<div className="font-bold text-xl px-2">
-											Title:
-										</div>
-										<input
-											type="text"
-											{...register("title", {
-												required: {
-													value: true,
-													message:
-														"Title is requited.",
-												},
-											})}
-											placeholder={
-												errors.title
-													? errors.title.message
-													: "Title"
-											}
-											className={
-												errors.title
-													? "placeholder:text-red-400"
-													: "text-black"
-											}
+										<TextInput
+											target="title"
+											register={register}
+											errors={errors}
+											label="Title"
+											required={true}
 										/>
-										<div className="font-bold text-xl px-2 mt-2">
-											Date/Location:
-										</div>
-										<input
-											type="text"
-											className="text-black"
-											{...register("dateLocation")}
+										<TextInput
+											target="dateLocation"
+											register={register}
+											errors={errors}
+											label="Date/Location"
+											required={false}
 										/>
 										<div className="flex justify-between mt-5">
 											<div className="font-bold text-xl px-2 mt-auto">
@@ -190,11 +191,7 @@ const CaseStudyModal = ({
 																)
 															}
 															className="cursor-pointer"
-															key={
-																tag.text +
-																"-" +
-																index
-															}
+															key={`${tag.text}-${index}`}
 														>
 															{tag.text}
 														</Chip>
@@ -215,7 +212,6 @@ const CaseStudyModal = ({
 													setNewTag(e.target.value);
 												}}
 											/>
-
 											<Button
 												type="button"
 												onPress={() => {
@@ -365,59 +361,72 @@ const CaseStudyModal = ({
 									</div>
 								</div>
 							</ModalBody>
-							<ModalFooter>
-								{caseStudy && (
+							<ModalFooter className="justify-between">
+								<div className="flex gap-4">
 									<Button
 										type="button"
 										color="danger"
-										variant="light"
 										className="rounded-md"
-										onPress={() => {}}
+										onPress={() => {
+											onClose();
+											reset();
+										}}
 									>
-										Delete Case Study
+										Close
 									</Button>
-								)}
-								<Button
-									type="button"
-									color="warning"
-									variant="light"
-									className="rounded-md"
-									onPress={() => {
-										reset();
-									}}
-								>
-									Reset
-								</Button>
-								<Button
-									type="button"
-									color="danger"
-									className="rounded-md"
-									onPress={() => {
-										onClose();
-										reset();
-									}}
-								>
-									Cancel
-								</Button>
-								{caseStudy && (
+									{caseStudy && (
+										<DeleteWarningModal
+											buttonText="Delete Case Study"
+											onDeleteCallback={onDelete}
+											onCloseCallback={() =>
+												setDeleteError(null)
+											}
+											deleteError={deleteError}
+											type="study"
+										/>
+									)}
+								</div>
+								<div className="flex gap-4">
+									{isDirty && (
+										<Button
+											type="button"
+											color="warning"
+											variant="light"
+											className="rounded-md fade-in"
+											onPress={() => {
+												reset();
+											}}
+										>
+											Reset
+										</Button>
+									)}
+									{caseStudy && (
+										<Button
+											type="button"
+											color={
+												published ? "danger" : "success"
+											}
+											className="rounded-md"
+											onPress={() => {}}
+										>
+											{published
+												? "Unpublish"
+												: "Publish"}
+										</Button>
+									)}
 									<Button
 										type="button"
-										color={published ? "danger" : "success"}
-										className="rounded-md"
-										onPress={() => {}}
+										isDisabled={!isDirty}
+										onPress={() =>
+											handleSubmit((data) =>
+												onSubmit(data)
+											)()
+										}
+										className="bg-orange-600 text-white rounded-md"
 									>
-										{published ? "Unpublish" : "Publish"}
+										Save
 									</Button>
-								)}
-								<Button
-									type="button"
-									onPress={() =>
-										handleSubmit((data) => onSubmit(data))()
-									}
-									className="bg-orange-600 text-white rounded-md"
-								>
-									Save
-								</Button>
+								</div>
 							</ModalFooter>
 						</>
 					)}
