@@ -158,13 +158,6 @@ const AddUserButtonModal = () => {
 										<div className="text-center bg-white text-black p-2 rounded-xl">
 											{password}
 										</div>
-										<Button
-											color="danger"
-											variant="light"
-											onPress={handleClose}
-										>
-											Close
-										</Button>
 									</div>
 								)}
 
