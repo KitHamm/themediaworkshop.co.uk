@@ -7,6 +7,7 @@ import { useMessageState } from "./MessageStateProvider";
 import { updateMessage } from "@/server/messageActions/updateMessage";
 // components
 import DeleteMessageModal from "./DeleteMessageModal";
+import Link from "next/link";
 
 const DesktopViewMessage = () => {
 	const { selectedMessage, setSelectedMessage } = useMessageState();
@@ -34,36 +35,36 @@ const DesktopViewMessage = () => {
 
 	return (
 		<>
-			<div className="flex w-full gap-6 p-4">
+			<div className="flex w-full gap-6 p-4 items-center">
 				<div className="font-bold">Actions:</div>
-				<div
+				<button
 					onClick={onOpenChange}
 					className="text-red-400 cursor-pointer"
 				>
 					Delete
-				</div>
-				<div
+				</button>
+				<button
 					onClick={onUpdateMessage}
 					className="text-orange-600 cursor-pointer"
 				>
 					Mark as unread
-				</div>
-				<a
+				</button>
+				<Link
 					href={"mailto:" + selectedMessage.email}
 					className="text-green-400"
 				>
 					Reply
-				</a>
+				</Link>
 				<div className="flex grow justify-end">
-					<div
+					<button
 						onClick={onCloseMessage}
 						className="transition-all flex hover:bg-neutral-800 rounded-full p-1"
 					>
 						<i
 							aria-hidden
-							className="fa-regular text-neutral-400 hover:text-neutral-500 m-auto cursor-pointer text-3xl fa-circle-xmark"
+							className="fa-regular text-neutral-400 hover:text-neutral-500 m-auto text-3xl fa-circle-xmark"
 						/>
-					</div>
+					</button>
 				</div>
 			</div>
 			<div>
