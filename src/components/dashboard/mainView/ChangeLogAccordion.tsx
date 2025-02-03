@@ -60,13 +60,13 @@ const ChangeLogAccordion = () => {
 							<li>
 								-{" "}
 								<span className="text-orange-600">Updated</span>{" "}
-								used packages to latest stable versions.
+								current used packages to latest stable versions.
 							</li>
 							<li>
 								-{" "}
 								<span className="text-orange-600">Updated</span>{" "}
-								mail routing so use MailerSend api as
-								notification emails were not sending.
+								mail routing to use MailerSend api. This fixes
+								notification emails not sending.
 							</li>
 							<li>
 								-{" "}
@@ -91,6 +91,10 @@ const ChangeLogAccordion = () => {
 									Reliability and Maintainability
 								</span>{" "}
 								updates.
+							</li>
+							<li>
+								- <span className="text-orange-600">SEO</span>{" "}
+								and OpenGraph updates and improvements.
 							</li>
 						</ul>
 					</div>
