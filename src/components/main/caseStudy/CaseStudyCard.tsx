@@ -90,7 +90,14 @@ const CaseStudyCard = ({
 										"/videos/" +
 										caseStudy.video
 									}
-								/>
+								>
+									<track
+										kind="captions"
+										srcLang="en"
+										label="English"
+										default
+									/>
+								</video>
 								{caseStudy.videoThumbnail && (
 									<button
 										onClick={onOpenChangeViewVideo}

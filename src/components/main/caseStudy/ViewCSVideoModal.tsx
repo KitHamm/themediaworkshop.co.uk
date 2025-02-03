@@ -42,13 +42,14 @@ const ViewCSVideoModal = ({
 								"/videos/" +
 								videoURL
 							}
-						/>
-						<track
-							kind="captions"
-							srcLang="en"
-							label="English"
-							default
-						/>
+						>
+							<track
+								kind="captions"
+								srcLang="en"
+								label="English"
+								default
+							/>
+						</video>
 					</>
 				)}
 			</ModalContent>

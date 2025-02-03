@@ -103,13 +103,14 @@ const VideoDisplay = () => {
 												"/videos/" +
 												selectedVideo
 											}
-										/>
-										<track
-											kind="captions"
-											srcLang="en"
-											label="English"
-											default
-										/>
+										>
+											<track
+												kind="captions"
+												srcLang="en"
+												label="English"
+												default
+											/>
+										</video>
 									</div>
 								</ModalBody>
 								<ModalFooter>
