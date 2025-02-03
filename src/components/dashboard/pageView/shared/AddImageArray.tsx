@@ -21,9 +21,9 @@ const AddImageArray = ({
 	const { isOpen, onOpenChange } = useDisclosure();
 
 	const handleReturnURL = (url: string) => {
-		imageAppendSegment && imageAppendSegment({ url: url });
-		imageAppendCaseStudy && imageAppendCaseStudy({ url: url });
-		setValue && setValue("videoThumbnail", url);
+		imageAppendSegment?.({ url });
+		imageAppendCaseStudy?.({ url });
+		setValue?.("videoThumbnail", url);
 		onOpenChange();
 	};
 

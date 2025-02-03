@@ -46,8 +46,8 @@ const TickerTape = ({
 						style={{ height: emblaHeight }}
 						className="embla__container"
 					>
-						{logos.map((image: string, index: number) => (
-							<div className="embla__slide_2 my-0" key={index}>
+						{logos.map((image: string) => (
+							<div className="embla__slide_2 my-0" key={image}>
 								<Image
 									onLoad={(e) => {
 										if (emblaHeight === "auto") {

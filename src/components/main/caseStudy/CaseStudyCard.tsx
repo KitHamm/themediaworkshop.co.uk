@@ -22,6 +22,33 @@ const CaseStudyCard = ({
 	const { isOpen: isOpenViewVideo, onOpenChange: onOpenChangeViewVideo } =
 		useDisclosure();
 
+	let imageContent;
+
+	if (caseStudy.image.length > 0) {
+		if (caseStudy.image.length > 1) {
+			imageContent = (
+				<button onClick={onOpenChangeViewImages}>
+					<EmblaCarouselCaseStudyInner slides={caseStudy.image} />
+				</button>
+			);
+		} else {
+			imageContent = (
+				<Image
+					onClick={onOpenChangeViewImages}
+					width={900}
+					height={500}
+					src={
+						process.env.NEXT_PUBLIC_CDN! +
+						"/images/" +
+						caseStudy.image[0]
+					}
+					alt={caseStudy.image[0]}
+					className="w-full h-auto cursor-pointer"
+				/>
+			);
+		}
+	}
+
 	return (
 		<div
 			key={caseStudy.title + "_" + index}
@@ -51,30 +78,7 @@ const CaseStudyCard = ({
 				</div>
 				<div id="media" className="xl:mt-10">
 					<div id="images" className="my-auto carousel-embla">
-						{caseStudy.image.length > 0 ? (
-							caseStudy.image.length > 1 ? (
-								<button onClick={onOpenChangeViewImages}>
-									<EmblaCarouselCaseStudyInner
-										slides={caseStudy.image}
-									/>
-								</button>
-							) : (
-								<Image
-									onClick={onOpenChangeViewImages}
-									width={900}
-									height={500}
-									src={
-										process.env.NEXT_PUBLIC_CDN! +
-										"/images/" +
-										caseStudy.image[0]
-									}
-									alt={caseStudy.image[0]}
-									className="w-full h-auto cursor-pointer"
-								/>
-							)
-						) : (
-							""
-						)}
+						{imageContent}
 						{caseStudy.video && (
 							<div className="relative">
 								<video

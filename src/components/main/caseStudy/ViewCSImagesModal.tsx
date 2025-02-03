@@ -1,13 +1,6 @@
 "use client";
 // packages
-import {
-	Button,
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-} from "@heroui/react";
+import { Modal, ModalContent } from "@heroui/react";
 import Image from "next/image";
 import { EmblaCarouselCaseStudyView } from "@/Embla/EmblaCarousel";
 

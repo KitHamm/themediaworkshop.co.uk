@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { CircularProgress } from "@heroui/react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { redirect } from "next/navigation";
 
 type FormTypes = {
 	email: string;

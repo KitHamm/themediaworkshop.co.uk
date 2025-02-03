@@ -28,29 +28,27 @@ const VideoModal = ({
 			>
 				<ModalContent>
 					{() => (
-						<>
-							<video
-								playsInline
-								disablePictureInPicture
-								className="-z-10"
-								autoPlay={true}
-								autoFocus={false}
-								id="bg-video"
-								controls={true}
-								src={
-									process.env.NEXT_PUBLIC_CDN +
-									"/videos/" +
-									videoURL
-								}
-							>
-								<track
-									kind="captions"
-									srcLang="en"
-									label="English"
-									default
-								/>
-							</video>
-						</>
+						<video
+							playsInline
+							disablePictureInPicture
+							className="-z-10"
+							autoPlay={true}
+							autoFocus={false}
+							id="bg-video"
+							controls={true}
+							src={
+								process.env.NEXT_PUBLIC_CDN +
+								"/videos/" +
+								videoURL
+							}
+						>
+							<track
+								kind="captions"
+								srcLang="en"
+								label="English"
+								default
+							/>
+						</video>
 					)}
 				</ModalContent>
 			</Modal>

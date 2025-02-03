@@ -67,27 +67,29 @@ const ContactModal = ({ children }: { children: React.ReactNode }) => {
 		try {
 			const res = await createMessage(data);
 			if (res.success) {
-				handleSendingDelay(true);
+				handleSendingDelaySuccess();
 			} else {
 				console.log("Error:", res.error);
-				handleSendingDelay(false);
+				handleSendingDelayError();
 			}
 		} catch (error) {
 			console.log("Unexpected error:", error);
-			handleSendingDelay(false);
+			handleSendingDelayError();
 		}
 	};
 
-	const handleSendingDelay = (success: boolean) => {
+	const handleSendingDelaySuccess = () => {
 		setTimeout(() => {
-			if (success) {
-				setSendingState(MessageSendingState.SUCCESS);
-				reset();
-				handleResetDelay();
-			} else {
-				setSendingState(MessageSendingState.ERROR);
-				reset();
-			}
+			setSendingState(MessageSendingState.SUCCESS);
+			reset();
+			handleResetDelay();
+		}, 2000);
+	};
+
+	const handleSendingDelayError = () => {
+		setTimeout(() => {
+			setSendingState(MessageSendingState.ERROR);
+			reset();
 		}, 2000);
 	};
 
@@ -100,7 +102,7 @@ const ContactModal = ({ children }: { children: React.ReactNode }) => {
 	const contactModalValue = useMemo(() => ({ onOpenChange }), [onOpenChange]);
 
 	return (
-		<ContactModalContext.Provider value={{ onOpenChange }}>
+		<ContactModalContext.Provider value={contactModalValue}>
 			{children}
 			<Modal
 				size="2xl"

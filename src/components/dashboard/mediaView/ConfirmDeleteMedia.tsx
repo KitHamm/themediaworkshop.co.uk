@@ -119,41 +119,34 @@ const ConfirmDeleteMedia = ({
 															{error.type}
 														</div>
 														{error.caseTitle && (
-															<>
-																<div>
-																	<strong>
-																		Case
-																		Study:{" "}
-																	</strong>
-																	{
-																		error.caseTitle
-																	}
-																</div>
-															</>
+															<div>
+																<strong>
+																	Case Study:{" "}
+																</strong>
+																{
+																	error.caseTitle
+																}
+															</div>
 														)}
 														{error.segmentTitle && (
-															<>
-																<div>
-																	<strong>
-																		Segment:{" "}
-																	</strong>
-																	{
-																		error.segmentTitle
-																	}
-																</div>
-															</>
+															<div>
+																<strong>
+																	Segment:{" "}
+																</strong>
+																{
+																	error.segmentTitle
+																}
+															</div>
 														)}
 														{error.pageTitle && (
-															<>
-																<div>
-																	<strong>
-																		Page:{" "}
-																	</strong>
-																	{
-																		error.pageTitle
-																	}
-																</div>
-															</>
+															<div>
+																<strong>
+																	Page:{" "}
+																</strong>
+																{
+																	error.pageTitle
+																}
+															</div>
 														)}
 													</div>
 												);

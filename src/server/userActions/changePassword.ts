@@ -15,7 +15,7 @@ export async function changePassword(data: UserPasswordFormTypes) {
 			},
 		});
 
-		if (!changeUser || !changeUser.password) {
+		if (!changeUser?.password) {
 			return createResponse(false, null, "User not found.");
 		}
 

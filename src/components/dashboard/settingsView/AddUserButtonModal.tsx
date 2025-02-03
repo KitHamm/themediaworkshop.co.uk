@@ -30,7 +30,6 @@ const AddUserButtonModal = () => {
 		formState: { errors },
 		reset,
 		watch,
-		getValues,
 		setValue,
 	} = useForm<UserFormTypes>({
 		defaultValues: {

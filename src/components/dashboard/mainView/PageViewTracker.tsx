@@ -109,31 +109,28 @@ const PageViewTracker = ({ requests }: { requests: serviceRequest[] }) => {
 	};
 
 	return (
-		<>
-			<TooltipNextUI
-				offset={-20}
-				closeDelay={0}
-				className="dark"
-				content={
-					<div className="max-w-72">
-						<div className="text-xl w-full border-b pb-2 mb-2">
-							Page View
-						</div>
-						<div>
-							Here you can see how many times each page has been
-							loaded. This does not work as a tracker and does not
-							use cookies. It is an anonymous click event that is
-							saved to the database. Data shown is over a 7 day
-							period.
-						</div>
+		<TooltipNextUI
+			offset={-20}
+			closeDelay={0}
+			className="dark"
+			content={
+				<div className="max-w-72">
+					<div className="text-xl w-full border-b pb-2 mb-2">
+						Page View
 					</div>
-				}
-			>
-				<div className="mt-6 mb-10 cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
-					<Line options={options} data={chartData} />
+					<div>
+						Here you can see how many times each page has been
+						loaded. This does not work as a tracker and does not use
+						cookies. It is an anonymous click event that is saved to
+						the database. Data shown is over a 7 day period.
+					</div>
 				</div>
-			</TooltipNextUI>
-		</>
+			}
+		>
+			<div className="mt-6 mb-10 cursor-help min-h-72 bg-zinc-900 shadow-xl border border-orange-600 p-2 rounded-xl">
+				<Line options={options} data={chartData} />
+			</div>
+		</TooltipNextUI>
 	);
 };
 

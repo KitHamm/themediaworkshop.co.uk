@@ -1,8 +1,7 @@
 "use client";
 
 import { UserWithoutPassword } from "@/lib/types";
-import { Avatar, Button, useDisclosure } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { Avatar } from "@heroui/react";
 import EditUser from "./EditUserModal";
 import DeleteUser from "./DeleteUserWarningModal";
 

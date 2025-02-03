@@ -22,14 +22,16 @@ const ParallaxImage = ({
 				setContainerHeight
 			);
 			headerImageEl.current.classList.replace("opacity-0", "fade-in");
-			window.addEventListener("scroll", () =>
-				parallaxOnScroll(
-					headerImageContainerEl.current!,
-					headerImageEl.current!,
-					setParallaxValue,
-					setContainerHeight
-				)
-			);
+			window.addEventListener("scroll", () => {
+				if (headerImageContainerEl.current && headerImageEl.current) {
+					parallaxOnScroll(
+						headerImageContainerEl.current,
+						headerImageEl.current,
+						setParallaxValue,
+						setContainerHeight
+					);
+				}
+			});
 		}
 	}, []);
 
