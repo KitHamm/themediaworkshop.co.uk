@@ -59,6 +59,12 @@ const VideoPreview = ({ videoUrl }: Readonly<{ videoUrl: string }>) => {
 										videoUrl
 									}
 								/>
+								<track
+									kind="captions"
+									srcLang="en"
+									label="English"
+									default
+								/>
 							</ModalBody>
 							<ModalFooter>
 								<Button
