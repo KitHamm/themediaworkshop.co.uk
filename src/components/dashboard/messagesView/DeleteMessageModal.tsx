@@ -26,7 +26,8 @@ const DeleteMessageModal = ({
 	onOpenChange: () => void;
 	onClose: () => void;
 }>) => {
-	const { setSelectedMessage } = useMessageState();
+	const { setSelectedMessage, multipleMessagesIDs, setMultipleMessagesIDs } =
+		useMessageState();
 
 	const onDelete = async () => {
 		try {
@@ -34,6 +35,11 @@ const DeleteMessageModal = ({
 			if (res.success) {
 				onClose();
 				setSelectedMessage(null);
+				if (multipleMessagesIDs.includes(message.id)) {
+					setMultipleMessagesIDs(
+						multipleMessagesIDs.filter((id) => id !== message.id)
+					);
+				}
 			} else {
 				console.log("Error:", res.error);
 			}
