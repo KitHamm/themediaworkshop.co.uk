@@ -69,7 +69,7 @@ const DesktopMessageCard = ({ message }: Readonly<{ message: Message }>) => {
 	return (
 		<button
 			onClick={() => onOpenMessage(message.read)}
-			className={`${messageCardClass} fade-in py-6 px-4 flex gap-6 border-b border-black w-full hover:bg-neutral-500 transition-all`}
+			className={`${messageCardClass} text-start fade-in py-6 px-4 flex gap-6 border-b border-black w-full hover:bg-neutral-500 transition-all`}
 		>
 			<div className="flex gap-2">
 				<Checkbox
