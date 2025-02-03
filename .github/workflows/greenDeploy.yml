@@ -51,7 +51,7 @@ jobs:
                         npm install || { echo "NPM install failed"; exit 1; }
 
                         echo "Stopping pm2 process..."
-                        pm2 stop stagingthemediaworkshop.co.uk || { echo "Failed to stop pm2 process"; exit 1; }
+                        pm2 stop staging || { echo "Failed to stop pm2 process"; exit 1; }
 
                         echo "Building project..."
                         npm run build
@@ -61,7 +61,7 @@ jobs:
                         fi
 
                         echo "Starting pm2 process..."
-                        pm2 start 3 || { echo "Failed to stop pm2 process"; exit 1; }
+                        pm2 start staging || { echo "Failed to stop pm2 process"; exit 1; }
 
                         echo "Deployment completed successfully."
                         echo "Ready for blue deployment."
