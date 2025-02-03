@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 		const videoBuffer = Buffer.from(await file.arrayBuffer());
 		// get metadata
 		const [baseName, extension] = file.name.split(".");
-		const timestamp = new Date().toISOString().replace(/:|\./g, "-");
+		const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 		const sanitizedBaseName = baseName.split("-")[0].replace(/\s+/g, "-");
 		const videoName = `${sanitizedBaseName}-${timestamp}.${extension}`;
 		const videoKey = `videos/${videoName}`;

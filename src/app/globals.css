@@ -317,17 +317,6 @@ video {
 	width: 4rem;
 	height: 4rem;
 }
-
-.embla__button {
-	z-index: 1;
-	color: var(--background-site);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	width: 4rem;
-	height: 4rem;
-}
 .embla__button:disabled {
 	opacity: 0.3;
 }
@@ -339,12 +328,16 @@ video {
 	-webkit-appearance: none;
 	background-color: transparent;
 	touch-action: manipulation;
-	display: inline-flex;
-	text-decoration: none;
+	display: flex;
+	align-items: center;
 	cursor: pointer;
 	border: 0;
 	padding: 0;
 	margin: 0;
+	width: 2.4rem;
+	height: 2.4rem;
+	margin-right: 0.75rem;
+	margin-left: 0.75rem;
 }
 .embla__dots {
 	z-index: 1;
@@ -356,14 +349,7 @@ video {
 	justify-content: center;
 	align-items: center;
 }
-.embla__dot {
-	width: 2.4rem;
-	height: 2.4rem;
-	display: flex;
-	align-items: center;
-	margin-right: 0.75rem;
-	margin-left: 0.75rem;
-}
+
 .embla__dot:after {
 	background: var(--background-site);
 	border-radius: 0.2rem;
