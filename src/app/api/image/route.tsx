@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 		const date = new Date();
 		const baseName = file.name.split(".")[0].replace(" ", "-");
 		const type = file.name.split("_")[0];
-		const formattedDate = date.toISOString().replace(/:|\./g, "-");
+		const formattedDate = date.toISOString().replace(/[:.]/g, "-");
 		const formattedName = `${baseName
 			.split("-")[0]
 			.replace(" ", "_")}-${formattedDate}.webp`;

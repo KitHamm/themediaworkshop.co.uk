@@ -8,9 +8,11 @@ const ScrollChevrons = () => {
 	const chevron = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		window.addEventListener("scroll", () =>
-			handleChevronOnScroll(chevron.current!)
-		);
+		window.addEventListener("scroll", () => {
+			if (chevron.current) {
+				handleChevronOnScroll(chevron.current);
+			}
+		});
 		setTimeout(() => {
 			if (document.body.getBoundingClientRect().top === 0) {
 				chevron.current?.classList.replace("opacity-0", "opacity-100");

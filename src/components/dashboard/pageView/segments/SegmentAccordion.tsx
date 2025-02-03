@@ -1,6 +1,6 @@
 "use client";
 // packages
-import { Children, useRef, createContext, useContext } from "react";
+import { Children, useRef, createContext, useContext, useMemo } from "react";
 
 const accordionBaseHeight = "3.5rem";
 
@@ -19,20 +19,23 @@ const SegmentAccordion = ({
 }>) => {
 	const accordionItem = useRef<HTMLDivElement[]>([]);
 
-	const toggleAccordion = (index: number) => {
-		const items = accordionItem.current;
-		items.forEach((item, i) => {
-			if (i === index) {
-				if (item.style.height === accordionBaseHeight) {
-					item.style.height = `${item.scrollHeight}px`;
+	const toggleAccordion = useMemo(
+		() => (index: number) => {
+			const items = accordionItem.current;
+			items.forEach((item, i) => {
+				if (i === index) {
+					if (item.style.height === accordionBaseHeight) {
+						item.style.height = `${item.scrollHeight}px`;
+					} else {
+						item.style.height = accordionBaseHeight;
+					}
 				} else {
 					item.style.height = accordionBaseHeight;
 				}
-			} else {
-				item.style.height = accordionBaseHeight;
-			}
-		});
-	};
+			});
+		},
+		[]
+	);
 
 	return (
 		<div id="segment-accordion" className="mb-10">

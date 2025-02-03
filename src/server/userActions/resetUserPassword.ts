@@ -18,7 +18,7 @@ export async function resetUserPassword(data: ResetUserPasswordFormType) {
 			},
 		});
 
-		if (!admin || !admin.password) {
+		if (!admin?.password) {
 			return createResponse(false, null, "Admin not found.");
 		}
 

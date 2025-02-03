@@ -13,8 +13,7 @@ import {
 	useDisclosure,
 } from "@heroui/react";
 import { Role } from "@prisma/client";
-import { Session } from "next-auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import ResetPassword from "./ResetPasswordModal";
 import ChangePassword from "./ChangePasswordModal";

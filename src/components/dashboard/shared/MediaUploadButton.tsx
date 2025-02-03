@@ -35,13 +35,15 @@ const MediaUploadButton = ({
 				e.dataTransfer.files[0],
 				mediaType
 			);
+
 			if (success) {
 				setImageToUpload(e.dataTransfer.files[0]);
 				setUploadState(UploadState.READY);
-			} else {
-				if (returnError) {
-					returnError(message);
-				}
+				return;
+			}
+
+			if (returnError) {
+				returnError(message);
 			}
 		}
 	};
@@ -52,13 +54,15 @@ const MediaUploadButton = ({
 				e.target.files[0],
 				mediaType
 			);
+
 			if (success) {
 				setImageToUpload(e.target.files[0]);
 				setUploadState(UploadState.READY);
-			} else {
-				if (returnError) {
-					returnError(message);
-				}
+				return;
+			}
+
+			if (returnError) {
+				returnError(message);
 			}
 		}
 	};

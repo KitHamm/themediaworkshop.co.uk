@@ -36,13 +36,7 @@ const MobileNavLink = ({
 				<Badge
 					placement="top-right"
 					color="danger"
-					isInvisible={
-						unreadMessages
-							? unreadMessages < 1
-								? true
-								: false
-							: true
-					}
+					isInvisible={!unreadMessages || unreadMessages < 1}
 					content={unreadMessages}
 				>
 					<></>

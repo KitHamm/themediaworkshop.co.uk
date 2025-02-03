@@ -17,10 +17,10 @@ const MobileUserTable = ({
 	return (
 		<div className="xl:hidden">
 			<Accordion className="dark" variant="splitted">
-				{users.map((user: UserWithoutPassword, index: number) => {
+				{users.map((user: UserWithoutPassword) => {
 					return (
 						<AccordionItem
-							key={index}
+							key={user.id}
 							aria-label={user.firstname + " " + user.lastname}
 							startContent={
 								<Avatar

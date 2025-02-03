@@ -23,8 +23,8 @@ export const EmblaCarouselCaseStudyInner = ({
 		<div className="embla">
 			<div className="embla__viewport" ref={emblaRef}>
 				<div className="embla__container">
-					{slides.map((image: string, index: number) => (
-						<div className="embla__slide w-full h-auto" key={index}>
+					{slides.map((image: string) => (
+						<div className="embla__slide w-full h-auto" key={image}>
 							<Image
 								className="embla__slide__img cursor-pointer"
 								width={900}
@@ -77,8 +77,8 @@ export const EmblaCarouselCaseStudyView = ({
 			{/* </div> */}
 			<div className="embla__viewport" ref={emblaRef}>
 				<div className="embla__container">
-					{slides.map((image: string, index: number) => (
-						<div className="embla__slide w-full h-auto" key={index}>
+					{slides.map((image: string) => (
+						<div className="embla__slide w-full h-auto" key={image}>
 							<Image
 								className="embla__slide__img cursor-pointer"
 								width={900}

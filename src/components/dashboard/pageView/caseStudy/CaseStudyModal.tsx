@@ -150,7 +150,7 @@ const CaseStudyModal = ({
 						<>
 							<ModalHeader>
 								<div className="w-full text-center text-3xl font-bold text-orange-600">
-									{title ? title : "Unnamed Case Study"}
+									{title || "Unnamed Case Study"}
 								</div>
 							</ModalHeader>
 							<ModalBody className="light">

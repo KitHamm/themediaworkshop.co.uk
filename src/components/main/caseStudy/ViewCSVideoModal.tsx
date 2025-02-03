@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Button,
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-} from "@heroui/react";
+import { Modal, ModalContent } from "@heroui/react";
 
 const ViewCSVideoModal = ({
 	isOpen,
@@ -29,28 +22,24 @@ const ViewCSVideoModal = ({
 		>
 			<ModalContent>
 				{(onClose) => (
-					<>
-						<video
-							playsInline
-							disablePictureInPicture
-							id="bg-video"
-							className="h-auto w-full fade-in"
-							autoPlay={true}
-							controls
-							src={
-								process.env.NEXT_PUBLIC_CDN +
-								"/videos/" +
-								videoURL
-							}
-						>
-							<track
-								kind="captions"
-								srcLang="en"
-								label="English"
-								default
-							/>
-						</video>
-					</>
+					<video
+						playsInline
+						disablePictureInPicture
+						id="bg-video"
+						className="h-auto w-full fade-in"
+						autoPlay={true}
+						controls
+						src={
+							process.env.NEXT_PUBLIC_CDN + "/videos/" + videoURL
+						}
+					>
+						<track
+							kind="captions"
+							srcLang="en"
+							label="English"
+							default
+						/>
+					</video>
 				)}
 			</ModalContent>
 		</Modal>

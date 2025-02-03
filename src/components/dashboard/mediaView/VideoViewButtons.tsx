@@ -10,6 +10,11 @@ const selectionOptions: { label: string; value: "HEADER" | "VIDEO" }[] = [
 
 const VideoViewButtons = () => {
 	const { videoView, setVideoView } = useMediaState();
+
+	if (setVideoView === null) {
+		throw new Error("Component should be in media context.");
+	}
+
 	return (
 		<>
 			{selectionOptions.map((option) => (

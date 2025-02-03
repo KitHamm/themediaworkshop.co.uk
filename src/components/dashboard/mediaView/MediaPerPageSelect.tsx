@@ -14,27 +14,35 @@ const MediaPerPageSelect = ({
 	perPage?: number;
 	setPerPage?: Dispatch<SetStateAction<number>>;
 }>) => {
-	const { getMediaPerPage, setMediaPerPage } = useMediaState();
+	const { imagesPerPage, videosPerPage, setImagesPerPage, setVideosPerPage } =
+		useMediaState();
 	const label = image ? "Images" : "Videos";
 
+	const errorString = "Component needs to be in media context or set props";
+
 	const handleGetMediaPerPage = () => {
-		if (getMediaPerPage) {
-			return getMediaPerPage(image).toString();
-		} else if (perPage) {
+		if (imagesPerPage != null && videosPerPage != null) {
+			return image ? imagesPerPage : videosPerPage;
+		}
+
+		if (perPage != null) {
 			return perPage.toString();
 		}
-		throw "Component needs to be in media context or set perPage props";
+
+		throw new Error(errorString);
 	};
 
-	const handleSetPerPage = (value: number, isImage: boolean) => {
-		if (setMediaPerPage) {
-			setMediaPerPage(value, isImage);
-			return;
-		} else if (setPerPage) {
+	const handleSetPerPage = (value: number) => {
+		if (setImagesPerPage != null && setVideosPerPage != null) {
+			return image ? setImagesPerPage(value) : setVideosPerPage(value);
+		}
+
+		if (setPerPage != null) {
 			setPerPage(value);
 			return;
 		}
-		throw "Component needs to be in media context or set setPerPage props";
+
+		throw new Error(errorString);
 	};
 
 	return (
@@ -47,7 +55,7 @@ const MediaPerPageSelect = ({
 			selectedKeys={[handleGetMediaPerPage()]}
 			labelPlacement="outside"
 			label={`${label} Per Page`}
-			onChange={(e) => handleSetPerPage(parseInt(e.target.value), image)}
+			onChange={(e) => handleSetPerPage(parseInt(e.target.value))}
 		>
 			<SelectItem className="dark" key={8} value={8}>
 				8

@@ -18,43 +18,58 @@ const MediaPaginationControl = ({
 	getPage?: number;
 	setPage?: Dispatch<SetStateAction<number>>;
 }>) => {
-	const { getMediaLength, getMediaPage, setMediaPage, getMediaPerPage } =
-		useMediaState();
+	const {
+		selectedImages,
+		selectedVideos,
+		imagesPerPage,
+		videosPerPage,
+		imagePage,
+		videoPage,
+		setImagePage,
+		setVideoPage,
+	} = useMediaState();
 
 	const warningString =
 		"Component needs to be in media provider or have props set.";
 
 	const handleGetMediaLength = () => {
-		if (getMediaLength) {
-			return getMediaLength(image);
-		} else if (getLength) {
+		if (selectedImages != null && selectedVideos != null) {
+			return image ? selectedImages.length : selectedVideos.length;
+		}
+
+		if (getLength) {
 			return getLength;
 		}
 		throw warningString;
 	};
 
 	const handleGetMediaPerPage = () => {
-		if (getMediaPerPage) {
-			return getMediaPerPage(image);
-		} else if (getPerPage) {
+		if (imagesPerPage != null && videosPerPage != null) {
+			return image ? imagesPerPage : videosPerPage;
+		}
+
+		if (getPerPage) {
 			return getPerPage;
 		}
 		throw warningString;
 	};
 
 	const handleGetPage = () => {
-		if (getMediaPage) {
-			return getMediaPage(image);
-		} else if (getPage) {
+		if (imagePage != null && videoPage != null) {
+			return image ? imagePage : videoPage;
+		}
+
+		if (getPage) {
 			return getPage;
 		}
 		throw warningString;
 	};
 
 	const handleSetMediaPage = (page: number) => {
-		if (setMediaPage) {
-			return setMediaPage(page, image);
-		} else if (setPage) {
+		if (setImagePage != null && setVideoPage != null) {
+			return image ? setImagePage(page) : setVideoPage(page);
+		}
+		if (setPage) {
 			return setPage(page);
 		}
 		throw warningString;
