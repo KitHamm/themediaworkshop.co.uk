@@ -17,6 +17,11 @@ const selectionOptions: {
 
 const ImageViewButtons = () => {
 	const { imageView, setImageView } = useMediaState();
+
+	if (setImageView === null) {
+		throw new Error("Component should be in media context.");
+	}
+
 	return (
 		<>
 			{selectionOptions.map((option) => (

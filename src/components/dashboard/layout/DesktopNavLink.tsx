@@ -28,13 +28,7 @@ const DesktopNavLink = ({
 		>
 			{page === "messages" ? (
 				<Badge
-					isInvisible={
-						unreadMessages
-							? unreadMessages < 1
-								? true
-								: false
-							: true
-					}
+					isInvisible={!unreadMessages || unreadMessages < 1}
 					content={unreadMessages}
 					color="danger"
 				>

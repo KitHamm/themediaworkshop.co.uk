@@ -14,24 +14,32 @@ const MediaSortBySelect = ({
 	getSortBy?: string;
 	setSortBy?: Dispatch<SetStateAction<string>>;
 }>) => {
-	const { getSortMediaBy, setSortMediaBy } = useMediaState();
+	const { sortImagesBy, sortVideosBy, setSortImagesBy, setSortVideosBy } =
+		useMediaState();
+
+	const errorString =
+		"Component needs to be in media provider or have props set.";
 
 	const handleGetSortBy = () => {
-		if (getSortMediaBy) {
-			return getSortMediaBy(image);
-		} else if (getSortBy) {
+		if (sortImagesBy != null && sortVideosBy != null) {
+			return image ? sortImagesBy : sortVideosBy;
+		}
+
+		if (getSortBy) {
 			return getSortBy;
 		}
-		throw "Component needs to be in media provider or have getSortBy by props";
+		throw new Error(errorString);
 	};
 
 	const handleSetSortBy = (value: string) => {
-		if (setSortMediaBy) {
-			return setSortMediaBy(value, image);
-		} else if (setSortBy) {
+		if (setSortImagesBy != null && setSortVideosBy != null) {
+			return image ? setSortImagesBy(value) : setSortVideosBy(value);
+		}
+
+		if (setSortBy) {
 			return setSortBy(value);
 		}
-		throw "Component needs to be in media provider or have setSortBy by props";
+		throw new Error(errorString);
 	};
 	return (
 		<Select

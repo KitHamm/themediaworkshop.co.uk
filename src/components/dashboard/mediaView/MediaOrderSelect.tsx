@@ -14,24 +14,31 @@ const MediaOrderSelect = ({
 	getOrderBy?: string;
 	setOrderBy?: Dispatch<SetStateAction<string>>;
 }>) => {
-	const { setMediaOrderBy, getMediaOrderBy } = useMediaState();
+	const { orderImages, orderVideos, setOrderImages, setOrderVideos } =
+		useMediaState();
+
+	const errorString =
+		"Component needs to be in media provider or have props set.";
 
 	const handleGetOrderBy = () => {
-		if (getMediaOrderBy) {
-			return getMediaOrderBy(image);
-		} else if (getOrderBy) {
+		if (orderImages != null && orderVideos != null) {
+			return image ? orderImages : orderVideos;
+		}
+
+		if (getOrderBy) {
 			return getOrderBy;
 		}
-		throw "Component needs to be in media provider or have getOrderBy props set.";
+		throw new Error(errorString);
 	};
 
 	const handleSetOrderBy = (value: string) => {
-		if (setMediaOrderBy) {
-			return setMediaOrderBy(value, image);
-		} else if (setOrderBy) {
+		if (setOrderImages != null && setOrderVideos != null) {
+			return image ? setOrderImages(value) : setOrderVideos(value);
+		}
+		if (setOrderBy) {
 			return setOrderBy(value);
 		}
-		throw "Component needs to be in media provider or have setOrderBy props set.";
+		throw new Error(errorString);
 	};
 
 	return (

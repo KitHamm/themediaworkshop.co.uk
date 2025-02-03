@@ -13,7 +13,13 @@ type MediaContextType = {
 	videoView: "HEADER" | "VIDEO";
 	setVideoView: React.Dispatch<React.SetStateAction<"HEADER" | "VIDEO">>;
 	videosPerPage: number;
+	setVideosPerPage: React.Dispatch<React.SetStateAction<number>>;
 	videoPage: number;
+	setVideoPage: React.Dispatch<React.SetStateAction<number>>;
+	sortVideosBy: string;
+	setSortVideosBy: React.Dispatch<React.SetStateAction<string>>;
+	orderVideos: string;
+	setOrderVideos: React.Dispatch<React.SetStateAction<string>>;
 	selectedImages: Images[];
 	imageView: "SEGHEAD" | "SEGMENT" | "STUDY" | "LOGO" | "THUMBNAIL";
 	setImageView: React.Dispatch<
@@ -22,16 +28,13 @@ type MediaContextType = {
 		>
 	>;
 	imagesPerPage: number;
+	setImagesPerPage: React.Dispatch<React.SetStateAction<number>>;
 	imagePage: number;
-	setMediaPerPage: (value: number, isImage: boolean) => void;
-	getMediaPerPage: (isImage: boolean) => number;
-	setSortMediaBy: (value: string, isImage: boolean) => void;
-	getSortMediaBy: (isImage: boolean) => string;
-	setMediaOrderBy: (value: string, isImage: boolean) => void;
-	getMediaOrderBy: (isImage: boolean) => string;
-	getMediaLength: (isImage: boolean) => number;
-	getMediaPage: (isImage: boolean) => number;
-	setMediaPage: (value: number, isImage: boolean) => void;
+	setImagePage: React.Dispatch<React.SetStateAction<number>>;
+	sortImagesBy: string;
+	setSortImagesBy: React.Dispatch<React.SetStateAction<string>>;
+	orderImages: string;
+	setOrderImages: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const MediaStateContext = createContext<MediaContextType>(
@@ -87,78 +90,6 @@ const MediaStateProvider = ({
 	const [sortImagesBy, setSortImagesBy] = useState("date");
 	const [orderImages, setOrderImages] = useState("desc");
 
-	const setMediaPerPage = (value: number, isImage: boolean) => {
-		if (isImage) {
-			setImagesPerPage(value);
-		} else {
-			setVideosPerPage(value);
-		}
-	};
-
-	const getMediaPerPage = (isImage: boolean) => {
-		if (isImage) {
-			return imagesPerPage;
-		} else {
-			return videosPerPage;
-		}
-	};
-
-	const setSortMediaBy = (value: string, isImage: boolean) => {
-		if (isImage) {
-			setSortImagesBy(value);
-		} else {
-			setSortVideosBy(value);
-		}
-	};
-
-	const getSortMediaBy = (isImage: boolean) => {
-		if (isImage) {
-			return sortImagesBy;
-		} else {
-			return sortVideosBy;
-		}
-	};
-
-	const setMediaOrderBy = (value: string, isImage: boolean) => {
-		if (isImage) {
-			setOrderImages(value);
-		} else {
-			setOrderVideos(value);
-		}
-	};
-
-	const getMediaOrderBy = (isImage: boolean) => {
-		if (isImage) {
-			return orderImages;
-		} else {
-			return orderVideos;
-		}
-	};
-
-	const getMediaLength = (isImage: boolean) => {
-		if (isImage) {
-			return selectedImages.length;
-		} else {
-			return selectedVideos.length;
-		}
-	};
-
-	const getMediaPage = (isImage: boolean) => {
-		if (isImage) {
-			return imagePage;
-		} else {
-			return videoPage;
-		}
-	};
-
-	const setMediaPage = (value: number, isImage: boolean) => {
-		if (isImage) {
-			setImagePage(value);
-		} else {
-			setVideoPage(value);
-		}
-	};
-
 	// Set Images
 	useEffect(() => {
 		setImagePage(1);
@@ -184,42 +115,48 @@ const MediaStateProvider = ({
 			videoView,
 			setVideoView,
 			videosPerPage,
+			setVideosPerPage,
 			videoPage,
+			setVideoPage,
+			sortVideosBy,
+			setSortVideosBy,
+			orderVideos,
+			setOrderVideos,
 			selectedImages,
 			imageView,
 			setImageView,
 			imagesPerPage,
+			setImagesPerPage,
 			imagePage,
-			setMediaPerPage,
-			getMediaPerPage,
-			setSortMediaBy,
-			getSortMediaBy,
-			setMediaOrderBy,
-			getMediaOrderBy,
-			getMediaLength,
-			getMediaPage,
-			setMediaPage,
+			setImagePage,
+			sortImagesBy,
+			setSortImagesBy,
+			orderImages,
+			setOrderImages,
 		}),
 		[
 			selectedVideos,
 			videoView,
 			setVideoView,
 			videosPerPage,
+			setVideosPerPage,
 			videoPage,
+			setVideoPage,
+			sortVideosBy,
+			setSortVideosBy,
+			orderVideos,
+			setOrderVideos,
 			selectedImages,
 			imageView,
 			setImageView,
 			imagesPerPage,
+			setImagesPerPage,
 			imagePage,
-			setMediaPerPage,
-			getMediaPerPage,
-			setSortMediaBy,
-			getSortMediaBy,
-			setMediaOrderBy,
-			getMediaOrderBy,
-			getMediaLength,
-			getMediaPage,
-			setMediaPage,
+			setImagePage,
+			sortImagesBy,
+			setSortImagesBy,
+			orderImages,
+			setOrderImages,
 		]
 	);
 
@@ -234,25 +171,28 @@ export const useMediaState = () => {
 	const context = useContext(MediaStateContext);
 	if (!context) {
 		return {
-			selectedVideos: [],
-			videoView: "HEADER",
-			setVideoView: () => {},
-			videosPerPage: 8,
-			videoPage: 1,
-			selectedImages: [],
-			imageView: "SEGHEAD",
-			setImageView: () => {},
-			imagesPerPage: 8,
-			imagePage: 1,
-			setMediaPerPage: null,
-			getMediaPerPage: null,
-			setSortMediaBy: null,
-			getSortMediaBy: null,
-			setMediaOrderBy: null,
-			getMediaOrderBy: null,
-			getMediaLength: null,
-			getMediaPage: null,
-			setMediaPage: null,
+			selectedVideos: null,
+			videoView: null,
+			setVideoView: null,
+			videosPerPage: null,
+			setVideosPerPage: null,
+			videoPage: null,
+			setVideoPage: null,
+			sortVideosBy: null,
+			setSortVideosBy: null,
+			orderVideos: null,
+			setOrderVideos: null,
+			selectedImages: null,
+			imageView: null,
+			setImageView: null,
+			imagesPerPage: null,
+			setImagesPerPage: null,
+			imagePage: null,
+			setImagePage: null,
+			sortImagesBy: null,
+			setSortImagesBy: null,
+			orderImages: null,
+			setOrderImages: null,
 		};
 	}
 	return context;

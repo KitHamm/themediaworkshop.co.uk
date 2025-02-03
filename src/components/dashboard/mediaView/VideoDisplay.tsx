@@ -32,6 +32,10 @@ const VideoDisplay = () => {
 		[]
 	);
 
+	if (selectedVideos === null) {
+		throw new Error("Component should be in media context.");
+	}
+
 	const handleOpenPreview = (video: string) => {
 		setSelectedVideo(video);
 		onOpenChange();

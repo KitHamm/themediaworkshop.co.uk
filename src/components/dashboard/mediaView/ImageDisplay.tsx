@@ -32,6 +32,10 @@ const ImageDisplay = () => {
 		[]
 	);
 
+	if (selectedImages === null) {
+		throw new Error("Component should be in media context.");
+	}
+
 	const handleOpenPreview = (image: string) => {
 		setSelectedImage(image);
 		onOpenChange();
