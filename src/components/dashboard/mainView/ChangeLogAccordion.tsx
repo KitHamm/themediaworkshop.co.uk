@@ -10,13 +10,91 @@ const ChangeLogAccordion = () => {
 					aria-hidden
 					className="spin text-green-400 fa-solid fa-certificate my-auto"
 				/>
-				<div className="text-orange-600">V2.0!</div>
+				<div className="text-orange-600">V2.1!</div>
 				<i
 					aria-hidden
 					className="spin text-green-400 fa-solid fa-certificate my-auto"
 				/>
 			</div>
-			<Accordion defaultExpandedKeys={["1"]} variant="splitted">
+			<Accordion defaultExpandedKeys={["2"]} variant="splitted">
+				<AccordionItem
+					className="dark"
+					key={2}
+					aria-label="3/2/2025"
+					title={
+						<div className="flex border-b pb-2 mb-2 gap-4">
+							<div className="text-lg text-orange-600 font-bold">
+								3/2/2025
+							</div>
+							<div className="text-lg text-green-400 font-bold">
+								NEW! V2.1
+							</div>
+						</div>
+					}
+				>
+					<div className="text-lg">
+						<ul>
+							<li>
+								-{" "}
+								<a
+									className="underline"
+									target="_blank"
+									rel="noreferrer"
+									href="https://en.wikipedia.org/wiki/Blue%E2%80%93green_deployment"
+								>
+									<span className="text-blue-600">Blue</span>
+									{" / "}
+									<span className="text-green-600">
+										Green
+									</span>
+								</a>{" "}
+								deployment now means updates have 0 downtime.
+							</li>
+							<li>
+								-{" "}
+								<span className="text-orange-600">
+									Outdated
+								</span>{" "}
+								package dependencies removed.
+							</li>
+							<li>
+								-{" "}
+								<span className="text-orange-600">Updated</span>{" "}
+								used packages to latest stable versions.
+							</li>
+							<li>
+								-{" "}
+								<span className="text-orange-600">Updated</span>{" "}
+								mail routing so use MailerSend api as
+								notification emails were not sending.
+							</li>
+							<li>
+								-{" "}
+								<span className="text-orange-600">Public</span>{" "}
+								pages now use dynamic routing. This reduces
+								bundle size and improves performance.
+							</li>
+							<li>
+								- <span className="text-orange-600">Pages</span>{" "}
+								can be reordered (this affects the navbar as
+								well).
+							</li>
+							<li>
+								- <span className="text-orange-600">Fixed</span>{" "}
+								the weekly traffic chart. (It was showing the
+								data relevant to the last site visit, not the
+								current week).
+							</li>
+							<li>
+								-{" "}
+								<span className="text-orange-600">
+									Reliability and Maintainability
+								</span>{" "}
+								updates.
+							</li>
+						</ul>
+					</div>
+				</AccordionItem>
 				<AccordionItem
 					className="dark"
 					key={1}
@@ -25,9 +103,6 @@ const ChangeLogAccordion = () => {
 						<div className="flex border-b pb-2 mb-2 gap-4">
 							<div className="text-lg text-orange-600 font-bold">
 								3/12/2024
-							</div>
-							<div className="text-lg text-green-400 font-bold">
-								NEW!
 							</div>
 						</div>
 					}

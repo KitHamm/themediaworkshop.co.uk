@@ -26,7 +26,7 @@ const MediaPerPageSelect = ({
 		}
 
 		if (perPage != null) {
-			return perPage.toString();
+			return perPage;
 		}
 
 		throw new Error(errorString);
@@ -52,7 +52,7 @@ const MediaPerPageSelect = ({
 				popoverContent: "bg-neutral-600",
 			}}
 			variant="bordered"
-			selectedKeys={[handleGetMediaPerPage()]}
+			selectedKeys={[handleGetMediaPerPage().toString()]}
 			labelPlacement="outside"
 			label={`${label} Per Page`}
 			onChange={(e) => handleSetPerPage(parseInt(e.target.value))}
