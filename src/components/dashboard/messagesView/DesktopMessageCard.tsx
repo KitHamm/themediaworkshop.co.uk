@@ -39,13 +39,13 @@ const DesktopMessageCard = ({ message }: Readonly<{ message: Message }>) => {
 		}
 	}, [multipleMessagesIDs, message.id]);
 
-	const onOpenMessage = async (messageRead: boolean, value: boolean) => {
+	const onOpenMessage = async (messageRead: boolean) => {
 		if (messageRead) {
 			return setSelectedMessage(message);
 		}
 
 		try {
-			const res = await updateMessage(message.id, value);
+			const res = await updateMessage(message.id, true);
 			if (res.success) {
 				setSelectedMessage(message);
 			} else {
@@ -67,9 +67,9 @@ const DesktopMessageCard = ({ message }: Readonly<{ message: Message }>) => {
 	};
 
 	return (
-		<div
-			onClick={() => onOpenMessage(message.read, true)}
-			className={`${messageCardClass} fade-in py-6 px-4 flex gap-6 border-b border-black cursor-pointer hover:bg-neutral-500 transition-all`}
+		<button
+			onClick={() => onOpenMessage(message.read)}
+			className={`${messageCardClass} fade-in py-6 px-4 flex gap-6 border-b border-black w-full hover:bg-neutral-500 transition-all`}
 		>
 			<div className="flex gap-2">
 				<Checkbox
@@ -108,7 +108,7 @@ const DesktopMessageCard = ({ message }: Readonly<{ message: Message }>) => {
 			>
 				{formatDate(message.createdAt)}
 			</div>
-		</div>
+		</button>
 	);
 };
 

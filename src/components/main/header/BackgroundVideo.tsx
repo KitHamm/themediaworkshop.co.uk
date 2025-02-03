@@ -21,7 +21,9 @@ const BackgroundVideo = ({
 			muted
 			loop
 			src={process.env.NEXT_PUBLIC_CDN + "/videos/" + backgroundVideo}
-		/>
+		>
+			<track kind="captions" srcLang="en" label="English" default />
+		</video>
 	);
 };
 

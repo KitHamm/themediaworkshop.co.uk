@@ -8,7 +8,7 @@ const selectionOptions: { label: string; value: "HEADER" | "VIDEO" }[] = [
 	{ label: "Videos", value: "VIDEO" },
 ];
 
-const VideoViewButtons = ({}: Readonly<{}>) => {
+const VideoViewButtons = () => {
 	const { videoView, setVideoView } = useMediaState();
 	return (
 		<>

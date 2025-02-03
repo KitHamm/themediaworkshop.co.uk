@@ -42,7 +42,14 @@ const VideoModal = ({
 									"/videos/" +
 									videoURL
 								}
-							/>
+							>
+								<track
+									kind="captions"
+									srcLang="en"
+									label="English"
+									default
+								/>
+							</video>
 						</>
 					)}
 				</ModalContent>

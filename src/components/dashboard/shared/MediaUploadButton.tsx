@@ -146,6 +146,7 @@ const MediaUploadButton = ({
 								name="dropzone-file"
 								type="file"
 								className="hidden"
+								aria-label="Select or drag and drop an image file"
 							/>
 						</label>
 					</div>

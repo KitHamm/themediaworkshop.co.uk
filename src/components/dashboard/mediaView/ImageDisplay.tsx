@@ -54,11 +54,11 @@ const ImageDisplay = () => {
 							content={image.name}
 						>
 							<div className="fade-in flex flex-col border rounded border-neutral-800">
-								<div
+								<button
 									onClick={() => {
 										handleOpenPreview(image.name);
 									}}
-									className="cursor-pointer bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full"
+									className="bg-neutral-600 bg-opacity-25 p-4 h-full flex w-full"
 								>
 									<Image
 										height={100}
@@ -75,7 +75,7 @@ const ImageDisplay = () => {
 										alt={image.name}
 										className="w-full h-auto m-auto"
 									/>
-								</div>
+								</button>
 								<div className="bg-neutral-800 bg-opacity-25">
 									<div
 										id={image.name}

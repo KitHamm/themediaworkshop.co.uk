@@ -1,4 +1,4 @@
-const DataError = ({}: Readonly<{}>) => {
+const DataError = () => {
 	return (
 		<main className="min-h-screen flex flex-col gap-4 justify-center items-center">
 			<div className="text-4xl">Unexpected Error</div>

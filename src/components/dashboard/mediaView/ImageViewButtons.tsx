@@ -15,7 +15,7 @@ const selectionOptions: {
 	{ label: "Logos", value: "LOGO" },
 ];
 
-const ImageViewButtons = ({}: Readonly<{}>) => {
+const ImageViewButtons = () => {
 	const { imageView, setImageView } = useMediaState();
 	return (
 		<>

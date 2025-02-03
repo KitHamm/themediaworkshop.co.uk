@@ -53,11 +53,11 @@ const CaseStudyCard = ({
 					<div id="images" className="my-auto carousel-embla">
 						{caseStudy.image.length > 0 ? (
 							caseStudy.image.length > 1 ? (
-								<div onClick={onOpenChangeViewImages}>
+								<button onClick={onOpenChangeViewImages}>
 									<EmblaCarouselCaseStudyInner
 										slides={caseStudy.image}
 									/>
-								</div>
+								</button>
 							) : (
 								<Image
 									onClick={onOpenChangeViewImages}
@@ -90,11 +90,18 @@ const CaseStudyCard = ({
 										"/videos/" +
 										caseStudy.video
 									}
-								/>
+								>
+									<track
+										kind="captions"
+										srcLang="en"
+										label="English"
+										default
+									/>
+								</video>
 								{caseStudy.videoThumbnail && (
-									<div
+									<button
 										onClick={onOpenChangeViewVideo}
-										className="absolute z-10 bottom-0 w-full h-full flex cursor-pointer"
+										className="absolute z-10 bottom-0 w-full h-full flex"
 									>
 										<Image
 											src={
@@ -107,11 +114,11 @@ const CaseStudyCard = ({
 											height={300}
 											className="h-full w-auto m-auto"
 										/>
-									</div>
+									</button>
 								)}
-								<div
+								<button
 									onClick={onOpenChangeViewVideo}
-									className="transition-all absolute z-20 bg-black hover:bg-opacity-25 bg-opacity-50 bottom-0 w-full h-full flex cursor-pointer"
+									className="transition-all absolute z-20 bg-black hover:bg-opacity-25 bg-opacity-50 bottom-0 w-full h-full flex"
 								>
 									<Image
 										src={"/images/play.png"}
@@ -120,7 +127,7 @@ const CaseStudyCard = ({
 										height={300}
 										className="transition-all h-1/2 w-auto m-auto hover:opacity-100 opacity-85"
 									/>
-								</div>
+								</button>
 							</div>
 						)}
 					</div>
