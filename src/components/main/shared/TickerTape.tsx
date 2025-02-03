@@ -30,7 +30,7 @@ const TickerTape = ({
 				arr.slice(0, Math.ceil(arr.length / 2)),
 				arr.slice(Math.ceil(arr.length / 2)),
 			];
-			var newTemp = splitInHalf(tempArray);
+			const newTemp = splitInHalf(tempArray);
 			setLogos(newTemp[1].concat(newTemp[0]));
 		} else {
 			setLogos(tempArray);
