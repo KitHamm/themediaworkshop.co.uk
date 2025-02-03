@@ -19,22 +19,26 @@ const SegmentAccordion = ({
 }>) => {
 	const accordionItem = useRef<HTMLDivElement[]>([]);
 
-	const toggleAccordion = useMemo(
-		() => (index: number) => {
-			const items = accordionItem.current;
-			items.forEach((item, i) => {
-				if (i === index) {
-					if (item.style.height === accordionBaseHeight) {
-						item.style.height = `${item.scrollHeight}px`;
-					} else {
-						item.style.height = accordionBaseHeight;
-					}
+	const toggleAccordion = (index: number) => {
+		const items = accordionItem.current;
+		items.forEach((item, i) => {
+			if (i === index) {
+				if (item.style.height === accordionBaseHeight) {
+					item.style.height = `${item.scrollHeight}px`;
 				} else {
 					item.style.height = accordionBaseHeight;
 				}
-			});
-		},
-		[]
+			} else {
+				item.style.height = accordionBaseHeight;
+			}
+		});
+	};
+
+	const accordionContextValue = useMemo(
+		() => ({
+			toggleAccordion,
+		}),
+		[toggleAccordion]
 	);
 
 	return (
@@ -51,7 +55,7 @@ const SegmentAccordion = ({
 						className="drop-shadow-lg overflow-hidden transition-all rounded-lg mx-2 mb-2 bg-zinc-800"
 					>
 						<SegmentAccordionContext.Provider
-							value={{ toggleAccordion }}
+							value={accordionContextValue}
 						>
 							{child}
 						</SegmentAccordionContext.Provider>
