@@ -50,11 +50,11 @@ const VideoDisplay = () => {
 							content={video.name.split("-")[0].split("_")[1]}
 						>
 							<div className="flex flex-col border rounded border-neutral-800">
-								<div
+								<button
 									onClick={() => {
 										handleOpenPreview(video.name);
 									}}
-									className="cursor-pointer bg-black bg-opacity-25 p-4 h-full flex w-full"
+									className="bg-black bg-opacity-25 p-4 h-full flex w-full"
 								>
 									<Image
 										height={100}
@@ -63,7 +63,7 @@ const VideoDisplay = () => {
 										alt="play"
 										className="xl:w-full h-auto m-auto"
 									/>
-								</div>
+								</button>
 								<div className="bg-neutral-800 bg-opacity-25">
 									<div className="text-center truncate p-2 h-full">
 										{video.name.split("-")[0].split("_")[1]}
@@ -103,6 +103,12 @@ const VideoDisplay = () => {
 												"/videos/" +
 												selectedVideo
 											}
+										/>
+										<track
+											kind="captions"
+											srcLang="en"
+											label="English"
+											default
 										/>
 									</div>
 								</ModalBody>
