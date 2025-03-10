@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 		const command = new PutObjectCommand({
 			Bucket: bucketName,
 			Key: key,
-			ContentType: "application/octet-stream", // You can set your content type accordingly
+			ContentType: "video/mp4", // You can set your content type accordingly
 		});
 
 		const signedUrl = await getSignedUrl(s3Client, command, {
